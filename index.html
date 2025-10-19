@@ -39,17 +39,6 @@
   .brand-title{font-weight:800;letter-spacing:.08em}
   .todayDate{font-size:.9rem;text-align:center;color:var(--muted);margin-top:6px}
 
-  /* [CSS-TOPBAR WORDMARK] contenitore pronto per SVG */
-.brand-wordmark{
-  display:flex; align-items:center; justify-content:center;
-  line-height:0;
-}
-.wordmark-fallback{
-  font-weight:800; letter-spacing:.08em; color:#fff;
-  /* quando inseriremo l’SVG, questa riga sparirà */
-}
-
-
   /* =========================================================
      [CSS-LAYOUT] Main, barra mese, intestazioni giorni
      ========================================================= */
@@ -351,61 +340,7 @@
         <path d="M32 2c9 6 18 6 30 6v20c0 18-14 30-30 34C16 58 2 46 2 28V8c12 0 21 0 30-6z" fill="none" stroke="#0f4fa3" stroke-width="2"/>
       </svg>
     </div>
-
-    <div class="brand-wordmark" aria-label="Polizia">
-  <!-- Fallback testuale temporaneo; al passo 2 qui metteremo l’SVG -->
-  <svg viewBox="0 0 1920 400" width="420" height="88" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet" style="color: var(--iosBlue)">
-  <defs>
-    <!-- Qui mettiamo SOLO i tracciati delle lettere, niente sfondi -->
-    <symbol id="polizia-word" viewBox="0 0 1920 400">
-      <!-- INCOLLA QUI dal tuo SVG:
-           1) NON copiare il DOCTYPE né l'header XML.
-           2) Elimina il path gigante di sfondo che inizia con:
-              M0 2000 l0 -2000 9600 0 9600 0 ...
-           3) Elimina eventuali <rect> di sfondo.
-           4) Mantieni il gruppo delle lettere, tipicamente:
-              <g transform="translate(0,400) scale(0.1,-0.1)" fill="#000000" stroke="none">
-                ... tanti <path d="..."/> delle lettere ...
-              </g>
-      -->
-      <!-- Esempio di struttura (metti qui il TUO <g> con i path delle lettere) -->
-      <!-- <g transform="translate(0,400) scale(0.1,-0.1)" fill="#000000" stroke="none"> -->
-      <!--   <path d="..."/> -->
-      <!--   ... -->
-      <!-- </g> -->
-    </symbol>
-  </defs>
-
-  <!-- Strato 1: bordo esterno BIANCO spesso -->
-  <use href="#polizia-word" fill="none" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" stroke-linecap="round"></use>
-
-  <!-- Strato 2: bordo interno BLU (uguale alla topbar, grazie a currentColor) -->
-  <use href="#polizia-word" fill="none" stroke="currentColor" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"></use>
-
-  <!-- Strato 3: riempimento BIANCO -->
-  <use href="#polizia-word" fill="#ffffff" stroke="none"></use>
-</svg>
-
-<svg viewBox="0 0 1920 400" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet" style="color: var(--iosBlue)">
-<defs>
-<symbol id="polizia-word" viewBox="0 0 1920 400">
-<g transform="translate(0,400) scale(0.1,-0.1)" fill="#000000" stroke="none">
-<path d="M4655 2695 c50 -10 97 -18 106 -19 25 -3 102 -46 131 -73 36 -34 67 -109 74 -180 13 -124 -33 -345 -101 -491 -66 -141 -193 -238 -342 -262 -32 -6 -270 -10 -529 -10 -360 0 -474 -3 -487 -12 -10 -8 -27 -55 -42 -113 -30 -119 -62 -169 -131 -205 -48 -25 -50 -25 -324 -25 -259 0 -277 1 -310 20 -47 28 -74 77 -73 134 0 25 19 134 42 241 22 107 52 250 66 317 77 372 108 455 198 545 51 51 167 113 232 124 66 12 338 19 835 22 499 3 575 2 655 -13z"/>
-<path d="M11339 2666 c-74 -16 -122 -53 -145 -112 -16 -42 -16 -50 -3 -87 8 -22 27 -50 42 -61 27 -20 42 -21 422 -26 216 -3 396 -8 399 -11 12 -11 -5 -34 -50 -69 -24 -19 -42 -40 -40 -47 3 -7 -1 -10 -7 -7 -11 4 -515 -406 -543 -442 -6 -8 -14 -14 -18 -14 -14 0 -322 -263 -348 -297 -19 -25 -28 -48 -28 -74 0 -49 34 -74 121 -88 87 -15 1511 -15 1598 -1 107 18 166 58 192 133 11 32 11 44 -1 79 -8 23 -28 51 -43 62 -28 20 -40 21 -438 24 -247 2 -409 6 -407 12 2 5 199 172 438 371 239 199 460 383 490 408 83 69 129 119 136 146 10 40 -4 74 -39 95 -31 19 -54 20 -852 19 -602 0 -835 -4 -876 -13z"/>
-<path d="M15254 2680 c-174 -25 -335 -128 -427 -273 -32 -49 -210 -410 -384 -777 -82 -173 -89 -210 -49 -257 l24 -28 284 -6 c155 -3 298 -2 317 2 60 13 84 41 151 172 36 70 75 137 87 149 21 21 29 21 262 21 133 0 244 -3 248 -7 5 -4 10 -65 13 -135 5 -132 16 -168 57 -190 20 -10 194 -15 462 -12 l173 1 39 39 c38 38 39 40 39 113 0 41 -5 155 -10 254 -6 98 -17 316 -25 484 -8 168 -19 321 -25 341 -17 59 -101 119 -150 106 -11 -3 -20 -1 -20 4 0 11 -991 10 -1066 -1z"/>
-</g>
-</symbol>
-</defs>
-
-<use href="#polizia-word" fill="none" stroke="#ffffff" stroke-width="18" stroke-linejoin="round" stroke-linecap="round"></use>
-
-<use href="#polizia-word" fill="none" stroke="currentColor" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"></use>
-
-<use href="#polizia-word" fill="#ffffff" stroke="none"></use>
-</svg>
-
-</div>
-
+    <div class="brand-title">POLIZIA</div>
   </div>
 
   <div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
