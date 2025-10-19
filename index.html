@@ -1216,20 +1216,24 @@ function dbx_bindIconClicks(){
 
 
   // =========================================================
-  // [BLOCK: BOOTSTRAP] DOM ready
-  // =========================================================
-  if(document.readyState==='loading'){
-    window.addEventListener('DOMContentLoaded', boot_init);
-  }else{
-    boot_init();
-  }
-
-  </script>
-
-  <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/turni-pds/sw.js');
+// [BLOCK: BOOTSTRAP] DOM ready
+// =========================================================
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', boot_init);
+} else {
+  boot_init();
 }
+
+// =========================================================
+// [SERVICE WORKER] – cache offline
+// =========================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/turni-pds/service-worker.js', { scope: '/turni-pds/' })
+      .catch(() => {/* meh */});
+  });
+}
+
 </script>
 
 
