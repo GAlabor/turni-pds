@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title> Turni Polizia di Stato </title>
 
+  <link rel="manifest" href="/turni-pds/manifest.webmanifest">
+  <meta name="theme-color" content="#1976d2">
+
+
   <style>
   /* =========================================================
      [CSS-ROOT] Variabili tema e dimensioni standard
@@ -1221,5 +1225,13 @@ function dbx_bindIconClicks(){
   }
 
   </script>
+
+  <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/turni-pds/sw.js');
+}
+</script>
+
+
 </body>
 </html>
