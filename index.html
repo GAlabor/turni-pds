@@ -1,0 +1,1225 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title> Turni Polizia di Stato </title>
+
+  <style>
+  /* =========================================================
+     [CSS-ROOT] Variabili tema e dimensioni standard
+     ========================================================= */
+  :root{
+    --iosBlue:#1976d2; --iosBlue-600:#1565c0;
+    --bg:#f3f5f8; --card:#ffffff; --gridBorder:#d9dee6;
+    --text:#0b1320; --muted:#7a8595;
+    --sunday:#c62828; --today:#cfe3ff;
+    --T-GL:#c68bcf; --T-AP:#a47ac9;      /* colori fissi GL/AP */
+    --fieldH:44px;                        /* altezza campi impostazioni */
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b0c10; --card:#14161a; --gridBorder:#222831; --text:#e6e8ec; --muted:#98a3af; --today:#103a7a }
+  }
+
+  /* =========================================================
+     [CSS-BASE] Reset e tipografia
+     ========================================================= */
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,"Helvetica Neue",Arial}
+
+  /* =========================================================
+     [CSS-TOPBAR] Barra blu + data di oggi
+     ========================================================= */
+  .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;justify-content:center;padding:10px 12px;background:var(--iosBlue);color:#fff}
+  .topbar .brand{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+  .brand-title{font-weight:800;letter-spacing:.08em}
+  .todayDate{font-size:.9rem;text-align:center;color:var(--muted);margin-top:6px}
+
+  /* =========================================================
+     [CSS-LAYOUT] Main, barra mese, intestazioni giorni
+     ========================================================= */
+  main{max-width:760px;margin:8px auto 90px;padding:0 10px}
+  .monthbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin:10px 0 6px}
+  .monthbar .title{text-align:center}
+  .navbtn{appearance:none;border:0;background:transparent;color:var(--iosBlue);font-size:22px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:10px}
+  .navbtn:active{background:rgba(25,118,210,.12)}
+
+  .weekhead{display:grid;grid-template-columns:repeat(7,1fr)}
+  .weekhead div{background:var(--iosBlue);color:#fff;text-align:center;padding:8px 0;border:1px solid var(--iosBlue-600);font-weight:700}
+  .weekhead div+div{border-left-width:0}
+
+  .view{display:none}
+  .view.active{display:block}
+
+  /* =========================================================
+     [CSS-CALENDAR GRID] Celle calendario
+     ========================================================= */
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:minmax(62px,1fr)}
+  .cell{position:relative;min-height:84px;background:var(--card);border:1px solid var(--gridBorder);border-top:0;display:flex;align-items:center;justify-content:center}
+  @media(max-width:560px){.cell{min-height:62px}}
+  .num{position:absolute; right:8px; top:6px;font-size:12px; color:var(--muted);font-weight:800;} /* giorno del mese */
+  .sun .num{color:var(--sunday)}
+  .today{background:var(--today)}
+  .sigla{font-size:22px;font-weight:400;letter-spacing:.5px;opacity:.95;} /* sigla del turno */
+  .T-GL{color:var(--T-GL)} .T-AP{color:var(--T-AP)}
+
+  /* =========================================================
+     [CSS-SETTINGS CARD] Struttura card impostazioni
+     ========================================================= */
+  .settingsCard{background:var(--card);border:1px solid var(--gridBorder);border-radius:10px;padding:14px;margin-top:10px}
+  .settingsRow{display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:center;margin:8px 0}
+  .settingsRow label{font-weight:600;color:var(--muted)}
+  .settingsRow input,.settingsRow select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--gridBorder);background:var(--card);color:var(--text);height:var(--fieldH)}
+  .savebtn{margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:var(--iosBlue);color:#fff;font-weight:700;cursor:pointer}
+
+  /* =========================================================
+     [CSS-TABBAR] Navigazione in basso
+     ========================================================= */
+  .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--gridBorder);display:flex;gap:10px;justify-content:space-around;padding:8px 10px}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:12px;cursor:pointer}
+  .tab.active{color:var(--iosBlue);font-weight:700}
+
+  /* =========================================================
+     [CSS-FORMS TWEAKS] Campi, bottoni e griglia turni
+     ========================================================= */
+  .siglaInput{max-width:70px;text-transform:uppercase}
+  .turni-grid .siglaInput{max-width:70px}
+  .orarioInput{width:100%}
+  .thin-sep{height:0;border-top:1px solid var(--gridBorder);margin:6px 0}
+  .iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:8px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0}
+  .iconbtn-primary{background:var(--iosBlue);color:#fff}
+  .iconbtn-danger{background:#b42325;color:#fff}
+  .iconbtn:active{transform:translateY(1px)}
+  @media(max-width:560px){
+    .turni-grid{grid-template-columns:1fr 80px 2fr 90px 44px !important}
+    .settingsRow{grid-template-columns:120px 1fr}
+  }
+.hide-topbar .topbar,           /* barra blu POLIZIA */
+.hide-topbar #todayHeaderRow{   /* riga data + icona Dropbox */
+  display: none !important;
+}
+
+/* Compensa lo spazio sopra quando le barre sono nascoste */
+.hide-topbar main{
+  margin-top: 8px; /* metti 0 se vuoi tutto attaccato */
+}
+
+/* =========================================================
+   [CSS-COLOR PICKER] Quadretto colore = altezza campi
+   ========================================================= */
+.colorCell{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Il controllo ha ESATTAMENTE la stessa altezza dei campi */
+.colorInput{
+  -webkit-appearance:none; appearance:none;
+  box-sizing:border-box;
+  width:var(--fieldH);
+  height:var(--fieldH);
+  aspect-ratio:1/1;             /* forza il quadrato dove supportato */
+  padding:0;
+  margin:0;
+  border:1px solid var(--gridBorder);
+  border-radius:8px;            /* stessa raggiatura dei campi */
+  background:transparent;
+  min-width:0;
+  line-height:normal;
+}
+/* Chrome/Safari: niente padding/bordi interni */
+.colorInput::-webkit-color-swatch-wrapper{ padding:0; }
+.colorInput::-webkit-color-swatch{ border:none; border-radius:6px; }
+/* Firefox: allinea il “swatch” */
+.colorInput::-moz-color-swatch{ border:none; border-radius:6px; }
+
+/* Mobile: campi un filo più compatti → il quadretto segue */
+@media (max-width:560px){
+  :root{ --fieldH:40px; }
+}
+/* =========================================================
+   [CSS-GRID TURNI OVERRIDE v4] Sigla 4 char + Orario più corto
+   ========================================================= */
+/* Desktop / tablet */
+.turni-grid{
+  /* 1) Turno   2) Sigla   3) Orario   4) Colore   5) Azione */
+  grid-template-columns: 1fr 64px 1.05fr 52px 44px !important;
+  align-items:center;
+}
+
+/* Sigla comoda per 4 lettere */
+.siglaInput{
+  width:100%;
+  max-width:none;
+  text-transform:uppercase;
+  text-align:center;
+  letter-spacing:0.5px;
+}
+
+/* Orario: solo dimensioni base qui. La stilizzazione completa è sotto */
+.orarioArea{
+  min-width:0;
+  width:100%;
+}
+
+/* Mobile stretto */
+@media (max-width:560px){
+  .turni-grid{
+    grid-template-columns: 1fr 60px 0.85fr 46px 44px !important;
+  }
+  .siglaInput{ width:100%; }
+}
+
+/* =========================================================
+   [CSS-APP DATE FIELD v3] Altezza ridotta + testo centrato
+   ========================================================= */
+.settingsRow input[type="date"]{
+  width:95%;
+  min-width:0;
+  font-size:1rem;
+  height:38px;                 /* più basso del precedente (~44px) */
+  line-height:38px;            /* centra la data in verticale */
+  text-align:center;           /* centra orizzontalmente il testo */
+  margin:0 auto;
+  display:block;
+  box-sizing:border-box;
+  border-radius:8px;
+}
+
+@media (max-width:560px){
+  .settingsRow input[type="date"]{
+    width:92%;
+    font-size:1.05rem;
+    height:36px;               /* ancora un po’ più compatto in app */
+    line-height:36px;
+  }
+}
+
+
+/* =========================================================
+   [CSS-ORARIO MULTILINEA] Un solo campo, 2 righe (inizio/fine)
+   ========================================================= */
+.orarioArea{
+  display:block;
+  width:100%;
+  min-width:0;
+  height:calc(var(--fieldH) + 2px);   /* più basso di prima */
+  padding:6px 8px;
+  resize:none;
+  line-height:1.05;
+  font-size:0.86rem;                  /* più piccolo */
+  border:1px solid var(--gridBorder);
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text);
+  box-sizing:border-box;
+  white-space:pre;                    /* rispetta il \n */
+}
+@media (max-width:560px){
+  .orarioArea{ font-size:0.8rem; height:calc(var(--fieldH)); }
+}
+
+
+/* micro-spazi */
+.settingsRow{ gap:8px; }
+@media (max-width:560px){
+  .settingsRow{ gap:6px; }
+  .turni-grid > div:first-child input{ padding-left:8px; } /* Turno parte un filo più a sx */
+}
+
+/* =========================================================
+   [CSS-DROPBOX UI] Icona stato + popup modale
+   ========================================================= */
+.dropboxIconBtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px;                 /* ↑ più grande */
+  margin-left:8px; cursor:pointer;
+  border-radius:6px;
+  border:1px solid transparent;
+  background:transparent;
+}
+.dropboxIconBtn:hover,
+.dropboxIconBtn:focus,
+.dropboxIconBtn:active{
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+}
+.dropboxIconBtn svg{
+  display:block;
+  width:28px; height:28px;                 /* ↑ più grande */
+  background:transparent;
+}
+.dropboxIconBtn:active{ transform:translateY(1px); }
+.dropboxIconBtn svg{ display:block; width:22px; height:22px; }
+
+/* Stato NON connesso: stesso colore della data */
+.dbx-off{ color: var(--muted); }
+.dbx-off svg path{ fill: currentColor; }
+
+/* Stato connesso: blu tema */
+.dbx-on{ color: var(--iosBlue); }
+.dbx-on svg path{ fill: currentColor; }
+
+/*.dbx-on svg path{ fill:#1976d2; } vecchio colore per stato connesso */
+
+/* Modale leggero */
+.modalBackdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.35);
+  display:none; align-items:center; justify-content:center; z-index:50;
+}
+.modalBackdrop.active{ display:flex; }
+.modalCard{
+  width:min(480px, 92vw); background:var(--card);
+  border:1px solid var(--gridBorder); border-radius:12px;
+  padding:16px; box-shadow:0 6px 24px rgba(0,0,0,.25);
+}
+.modalHeader{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.modalTitle{ font-weight:700; }
+.modalBody{ margin-top:10px; color:var(--muted); }
+.modalActions{ margin-top:14px; display:flex; gap:8px; justify-content:flex-end; }
+
+/* =========================================================
+   [CSS-TEXT BUTTONS] Bottoni testuali per azioni leggere
+   ========================================================= */
+.textbtn{
+  appearance:none; border:1px solid var(--gridBorder);
+  background:transparent; color:var(--text);
+  padding:8px 12px; border-radius:8px; cursor:pointer;
+  font-weight:600; font-size:.92rem;
+}
+.textbtn:active{ transform:translateY(1px); }
+.textbtn-danger{
+  border-color:#b42325; color:#b42325;
+}
+.textbtn-danger:active{ border-color:#96201f; }
+
+
+/* =========================================================
+   [CSS-ACTION ICONS] Contenitore e tooltip
+   ========================================================= */
+.actionIcons{ display:flex; gap:10px; flex-wrap:wrap; }
+
+.tipwrap{ position:relative; }
+.tipwrap .tip{
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom:calc(100% + 6px);
+  background:var(--card); color:var(--muted);
+  border:1px solid var(--gridBorder);
+  padding:6px 8px; border-radius:8px; font-size:.8rem; white-space:nowrap;
+  box-shadow:0 4px 14px rgba(0,0,0,.15);
+  opacity:0; pointer-events:none; transition:opacity .15s ease;
+}
+.tipwrap:hover .tip, .tipwrap:focus .tip{ opacity:1; }
+
+
+
+
+
+
+  </style>
+</head>
+
+<body>
+  <!-- =======================================================
+       [HTML-TOPBAR] Logo + scritta POLIZIA STRADALE + data
+       ======================================================= -->
+  <div class="topbar" aria-label="Intestazione Polizia Stradale">
+    <div class="brand" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="32" height="32" role="img" focusable="false" aria-hidden="true">
+        <defs><clipPath id="shield"><path d="M32 2c9 6 18 6 30 6v20c0 18-14 30-30 34C16 58 2 46 2 28V8c12 0 21 0 30-6z"/></clipPath></defs>
+        <g clip-path="url(#shield)">
+          <rect x="0" y="0" width="64" height="64" fill="#1976d2"/><rect x="4" y="0" width="8" height="64" fill="#1c8d3a"/><rect x="12" y="0" width="8" height="64" fill="#ffffff"/><rect x="20" y="0" width="8" height="64" fill="#c72b31"/>
+          <path d="M38 20c8 0 12 3 12 8 0 9-12 15-22 13 4-2 6-4 8-7-6 2-11 1-12-3-1-4 5-9 14-11z" fill="#d9b13e"/>
+        </g>
+        <path d="M32 2c9 6 18 6 30 6v20c0 18-14 30-30 34C16 58 2 46 2 28V8c12 0 21 0 30-6z" fill="none" stroke="#0f4fa3" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="brand-title">POLIZIA</div>
+  </div>
+
+  <div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
+  <span id="todayHeader"></span>
+  <!-- =========================================================
+       [UI-DROPBOX ICON HEADER] Stato collegamento (clic = collega)
+       ========================================================= -->
+  <button id="dbxIconHeader" class="dropboxIconBtn dbx-off" title="Collega Dropbox" aria-label="Collega Dropbox">
+    <!-- Logo Dropbox (SVG) -->
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6.5 3L12 6.5 7 9.5 1.5 6zM17.5 3L23 6 17 9.5 12 6.5zM7 10.5l5 3.5-5 3.5L1.5 14zM17 10.5l5.5 3.5L17 17.5l-5-3.5zM12 18l5 3-5 3-5-3z" fill="currentColor"/>
+    </svg>
+  </button>
+</div>
+
+  <!-- =======================================================
+       [HTML-CALENDAR VIEW] Vista calendario
+       ======================================================= -->
+  <main>
+
+    <section class="view active" id="view-calendar">
+      <div class="monthbar">
+        <button class="navbtn" id="prev">&#x276E;</button>
+        <div class="title" id="monthLabel">ottobre 2025</div>
+        <button class="navbtn" id="next">&#x276F;</button>
+      </div>
+      <div class="weekhead"><div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div></div>
+      <section class="grid" role="grid" aria-labelledby="monthLabel"></section>
+    </section>
+
+    <!-- =====================================================
+         [HTML-SETTINGS VIEW] Vista impostazioni
+         ===================================================== -->
+    <section class="view" id="view-settings">
+      <div class="settingsCard" id="set-turni">
+        <!-- [SET-REF SHIFT] Primo giorno -->
+        <div class="settingsRow" style="grid-template-columns:120px 1fr">
+          <label>Primo giorno</label>
+          <input type="date" id="startDate" />
+        </div>
+        
+      <!-- =========================================================
+     [UI-ACTIONS] Salva su Dropbox + Importa da Dropbox (icone)
+     ========================================================= -->
+<div class="settingsRow" style="grid-template-columns:1fr; align-items:center; margin-top:6px">
+  <div class="actionIcons">
+    <!-- Salva su Dropbox -->
+    <button id="btnSaveCloud" class="iconbtn iconbtn-primary tipwrap" aria-label="Salva su Dropbox" title="Salva su Dropbox">
+      <!-- Floppy SVG -->
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M4 3h11l5 5v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm9 0v6H6V3h7zM6 21h12V9H6v12zm6-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill="currentColor"/>
+      </svg>
+      <span class="tip">Salva su Dropbox</span>
+    </button>
+
+    <!-- Importa da Dropbox -->
+    <button id="btnImportCloud" class="iconbtn tipwrap" aria-label="Importa da Dropbox" title="Importa da Dropbox">
+      <!-- Download-cloud SVG -->
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M7 18a5 5 0 1 1 1.2-9.85A6.5 6.5 0 0 1 21 13a4 4 0 0 1-1 7H7zm5-9v6.59l2.3-2.3 1.4 1.42L12 19.4l-3.7-3.7 1.4-1.42 2.3 2.3V9h2z" fill="currentColor"/>
+      </svg>
+      <span class="tip">Importa da Dropbox</span>
+    </button>
+  </div>
+</div>
+
+
+
+
+        <!-- =========================================================
+     [UI-DROPBOX ICON SETTINGS] Icona + stato + Disconnetti
+     ========================================================= -->
+<div class="settingsRow" style="grid-template-columns:1fr;align-items:center">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <button id="dbxIconSettings" class="dropboxIconBtn dbx-off" title="Collega Dropbox" aria-label="Collega Dropbox">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6.5 3L12 6.5 7 9.5 1.5 6zM17.5 3L23 6 17 9.5 12 6.5zM7 10.5l5 3.5-5 3.5L1.5 14zM17 10.5l5.5 3.5L17 17.5l-5-3.5zM12 18l5 3-5 3-5-3z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <span id="dropboxStatus" class="todayDate"></span>
+
+    <!-- Pulsante disconnessione: visibile solo quando connessi -->
+    <button id="dbxDisconnect" type="button" class="textbtn textbtn-danger" style="display:none">
+      Disconnetti
+    </button>
+  </div>
+</div>
+
+
+        <hr style="border:none;border-top:1px solid var(--gridBorder);margin:12px 0" />
+
+        <!-- [SET-HEAD] Intestazioni turni -->
+        <div class="settingsRow turni-grid turni-head" style="grid-template-columns:1fr 80px 2fr 90px 44px; align-items:center">
+          <div style="font-weight:700;color:var(--muted)">Turno</div>
+          <div style="font-weight:700;color:var(--muted)">Sigla</div>
+          <div style="font-weight:700;color:var(--muted)">Orario</div>
+          <div style="font-weight:700;color:var(--muted)">Colore</div>
+          <div></div>
+        </div>
+        <div class="thin-sep"></div>
+
+        <!-- [SET-ADD ROW] Riga “Aggiungi turno” -->
+        <div class="settingsRow turni-grid" style="grid-template-columns:1fr 80px 2fr 90px 44px; align-items:center">
+  <div><input id="newNome"></div>
+  <div><input id="newSigla" class="siglaInput" maxlength="4"></div>
+  <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00"></textarea>
+  <div class="colorCell"><input id="newColor" class="colorInput" type="color" value="#8e88ff" title="Colore"></div>
+  <button id="btnAddTurno" type="button" class="iconbtn iconbtn-primary" title="Aggiungi">+</button>
+</div>
+
+
+        <!-- [SET-LIST] Elenco turni -->
+        <div id="turniList"></div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+     [UI-DROPBOX MODAL] Popup collegamento
+     ========================================================= -->
+<div id="dbxModal" class="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="dbxModalTitle">
+  <div class="modalCard">
+    <div class="modalHeader">
+      <div class="modalTitle" id="dbxModalTitle">Collega Dropbox</div>
+      <button id="dbxModalClose" class="iconbtn iconbtn-danger" title="Chiudi">✕</button>
+    </div>
+    <div class="modalBody">
+      Verrà aperta una finestra di Dropbox per l’autorizzazione. Dopo il collegamento, tornerai al calendario.
+    </div>
+    <div class="modalActions">
+      <button id="dbxModalGo" class="savebtn">Procedi</button>
+    </div>
+  </div>
+</div>
+
+
+  </main>
+
+  <!-- =======================================================
+       [HTML-TABBAR] Navigazione inferiore
+       ======================================================= -->
+  <nav class="tabbar" aria-label="Barra schede">
+    <div class="tab active" data-tab="calendar">📅<span>Calendario</span></div>
+    <div class="tab" data-tab="settings">⚙️<span>Impostazioni</span></div>
+  </nav>
+
+  <script>
+  "use strict";
+
+  // =========================================================
+  // [FN: util_jsWeekdayUTC] Lunedì=0 … Domenica=6 (UTC)
+  // =========================================================
+  function util_jsWeekdayUTC(d){ return (d.getUTCDay()+6)%7 }
+
+  // =========================================================
+  // [FN: util_pad2] Padding numeri a 2 cifre
+  // =========================================================
+  function util_pad2(n){ return n.toString().padStart(2,'0') }
+
+  // =========================================================
+  // [FN: util_fmtMonth] “ottobre 2025”
+  // =========================================================
+  function util_fmtMonth(fmt,y,m){ return fmt.format(new Date(y,m,1)) }
+  // =========================================================
+  // [FN: util_splitOrario] "07:00–13:00" -> {start:"07:00", end:"13:00"}
+  // [FN: util_joinOrarioMultiline] "riga1\nriga2" -> "riga1–riga2"
+  // =========================================================
+function util_splitOrario(s){
+  const parts = String(s||'').split(/[-–—]/).map(x=>x.trim());
+  return { start: parts[0]||'', end: parts[1]||'' };
+}
+function util_joinOrarioMultiline(txt){
+  const [rawS='', rawE=''] = String(txt||'').split(/\n/);
+  const s = (rawS || '').trim();
+  const e = (rawE || '').trim();
+  return (s || e) ? `${s}–${e}` : '';
+}
+
+// =======================================================
+// [STORAGE PAYLOAD] Cosa salviamo su Dropbox
+// =======================================================
+function storage_buildPayload(){
+  return {
+    _meta:{
+      app:"Turni Polizia di Stato",
+      version:1,
+      savedAt:new Date().toISOString()
+    },
+    settings: settings_effective(),     // {date, shift}
+    defs:     defs_effective()          // lista turni personalizzati
+  };
+}
+
+// Nome file: YYYY-MM-TURNI.json (es. 2025-10-TURNI.json)
+function storage_buildFilename(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = util_pad2(now.getMonth()+1);
+  return `${y}-${m}-TURNI.json`;
+}
+
+
+
+  // =========================================================
+  // [BLOCK: JS-STATE] Formatter, date e riferimenti DOM
+  // =========================================================
+  const itMonth = new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'});
+  const today   = new Date();
+  let   view    = new Date(Date.UTC(2025,9,1)); // demo: ottobre 2025
+
+  const grid        = document.querySelector('.grid');
+  const monthLabel  = document.getElementById('monthLabel');
+  const todayHeader = document.getElementById('todayHeader');
+
+  // =========================================================
+  // [BLOCK: STORAGE KEYS] LocalStorage + default turni
+  // =========================================================
+  const LS_KEY   = 'cal_turno_start_v1';
+  const LS_TURNS = 'cal_turni_defs_v2';
+
+  const SHIFT_DEFAULTS = [
+    { key:'S', nome:'Sera',       sigla:'S', orario:'18:55–00:08', color:'#8e88ff' },
+    { key:'P', nome:'Pomeriggio', sigla:'P', orario:'12:55–19:08', color:'#c7a47b' },
+    { key:'M', nome:'Mattina',    sigla:'M', orario:'06:55–13:08', color:'#f1a04f' },
+    { key:'N', nome:'Notte',      sigla:'N', orario:'23:55–07:08', color:'#9aa3ad' },
+    { key:'R', nome:'Riposo',     sigla:'R', orario:'—',           color:'#28a745' }
+  ];
+
+  // =========================================================
+  // [FN: defs_load / defs_save / defs_effective]
+  // Gestione definizioni turni personalizzate
+  // =========================================================
+  function defs_load(){ try{ return JSON.parse(localStorage.getItem(LS_TURNS))||null }catch{ return null } }
+  function defs_save(list){ localStorage.setItem(LS_TURNS, JSON.stringify(list)) }
+  function defs_effective(){
+    const l = defs_load();
+    let out = Array.isArray(l) && l.length ? l : SHIFT_DEFAULTS.slice();
+    out = out.map(item => ({
+      key:   (item.key||(['S','P','M','N','R'].includes(item.sigla)?item.sigla:'S')),
+      nome:  item.nome||'',
+      sigla: item.sigla||'',
+      orario:item.orario||'',
+      color: item.color||'#8e88ff'
+    }));
+    defs_save(out);
+    return out;
+  }
+
+  // =========================================================
+  // [FN: settings_*] Primo giorno (data+base)
+  // =========================================================
+  function settings_load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY))||null }catch{ return null } }
+  function settings_save(obj){ localStorage.setItem(LS_KEY, JSON.stringify(obj)) }
+  function settings_effective(){
+    const s=settings_load();
+    if(s && s.date && s.shift) return s;
+    const t=new Date();
+    const def={date:`${t.getFullYear()}-${util_pad2(t.getMonth()+1)}-${util_pad2(t.getDate())}`, shift:'S'};
+    settings_save(def); return def;
+  }
+
+  // =========================================================
+  // [FN: shifts_codeForDate] Calcolo ciclo S→P→M→N→R + GL/AP
+  // =========================================================
+  const BASE_SEQ=['S','P','M','N','R'];
+  function shifts_codeForDate(d){
+    const cfg=settings_effective();
+    const [y,m,dd]=cfg.date.split('-').map(Number);
+    const anchor=new Date(Date.UTC(y,m-1,dd));
+    const idx0=BASE_SEQ.indexOf(cfg.shift);
+    const daysDiff=Math.floor((Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())-Date.UTC(anchor.getUTCFullYear(),anchor.getUTCMonth(),anchor.getUTCDate()))/86400000);
+    const step=((idx0+(daysDiff%5)+5)%5);
+    const raw=BASE_SEQ[step];
+    if(raw!=='R') return raw;
+    const dow=util_jsWeekdayUTC(d);
+    if(dow===0) return 'GL';
+    if(dow===1) return 'AP';
+    return 'R';
+  }
+
+  // =========================================================
+  // [FN: ui_displayLabelFor / ui_colorForBase]
+  // Etichetta e colore per sigle base
+  // =========================================================
+  function ui_displayLabelFor(base){
+    const f = defs_effective().find(x => x.key === base);
+    return f && f.sigla ? f.sigla : base;
+  }
+  function ui_colorForBase(base){
+    const f = defs_effective().find(x => x.key === base);
+    return (f && f.color) ? f.color : '#8e88ff';
+  }
+
+  // =========================================================
+  // [FN: render_createCellHTML] HTML singola cella del mese
+  // =========================================================
+  function render_createCellHTML({day, sun, sigla, isToday, startCol}){
+    const classes = ['cell']; if (sun) classes.push('sun'); if (isToday) classes.push('today');
+    const startAttr = startCol ? ` style="grid-column-start:${startCol}"` : '';
+
+    const isGLAP = (sigla === 'GL' || sigla === 'AP');
+    const label  = isGLAP ? sigla : ui_displayLabelFor(sigla);
+    const color  = isGLAP ? null  : ui_colorForBase(sigla);
+
+    let siglaSpan = '';
+    if (label) {
+      siglaSpan = isGLAP
+        ? `<span class="sigla ${sigla==='GL'?'T-GL':'T-AP'}">${label}</span>`
+        : `<span class="sigla" style="color:${color}">${label}</span>`;
+    }
+    return `<div class="${classes.join(' ')}"${startAttr}><span class="num">${util_pad2(day)}</span>${siglaSpan}</div>`;
+  }
+
+  // =========================================================
+  // [FN: render_buildMonth] Costruzione dell'intero mese
+  // =========================================================
+  function render_buildMonth(year,month){
+    grid.innerHTML='';
+    const first=new Date(Date.UTC(year,month,1));
+    const last =new Date(Date.UTC(year,month+1,0));
+    const lead =util_jsWeekdayUTC(first);
+    monthLabel.textContent=util_fmtMonth(itMonth,year,month);
+
+    for(let day=1; day<=last.getUTCDate(); day++){
+      const d=new Date(Date.UTC(year,month,day));
+      const isSun = util_jsWeekdayUTC(d)===6;
+      const isT   = d.getUTCFullYear()===today.getFullYear() && d.getUTCMonth()===today.getMonth() && d.getUTCDate()===today.getDate();
+      const sigla = shifts_codeForDate(d);
+      const startCol = (day===1)? (lead+1) : undefined;
+      grid.insertAdjacentHTML('beforeend', render_createCellHTML({day,sun:isSun,sigla,isToday:isT,startCol}));
+    }
+  }
+
+  // =========================================================
+  // [FN: nav_shift] Navigazione mese precedente/successivo
+  // =========================================================
+  function nav_shift(delta){
+    view=new Date(Date.UTC(view.getUTCFullYear(), view.getUTCMonth()+delta, 1));
+    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  }
+
+  // =========================================================
+  // [FN: ui_switchTab] Cambio vista (calendario/impostazioni)
+  // =========================================================
+  function ui_switchTab(name){
+    document.body.classList.toggle('hide-topbar', name==='settings');
+    document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===name));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
+  }
+
+  // =========================================================
+  // [FN: ui_defsRenderList] Rende la lista dei turni
+  // =========================================================
+function ui_defsRenderList(){
+  const list=defs_effective();
+  const wrap=document.getElementById('turniList');
+  wrap.innerHTML='';
+  list.forEach((t,idx)=>{
+    const row=document.createElement('div');
+    row.className='settingsRow turni-grid';
+    row.style.gridTemplateColumns='1fr 80px 2fr 90px 44px';
+    row.style.alignItems='center';
+
+    const p = util_splitOrario(t.orario);
+    row.innerHTML = [
+      `<input value="${t.nome}" data-k="nome" data-i="${idx}" />`,
+      `<input value="${t.sigla}" maxlength="4" class="siglaInput" data-k="sigla" data-i="${idx}" />`,
+      `<textarea class="orarioArea" data-k="orarioMultiline" data-i="${idx}" rows="2">${p.start}\n${p.end}</textarea>`,
+      `<div class="colorCell"><input value="${t.color || '#8e88ff'}" class="colorInput" data-k="color" data-i="${idx}" type="color" /></div>`,
+      `<button type="button" class="iconbtn iconbtn-danger" data-act="del" data-i="${idx}">✕</button>`
+    ].join('');
+
+    wrap.appendChild(row);
+  });
+
+  // Pulsante elimina
+  wrap.querySelectorAll('button[data-act="del"]').forEach(b=>{
+    b.addEventListener('click', ()=> ui_defsDelete(parseInt(b.dataset.i)));
+  });
+
+  // Input/textarea con aggiornamento live e a change
+  wrap.querySelectorAll('input, textarea').forEach(inp=>{
+    const h = ()=>{
+      ui_defsEditInline(parseInt(inp.dataset.i), inp.dataset.k, inp.value);
+      render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+    };
+    inp.addEventListener('input', h);
+    inp.addEventListener('change', h);
+  });
+}
+
+
+  // =========================================================
+  // [FN: ui_defsAdd / ui_defsClearNew / ui_defsDelete / ui_defsEditInline]
+  // CRUD dei turni
+  // =========================================================
+  function ui_defsAdd(){
+  const nome  = document.getElementById('newNome').value.trim();
+  const sigla = document.getElementById('newSigla').value.trim().toUpperCase();
+  const orTxt = document.getElementById('newOrario').value; // può contenere \n
+  const color = document.getElementById('newColor').value.trim() || '#8e88ff';
+  if(!nome || !sigla) return;
+  const orario = util_joinOrarioMultiline(orTxt);
+  const list=defs_effective();
+  list.push({ key:'X'+Date.now(), nome, sigla, orario, color });
+  defs_save(list);
+  ui_defsClearNew();
+  ui_defsRenderList();
+}
+
+  function ui_defsClearNew(){
+  document.getElementById('newNome').value = '';
+  document.getElementById('newSigla').value = '';
+  document.getElementById('newOrario').value = '';   // <-- una sola riga per orario
+  document.getElementById('newColor').value = '#8e88ff';
+}
+  function ui_defsDelete(i){
+    const list=defs_effective();
+    list.splice(i,1);
+    defs_save(list);
+    ui_defsRenderList();
+  }
+  function ui_defsEditInline(i,key,val){
+  const list=defs_effective();
+  if(!list[i]) return;
+
+  if(key==='orarioMultiline'){
+    list[i].orario = util_joinOrarioMultiline(val);
+  }else{
+    list[i][key]=val;
+  }
+  defs_save(list);
+}
+
+  // =========================================================
+  // [FN: ui_settingsInit / ui_settingsApply] Init e Salva
+  // =========================================================
+  function ui_settingsInit(){
+    const c=settings_effective();
+    document.getElementById('startDate').value=c.date;
+    ui_defsRenderList();
+  }
+  function ui_settingsApply(){
+    const date=document.getElementById('startDate').value;
+    const shift=settings_effective().shift || 'S';
+    settings_save({date,shift});
+    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  }
+
+  // =========================================================
+  // [FN: boot_init] Avvio app
+  // =========================================================
+  function boot_init(){
+  const fmt=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const f=fmt.format(new Date());
+  document.getElementById('todayHeader').textContent=f.charAt(0).toUpperCase()+f.slice(1);
+
+  // Navigazione calendario
+  document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
+  document.getElementById('next').addEventListener('click', ()=>nav_shift(1));
+
+  // Cambio tab
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>ui_switchTab(t.dataset.tab)));
+
+  // Impostazioni
+document.getElementById('btnAddTurno').addEventListener('click', ui_defsAdd);
+
+const btnSaveCloud  = document.getElementById('btnSaveCloud');
+const btnImportCloud= document.getElementById('btnImportCloud');
+if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToDropbox);
+if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDropbox);
+
+  // Placeholder multilinea coerente ovunque
+  document.getElementById('newOrario').placeholder = "00:00\n00:00";
+
+  // >>> QUI: bind icone e stato Dropbox all’avvio <<<
+  dbx_bindIconClicks();
+  dbx_updateIcons(); // allinea lo stato delle icone al boot
+
+  // Init UI
+  ui_settingsInit();
+  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+}
+
+
+// =======================================================
+// [BLOCK: DROPBOX PKCE HELPERS] – Fase 8
+// =======================================================
+function generateCodeVerifier() {
+  const array = new Uint8Array(32);
+  window.crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await window.crypto.subtle.digest("SHA-256", data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+
+// =======================================================
+// [BLOCK: DROPBOX AUTH INIT] – Fase 7 (FIX async/PKCE)
+// =======================================================
+
+async function startDropboxAuth() {
+  try {
+    const verifier  = generateCodeVerifier();
+    const challenge = await generateCodeChallenge(verifier); // <-- QUI il punto chiave
+    localStorage.setItem("dbx_code_verifier", verifier);
+
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: DROPBOX_APP_KEY,
+      redirect_uri: DROPBOX_REDIRECT,
+      token_access_type: "offline",
+      code_challenge_method: "S256",
+      code_challenge: challenge
+    });
+
+    window.location.href = `https://www.dropbox.com/oauth2/authorize?${params.toString()}`;
+  } catch (e) {
+    const el = document.getElementById("dropboxStatus");
+    if (el) el.textContent = "Errore locale nell'avvio PKCE";
+  }
+}
+
+
+// =======================================================
+// [BLOCK: DROPBOX STATUS] – Fase 8
+// =======================================================
+function updateDropboxStatus() {
+  const token = localStorage.getItem("dropbox_token");
+  const el = document.getElementById("dropboxStatus");
+  if (token) {
+    el.textContent = "✅ Connesso a Dropbox";
+  } else {
+    el.textContent = "❌ Non collegato";
+  }
+}
+updateDropboxStatus();
+
+// =======================================================
+// [BLOCK: DROPBOX UI HELPERS] Stato icone + modale
+// =======================================================
+function dbx_isConnected(){
+  return !!localStorage.getItem("dropbox_token");
+}
+function dbx_updateIcons(){
+  const on = dbx_isConnected();
+  const h  = document.getElementById("dbxIconHeader");
+  const s  = document.getElementById("dbxIconSettings");
+  const st = document.getElementById("dropboxStatus");
+  const dis= document.getElementById("dbxDisconnect");
+
+  [h,s].forEach(el => {
+    if(!el) return;
+    el.classList.toggle("dbx-on",  on);
+    el.classList.toggle("dbx-off", !on);
+  });
+
+  if(st) st.textContent = on ? "✅ Connesso a Dropbox" : "❌ Non collegato";
+
+  if(dis){
+    dis.style.display = on ? "inline-flex" : "none";
+  }
+}
+
+
+function dbx_openModal(show){
+  const m = document.getElementById("dbxModal");
+  if(!m) return;
+  m.classList.toggle("active", !!show);
+
+  // Aggiorna copy del modale in base alla modalità
+  const body = m.querySelector('.modalBody');
+  if(body){
+    if(isStandaloneDisplayMode()){
+      body.textContent = "Verrai reindirizzato a una pagina di Dropbox per l’autorizzazione. Dopo il collegamento tornerai al calendario.";
+    }else{
+      body.textContent = "Verrà aperta una finestra di Dropbox per l’autorizzazione. Dopo il collegamento, tornerai al calendario.";
+    }
+  }
+}
+
+// =======================================================
+// [DBX LOW-LEVEL HELPERS] chiamate API
+// =======================================================
+function dbx_token(){
+  return localStorage.getItem("dropbox_token") || "";
+}
+
+async function dbx_api(path, bodyObj){
+  const res = await fetch("https://api.dropboxapi.com/2" + path, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer " + dbx_token()
+    },
+    body: JSON.stringify(bodyObj||{})
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(`Dropbox API ${path} failed: ${res.status} ${t}`);
+  }
+  return res.json();
+}
+
+// Upload binario (files/upload su content.dropboxapi.com)
+async function dbx_upload(filepath, uint8){
+  const args = {
+    path: filepath,
+    mode: "overwrite",
+    autorename: false,
+    mute: true
+  };
+  const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+    method:"POST",
+    headers:{
+      "Authorization":"Bearer " + dbx_token(),
+      "Dropbox-API-Arg": JSON.stringify(args),
+      "Content-Type":"application/octet-stream"
+    },
+    body: uint8
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(`Dropbox upload failed: ${res.status} ${t}`);
+  }
+  return res.json();
+}
+
+async function dbx_download(filepath){
+  const res = await fetch("https://content.dropboxapi.com/2/files/download", {
+    method:"POST",
+    headers:{
+      "Authorization":"Bearer " + dbx_token(),
+      "Dropbox-API-Arg": JSON.stringify({ path: filepath })
+    }
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(`Dropbox download failed: ${res.status} ${t}`);
+  }
+  const text = await res.text();
+  return text;
+}
+
+// Crea cartella se non esiste. Restituisce true se già esiste o creata.
+async function dbx_ensureFolder(folderPath){
+  // Se esiste, bene; se 409 path/not_found, la creiamo.
+  try{
+    await dbx_api("/files/get_metadata", { path: folderPath });
+    return true;
+  }catch(e){
+    // prova a creare
+    try{
+      await dbx_api("/files/create_folder_v2", { path: folderPath, autorename:false });
+      return true;
+    }catch(err){
+      // Se è un app-folder, la root è già "Apps/<AppName>" e non puoi usare "/Apps/.."
+      // Fallback: prova senza /Apps
+      if(String(err).includes("path/not_found") || String(err).includes("path/restricted_content")){
+        return false;
+      }
+      throw err;
+    }
+  }
+}
+
+// =======================================================
+// [STORAGE SAVE/IMPORT] Logica alto livello (cartella fissa /Apps/turni)
+// =======================================================
+async function storage_saveToDropbox(){
+  if(!dbx_isConnected()){
+    alert("Non sei connesso a Dropbox.");
+    return;
+  }
+
+  ui_settingsApply();
+
+  const payload = storage_buildPayload();
+  const jsonStr  = JSON.stringify(payload, null, 2);
+  const bytes    = new TextEncoder().encode(jsonStr);
+  const fname    = storage_buildFilename();
+
+  const base = "/Apps/turni";
+  await dbx_ensureFolder(base);
+  const path = `${base}/${fname}`;
+
+  try{
+    await dbx_upload(path, bytes);
+    const st = document.getElementById("dropboxStatus");
+    if(st) st.textContent = `✅ Salvato: ${path}`;
+  }catch(e){
+    alert("Errore nel salvataggio su Dropbox.");
+    console.error(e);
+  }
+}
+
+
+async function storage_importFromDropbox(){
+  if(!dbx_isConnected()){
+    alert("Non sei connesso a Dropbox.");
+    return;
+  }
+
+  const fname = storage_buildFilename();
+  const path  = `/Apps/turni/${fname}`;
+
+  try{
+    const text = await dbx_download(path);
+    const obj  = JSON.parse(text);
+
+    if(obj.settings) settings_save(obj.settings);
+    if(Array.isArray(obj.defs)) defs_save(obj.defs);
+
+    ui_settingsInit();
+    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+
+    const st = document.getElementById("dropboxStatus");
+    if(st) st.textContent = `✅ Importato da: ${path}`;
+  }catch(e){
+    alert("Errore nell’importazione da Dropbox o file non trovato.");
+    console.error(e);
+  }
+}
+
+
+
+// =======================================================
+// [BLOCK: DROPBOX DISCONNECT] Pulisce token e aggiorna UI
+// =======================================================
+function dbx_disconnect(){
+  // Conferma leggera
+  const ok = confirm("Vuoi disconnettere l'app da Dropbox?");
+  if(!ok) return;
+
+  try{
+    localStorage.removeItem("dropbox_token");
+    localStorage.removeItem("dbx_code_verifier");
+  }catch{}
+
+  dbx_updateIcons();                // aggiorna icone/stato
+  ui_switchTab("settings");         // resta in impostazioni
+  const st = document.getElementById("dropboxStatus");
+  if(st){ st.textContent = "❌ Non collegato"; }
+}
+
+
+/// =======================================================
+// [BLOCK: DROPBOX AUTH SMART] Popup quando possibile, altrimenti full redirect
+// =======================================================
+const DROPBOX_APP_KEY = "2aw9gg2ov9tmzuc";
+const DROPBOX_REDIRECT = "https://astounding-entremet-ff96d4.netlify.app/redirect";
+
+let dbxPopupRef = null;
+
+function isStandaloneDisplayMode(){
+  // iOS: navigator.standalone; PWA generico: media query display-mode
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+         || (window.navigator && window.navigator.standalone === true);
+}
+
+async function dbx_startAuthSmart(){
+  try{
+    const verifier  = generateCodeVerifier();
+    const challenge = await generateCodeChallenge(verifier);
+    localStorage.setItem("dbx_code_verifier", verifier);
+
+    const params = new URLSearchParams({
+      response_type:"code",
+      client_id: DROPBOX_APP_KEY,
+      redirect_uri: DROPBOX_REDIRECT,
+      token_access_type:"offline",
+      code_challenge_method:"S256",
+      code_challenge: challenge
+    });
+    const authUrl = `https://www.dropbox.com/oauth2/authorize?${params.toString()}`;
+
+    // In modalità standalone / iOS Add-to-Home o se i popup sono bloccati → redirect pieno
+    if (isStandaloneDisplayMode()) {
+      window.location.href = authUrl;
+      return;
+    }
+
+    // Popup centrato in modo robusto (compatibile multi-monitor e Safari)
+const W = 520, H = 680;
+const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left;
+const dualScreenTop  = window.screenTop  !== undefined ? window.screenTop  : screen.top;
+
+const width  = window.innerWidth  ? window.innerWidth  : document.documentElement.clientWidth  ? document.documentElement.clientWidth  : screen.width;
+const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+const left = ((width  - W) / 2) + dualScreenLeft;
+const top  = ((height - H) / 2) + dualScreenTop;
+
+dbxPopupRef = window.open(
+  authUrl,
+  "dbx_auth",
+  `scrollbars=yes,width=${W},height=${H},top=${top},left=${left}`
+);
+
+
+    // Fallback: se il popup è nullo/subito chiuso, vai di redirect
+    setTimeout(()=>{
+      if(!dbxPopupRef || dbxPopupRef.closed){
+        window.location.href = authUrl;
+      }
+    }, 400);
+  }catch(e){
+    const st = document.getElementById("dropboxStatus");
+    if(st) st.textContent = "Errore nell’avvio del collegamento.";
+  }
+}
+
+// Bind pulsanti icona + modale
+function dbx_bindIconClicks(){
+  const h = document.getElementById("dbxIconHeader");
+  const s = document.getElementById("dbxIconSettings");
+  [h,s].forEach(el=>{
+    if(!el) return;
+    el.addEventListener("click", ()=>{
+      if(dbx_isConnected()){
+        return; // già collegato
+      }
+      dbx_openModal(true);
+    });
+  });
+
+  // Pulsante Disconnetti
+  const dis = document.getElementById("dbxDisconnect");
+  if(dis) dis.addEventListener("click", dbx_disconnect);
+
+  // Modale: avanti/chiudi
+  const go = document.getElementById("dbxModalGo");
+  const cl = document.getElementById("dbxModalClose");
+  if(go) go.addEventListener("click", ()=>{ dbx_openModal(false); dbx_startAuthSmart(); });
+  if(cl) cl.addEventListener("click", ()=> dbx_openModal(false));
+}
+
+
+// Ricezione esito da redirect.html + sync storage cross-window
+(function(){
+  // Origini attendibili (Netlify)
+  const ALLOWED_ORIGINS = ["https://astounding-entremet-ff96d4.netlify.app"];
+
+  // Messaggio dal popup: token salvato → aggiorna UI, chiudi, torna al calendario
+  window.addEventListener("message",(ev)=>{
+    if(!ALLOWED_ORIGINS.includes(ev.origin)) return;
+    if(ev.data === "DBX_OK"){
+      dbx_updateIcons();
+      if(dbxPopupRef && !dbxPopupRef.closed) dbxPopupRef.close();
+      ui_switchTab("calendar");
+    }
+  });
+
+  // Evento storage: se un’altra window salva dropbox_token, aggiorna le icone live
+  window.addEventListener("storage",(ev)=>{
+    if(ev.key === "dropbox_token"){
+      dbx_updateIcons();
+    }
+  });
+})();
+
+
+
+  // =========================================================
+  // [BLOCK: BOOTSTRAP] DOM ready
+  // =========================================================
+  if(document.readyState==='loading'){
+    window.addEventListener('DOMContentLoaded', boot_init);
+  }else{
+    boot_init();
+  }
+
+  </script>
+</body>
+</html>
