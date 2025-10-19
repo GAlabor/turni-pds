@@ -39,6 +39,17 @@
   .brand-title{font-weight:800;letter-spacing:.08em}
   .todayDate{font-size:.9rem;text-align:center;color:var(--muted);margin-top:6px}
 
+  /* [CSS-TOPBAR WORDMARK] contenitore pronto per SVG */
+.brand-wordmark{
+  display:flex; align-items:center; justify-content:center;
+  line-height:0;
+}
+.wordmark-fallback{
+  font-weight:800; letter-spacing:.08em; color:#fff;
+  /* quando inseriremo l’SVG, questa riga sparirà */
+}
+
+
   /* =========================================================
      [CSS-LAYOUT] Main, barra mese, intestazioni giorni
      ========================================================= */
@@ -340,7 +351,12 @@
         <path d="M32 2c9 6 18 6 30 6v20c0 18-14 30-30 34C16 58 2 46 2 28V8c12 0 21 0 30-6z" fill="none" stroke="#0f4fa3" stroke-width="2"/>
       </svg>
     </div>
-    <div class="brand-title">POLIZIA</div>
+
+    <div class="brand-wordmark" aria-label="Polizia">
+  <!-- Fallback testuale temporaneo; al passo 2 qui metteremo l’SVG -->
+  <span class="wordmark-fallback">POLIZIA</span>
+</div>
+
   </div>
 
   <div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
