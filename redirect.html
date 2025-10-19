@@ -20,7 +20,7 @@ async function exchangeCodeForToken() {
     code,
     grant_type: "authorization_code",
     client_id: "2aw9gg2ov9tmzuc",
-    redirect_uri: "https://astounding-entremet-ff96d4.netlify.app/redirect",
+    redirect_uri: "https://galabor.github.io/turni-pds/redirect",
     code_verifier: verifier
   });
 
@@ -37,10 +37,10 @@ async function exchangeCodeForToken() {
       // Se c'è un opener (flusso popup), notifico e chiudo
       if (window.opener) {
         try{
-          const parentOrigin = new URL(document.referrer || "https://astounding-entremet-ff96d4.netlify.app").origin;
+          const parentOrigin = new URL(document.referrer || "https://galabor.github.io/turni-pds").origin;
           window.opener.postMessage("DBX_OK", parentOrigin);
         }catch{
-          window.opener.postMessage("DBX_OK", "https://astounding-entremet-ff96d4.netlify.app");
+          window.opener.postMessage("DBX_OK", "https://galabor.github.io/turni-pds");
         }
         setTimeout(()=> window.close(), 250);
         return;
@@ -50,7 +50,7 @@ async function exchangeCodeForToken() {
       status && (status.textContent = "✅ Autorizzazione completata. Ritorno all’app…");
       setTimeout(()=>{
         // Torna alla root del sito dove sta l'app principale
-        window.location.replace("https://astounding-entremet-ff96d4.netlify.app/");
+        window.location.replace("https://galabor.github.io/turni-pds/");
       }, 300);
     } else {
       status && (status.textContent = "Errore nel recupero token.");

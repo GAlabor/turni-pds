@@ -1098,7 +1098,7 @@ function dbx_disconnect(){
 // [BLOCK: DROPBOX AUTH SMART] Popup quando possibile, altrimenti full redirect
 // =======================================================
 const DROPBOX_APP_KEY = "2aw9gg2ov9tmzuc";
-const DROPBOX_REDIRECT = "https://astounding-entremet-ff96d4.netlify.app/redirect";
+const DROPBOX_REDIRECT = "https://galabor.github.io/turni-pds/redirect";
 
 let dbxPopupRef = null;
 
@@ -1188,8 +1188,8 @@ function dbx_bindIconClicks(){
 
 // Ricezione esito da redirect.html + sync storage cross-window
 (function(){
-  // Origini attendibili (Netlify)
-  const ALLOWED_ORIGINS = ["https://astounding-entremet-ff96d4.netlify.app"];
+// Origini attendibili (GitHub Pages)
+  const ALLOWED_ORIGINS = ["https://galabor.github.io"];
 
   // Messaggio dal popup: token salvato → aggiorna UI, chiudi, torna al calendario
   window.addEventListener("message",(ev)=>{
