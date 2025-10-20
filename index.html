@@ -50,36 +50,12 @@
   body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,"Helvetica Neue",Arial}
 
   /* =========================================================
-   [CSS-TOPBAR] Barra blu + data di oggi (AGGIORNATA)
-   ========================================================= */
-.topbar{
-  position:sticky; top:0; z-index:5;
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  padding:6px 12px;                      /* più bassa */
-  background:var(--iosBlue); color:#fff;
-  border-bottom:1px solid rgba(0,0,0,.08);
-}
-.brand-title{
-  font-weight:800;
-  letter-spacing:.02em;
-  font-size:1.02rem;
-  text-transform:none;
-  /* un look più “pulito”; se il sistema ha un buon font, lo prende */
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, "Helvetica Neue", Arial;
-}
-.todayDate{
-  font-size:.88rem; text-align:center; color:#e6eefc; margin-top:6px;
-}
-
-/* Pulsante “Oggi” stile chip */
-.todayBtn{
-  appearance:none; border:0; cursor:pointer;
-  padding:6px 10px; margin-left:8px;
-  border-radius:999px; font-weight:700; font-size:.86rem;
-  background:rgba(255,255,255,.18); color:#fff;
-}
-.todayBtn:active{ transform:translateY(1px) }
-
+     [CSS-TOPBAR] Barra blu + data di oggi
+     ========================================================= */
+  .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;justify-content:center;padding:10px 12px;background:var(--iosBlue);color:#fff}
+  .topbar .brand{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+  .brand-title{font-weight:800;letter-spacing:.08em}
+  .todayDate{font-size:.9rem;text-align:center;color:var(--muted);margin-top:6px}
 
   /* =========================================================
      [CSS-LAYOUT] Main, barra mese, intestazioni giorni
@@ -87,7 +63,6 @@
   main{max-width:760px;margin:8px auto 90px;padding:0 10px}
   .monthbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin:10px 0 6px}
   .monthbar .title{text-align:center}
-  .monthbar .todayBtn{ margin-left:4px }
   .navbtn{appearance:none;border:0;background:transparent;color:var(--iosBlue);font-size:22px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:10px}
   .navbtn:active{background:rgba(25,118,210,.12)}
 
@@ -160,8 +135,6 @@
   .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--gridBorder);display:flex;gap:10px;justify-content:space-around;padding:8px 10px}
   .tab{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:12px;cursor:pointer}
   .tab.active{color:var(--iosBlue);font-weight:700}
-  .tab svg{ display:block; width:22px; height:22px }
-  .tab.active{ color:var(--iosBlue); font-weight:700 }
 
   /* =========================================================
      [CSS-FORMS TWEAKS] Campi, bottoni e griglia turni
@@ -402,24 +375,24 @@
 
 <body>
   <!-- =======================================================
-     [HTML-TOPBAR] Titolo + data (logo rimosso)
-     ======================================================= -->
-<div class="topbar" aria-label="Intestazione Calendario">
-  <div class="brand-title">Calendario Polizia di Stato</div>
-</div>
+       [HTML-TOPBAR] Logo + scritta POLIZIA STRADALE + data
+       ======================================================= -->
+  <div class="topbar" aria-label="Intestazione Polizia Stradale">
+    <div class="brand" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="32" height="32" role="img" focusable="false" aria-hidden="true">
+        <defs><clipPath id="shield"><path d="M32 2c9 6 18 6 30 6v20c0 18-14 30-30 34C16 58 2 46 2 28V8c12 0 21 0 30-6z"/></clipPath></defs>
+        <g clip-path="url(#shield)">
+          <rect x="0" y="0" width="64" height="64" fill="#1976d2"/><rect x="4" y="0" width="8" height="64" fill="#1c8d3a"/><rect x="12" y="0" width="8" height="64" fill="#ffffff"/><rect x="20" y="0" width="8" height="64" fill="#c72b31"/>
+          <path d="M38 20c8 0 12 3 12 8 0 9-12 15-22 13 4-2 6-4 8-7-6 2-11 1-12-3-1-4 5-9 14-11z" fill="#d9b13e"/>
+        </g>
+        <path d="M32 2c9 6 18 6 30 6v20c0 18-14 30-30 34C16 58 2 46 2 28V8c12 0 21 0 30-6z" fill="none" stroke="#0f4fa3" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="brand-title">POLIZIA</div>
+  </div>
 
-<div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
+  <div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
   <span id="todayHeader"></span>
-  <!-- =========================================================
-       [UI-DROPBOX ICON HEADER] Stato collegamento (clic = collega)
-       ========================================================= -->
-  <button id="dbxIconHeader" class="dropboxIconBtn dbx-off" title="Collega Dropbox" aria-label="Collega Dropbox">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.5 3L12 6.5 7 9.5 1.5 6zM17.5 3L23 6 17 9.5 12 6.5zM7 10.5l5 3.5-5 3.5L1.5 14zM17 10.5l5.5 3.5L17 17.5l-5-3.5zM12 18l5 3-5 3-5-3z" fill="currentColor"/>
-    </svg>
-  </button>
-</div>
-
   <!-- =========================================================
        [UI-DROPBOX ICON HEADER] Stato collegamento (clic = collega)
        ========================================================= -->
@@ -438,13 +411,10 @@
 
     <section class="view active" id="view-calendar">
       <div class="monthbar">
-  <button class="navbtn" id="prev" aria-label="Mese precedente">&#x276E;</button>
-  <div class="title" id="monthLabel">ottobre 2025</div>
-  <div style="display:flex;align-items:center;gap:6px">
-    <button class="todayBtn" id="todayBtn" title="Torna al mese corrente">Oggi</button>
-    <button class="navbtn" id="next" aria-label="Mese successivo">&#x276F;</button>
-  </div>
-</div>
+        <button class="navbtn" id="prev">&#x276E;</button>
+        <div class="title" id="monthLabel">ottobre 2025</div>
+        <button class="navbtn" id="next">&#x276F;</button>
+      </div>
       <div class="weekhead"><div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div></div>
       <section class="grid" role="grid" aria-labelledby="monthLabel"></section>
     </section>
@@ -761,15 +731,6 @@ function storage_buildFilename(){
   }
 
   // =========================================================
-  // [FN: nav_toToday] Torna al mese corrente
-  // =========================================================
-  function nav_toToday(){
-    const now = new Date();
-    view = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
-    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
-  }
-
-  // =========================================================
   // [FN: ui_switchTab] Cambio vista (calendario/impostazioni)
   // =========================================================
   function ui_switchTab(name){
@@ -885,9 +846,6 @@ function ui_defsRenderList(){
   const fmt=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   const f=fmt.format(new Date());
   document.getElementById('todayHeader').textContent=f.charAt(0).toUpperCase()+f.slice(1);
-  const todayBtn = document.getElementById('todayBtn');
-  if(todayBtn) todayBtn.addEventListener('click', nav_toToday);
-
 
   // Navigazione calendario
   document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
@@ -1302,6 +1260,8 @@ function dbx_bindIconClicks(){
     }
   });
 })();
+
+
 
   // =========================================================
 // [BLOCK: BOOTSTRAP] DOM ready
