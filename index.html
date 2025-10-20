@@ -1256,14 +1256,65 @@ if (document.readyState === 'loading') {
 }
 
 // =========================================================
-// [SERVICE WORKER] – cache offline
+// [SERVICE WORKER] – registrazione con auto-update
 // =========================================================
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/turni-pds/service-worker.js', { scope: '/turni-pds/' })
-      .catch(() => {/* meh */});
-  });
-}
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+
+  // Allinea il ?v=... a quello del SW (basta lo stesso numero finale)
+  const SW_VERSION = '2025-10-22-01';
+  const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
+
+  async function registerSW(){
+    try{
+      const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
+
+      // Se c'è già un worker "waiting", chiedi di attivarsi
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      // Quando arriva un nuovo SW (installing), aspetta "installed" e poi promuovilo subito
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            nw.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      });
+
+      // Quando il controller cambia, significa che il nuovo SW è attivo: ricarica l’app
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // Evita loop: ricarica una sola volta
+        if (!window.__reloadedForSW) {
+          window.__reloadedForSW = true;
+          location.reload();
+        }
+      });
+
+      // Piccolo “tiramisù” periodico: controlla update all’avvio e quando torni in focus
+      reg.update().catch(()=>{});
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          reg.update().catch(()=>{});
+        }
+      });
+
+    }catch(e){
+      // pace
+    }
+  }
+
+  // Registra appena possibile (più affidabile di 'load' sulle PWA installate)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', registerSW);
+  } else {
+    registerSW();
+  }
+})();
+
 
 </script>
 
