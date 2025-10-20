@@ -49,29 +49,28 @@
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,"Helvetica Neue",Arial}
 
-  //* =========================================================
-   [CSS-TOPBAR] Barra blu + data di oggi (AGGIORNATO)
+  /* =========================================================
+     [CSS-TOPBAR] Barra blu + data di oggi
+     ========================================================= */
+  /* =========================================================
+   [CSS-TOPBAR] Barra blu + data di oggi
    ========================================================= */
-.topbar{
-  position:sticky; top:0; z-index:5;
-  display:flex; align-items:center; justify-content:center;
-  padding:12px 14px;
-  background:var(--iosBlue); color:#fff;
+.topbar {
+  position:sticky;
+  top:0;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  justify-content:center;
+  padding:8px 12px;  /* Altezza leggermente ridotta */
+  background:var(--iosBlue);
+  color:#fff;
 }
 
-/* Titolo sottile e delicato */
-.brand-title{
-  font-weight:300;           /* era 800: ora leggero */
-  letter-spacing:.02em;      /* meno “gridato” */
-  font-size:1.05rem;
-}
-
-/* Riga data sotto la barra */
-.todayDate{
-  font-size:.9rem;
-  text-align:center;
-  color:var(--muted);
-  margin-top:6px;
+.topbar .brand-title {
+  font-weight:800;
+  letter-spacing:.08em;
 }
 
 
@@ -393,24 +392,14 @@
 
 <body>
   <!-- =======================================================
-     [HTML-TOPBAR] Titolo sobrio + data (AGGIORNATO)
-     ======================================================= -->
-<div class="topbar" aria-label="Intestazione Calendario Polizia di Stato">
-  <div class="brand-title">Calendario Polizia di Stato</div>
-</div>
+       [HTML-TOPBAR] Logo + scritta POLIZIA STRADALE + data
+       ======================================================= -->
+    </div>
+    <div class="brand-title">Calendario</div>
+  </div>
 
-<div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
+  <div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
   <span id="todayHeader"></span>
-  <!-- =========================================================
-       [UI-DROPBOX ICON HEADER] Stato collegamento (clic = collega)
-       ========================================================= -->
-  <button id="dbxIconHeader" class="dropboxIconBtn dbx-off" title="Collega Dropbox" aria-label="Collega Dropbox">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.5 3L12 6.5 7 9.5 1.5 6zM17.5 3L23 6 17 9.5 12 6.5zM7 10.5l5 3.5-5 3.5L1.5 14zM17 10.5l5.5 3.5L17 17.5l-5-3.5zM12 18l5 3-5 3-5-3z" fill="currentColor"/>
-    </svg>
-  </button>
-</div>
-
   <!-- =========================================================
        [UI-DROPBOX ICON HEADER] Stato collegamento (clic = collega)
        ========================================================= -->
