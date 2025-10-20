@@ -1,16 +1,33 @@
-<!doctype html>
-<html lang="it">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title> Turni Polizia di Stato </title>
 
-  <link rel="manifest" href="/turni-pds/manifest.webmanifest?v=2025-10-20-02">
+  <!-- Canonicalizza l’URL su /turni-pds/ ed evita il BFCache zombie -->
+  <script>
+  (function(){
+    var p = location.pathname;
+    if (p === '/turni-pds' || p === '/turni-pds/index.html') {
+      location.replace('/turni-pds/');
+    }
+  })();
+  </script>
 
+  <!-- Spingi i browser a non cacheare l'HTML -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <title>Turni Polizia di Stato</title>
+
+  <!-- Manifest con query di versione -->
+  <link rel="manifest" href="/turni-pds/manifest.webmanifest?v=2025-10-22-03">
+
+
+  <!-- Colore tema -->
   <meta name="theme-color" content="#1976d2">
 
-
   <style>
+
   /* =========================================================
      [CSS-ROOT] Variabili tema e dimensioni standard
      ========================================================= */
@@ -1262,7 +1279,7 @@ if (document.readyState === 'loading') {
   if (!('serviceWorker' in navigator)) return;
 
   // Allinea il ?v=... a quello del SW (basta lo stesso numero finale)
-  const SW_VERSION = '2025-10-22-01';
+  const SW_VERSION = '2025-10-22-03';
   const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
 
   async function registerSW(){

@@ -2,7 +2,8 @@
 // Turni PDS - Service Worker v2025-10-20-02
 // BUMPA 'VERSION' ad ogni deploy che deve invalidare cache.
 // ==============================
-const VERSION    = '2025-10-22-01';
+// Turni PDS - Service Worker v2025-10-22-03
+const VERSION    = '2025-10-22-03';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Precache minimo per offline affidabile.
