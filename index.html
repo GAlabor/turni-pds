@@ -183,39 +183,104 @@
   .savebtn{margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:var(--iosBlue);color:#fff;font-weight:700;cursor:pointer}
 
 /* =========================================================
-   [CSS-TABBAR] Navigazione in basso (icone SVG)
+   [CSS-TABBAR] Navigazione in basso — Stile uniforme
    ========================================================= */
 .tabbar{
   position:fixed;
   bottom:0; left:0; right:0;
   background:var(--card);
   border-top:1px solid var(--gridBorder);
-  display:flex; gap:10px; justify-content:space-around;
+  display:flex;
+  justify-content:space-around;
+  gap:10px;
   padding:8px 10px;
+  z-index:10;
 }
 
+/* Ogni icona/tab */
 .tab{
-  display:flex; flex-direction:column; align-items:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   gap:4px;
-  color:var(--muted);
+  width:64px;
+  height:52px;
+  border-radius:12px;
+  background:transparent;
+  color:rgba(255,255,255,0.55);
   font-size:12px;
   cursor:pointer;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color:transparent;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.05s ease;
 }
 
-.tab.active{
-  color:var(--iosBlue);
-  font-weight:700;
-}
-
+/* Icone SVG */
 .tab svg{
-  width:22px; height:22px;
-  stroke:currentColor; fill:none;
-  flex-shrink:0; display:block;
+  width:26px;
+  height:26px;
+  stroke:currentColor;
+  fill:none;
+  display:block;
+  flex-shrink:0;
 }
 
+/* Stato attivo */
+.tab.active{
+  color:rgba(255,255,255,0.95);
+  background:rgba(255,255,255,0.14);
+}
+
+/* Hover → stesso effetto dei pulsanti in alto */
+.tab:hover{
+  background:rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.85);
+  transform:translateY(-1px);
+}
+
+/* Click */
+.tab:active{
+  background:rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.95);
+  transform:translateY(1px);
+}
+
+/* Testo compatto sotto l’icona */
 .tab span{
-  line-height:1; /* testo più compatto sotto l’icona */
+  line-height:1;
+}
+
+/* Modalità chiara */
+@media (prefers-color-scheme: light){
+  .tab{
+    color:rgba(0,0,0,0.55);
+  }
+  .tab.active{
+    color:rgba(0,0,0,0.95);
+    background:rgba(0,0,0,0.08);
+  }
+  .tab:hover{
+    background:rgba(0,0,0,0.08);
+    color:rgba(0,0,0,0.85);
+  }
+  .tab:active{
+    background:rgba(0,0,0,0.12);
+    color:rgba(0,0,0,0.95);
+  }
+}
+
+@media (max-width:560px){
+  .tab{
+    width:52px;
+    height:44px;
+  }
+  .tab svg{
+    width:20px;
+    height:20px;
+  }
 }
 
 
@@ -437,21 +502,78 @@
 
 
 /* =========================================================
-   [CSS-ACTION ICONS] Contenitore e tooltip
+   [CSS-SETTINGS ACTIONS] Pulsanti Salva/Importa — Stile pulito ChatGPT
    ========================================================= */
-.actionIcons{ display:flex; gap:10px; flex-wrap:wrap; }
-
-.tipwrap{ position:relative; }
-.tipwrap .tip{
-  position:absolute; left:50%; transform:translateX(-50%);
-  bottom:calc(100% + 6px);
-  background:var(--card); color:var(--muted);
-  border:1px solid var(--gridBorder);
-  padding:6px 8px; border-radius:8px; font-size:.8rem; white-space:nowrap;
-  box-shadow:0 4px 14px rgba(0,0,0,.15);
-  opacity:0; pointer-events:none; transition:opacity .15s ease;
+.actionIcons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
 }
-.tipwrap:hover .tip, .tipwrap:focus .tip{ opacity:1; }
+
+.btn-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  padding:0;
+  border:none;
+  border-radius:12px;
+  background:transparent;                /* nessuna ombra o fondo iniziale */
+  color:rgba(255,255,255,0.55);          /* icona spenta */
+  cursor:pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.05s ease;
+}
+
+/* Hover → illuminazione completa (senza bordo) */
+.btn-icon:hover{
+  background:rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.85);
+  transform:translateY(-1px);
+}
+
+/* Click → leggera pressione */
+.btn-icon:active{
+  background:rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.95);
+  transform:translateY(1px);
+}
+
+/* Icone inline */
+.btn-icon svg{
+  width:26px;
+  height:26px;
+  stroke:currentColor;
+  fill:none;
+  display:block;
+  flex-shrink:0;
+}
+
+/* Nasconde label testuale ma mantiene accessibilità */
+.btn-icon span{ display:none; }
+
+/* Modalità chiara */
+@media (prefers-color-scheme: light){
+  .btn-icon{
+    background:transparent;
+    color:rgba(0,0,0,0.55);
+  }
+  .btn-icon:hover{
+    background:rgba(0,0,0,0.08);
+    color:rgba(0,0,0,0.85);
+  }
+  .btn-icon:active{
+    background:rgba(0,0,0,0.12);
+    color:rgba(0,0,0,0.95);
+  }
+}
+
+
+
 
   </style>
 </head>
@@ -522,34 +644,36 @@
         </div>
         
       <!-- =========================================================
-     [UI-ACTIONS] Salva su Dropbox + Importa da Dropbox (icone)
+     [UI-ACTIONS] Salva su Dropbox + Importa da Dropbox (icone nuove)
      ========================================================= -->
 <div class="settingsRow" style="grid-template-columns:1fr; align-items:center; margin-top:6px">
   <div class="actionIcons">
     <!-- Salva su Dropbox -->
-    <button id="btnSaveCloud" class="iconbtn iconbtn-primary tipwrap" aria-label="Salva su Dropbox" title="Salva su Dropbox">
-      <!-- Floppy SVG -->
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-        <path d="M4 3h11l5 5v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm9 0v6H6V3h7zM6 21h12V9H6v12zm6-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" fill="currentColor"/>
+    <button id="btnSaveCloud" class="btn-icon primary" aria-label="Salva su Dropbox" title="Salva su Dropbox">
+      <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.76471 4H5C4.44771 4 4 4.44772 4 5V16.5376C4 16.8309 4.12882 17.1095 4.35235 17.2995L8.42581 20.7619C8.60661 20.9156 8.83617 21 9.07346 21H19C19.5523 21 20 20.5523 20 20V5C20 4.44772 19.5523 4 19 4H16.2353M7.76471 4V9C7.76471 9.55228 8.21242 10 8.76471 10H15.2353C15.7876 10 16.2353 9.55228 16.2353 9V4M7.76471 4H16.2353" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 21V16C9 15.4477 9.44772 15 10 15H14C14.5523 15 15 15.4477 15 16V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <span class="tip">Salva su Dropbox</span>
     </button>
 
     <!-- Importa da Dropbox -->
-    <button id="btnImportCloud" class="iconbtn tipwrap" aria-label="Importa da Dropbox" title="Importa da Dropbox">
-      <!-- Download-cloud SVG -->
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-        <path d="M7 18a5 5 0 1 1 1.2-9.85A6.5 6.5 0 0 1 21 13a4 4 0 0 1-1 7H7zm5-9v6.59l2.3-2.3 1.4 1.42L12 19.4l-3.7-3.7 1.4-1.42 2.3 2.3V9h2z" fill="currentColor"/>
+    <button id="btnImportCloud" class="btn-icon" aria-label="Importa da Dropbox" title="Importa da Dropbox">
+      <!-- Cloud Download -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <!-- nube semplificata -->
+        <path d="M7 18a5 5 0 1 1 1.2-9.85A6 6 0 0 1 19 12a4 4 0 0 1-2 6H7"/>
+        <!-- freccia giù -->
+        <path d="M12 7v8"/>
+        <path d="m8.5 11.5 3.5 3.5 3.5-3.5"/>
       </svg>
-      <span class="tip">Importa da Dropbox</span>
+      <span>Importa da Dropbox</span>
     </button>
   </div>
 </div>
 
-
-
-
-        <!-- =========================================================
+<!-- =========================================================
      [UI-DROPBOX ICON SETTINGS] Icona + stato + Disconnetti
      ========================================================= -->
 <div class="settingsRow" style="grid-template-columns:1fr;align-items:center">
