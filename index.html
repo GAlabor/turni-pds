@@ -167,14 +167,6 @@ main{
   gap:3px;      /* distanza per calendario */
   padding:3px;  /* distanza per calendario */
 }
-/* Mobile: celle quadrate forzate (usiamo la larghezza reale della griglia) */
-@media (max-width:560px){
-  .grid{
-    /* 100% = larghezza contenuto della .grid
-       sottraiamo solo i 6 gap fra 7 colonne: 6 * 3px */
-    grid-auto-rows: calc((100% - 6 * 3px) / 7);
-  }
-}
 
 .cell{
   position:relative;
@@ -222,8 +214,19 @@ main{
 .cell:active::before{   background:var(--actActive); }
 .cell.selected::before{ background:var(--actActive); }
 
+/* Mobile: celle più compatte e più “quadrate” */
 @media(max-width:560px){
-  .cell{ min-height:62px }
+  .grid{
+    grid-auto-rows:minmax(48px,1fr); /* era 62px, ora più umano */
+  }
+  .cell{
+    min-height:auto; /* niente forzature inutili */
+    padding:4px 0;
+  }
+  .sigla{
+    font-size:18px;
+    top:4px;
+  }
 }
 
 
