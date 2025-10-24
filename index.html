@@ -111,66 +111,111 @@
 
 
   /* =========================================================
-     [CSS-LAYOUT] Main, barra mese, intestazioni giorni
-     ========================================================= */
-  main{max-width:760px;margin:8px auto 90px;padding:0 10px}
-  .monthbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin:10px 0 6px}
-  .monthbar .title{text-align:center}
-  .navbtn{appearance:none;border:0;background:transparent;color:var(--iosBlue);font-size:22px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:10px}
-  .navbtn:active{background:rgba(25,118,210,.12)}
+   [CSS-LAYOUT] Main, barra mese, intestazioni giorni
+   ========================================================= */
+main{
+  max-width:760px;
+  margin:8px auto 90px;
+  padding:0 10px;
+}
+.monthbar{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:8px;
+  margin:10px 0 6px;
+}
+.monthbar .title{ text-align:center }
+.navbtn{
+  appearance:none; border:0; background:transparent;
+  color:var(--iosBlue); font-size:22px; line-height:1;
+  cursor:pointer; padding:6px 8px; border-radius:10px;
+}
+.navbtn:active{ background:rgba(25,118,210,.12) }
 
-  .weekhead{display:grid;grid-template-columns:repeat(7,1fr)}
-  .weekhead div{background:var(--iosBlue);color:#fff;text-align:center;padding:8px 0;border:1px solid var(--iosBlue-600);font-weight:700}
-  .weekhead div+div{border-left-width:0}
+/* Intestazioni giorni: separazione morbida + raggio */
+.weekhead{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:3px;            /* distanza per calendario */
+  padding:3px 3px 0;  /* distanza per calendario - non toccare lo 0 */
+}
+.weekhead div{
+  background:var(--iosBlue);
+  color:#fff;
+  text-align:center;
+  padding:8px 0;
+  font-weight:700;
+  border-radius:10px;
+  border:1px solid var(--iosBlue-600);
+  letter-spacing:.03em;
+  font-size:.82rem;
+}
 
-  .view{display:none}
-  .view.active{display:block}
+
+.view{ display:none }
+.view.active{ display:block }
+
 
   /* =========================================================
-   [CSS-CALENDAR GRID] Celle calendario  (VERSIONE AGGIORNATA)
+   [CSS-CALENDAR GRID] Celle calendario (gap + radius + glow)
    ========================================================= */
 .grid{
   display:grid;
   grid-template-columns:repeat(7,1fr);
   grid-auto-rows:minmax(62px,1fr);
+  gap:3px;      /* distanza per calendario */
+  padding:3px;  /* distanza per calendario */
 }
 .cell{
   position:relative;
   min-height:84px;
   background:var(--card);
-  border:1px solid var(--gridBorder);
-  border-top:0;
+  border-radius:12px;
+  border:0;                    /* niente griglia dura */
   display:flex;
   align-items:center;
   justify-content:center;
+  overflow:hidden;             /* per l’effetto hover */
 }
-@media(max-width:560px){ .cell{ min-height:62px } }
+/* alone soft on hover/active/selected */
+.cell::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:inherit;
+  background:transparent;
+  transition:background .18s ease;
+  pointer-events:none;
+}
 
-/* Giorno del mese: SPOStATO A SINISTRA */
+/* Giorno in alto a sinistra */
 .num{
-  position:absolute;
-  left:8px;               /* <- prima era right:8px */
-  top:6px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:800;
+  position:absolute; left:8px; top:6px;
+  font-size:12px; color:var(--muted); font-weight:800;
+  z-index:1;
 }
 .sun .num{ color:var(--sunday) }
 
-/* Oggi evidenziato come prima */
-.today{ background:var(--today) }
+/* “Oggi” evidenziato in modo soft, non a secchiellata */
+.today{ box-shadow: inset 0 0 0 2px rgba(25,118,210,.22); }
 
-/* Sigla del turno: PIÙ IN BASSO */
+/* Sigla del turno: un filo più bassa */
 .sigla{
-  font-size:22px;
-  font-weight:400;
-  letter-spacing:.5px;
-  opacity:.95;
-  position:relative;
-  top:8px;                /* <- spinta verso il basso */
+  font-size:22px; font-weight:400; letter-spacing:.5px; opacity:.95;
+  position:relative; top:8px; z-index:1;
 }
 .T-GL{ color:var(--T-GL) }
 .T-AP{ color:var(--T-AP) }
+
+/* Hover/Active/Selected come i bottoni icona
+   (usa --actHover / --actActive già definiti) */
+.cell:hover::before{    background:var(--actHover); }
+.cell:active::before{   background:var(--actActive); }
+.cell.selected::before{ background:var(--actActive); }
+
+@media(max-width:560px){
+  .cell{ min-height:62px }
+}
 
 
   /* =========================================================
