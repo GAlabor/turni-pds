@@ -109,8 +109,8 @@
 .topbar::before{
   content: "";
   position: absolute;
-  left: -1px;
-  right: -1px;
+  left: 0;
+  right: 0;
   top: 0;
   height: calc(var(--bar-h) + var(--seam) + 1px);
   pointer-events: none;
@@ -753,13 +753,6 @@ main{
   .dither{ display: block; }
 }
 
-html, body {
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior-y: none;
-  touch-action: none;
-}
-
   </style>
 </head>
 
@@ -1331,7 +1324,7 @@ function ui_defsRenderList(){
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
   }
 
-// =========================================================
+  // =========================================================
 // [FN: ui_updateTopbarGlowCenter] allinea glow a topbar reale
 // =========================================================
 function ui_updateTopbarGlowCenter(){
@@ -1348,64 +1341,6 @@ function ui_updateTopbarGlowCenter(){
   // Altezza reale della topbar: non cambiamo le tue misure, le leggiamo
   document.documentElement.style.setProperty('--bar-h', r.height + 'px');
 }
-
-// =========================================================
-// [FN: ui_updateTopbarGlowCenter] allinea glow a topbar reale
-// =========================================================
-function ui_updateTopbarGlowCenter(){
-  const bar = document.querySelector('.topbar');
-  if(!bar) return;
-  const r = bar.getBoundingClientRect();
-
-  // Centro assoluto della topbar (in px viewport) per i radial-gradient
-  const cx = r.left + r.width/2;
-  const cy = r.top  + r.height/2;
-  document.documentElement.style.setProperty('--cx', cx + 'px');
-  document.documentElement.style.setProperty('--cy', cy + 'px');
-
-  // Altezza reale della topbar: non cambiamo le tue misure, le leggiamo
-  document.documentElement.style.setProperty('--bar-h', r.height + 'px');
-}
-
-
-
-// =========================================================
-// [BOOT: glow recalc triggers extra] evita "baffi" ai lati
-// =========================================================
-(function(){
-  const recalc = () => {
-    // due pass: uno subito e uno al frame dopo per allineare layout/paint
-    ui_updateTopbarGlowCenter();
-    requestAnimationFrame(ui_updateTopbarGlowCenter);
-    setTimeout(ui_updateTopbarGlowCenter, 60);
-  };
-
-  // 1) tema di sistema
-  try{
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mq && mq.addEventListener) mq.addEventListener('change', recalc);
-  }catch{}
-
-  // 2) fonts caricati (l'altezza della scritta può variare)
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(recalc).catch(()=>{});
-  }
-
-  // 3) eventi di vita pagina
-  window.addEventListener('load', recalc, { once:true });
-  window.addEventListener('pageshow', recalc);              // Safari/iOS PWA ritorni
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') recalc();
-  }, { passive:true });
-
-  // 4) orientamento/schermo
-  window.addEventListener('orientationchange', recalc);
-  window.addEventListener('resize', () => {
-    clearTimeout(window.__tbGlowT);
-    window.__tbGlowT = setTimeout(recalc, 80);
-  }, { passive:true });
-})();
-
 
   // =========================================================
   // [FN: boot_init] Avvio app
