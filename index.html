@@ -109,11 +109,22 @@
 .topbar::before{
   content: "";
   position: absolute;
-  left: 0; right: 0; top: 0;
+  left: 0;
+  right: 0;
+  top: 0;
   height: calc(var(--bar-h) + var(--seam) + 1px);
   pointer-events: none;
 
+  /* Edge fade verso lo sfondo ai lati + glow centrale */
   background:
+    linear-gradient(to right,
+      var(--bg) 0%,
+      color-mix(in oklch, var(--bg) 85%, transparent) 8%,
+      transparent 18%,
+      transparent 82%,
+      color-mix(in oklch, var(--bg) 85%, transparent) 92%,
+      var(--bg) 100%
+    ),
     radial-gradient(
       ellipse 85% 160% at var(--cx) var(--cy),
       rgba(var(--blue-rgb), var(--far-a1)) 0%,
@@ -156,8 +167,9 @@
       rgba(0,0,0,0.28) calc(var(--bar-h) + var(--seam) * .75),
       transparent           calc(var(--bar-h) + var(--seam)));
 
-  filter: blur(.2px); /* anti-banding bordo maschera */
+  filter: blur(.2px);
 }
+
 
 
 
@@ -1314,8 +1326,6 @@ if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDr
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
   setTimeout(ui_updateTopbarGlowCenter, 80);
-
-
 }
 
 
