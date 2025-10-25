@@ -29,57 +29,50 @@
   <style>
 
   /* =========================================================
-   [CSS-ROOT] Variabili tema e dimensioni standard
-   ========================================================= */
-:root{
-  --iosBlue:#1976d2; --iosBlue-600:#1565c0;
-  --bg:#f3f5f8; --card:#ffffff; --gridBorder:#d9dee6;
-  --text:#0b1320; --muted:#7a8595;
-  --sunday:#c62828; --today:#cfe3ff;
-  --T-GL:#c68bcf; --T-AP:#a47ac9;      /* colori fissi GL/AP */
-  --fieldH:44px;                       /* altezza campi impostazioni */
-
-  /* === Glow vars (topbar + background) === */
-  --bar-h: 60px;          /* aggiornato via JS all’altezza reale della topbar */
-  --seam: 20px;           /* lunghezza dissolvenza sotto la topbar */
-  --blue-rgb: 25,118,210; /* iosBlue in RGB */
-
-  /* Fallback centro glow per il primissimo paint (in px viewport) */
-  --cx: 50vw;             /* centro orizzontale viewport */
-  --cy: 30px;             /* metà di --bar-h fallback */
-
-  --glow-x: 50%;
-
-  /* Intensità glow (tema chiaro) */
-  --core-a1: 0.94; --core-a2: 0.82; --core-a3: 0.66; --core-a4: 0.48; --core-a5: 0.34;
-  --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.08;
-  --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.024;
-
-  /* In light sfumiamo verso lo sfondo */
-  --tail: color-mix(in oklch, rgb(var(--blue-rgb)) 0%, var(--bg) 100%);
-}
-
-@media (prefers-color-scheme: dark){
+     [CSS-ROOT] Variabili tema e dimensioni standard
+     ========================================================= */
   :root{
-    --bg:#0b0c10;
-    --card:#14161a;
-    --gridBorder:#222831;
-    --text:#e6e8ec;
-    --muted:#98a3af;
-    --today:#103a7a;
+    --iosBlue:#1976d2; --iosBlue-600:#1565c0;
+    --bg:#f3f5f8; --card:#ffffff; --gridBorder:#d9dee6;
+    --text:#0b1320; --muted:#7a8595;
+    --sunday:#c62828; --today:#cfe3ff;
+    --T-GL:#c68bcf; --T-AP:#a47ac9;      /* colori fissi GL/AP */
+    --fieldH:44px;                        /* altezza campi impostazioni */
 
-    /* === Glow override (dark) === */
-    --blue-rgb: 27,111,255;
-    --glow-x: 42%;
+    /* === Glow vars (topbar + background) === */
+--bar-h: 60px;     /* verrà aggiornato via JS all’altezza reale della tua topbar */
+--seam: 20px;      /* lunghezza dissolvenza sotto la topbar */
+--blue-rgb: 25,118,210; /* il tuo iosBlue in RGB */
 
-    --core-a1: 0.95; --core-a2: 0.82; --core-a3: 0.68; --core-a4: 0.50; --core-a5: 0.34;
-    --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.07;
-    --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.025;
+--cx: 50%;
+--cy: 50%;
+--glow-x: 50%;
 
-    /* in dark la coda può essere trasparente */
-    --tail: rgba(0,0,0,0);
+--core-a1: 0.94; --core-a2: 0.82; --core-a3: 0.66; --core-a4: 0.48; --core-a5: 0.34;
+--mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.08;
+--far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.024;
+--tail: color-mix(in oklch, rgb(var(--blue-rgb)) 0%, var(--bg) 100%);
+
+
+
   }
-}
+  @media (prefers-color-scheme: dark){
+    :root{ 
+      --bg:#0b0c10; 
+      --card:#14161a; 
+      --gridBorder:#222831; 
+      --text:#e6e8ec; 
+      --muted:#98a3af; 
+      --today:#103a7a 
+      /* === Glow vars override (dark) === */
+      --blue-rgb: 27,111,255;
+      --glow-x: 42%;
+      -core-a1: 0.95; --core-a2: 0.82; --core-a3: 0.68; --core-a4: 0.50; --core-a5: 0.34;
+      --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.07;
+      --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.025;
+      --tail: rgba(0,0,0,0);    
+    }
+  }
 
   /* =========================================================
      [CSS-BASE] Reset e tipografia
@@ -116,8 +109,8 @@
 .topbar::before{
   content: "";
   position: absolute;
-  left: -1px;
-  right: -1px;
+  left: 0;
+  right: 0;
   top: 0;
   height: calc(var(--bar-h) + var(--seam) + 1px);
   pointer-events: none;
@@ -760,25 +753,6 @@ main{
   .dither{ display: block; }
 }
 
-/* ===== [APP-NO-SCROLL v2] stop rubber-band senza uccidere i tap ===== */
-html, body {
-  height: 100%;
-  overscroll-behavior: none;   /* niente elastico/pull-to-refresh */
-}
-
-/* Blocca lo scroll della pagina intera */
-body {
-  overflow: hidden;            /* la pagina non scorre */
-}
-
-/* Se una vista interna deve scorrere, falla scorrere lei (non il body) */
-main,
-#view-settings {
-  overflow: auto;
-  -webkit-overflow-scrolling: touch; /* scroll fluido iOS quando serve */
-}
-
-
   </style>
 </head>
 
@@ -1408,25 +1382,6 @@ if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDr
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
   setTimeout(ui_updateTopbarGlowCenter, 80);
-
-    document.addEventListener('visibilitychange', () => {
-  if(document.visibilityState === 'visible'){
-    ui_updateTopbarGlowCenter();
-  }
-}, {passive:true});
-
-// Recalc anche quando cambia il tema di sistema (chiaro/scuro)
-try {
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  if (mq && mq.addEventListener) mq.addEventListener('change', ui_updateTopbarGlowCenter);
-} catch {}
-
-// Recalc quando i font hanno finito di caricarsi (altezza barra può variare)
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(ui_updateTopbarGlowCenter).catch(()=>{});
-}
-
-
 }
 
 
