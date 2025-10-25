@@ -57,22 +57,23 @@
 
   }
   @media (prefers-color-scheme: dark){
-    :root{ 
-      --bg:#0b0c10; 
-      --card:#14161a; 
-      --gridBorder:#222831; 
-      --text:#e6e8ec; 
-      --muted:#98a3af; 
-      --today:#103a7a 
-      /* === Glow vars override (dark) === */
-      --blue-rgb: 27,111,255;
-      --glow-x: 42%;
-      -core-a1: 0.95; --core-a2: 0.82; --core-a3: 0.68; --core-a4: 0.50; --core-a5: 0.34;
-      --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.07;
-      --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.025;
-      --tail: rgba(0,0,0,0);    
-    }
+  :root{ 
+    --bg:#0b0c10; 
+    --card:#14161a; 
+    --gridBorder:#222831; 
+    --text:#e6e8ec; 
+    --muted:#98a3af; 
+    --today:#103a7a;
+    /* === Glow vars override (dark) === */
+    --blue-rgb: 27,111,255;
+    --glow-x: 42%;
+    --core-a1: 0.95; --core-a2: 0.82; --core-a3: 0.68; --core-a4: 0.50; --core-a5: 0.34;
+    --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.07;
+    --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.025;
+    --tail: rgba(0,0,0,0);
   }
+}
+
 
   /* =========================================================
      [CSS-BASE] Reset e tipografia
@@ -86,36 +87,36 @@
 .topbar{
   position: sticky;
   top: 0;
-  z-index: 20;                    /* come prima */
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 10px;
   justify-content: center;
-  padding: 10px 12px;             /* MISURE INVARIATE: lasciamo il tuo padding */
+  padding: 10px 12px;
   color: #fff;
-
-  /* Niente blur/gradient locale: il glow vive sul ::before */
   background: transparent;
 
-  /* micro-ottimizzazioni compositing */
+  /* compositing */
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
   contain: paint;
   overflow: visible;
+
+  /* Seam-guard: copre qualsiasi hairline sopra/sotto */
+  box-shadow:
+    inset 0 -1px 0 var(--bg),
+    inset 0  1px 0 var(--bg);
 }
 
 /* Glow multilayer applicato alla topbar e sfumato sotto */
 .topbar::before{
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: calc(var(--bar-h) + var(--seam) + 1px);
+  left: 0; right: 0; top: 0;
+  height: calc(var(--bar-h) + var(--seam) + 2px);
   pointer-events: none;
 
-  /* Edge fade verso lo sfondo ai lati + glow centrale */
   background:
     linear-gradient(to right,
       var(--bg) 0%,
@@ -152,6 +153,7 @@
       var(--tail) 100%
     );
 
+  /* hard-stop preciso, niente bleed */
   -webkit-mask-image:
     linear-gradient(to bottom,
       #000 0,
@@ -167,8 +169,9 @@
       rgba(0,0,0,0.28) calc(var(--bar-h) + var(--seam) * .75),
       transparent           calc(var(--bar-h) + var(--seam)));
 
-  filter: blur(.2px);
+  /* rimosso il blur che causava gli “aloni” */
 }
+
 
 
 
@@ -191,11 +194,15 @@
   letter-spacing: 0.2em;
 }
 
-.todayDate {
+.todayDate{
   font-size: 0.9rem;
   text-align: center;
   color: var(--muted);
   margin-top: 6px;
+
+  /* anti-hairline fra topbar e riga data */
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== [TOPBAR SVG WORDMARK] (SCALA, NON CAMBIA LAYOUT) ===== */
@@ -258,6 +265,18 @@ main{
   letter-spacing:.03em;
   font-size:.82rem;
 }
+
+html, body { height: 100%; }
+body.no-scroll { overflow: hidden; }
+
+/* Quando non vogliamo scroll globale nella vista calendario,
+   evitiamo anche il margine extra che te lo innesca. */
+body.no-scroll main{
+  margin-bottom: calc(var(--tabH) + 12px);
+  /* niente overflow del main: lasciamo i click liberi */
+  overflow: clip;
+}
+
 
 
 .view{ display:none }
@@ -1219,11 +1238,21 @@ function storage_buildFilename(){
   // [FN: ui_switchTab] Cambio vista (calendario/impostazioni)
   // =========================================================
   function ui_switchTab(name){
-    document.body.classList.toggle('hide-topbar', name==='settings');
-    document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===name));
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    document.getElementById(`view-${name}`).classList.add('active');
-  }
+  const isSettings = (name === 'settings');
+
+  document.body.classList.toggle('hide-topbar', isSettings);
+  document.body.classList.toggle('no-scroll', !isSettings); // ← blocca scroll solo in calendario
+
+  document.querySelectorAll('.tab').forEach(el =>
+    el.classList.toggle('active', el.dataset.tab === name)
+  );
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${name}`).classList.add('active');
+
+  // riallinea il glow alla nuova geometria
+  ui_updateTopbarGlowCenter();
+}
+
 
   // =========================================================
   // [FN: ui_defsRenderList] Rende la lista dei turni
@@ -1375,6 +1404,10 @@ if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDr
   // Init UI
   ui_settingsInit();
   render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+
+  // Vista iniziale: calendario senza scroll globale
+  document.body.classList.add('no-scroll');
+
 
   // Allinea il glow alla topbar
   ui_updateTopbarGlowCenter();
