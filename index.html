@@ -629,13 +629,27 @@ body.no-scroll main{
   border-color:transparent;
   box-shadow:none;
 }
+/* =========================================================
+   [CSS-DROPBOX ICONS] Fix dimensioni e attivi
+   ========================================================= */
 .dropboxIconBtn svg{
   display:block;
-  width:28px; height:28px;                 /* ↑ più grande */
+  width:22px;
+  height:22px;
   background:transparent;
 }
-.dropboxIconBtn:active{ transform:translateY(1px); }
-.dropboxIconBtn svg{ display:block; width:22px; height:22px; }
+
+/* Esempio: Header più grande (28px) */
+#dbxIconHeader svg{
+  width:28px;
+  height:28px;
+}
+
+/* Press feedback */
+.dropboxIconBtn:active{
+  transform:translateY(1px);
+}
+
 
 /* Stato NON connesso: stesso colore della data */
 .dbx-off{ color: var(--muted); }
