@@ -24,7 +24,7 @@
 
 
   <!-- Colore tema -->
-  <meta name="theme-color" content="#1976d2">
+  <meta name="theme-color" content="#000000">
 
   <style>
 
@@ -785,6 +785,171 @@ body.no-scroll main{
 @media (prefers-color-scheme: light){
   .dither{ display: block; }
 }
+
+/* =========================================================
+   [THEME OVERRIDE] Forza tema fisso scuro (sfondo nero)
+   ========================================================= */
+
+/* Colori fissi per tutta l’app, ignoriamo il sistema per semplice precedenza */
+:root{
+  /* Sfondo e superfici */
+  --bg:#000000;
+  --card:#0b0c10;
+  --gridBorder:#1a1f27;
+
+  /* Testi */
+  --text:#e6e8ec;
+  --muted:#98a3af;
+
+  /* Evidenze calendario */
+  --today:#103a7a;
+  --sunday:#c62828;
+}
+
+/* Anti-banding off: su nero non serve */
+.dither{ display:none !important; }
+
+/* Tabbar coerente su scuro */
+:root{
+  --tabColor:#b7bcc6;
+  --tabColorActive:#e3e7ec;
+  --tabHoverBg:rgba(255,255,255,.10);
+  --tabActiveBg:rgba(255,255,255,.14);
+}
+
+/* =========================================================
+   [THEME] Moderno 2025 — Neo-Glass Soft
+   Incolla in fondo al <style>. Rimuovi per tornare indietro.
+   ========================================================= */
+
+/* Palette e sfondo */
+:root{
+  /* Fondo: scuro con accenni freddi, niente “vernice bagnata” */
+  --bg:
+    radial-gradient(1100px 640px at 50% -12%,
+      rgba(56, 124, 255, .22) 0%,
+      rgba(20, 28, 46, 0) 55%)
+    ,
+    linear-gradient(180deg, #0a0f14 0%, #0a0d13 45%, #07090d 100%);
+
+  /* Superfici */
+  --surface-glass: rgba(18, 22, 28, .55);   /* topbar/tabbar */
+  --surface-opaque: #0f141b;                /* card/impostazioni */
+  --cell-bg: #10161e;                        /* celle calendario */
+
+  /* Bordi e separatori */
+  --gridBorder: rgba(255,255,255,.08);
+  --border-soft: rgba(255,255,255,.06);
+
+  /* Testi */
+  --text:#f2f4f7;
+  --muted:#a6b0bb;
+
+  /* Accenti */
+  --blue-rgb: 56,124,255;                    /* glow topbar */
+  --today: rgba(56,124,255,.18);
+  --sunday:#e04d4d;
+
+  /* Stati e feedback */
+  --actHover:  rgba(255,255,255,.08);
+  --actActive: rgba(255,255,255,.14);
+
+  /* Tabbar */
+  --tabColor:#b7bcc6;
+  --tabColorActive:#eef2f7;
+  --tabHoverBg: rgba(255,255,255,.08);
+  --tabActiveBg: rgba(255,255,255,.14);
+}
+
+/* Sfondo app “ancorato” per stabilità durante lo scroll */
+body{
+  background: var(--bg) fixed !important;
+  color: var(--text);
+}
+
+/* ---------- Superfici ---------- */
+
+/* Topbar + Tabbar: vetro sobrio */
+.topbar,
+.tabbar{
+  background: var(--surface-glass) !important;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    0 8px 26px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* Card impostazioni: opache e pulite */
+.settingsCard{
+  background: var(--surface-opaque) !important;
+  border: 1px solid var(--gridBorder) !important;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+/* Celle calendario: opache, essenziali */
+.cell{
+  background: var(--cell-bg) !important;
+  border: 1px solid var(--border-soft) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.02) inset;
+}
+
+/* Hover morbido (niente aloni da discoteca) */
+.cell::before{
+  transition: background .18s ease, box-shadow .18s ease;
+}
+.cell:hover::before{
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* “Oggi” con ring sobrio + lieve ombra */
+.today{
+  box-shadow:
+    inset 0 0 0 2px rgba(var(--blue-rgb), .28),
+    0 6px 18px rgba(var(--blue-rgb), .10);
+}
+
+/* Intestazioni giorni: blu vetro tenue */
+.weekhead div{
+  background: rgba(56,124,255,.22) !important;
+  border: 1px solid rgba(56,124,255,.34) !important;
+  color: #fff;
+}
+
+/* Numeri giorno più leggibili su scuro */
+.num{ color: rgba(240,244,248,.86) !important; }
+
+/* Topbar: niente fondo pieno oltre al vetro; glow resta il tuo */
+.topbar{
+  box-shadow:
+    inset 0 -1px 0 rgba(255,255,255,.04),
+    inset 0  1px 0 rgba(0,0,0,.55);
+}
+
+/* Wordmark POLIZIA: micro riflesso contemporaneo */
+.brandmark svg path{
+  filter:
+    drop-shadow(0 1px 0 rgba(255,255,255,.07))
+    drop-shadow(0 10px 24px rgba(56,124,255,.20));
+}
+
+/* Input/controlli coerenti */
+.settingsRow input,
+.settingsRow select,
+.orarioArea{
+  background: #0e141b !important;
+  border: 1px solid var(--gridBorder) !important;
+  color: var(--text) !important;
+}
+
+/* Dither inutile su scuro: ciao */
+.dither{ display:none !important; }
+
+
+
 
   </style>
 </head>
