@@ -220,10 +220,6 @@
   transform-origin: center;
 }
 
-/* per sicurezza, non tagliare eventuale ingrandimento */
-.topbar{ color:#fff; overflow:visible; }
-
-
   /* =========================================================
    [CSS-LAYOUT] Main, barra mese, intestazioni giorni
    ========================================================= */
@@ -254,17 +250,7 @@ main{
   gap:3px;            /* distanza per calendario */
   padding:3px 3px 0;  /* distanza per calendario - non toccare lo 0 */
 }
-.weekhead div{
-  background:var(--iosBlue);
-  color:#fff;
-  text-align:center;
-  padding:8px 0;
-  font-weight:700;
-  border-radius:10px;
-  border:1px solid var(--iosBlue-600);
-  letter-spacing:.03em;
-  font-size:.82rem;
-}
+
 
 html, body { height: 100%; }
 body.no-scroll { overflow: hidden; }
@@ -322,9 +308,6 @@ body.no-scroll main{
   z-index:1;
 }
 .sun .num{ color:var(--sunday) }
-
-/* “Oggi” evidenziato in modo soft, non a secchiellata */
-.today{ box-shadow: inset 0 0 0 2px rgba(25,118,210,.22); }
 
 /* Sigla del turno: un filo più bassa */
 .sigla{
@@ -389,14 +372,6 @@ body.no-scroll main{
   --tabColorActive: #e3e7ec;
   --tabHoverBg: rgba(255,255,255,.10);
   --tabActiveBg: rgba(255,255,255,.14);
-}
-@media (prefers-color-scheme: light){
-  :root{
-    --tabColor: #6d7786;        /* grigio su chiaro */
-    --tabColorActive: #1f2937;
-    --tabHoverBg: rgba(0,0,0,.06);
-    --tabActiveBg: rgba(0,0,0,.10);
-  }
 }
 
 /* Ogni icona/tab */
@@ -465,8 +440,6 @@ body.no-scroll main{
   /* =========================================================
      [CSS-FORMS TWEAKS] Campi, bottoni e griglia turni
      ========================================================= */
-  .siglaInput{max-width:70px;text-transform:uppercase}
-  .turni-grid .siglaInput{max-width:70px}
   .orarioInput{width:100%}
   .thin-sep{height:0;border-top:1px solid var(--gridBorder);margin:6px 0}
   .iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:8px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0}
@@ -474,7 +447,6 @@ body.no-scroll main{
   .iconbtn-danger{background:#b42325;color:#fff}
   .iconbtn:active{transform:translateY(1px)}
   @media(max-width:560px){
-    .turni-grid{grid-template-columns:1fr 80px 2fr 90px 44px !important}
     .settingsRow{grid-template-columns:120px 1fr}
   }
 .hide-topbar .topbar,           /* barra blu POLIZIA */
@@ -538,12 +510,6 @@ body.no-scroll main{
   text-transform:uppercase;
   text-align:center;
   letter-spacing:0.5px;
-}
-
-/* Orario: solo dimensioni base qui. La stilizzazione completa è sotto */
-.orarioArea{
-  min-width:0;
-  width:100%;
 }
 
 /* Mobile stretto */
@@ -697,29 +663,6 @@ body.no-scroll main{
    [CSS-SETTINGS ACTIONS] Pulsanti Salva/Importa — stile uniforme
    ========================================================= */
 
-/* knob rapidi (desktop) */
-:root{
-  --actBtn:    44px;          /* lato bottone */
-  --actIcon:   24px;          /* lato icona   */
-  --actStroke: 2.25px;        /* spessore tratto */
-
-  /* Colori SOLIDI per evitare scurimenti nelle sovrapposizioni */
-  --actColor:    #bcc3cc;     /* icona “spenta” (dark) */
-  --actColorHi:  #e6e9ee;     /* icona “accesa” (dark) */
-
-  /* Hover/Active: solo il fondo resta semitrasparente */
-  --actHover:  rgba(255,255,255,.12);
-  --actActive: rgba(255,255,255,.18);
-}
-@media (prefers-color-scheme: light){
-  :root{
-    --actColor:    #586069;   /* grigio pieno (light) */
-    --actColorHi:  #1f2328;   /* quasi-nero pieno (light) */
-    --actHover:    rgba(0,0,0,.08);
-    --actActive:   rgba(0,0,0,.12);
-  }
-}
-
 .actionIcons{
   display:flex; flex-wrap:wrap; gap:10px; align-items:center;
 }
@@ -806,17 +749,6 @@ body.no-scroll main{
   --sunday:#c62828;
 }
 
-/* Anti-banding off: su nero non serve */
-.dither{ display:none !important; }
-
-/* Tabbar coerente su scuro */
-:root{
-  --tabColor:#b7bcc6;
-  --tabColorActive:#e3e7ec;
-  --tabHoverBg:rgba(255,255,255,.10);
-  --tabActiveBg:rgba(255,255,255,.14);
-}
-
 /* =========================================================
    [THEME] Moderno 2025 — Neo-Glass Soft
    Incolla in fondo al <style>. Rimuovi per tornare indietro.
@@ -831,6 +763,14 @@ body.no-scroll main{
       rgba(20, 28, 46, 0) 55%)
     ,
     linear-gradient(180deg, #0a0f14 0%, #0a0d13 45%, #07090d 100%);
+  
+    /* Icone Salva e Importa */
+--actBtn:    44px;
+--actIcon:   24px;
+--actStroke: 2.25px;
+--actColor:    #bcc3cc;   /* icona “spenta” */
+--actColorHi:  #e6e9ee;   /* icona “accesa” */
+
 
   /* Superfici */
   --surface-glass: rgba(18, 22, 28, .55);   /* topbar/tabbar */
@@ -917,6 +857,12 @@ body{
   background: rgba(56,124,255,.22) !important;
   border: 1px solid rgba(56,124,255,.34) !important;
   color: #fff;
+  text-align:center;
+  padding:8px 0;
+  font-weight:700;
+  border-radius:10px;
+  letter-spacing:.03em;
+  font-size:.82rem;
 }
 
 /* Numeri giorno più leggibili su scuro */
@@ -945,10 +891,8 @@ body{
   color: var(--text) !important;
 }
 
-/* Dither inutile su scuro: ciao */
+/* Dither inutile su scuro: */
 .dither{ display:none !important; }
-
-
 
 
   </style>
@@ -1644,21 +1588,6 @@ async function startDropboxAuth() {
     if (el) el.textContent = "Errore locale nell'avvio PKCE";
   }
 }
-
-
-// =======================================================
-// [BLOCK: DROPBOX STATUS] – Fase 8
-// =======================================================
-function updateDropboxStatus() {
-  const token = localStorage.getItem("dropbox_token");
-  const el = document.getElementById("dropboxStatus");
-  if (token) {
-    el.textContent = "✅ Connesso a Dropbox";
-  } else {
-    el.textContent = "❌ Non collegato";
-  }
-}
-updateDropboxStatus();
 
 // =======================================================
 // [BLOCK: DROPBOX UI HELPERS] Stato icone + modale
