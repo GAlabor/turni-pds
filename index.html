@@ -730,26 +730,6 @@ body.no-scroll main{
 }
 
 /* =========================================================
-   [THEME OVERRIDE] Forza tema fisso scuro (sfondo nero)
-   ========================================================= */
-
-/* Colori fissi per tutta l’app, ignoriamo il sistema per semplice precedenza */
-:root{
-  /* Sfondo e superfici */
-  --bg:#000000;
-  --card:#0b0c10;
-  --gridBorder:#1a1f27;
-
-  /* Testi */
-  --text:#e6e8ec;
-  --muted:#98a3af;
-
-  /* Evidenze calendario */
-  --today:#103a7a;
-  --sunday:#c62828;
-}
-
-/* =========================================================
    [THEME] Moderno 2025 — Neo-Glass Soft
    Incolla in fondo al <style>. Rimuovi per tornare indietro.
    ========================================================= */
@@ -1560,33 +1540,6 @@ async function generateCodeChallenge(verifier) {
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
-}
-
-
-// =======================================================
-// [BLOCK: DROPBOX AUTH INIT] – Fase 7 (FIX async/PKCE)
-// =======================================================
-
-async function startDropboxAuth() {
-  try {
-    const verifier  = generateCodeVerifier();
-    const challenge = await generateCodeChallenge(verifier); // <-- QUI il punto chiave
-    localStorage.setItem("dbx_code_verifier", verifier);
-
-    const params = new URLSearchParams({
-      response_type: "code",
-      client_id: DROPBOX_APP_KEY,
-      redirect_uri: DROPBOX_REDIRECT,
-      token_access_type: "offline",
-      code_challenge_method: "S256",
-      code_challenge: challenge
-    });
-
-    window.location.href = `https://www.dropbox.com/oauth2/authorize?${params.toString()}`;
-  } catch (e) {
-    const el = document.getElementById("dropboxStatus");
-    if (el) el.textContent = "Errore locale nell'avvio PKCE";
-  }
 }
 
 // =======================================================
