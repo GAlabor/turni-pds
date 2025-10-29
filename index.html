@@ -1,3 +1,12 @@
+<!-- ======================= -->
+<!-- inizio html            -->
+<!-- ======================= -->
+<!doctype html>
+<html lang="it">
+
+<!-- ======================= -->
+<!-- inizio head            -->
+<!-- ======================= -->
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,11 +31,11 @@
   <!-- Manifest con query di versione -->
   <link rel="manifest" href="/turni-pds/manifest.webmanifest">
 
-
   <!-- Colore tema -->
   <meta name="theme-color" content="#387cff">
 
   <style>
+  /* ====== TUTTI I TUOI STILI INVARIATI (copiati 1:1) ====== */
 
   /* =========================================================
      [CSS-ROOT] Variabili tema e dimensioni standard
@@ -40,18 +49,18 @@
     --fieldH:44px;                        /* altezza campi impostazioni */
 
     /* === Glow vars (topbar + background) === */
---bar-h: 60px;     /* verrà aggiornato via JS all’altezza reale della tua topbar */
---seam: 20px;      /* lunghezza dissolvenza sotto la topbar */
---blue-rgb: 25,118,210; /* il tuo iosBlue in RGB */
+    --bar-h: 60px;     /* verrà aggiornato via JS all’altezza reale della tua topbar */
+    --seam: 20px;      /* lunghezza dissolvenza sotto la topbar */
+    --blue-rgb: 25,118,210; /* il tuo iosBlue in RGB */
 
---cx: 50%;
---cy: 50%;
---glow-x: 50%;
+    --cx: 50%;
+    --cy: 50%;
+    --glow-x: 50%;
 
---core-a1: 0.94; --core-a2: 0.82; --core-a3: 0.66; --core-a4: 0.48; --core-a5: 0.34;
---mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.08;
---far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.024;
---tail: color-mix(in oklch, rgb(var(--blue-rgb)) 0%, var(--bg) 100%);
+    --core-a1: 0.94; --core-a2: 0.82; --core-a3: 0.66; --core-a4: 0.48; --core-a5: 0.34;
+    --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.08;
+    --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.024;
+    --tail: color-mix(in oklch, rgb(var(--blue-rgb)) 0%, var(--bg) 100%);
   }
 
   /* =========================================================
@@ -63,180 +72,219 @@
   /* =========================================================
    [CSS-TOPBAR] Barra blu con glow continuo (misure invariabili)
    ========================================================= */
-.topbar{
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-  padding: 10px 12px;
-  color: #fff;
-  background: transparent;
+  .topbar{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px 12px;
+    color: #fff;
+    background: transparent;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: paint;
+    overflow: visible;
+    box-shadow:
+      inset 0 -1px 0 var(--bg),
+      inset 0  1px 0 var(--bg);
+  }
+  /* Omino nella topbar, allineato a destra */
+  .topbar-right{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
 
-  /* compositing */
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  contain: paint;
-  overflow: visible;
-
-  /* Seam-guard: copre qualsiasi hairline sopra/sotto */
-  box-shadow:
-    inset 0 -1px 0 var(--bg),
-    inset 0  1px 0 var(--bg);
-}
-
-/* Glow multilayer applicato alla topbar e sfumato sotto */
-.topbar::before{
-  content: "";
-  position: absolute;
-  left: 0; right: 0; top: 0;
-  height: calc(var(--bar-h) + var(--seam) + 2px);
-  pointer-events: none;
-
-  background:
-    linear-gradient(to right,
-      var(--bg) 0%,
-      color-mix(in oklch, var(--bg) 85%, transparent) 8%,
-      transparent 18%,
-      transparent 82%,
-      color-mix(in oklch, var(--bg) 85%, transparent) 92%,
-      var(--bg) 100%
-    ),
-    radial-gradient(
-      ellipse 85% 160% at var(--cx) var(--cy),
-      rgba(var(--blue-rgb), var(--far-a1)) 0%,
-      rgba(var(--blue-rgb), var(--far-a2)) 32%,
-      rgba(var(--blue-rgb), var(--far-a3)) 62%,
-      var(--tail) 100%
-    ),
-    radial-gradient(
-      ellipse 60% 130% at var(--cx) var(--cy),
-      rgba(var(--blue-rgb), var(--mid-a1)) 0%,
-      rgba(var(--blue-rgb), var(--mid-a2)) 26%,
-      rgba(var(--blue-rgb), var(--mid-a3)) 56%,
-      var(--tail) 100%
-    ),
-    radial-gradient(
-      ellipse var(--glow-x) 120% at var(--cx) var(--cy),
-      rgba(var(--blue-rgb), 1) 0%,
-      rgba(var(--blue-rgb), var(--core-a1)) 8%,
-      rgba(var(--blue-rgb), var(--core-a2)) 14%,
-      rgba(var(--blue-rgb), var(--core-a3)) 22%,
-      rgba(var(--blue-rgb), var(--core-a4)) 32%,
-      rgba(var(--blue-rgb), var(--core-a5)) 44%,
-      rgba(var(--blue-rgb), 0.12) 62%,
-      rgba(var(--blue-rgb), 0.06) 78%,
-      var(--tail) 100%
-    );
-
-  /* hard-stop preciso, niente bleed */
-  -webkit-mask-image:
-    linear-gradient(to bottom,
-      #000 0,
-      #000 var(--bar-h),
-      rgba(0,0,0,0.65) calc(var(--bar-h) + var(--seam) * .35),
-      rgba(0,0,0,0.28) calc(var(--bar-h) + var(--seam) * .75),
-      transparent           calc(var(--bar-h) + var(--seam)));
-  mask-image:
-    linear-gradient(to bottom,
-      #000 0,
-      #000 var(--bar-h),
-      rgba(0,0,0,0.65) calc(var(--bar-h) + var(--seam) * .35),
-      rgba(0,0,0,0.28) calc(var(--bar-h) + var(--seam) * .75),
-      transparent           calc(var(--bar-h) + var(--seam)));
-
-  /* rimosso il blur che causava gli “aloni” */
-}
-
-.todayDate{
-  font-size: 0.9rem;
-  text-align: center;
-  color: var(--muted);
-  margin-top: 6px;
-
-  /* anti-hairline fra topbar e riga data */
+/* === Badge di stato accanto all’omino === */
+#acctBtnHeader {
   position: relative;
-  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ===== [TOPBAR SVG WORDMARK] (SCALA, NON CAMBIA LAYOUT) ===== */
-.brandmark{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  line-height:0;
+#acctBtnHeader svg {
+  width: 28px;
+  height: 28px;
+  transition: transform .2s ease;
 }
-.brandmark svg{
-  display:block;
-  height:24px;                 /* lascia 24px: è la “base” del layout */
-  width:auto;
-  transform: scale(var(--wmScale, 1.80));  /* ↑ ingrandisci dimensoni scritta POLIZIA qui */
-  transform-origin: center;
+
+/* Desktop: omino leggermente più grande */
+@media (min-width: 720px) {
+  #acctBtnHeader svg {
+    width: 32px;
+    height: 32px;
+  }
 }
+
+/* Badge stato */
+.acct-badge{
+  position:absolute;
+  right:1px;
+  bottom:1px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#2ecc71;
+  box-shadow:0 0 2px rgba(46,204,113,.55);
+  transform:translate(1px,1px);
+}
+
+.acct-badge.off{
+  background:#9ba4b0;
+  box-shadow:none;
+  opacity:.85;
+}
+
+
+
+
+  .topbar::before{
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: calc(var(--bar-h) + var(--seam) + 2px);
+    pointer-events: none;
+    background:
+      linear-gradient(to right,
+        var(--bg) 0%,
+        color-mix(in oklch, var(--bg) 85%, transparent) 8%,
+        transparent 18%,
+        transparent 82%,
+        color-mix(in oklch, var(--bg) 85%, transparent) 92%,
+        var(--bg) 100%
+      ),
+      radial-gradient(
+        ellipse 85% 160% at var(--cx) var(--cy),
+        rgba(var(--blue-rgb), var(--far-a1)) 0%,
+        rgba(var(--blue-rgb), var(--far-a2)) 32%,
+        rgba(var(--blue-rgb), var(--far-a3)) 62%,
+        var(--tail) 100%
+      ),
+      radial-gradient(
+        ellipse 60% 130% at var(--cx) var(--cy),
+        rgba(var(--blue-rgb), var(--mid-a1)) 0%,
+        rgba(var(--blue-rgb), var(--mid-a2)) 26%,
+        rgba(var(--blue-rgb), var(--mid-a3)) 56%,
+        var(--tail) 100%
+      ),
+      radial-gradient(
+        ellipse var(--glow-x) 120% at var(--cx) var(--cy),
+        rgba(var(--blue-rgb), 1) 0%,
+        rgba(var(--blue-rgb), var(--core-a1)) 8%,
+        rgba(var(--blue-rgb), var(--core-a2)) 14%,
+        rgba(var(--blue-rgb), var(--core-a3)) 22%,
+        rgba(var(--blue-rgb), var(--core-a4)) 32%,
+        rgba(var(--blue-rgb), var(--core-a5)) 44%,
+        rgba(var(--blue-rgb), 0.12) 62%,
+        rgba(var(--blue-rgb), 0.06) 78%,
+        var(--tail) 100%
+      );
+    -webkit-mask-image:
+      linear-gradient(to bottom,
+        #000 0,
+        #000 var(--bar-h),
+        rgba(0,0,0,0.65) calc(var(--bar-h) + var(--seam) * .35),
+        rgba(0,0,0,0.28) calc(var(--bar-h) + var(--seam) * .75),
+        transparent           calc(var(--bar-h) + var(--seam))
+      );
+    mask-image:
+      linear-gradient(to bottom,
+        #000 0,
+        #000 var(--bar-h),
+        rgba(0,0,0,0.65) calc(var(--bar-h) + var(--seam) * .35),
+        rgba(0,0,0,0.28) calc(var(--bar-h) + var(--seam) * .75),
+        transparent           calc(var(--bar-h) + var(--seam))
+      );
+  }
+  .todayDate{
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--muted);
+    margin-top: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .brandmark{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:0;
+  }
+  .brandmark svg{
+    display:block;
+    height:24px;
+    width:auto;
+    transform: scale(var(--wmScale, 1.80));
+    transform-origin: center;
+  }
 
   /* =========================================================
    [CSS-LAYOUT] Main, barra mese, intestazioni giorni
    ========================================================= */
-main{
-  max-width:760px;
-  margin:8px auto 90px;
-  padding:0 10px;
-}
-.monthbar{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:8px;
-  margin:10px 0 6px;
-}
-.monthbar .title{ text-align:center }
+  main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
+  .monthbar{
+    display:grid; grid-template-columns:auto 1fr auto;
+    align-items:center; gap:8px; margin:10px 0 6px;
+  }
+  .monthbar .title{ text-align:center }
+
+  /* Frecce mese stile icone (tab/btn) */
 .navbtn{
-  appearance:none; border:0; background:transparent;
-  color:var(--iosBlue); font-size:22px; line-height:1;
-  cursor:pointer; padding:6px 8px; border-radius:10px;
-}
-.navbtn:active{ background:rgba(25,118,210,.12) }
-
-/* Intestazioni giorni: separazione morbida + raggio */
-.weekhead{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:3px;            /* distanza per calendario */
-  padding:3px 3px 0;  /* distanza per calendario - non toccare lo 0 */
-}
-
-
-html, body { height: 100%; }
-body.no-scroll { overflow: hidden; }
-
-/* Quando non vogliamo scroll globale nella vista calendario,
-   evitiamo anche il margine extra che te lo innesca. */
-body.no-scroll main{
-  margin-bottom: calc(var(--tabH) + 12px);
-  /* niente overflow del main: lasciamo i click liberi */
-  overflow: clip;
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:var(--actColor);               /* stesso colore icone */
+  font-size:22px;
+  line-height:1;
+  cursor:pointer;
+  padding:6px 8px;
+  border-radius:10px;
+  -webkit-tap-highlight-color:transparent;
+  transition: background .18s ease, color .18s ease, transform .06s ease;
 }
 
+.navbtn:hover{
+  background:var(--actHover);          /* alone morbido */
+  color:var(--actColorHi);             /* highlight come icone */
+  transform:translateY(-1px);
+}
+
+.navbtn:active{
+  background:var(--actActive);         /* click feedback */
+  color:var(--actColorHi);
+  transform:translateY(1px);
+}
 
 
-.view{ display:none }
-.view.active{ display:block }
+  .weekhead{
+    display:grid; grid-template-columns:repeat(7,1fr);
+    gap:3px; padding:3px 3px 0;
+  }
 
+  html, body { height: 100%; }
+  body.no-scroll { overflow: hidden; }
+  body.no-scroll main{ margin-bottom: calc(var(--tabH) + 12px); overflow: clip; }
+  .view{ display:none } .view.active{ display:block }
 
   /* =========================================================
-   [CSS-CALENDAR GRID] Celle calendario (gap + radius + glow)
+   [CSS-CALENDAR GRID]
    ========================================================= */
 .grid{
   display:grid;
   grid-template-columns:repeat(7,1fr);
   grid-auto-rows:minmax(62px,1fr);
-  gap:3px;      /* distanza per calendario */
-  padding:3px;  /* distanza per calendario */
+  gap:3px;
+  padding:3px;
 }
-
 .cell{
   position:relative;
   min-height:84px;
@@ -244,58 +292,67 @@ body.no-scroll main{
   display:flex;
   align-items:center;
   justify-content:center;
-  overflow:hidden;             /* per l’effetto hover */
+  overflow:hidden;
 }
-/* alone soft on hover/active/selected */
 .cell::before{
   content:"";
-  position:absolute; inset:0;
+  position:absolute;
+  inset:0;
   border-radius:inherit;
   background:transparent;
   transition:background .18s ease;
   pointer-events:none;
 }
-
-/* Giorno in alto a sinistra */
 .num{
-  position:absolute; left:8px; top:6px;
-  font-size:12px; color:var(--muted); font-weight:800;
+  position:absolute;
+  left:8px;
+  top:6px;
+  font-size:18px;
+  color:var(--muted);
+  font-weight:800;
   z-index:1;
 }
-.sun .num{ color:var(--sunday) }
-
-/* Sigla del turno: un filo più bassa */
+.sun .num{ color:var(--sunday); }
 .sigla{
-  font-size:22px; font-weight:400; letter-spacing:.5px; opacity:.95;
-  position:relative; top:8px; z-index:1;
+  font-size:23px;
+  font-weight:400;
+  letter-spacing:.5px;
+  opacity:.95;
+  position:relative;
+  top:8px;
+  z-index:1;
 }
-.T-GL{ color:var(--T-GL) }
-.T-AP{ color:var(--T-AP) }
-
-/* Hover/Active/Selected come i bottoni icona
-   (usa --actHover / --actActive già definiti) */
-.cell:hover::before{    background:var(--actHover); }
-.cell:active::before{   background:var(--actActive); }
+.T-GL{ color:var(--T-GL); }
+.T-AP{ color:var(--T-AP); }
+.cell:hover::before{ background:var(--actHover); }
+.cell:active::before{ background:var(--actActive); }
 .cell.selected::before{ background:var(--actActive); }
 
-/* Mobile: celle più compatte e più “quadrate” */
 @media(max-width:560px){
-  .grid{
-    grid-auto-rows:minmax(48px,1fr); /* era 62px, ora più umano */
+  .grid{ grid-auto-rows:minmax(48px,1fr); }
+  .cell{ min-height:auto; padding:4px 0; }
+
+  .num{
+    font-size:15px;                /* più grande e nitido */
+    font-weight:800;               /* ritorna al peso pieno */
+    top:4px;
+    color:var(--text);             /* più contrastato */
+    line-height:1;
+    -webkit-text-stroke:0.15px transparent;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
   }
-  .cell{
-    min-height:auto; /* niente forzature inutili */
-    padding:4px 0;
-  }
+
   .sigla{
     font-size:18px;
-    top:4px;
+    top:9px;
+    opacity:.9;
   }
 }
 
 
   /* =========================================================
-     [CSS-SETTINGS CARD] Struttura card impostazioni
+     [CSS-SETTINGS CARD]
      ========================================================= */
   .settingsCard{background:var(--card);border:1px solid var(--gridBorder);border-radius:10px;padding:14px;margin-top:10px}
   .settingsRow{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center;margin:8px 0}
@@ -303,543 +360,264 @@ body.no-scroll main{
   .settingsRow input,.settingsRow select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--gridBorder);background:var(--card);color:var(--text);height:var(--fieldH)}
   .savebtn{margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:var(--iosBlue);color:#fff;font-weight:700;cursor:pointer}
 
-/* =========================================================
-   [CSS-TABBAR] Navigazione in basso — stile uniforme
-   ========================================================= */
-.tabbar{
-  position:fixed;
-  bottom:0; left:0; right:0;
-  background:var(--card);
-  border-top:1px solid var(--gridBorder);
-  display:flex;
-  justify-content:space-around;
-  gap:10px;
-  padding:8px 10px;
-  z-index:10;
-}
-
-/* Variabili comode per dimensioni */
-:root{
-  --tabW: 56px;           /* desktop larghezza */
-  --tabH: 46px;           /* desktop altezza   */
-  --tabIcon: 22px;        /* desktop icona     */
-  --tabColor: #b7bcc6;    /* grigio icona/testo default (dark) */
-  --tabColorActive: #e3e7ec;
-  --tabHoverBg: rgba(255,255,255,.10);
-  --tabActiveBg: rgba(255,255,255,.14);
-}
-
-/* Ogni icona/tab */
-.tab{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  width:var(--tabW);
-  height:var(--tabH);
-  border-radius:12px;
-  background:transparent;
-  color:var(--tabColor);
-  font-size:12px;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition: background-color .18s ease, color .18s ease, transform .06s ease;
-}
-
-/* Icone SVG: stesso tratto, niente sovrapposizioni visive */
-.tab svg{
-  width:var(--tabIcon);
-  height:var(--tabIcon);
-  display:block;
-  fill:none;
-  stroke:currentColor;
-  stroke-width:2.25;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-
-/* Stato attivo: colore + leggero fill dell’intero tasto */
-.tab.active{
-  color:var(--tabColorActive);
-  background:var(--tabActiveBg);
-  font-weight:700;
-}
-
-/* Hover → illumina tutto il bottone, non solo il bordo */
-.tab:hover{
-  background:var(--tabHoverBg);
-  color:var(--tabColorActive);
-  transform:translateY(-1px);
-}
-
-/* Click */
-.tab:active{
-  background:var(--tabActiveBg);
-  transform:translateY(1px);
-}
-
-/* Testo compatto sotto l’icona (se lo usi) */
-.tab span{ line-height:1; }
-
-/* Mobile: più piccoli, stop alle padelle giganti */
-@media (max-width:560px){
-  :root{
-    --tabW: 48px;
-    --tabH: 40px;
-    --tabIcon: 18px;
+  /* =========================================================
+     [CSS-TABBAR]
+     ========================================================= */
+  .tabbar{
+    position:fixed; bottom:0; left:0; right:0;
+    background:var(--card); border-top:1px solid var(--gridBorder);
+    display:flex; justify-content:space-around; gap:10px;
+    padding:8px 10px; z-index:10;
   }
-}
-
+  :root{
+    --tabW: 56px; --tabH: 46px; --tabIcon: 22px;
+    --tabColor: #b7bcc6; --tabColorActive: #e3e7ec;
+    --tabHoverBg: rgba(255,255,255,.10); --tabActiveBg: rgba(255,255,255,.14);
+  }
+  .tab{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    width:var(--tabW); height:var(--tabH); border-radius:12px; background:transparent;
+    color:var(--tabColor); font-size:12px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    transition: background-color .18s ease, color .18s ease, transform .06s ease;
+  }
+  .tab svg{ width:var(--tabIcon); height:var(--tabIcon); display:block; fill:none; stroke:currentColor; stroke-width:2.25; stroke-linecap:round; stroke-linejoin:round; }
+  .tab.active{ color:var(--tabColorActive); background:var(--tabActiveBg); font-weight:700; }
+  .tab:hover{ background:var(--tabHoverBg); color:var(--tabColorActive); transform:translateY(-1px); }
+  .tab:active{ background:var(--tabActiveBg); transform:translateY(1px); }
+  .tab span{ line-height:1; }
+  @media (max-width:560px){
+    :root{ --tabW: 48px; --tabH: 40px; --tabIcon: 18px; }
+  }
 
   /* =========================================================
-     [CSS-FORMS TWEAKS] Campi, bottoni e griglia turni
+     [CSS-FORMS TWEAKS]
      ========================================================= */
   .thin-sep{height:0;border-top:1px solid var(--gridBorder);margin:6px 0}
   .iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:8px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0}
   .iconbtn-primary{background:var(--iosBlue);color:#fff}
   .iconbtn-danger{background:#b42325;color:#fff}
   .iconbtn:active{transform:translateY(1px)}
-  @media(max-width:560px){
-    .settingsRow{grid-template-columns:120px 1fr}
+  @media(max-width:560px){ .settingsRow{grid-template-columns:120px 1fr} }
+  .hide-topbar .topbar, .hide-topbar #todayHeaderRow{ display: none !important; }
+  .hide-topbar main{ margin-top: 8px; }
+
+  /* =========================================================
+     [CSS-COLOR PICKER]
+     ========================================================= */
+  .colorCell{ display:flex; align-items:center; justify-content:center; }
+  .colorInput{
+    -webkit-appearance:none; appearance:none;
+    box-sizing:border-box; width:var(--fieldH); height:var(--fieldH);
+    aspect-ratio:1/1; padding:0; margin:0;
+    border:1px solid var(--gridBorder); border-radius:8px;
+    background:transparent; min-width:0; line-height:normal;
   }
-.hide-topbar .topbar,           /* barra blu POLIZIA */
-.hide-topbar #todayHeaderRow{   /* riga data + icona Dropbox */
-  display: none !important;
-}
+  .colorInput::-webkit-color-swatch-wrapper{ padding:0; }
+  .colorInput::-webkit-color-swatch{ border:none; border-radius:6px; }
+  .colorInput::-moz-color-swatch{ border:none; border-radius:6px; }
+  @media (max-width:560px){ :root{ --fieldH:40px; } }
 
-/* Compensa lo spazio sopra quando le barre sono nascoste */
-.hide-topbar main{
-  margin-top: 8px; /* metti 0 se vuoi tutto attaccato */
-}
-
-/* =========================================================
-   [CSS-COLOR PICKER] Quadretto colore = altezza campi
+  /* =========================================================
+   [CSS-GRID TURNI OVERRIDE v4]
    ========================================================= */
-.colorCell{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* Il controllo ha ESATTAMENTE la stessa altezza dei campi */
-.colorInput{
-  -webkit-appearance:none; appearance:none;
-  box-sizing:border-box;
-  width:var(--fieldH);
-  height:var(--fieldH);
-  aspect-ratio:1/1;             /* forza il quadrato dove supportato */
-  padding:0;
-  margin:0;
-  border:1px solid var(--gridBorder);
-  border-radius:8px;            /* stessa raggiatura dei campi */
-  background:transparent;
-  min-width:0;
-  line-height:normal;
-}
-/* Chrome/Safari: niente padding/bordi interni */
-.colorInput::-webkit-color-swatch-wrapper{ padding:0; }
-.colorInput::-webkit-color-swatch{ border:none; border-radius:6px; }
-/* Firefox: allinea il “swatch” */
-.colorInput::-moz-color-swatch{ border:none; border-radius:6px; }
-
-/* Mobile: campi un filo più compatti → il quadretto segue */
-@media (max-width:560px){
-  :root{ --fieldH:40px; }
-}
-/* =========================================================
-   [CSS-GRID TURNI OVERRIDE v4] Sigla 4 char + Orario più corto
-   ========================================================= */
-/* Desktop / tablet */
-.turni-grid{
-  /* 1) Turno   2) Sigla   3) Orario   4) Colore   5) Azione */
-  grid-template-columns: 1fr 64px 1.05fr 52px 44px !important;
-  align-items:center;
-}
-
-/* Sigla comoda per 4 lettere */
-.siglaInput{
-  width:100%;
-  max-width:none;
-  text-transform:uppercase;
-  text-align:center;
-  letter-spacing:0.5px;
-}
-
-/* Mobile stretto */
-@media (max-width:560px){
-  .turni-grid{
-    grid-template-columns: 1fr 60px 0.85fr 46px 44px !important;
+  .turni-grid{ grid-template-columns: 1fr 64px 1.05fr 52px 44px !important; align-items:center; }
+  .siglaInput{ width:100%; max-width:none; text-transform:uppercase; text-align:center; letter-spacing:0.5px; }
+  @media (max-width:560px){
+    .turni-grid{ grid-template-columns: 1fr 60px 0.85fr 46px 44px !important; }
+    .siglaInput{ width:100%; }
   }
-  .siglaInput{ width:100%; }
-}
 
-/* =========================================================
-   [CSS-APP DATE FIELD v3] Altezza ridotta + testo centrato
+  /* =========================================================
+   [CSS-APP DATE FIELD v3]
    ========================================================= */
-.settingsRow input[type="date"]{
-  width:95%;
-  min-width:0;
-  font-size:1rem;
-  height:38px;                 /* più basso del precedente (~44px) */
-  line-height:38px;            /* centra la data in verticale */
-  text-align:center;           /* centra orizzontalmente il testo */
-  margin:0 auto;
-  display:block;
-  box-sizing:border-box;
-  border-radius:8px;
-}
-
-@media (max-width:560px){
   .settingsRow input[type="date"]{
-    width:92%;
-    font-size:1.05rem;
-    height:36px;               /* ancora un po’ più compatto in app */
-    line-height:36px;
+    width:95%; min-width:0; font-size:1rem; height:38px; line-height:38px;
+    text-align:center; margin:0 auto; display:block; box-sizing:border-box; border-radius:8px;
   }
-}
+  @media (max-width:560px){
+    .settingsRow input[type="date"]{
+      width:92%; font-size:1.05rem; height:36px; line-height:36px;
+    }
+  }
 
-
-/* =========================================================
-   [CSS-ORARIO MULTILINEA] Un solo campo, 2 righe (inizio/fine)
+  /* =========================================================
+   [CSS-ORARIO MULTILINEA]
    ========================================================= */
-.orarioArea{
-  display:block;
-  width:100%;
-  min-width:0;
-  height:calc(var(--fieldH) + 2px);   /* più basso di prima */
-  padding:6px 8px;
-  resize:none;
-  line-height:1.05;
-  font-size:0.86rem;                  /* più piccolo */
-  border:1px solid var(--gridBorder);
-  border-radius:8px;
-  background:var(--card);
-  color:var(--text);
-  box-sizing:border-box;
-  white-space:pre;                    /* rispetta il \n */
-}
-@media (max-width:560px){
-  .orarioArea{ font-size:0.8rem; height:calc(var(--fieldH)); }
-}
+  .orarioArea{
+    display:block; width:100%; min-width:0; height:calc(var(--fieldH) + 2px);
+    padding:6px 8px; resize:none; line-height:1.05; font-size:0.86rem;
+    border:1px solid var(--gridBorder); border-radius:8px; background:var(--card); color:var(--text);
+    box-sizing:border-box; white-space:pre;
+  }
+  @media (max-width:560px){ .orarioArea{ font-size:0.8rem; height:calc(var(--fieldH)); } }
+  @media (max-width:560px){ .settingsRow{ gap:6px; } .turni-grid > div:first-child input{ padding-left:8px; } }
 
-
-/* micro-spazi */
-@media (max-width:560px){
-  .settingsRow{ gap:6px; }
-  .turni-grid > div:first-child input{ padding-left:8px; } /* Turno parte un filo più a sx */
-}
-
-/* =========================================================
-   [CSS-DROPBOX UI] Icona stato + popup modale
+  /* =========================================================
+   [CSS-DROPBOX UI] (RIUSATO PER L’OMINO GOOGLE, NON TOCCATO)
    ========================================================= */
-.dropboxIconBtn{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:36px; height:36px;                 /* ↑ più grande */
-  margin-left:8px; cursor:pointer;
-  border-radius:6px;
-  border:1px solid transparent;
-  background:transparent;
-}
-.dropboxIconBtn:hover,
-.dropboxIconBtn:focus,
-.dropboxIconBtn:active{
-  background:transparent;
-  border-color:transparent;
-  box-shadow:none;
-}
-/* =========================================================
-   [CSS-DROPBOX ICONS] Fix dimensioni e attivi
-   ========================================================= */
-.dropboxIconBtn svg{
-  display:block;
-  width:22px;
-  height:22px;
-  background:transparent;
-}
+  .dropboxIconBtn{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; margin-left:8px; cursor:pointer;
+    border-radius:6px; border:1px solid transparent; background:transparent;
+  }
+  .dropboxIconBtn:hover,
+  .dropboxIconBtn:focus,
+  .dropboxIconBtn:active{ background:transparent; border-color:transparent; box-shadow:none; }
+  .dropboxIconBtn svg{ display:block; width:22px; height:22px; background:transparent; }
+  #dbxIconHeader svg{ width:28px; height:28px; }
+  .dropboxIconBtn:active{ transform:translateY(1px); }
+  .dbx-off{ color: var(--muted); }
+  .dbx-off svg path{ fill: currentColor; }
+  .dbx-on{ color: var(--iosBlue); }
+  .dbx-on svg path{ fill: currentColor; }
 
-/* Esempio: Header più grande (28px) */
-#dbxIconHeader svg{
-  width:28px;
-  height:28px;
-}
+  .modalBackdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35);
+    display:none; align-items:center; justify-content:center; z-index:50; }
+  .modalBackdrop.active{ display:flex; }
+  .modalCard{ width:min(480px, 92vw); background:var(--card); border:1px solid var(--gridBorder);
+    border-radius:12px; padding:16px; box-shadow:0 6px 24px rgba(0,0,0,.25); }
+  .modalHeader{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .modalTitle{ font-weight:700; }
+  .modalBody{ margin-top:10px; color:var(--muted); }
+  .modalActions{ margin-top:14px; display:flex; gap:8px; justify-content:flex-end; }
 
-/* Press feedback */
-.dropboxIconBtn:active{
-  transform:translateY(1px);
-}
+  .textbtn{ appearance:none; border:1px solid var(--gridBorder); background:transparent; color:var(--text);
+    padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; font-size:.92rem; }
+  .textbtn:active{ transform:translateY(1px); }
+  .textbtn-danger{ border-color:#b42325; color:#b42325; }
+  .textbtn-danger:active{ border-color:#96201f; }
 
+  .actionIcons{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .btn-icon{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:var(--actBtn); height:var(--actBtn); padding:0; border:none; border-radius:12px;
+    background:transparent; color:var(--actColor); cursor:pointer;
+    transition: background .18s ease, color .18s ease, transform .06s ease;
+  }
+  .btn-icon:hover{ background:var(--actHover); color:var(--actColorHi); transform:translateY(-1px); }
+  .btn-icon:active{ background:var(--actActive); color:var(--actColorHi); transform:translateY(1px); }
+  .btn-icon svg{ width:var(--actIcon); height:var(--actIcon); display:block; flex-shrink:0; stroke:currentColor; fill:none; }
+  .btn-icon svg, .btn-icon svg *{ stroke-linecap:round; stroke-linejoin:round; stroke-width:var(--actStroke); vector-effect:non-scaling-stroke; stroke-opacity:1; }
+  .btn-icon span{ display:none; }
+  @media (max-width:560px){
+    :root{ --actBtn:40px; --actIcon:22px; --actStroke:2px; }
+  }
 
-/* Stato NON connesso: stesso colore della data */
-.dbx-off{ color: var(--muted); }
-.dbx-off svg path{ fill: currentColor; }
+  .dither{ position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: .04; mix-blend-mode: multiply; display: none;
+    background:
+      repeating-linear-gradient(  0deg, rgba(0,0,0,.03) 0 1px, transparent 1px 2px),
+      repeating-linear-gradient( 90deg, rgba(0,0,0,.03) 0 1px, transparent 1px 2px),
+      repeating-linear-gradient( 45deg, rgba(0,0,0,.02) 0 1px, transparent 1px 2px),
+      repeating-linear-gradient(-45deg, rgba(0,0,0,.02) 0 1px, transparent 1px 2px);
+  }
+  @media (prefers-color-scheme: light){ .dither{ display: block; } }
 
-/* Stato connesso: blu tema */
-.dbx-on{ color: var(--iosBlue); }
-.dbx-on svg path{ fill: currentColor; }
-
-/* Modale leggero */
-.modalBackdrop{
-  position:fixed; inset:0; background:rgba(0,0,0,.35);
-  display:none; align-items:center; justify-content:center; z-index:50;
-}
-.modalBackdrop.active{ display:flex; }
-.modalCard{
-  width:min(480px, 92vw); background:var(--card);
-  border:1px solid var(--gridBorder); border-radius:12px;
-  padding:16px; box-shadow:0 6px 24px rgba(0,0,0,.25);
-}
-.modalHeader{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.modalTitle{ font-weight:700; }
-.modalBody{ margin-top:10px; color:var(--muted); }
-.modalActions{ margin-top:14px; display:flex; gap:8px; justify-content:flex-end; }
-
-/* =========================================================
-   [CSS-TEXT BUTTONS] Bottoni testuali per azioni leggere
-   ========================================================= */
-.textbtn{
-  appearance:none; border:1px solid var(--gridBorder);
-  background:transparent; color:var(--text);
-  padding:8px 12px; border-radius:8px; cursor:pointer;
-  font-weight:600; font-size:.92rem;
-}
-.textbtn:active{ transform:translateY(1px); }
-.textbtn-danger{
-  border-color:#b42325; color:#b42325;
-}
-.textbtn-danger:active{ border-color:#96201f; }
-
-
-/* =========================================================
-   [CSS-SETTINGS ACTIONS] Pulsanti Salva/Importa — stile uniforme
-   ========================================================= */
-
-.actionIcons{
-  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
-}
-
-/* Bottone icon-only */
-.btn-icon{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:var(--actBtn); height:var(--actBtn);
-  padding:0; border:none; border-radius:12px;
-  background:transparent;                 /* niente fondo/ombra a riposo */
-  color:var(--actColor);
-  cursor:pointer;
-  transition: background .18s ease, color .18s ease, transform .06s ease;
-}
-.btn-icon:hover{
-  background:var(--actHover);
-  color:var(--actColorHi);
-  transform:translateY(-1px);
-}
-.btn-icon:active{
-  background:var(--actActive);
-  color:var(--actColorHi);
-  transform:translateY(1px);
-}
-
-/* SVG interni: tratto uniforme, angoli arrotondati, NO doppie linee */
-.btn-icon svg{
-  width:var(--actIcon); height:var(--actIcon);
-  display:block; flex-shrink:0;
-  stroke:currentColor; fill:none;
-}
-/* forza opacità piena del tratto: niente aloni in sovrapposizione */
-.btn-icon svg,
-.btn-icon svg *{
-  stroke-linecap:round; stroke-linejoin:round;
-  stroke-width:var(--actStroke);
-  vector-effect:non-scaling-stroke;
-  stroke-opacity:1;
-}
-
-/* niente label visibile */
-.btn-icon span{ display:none; }
-
-/* Mobile un filo più compatto */
-@media (max-width:560px){
+  /* =========================================================
+     [THEME] Moderno 2025 — Neo-Glass Soft
+     ========================================================= */
   :root{
-    --actBtn:   40px;
-    --actIcon:  22px;
-    --actStroke: 2px;
+    --bg:
+      radial-gradient(1100px 640px at 50% -12%,
+        rgba(56, 124, 255, .22) 0%,
+        rgba(20, 28, 46, 0) 55%)
+      ,
+      linear-gradient(180deg, #0a0f14 0%, #0a0d13 45%, #07090d 100%);
+
+    --actBtn:    44px;
+    --actIcon:   24px;
+    --actStroke: 2.25px;
+    --actColor:    #bcc3cc;
+    --actColorHi:  #e6e9ee;
+
+    --surface-glass: rgba(18, 22, 28, .55);
+    --surface-opaque: #0f141b;
+    --cell-bg: #10161e;
+
+    --gridBorder: rgba(255,255,255,.08);
+    --border-soft: rgba(255,255,255,.06);
+
+    --text:#f2f4f7;
+    --muted:#a6b0bb;
+
+    --blue-rgb: 56,124,255;
+    --today: rgba(56,124,255,.18);
+    --sunday:#e04d4d;
+
+    --actHover:  rgba(255,255,255,.08);
+    --actActive: rgba(255,255,255,.14);
+
+    --tabColor:#b7bcc6;
+    --tabColorActive:#eef2f7;
+    --tabHoverBg: rgba(255,255,255,.08);
+    --tabActiveBg: rgba(255,255,255,.14);
   }
+  body{ background: var(--bg) fixed !important; color: var(--text); }
+  .topbar, .tabbar{
+    background: var(--surface-glass) !important;
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 8px 26px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .settingsCard{
+    background: var(--surface-opaque) !important;
+    border: 1px solid var(--gridBorder) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .cell{
+    background: var(--cell-bg) !important;
+    border: 1px solid var(--border-soft) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,.02) inset;
+  }
+  .cell::before{ transition: background .18s ease, box-shadow .18s ease; }
+  .cell:hover::before{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+
+/* Giorno di oggi: effetto hover potenziato (versione soft) */
+.today::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in oklch, var(--actHover) 55%, white 25%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.15),
+    0 0 12px 4px rgba(var(--blue-rgb),.20),
+    0 0 20px 8px rgba(var(--blue-rgb),.10);
+  pointer-events: none;
 }
 
-/* Anti-banding leggerissimo in light, sopra tutto */
-.dither{
-  position: fixed; inset: 0; z-index: 2; pointer-events: none;
-  opacity: .04; mix-blend-mode: multiply; display: none;
-  background:
-    repeating-linear-gradient(  0deg, rgba(0,0,0,.03) 0 1px, transparent 1px 2px),
-    repeating-linear-gradient( 90deg, rgba(0,0,0,.03) 0 1px, transparent 1px 2px),
-    repeating-linear-gradient( 45deg, rgba(0,0,0,.02) 0 1px, transparent 1px 2px),
-    repeating-linear-gradient(-45deg, rgba(0,0,0,.02) 0 1px, transparent 1px 2px);
-}
-@media (prefers-color-scheme: light){
-  .dither{ display: block; }
-}
 
-/* =========================================================
-   [THEME] Moderno 2025 — Neo-Glass Soft
-   Incolla in fondo al <style>. Rimuovi per tornare indietro.
-   ========================================================= */
 
-/* Palette e sfondo */
-:root{
-  /* Fondo: scuro con accenni freddi, niente “vernice bagnata” */
-  --bg:
-    radial-gradient(1100px 640px at 50% -12%,
-      rgba(56, 124, 255, .22) 0%,
-      rgba(20, 28, 46, 0) 55%)
-    ,
-    linear-gradient(180deg, #0a0f14 0%, #0a0d13 45%, #07090d 100%);
+
   
-    /* Icone Salva e Importa */
---actBtn:    44px;
---actIcon:   24px;
---actStroke: 2.25px;
---actColor:    #bcc3cc;   /* icona “spenta” */
---actColorHi:  #e6e9ee;   /* icona “accesa” */
-
-
-  /* Superfici */
-  --surface-glass: rgba(18, 22, 28, .55);   /* topbar/tabbar */
-  --surface-opaque: #0f141b;                /* card/impostazioni */
-  --cell-bg: #10161e;                        /* celle calendario */
-
-  /* Bordi e separatori */
-  --gridBorder: rgba(255,255,255,.08);
-  --border-soft: rgba(255,255,255,.06);
-
-  /* Testi */
-  --text:#f2f4f7;
-  --muted:#a6b0bb;
-
-  /* Accenti */
-  --blue-rgb: 56,124,255;                    /* glow topbar */
-  --today: rgba(56,124,255,.18);
-  --sunday:#e04d4d;
-
-  /* Stati e feedback */
-  --actHover:  rgba(255,255,255,.08);
-  --actActive: rgba(255,255,255,.14);
-
-  /* Tabbar */
-  --tabColor:#b7bcc6;
-  --tabColorActive:#eef2f7;
-  --tabHoverBg: rgba(255,255,255,.08);
-  --tabActiveBg: rgba(255,255,255,.14);
-}
-
-/* Sfondo app “ancorato” per stabilità durante lo scroll */
-body{
-  background: var(--bg) fixed !important;
-  color: var(--text);
-}
-
-/* ---------- Superfici ---------- */
-
-/* Topbar + Tabbar: vetro sobrio */
-.topbar,
-.tabbar{
-  background: var(--surface-glass) !important;
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  border: 1px solid var(--border-soft);
-  box-shadow:
-    0 8px 26px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.04);
-}
-
-/* Card impostazioni: opache e pulite */
-.settingsCard{
-  background: var(--surface-opaque) !important;
-  border: 1px solid var(--gridBorder) !important;
-  box-shadow:
-    0 10px 28px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.03);
-}
-
-/* Celle calendario: opache, essenziali */
-.cell{
-  background: var(--cell-bg) !important;
-  border: 1px solid var(--border-soft) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,.02) inset;
-}
-
-/* Hover morbido (niente aloni da discoteca) */
-.cell::before{
-  transition: background .18s ease, box-shadow .18s ease;
-}
-.cell:hover::before{
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
-}
-
-/* “Oggi” con ring sobrio + lieve ombra */
-.today{
-  box-shadow:
-    inset 0 0 0 2px rgba(var(--blue-rgb), .28),
-    0 6px 18px rgba(var(--blue-rgb), .10);
-}
-
-/* Intestazioni giorni: blu vetro tenue */
-.weekhead div{
-  background: rgba(56,124,255,.22) !important;
-  border: 1px solid rgba(56,124,255,.34) !important;
-  color: #fff;
-  text-align:center;
-  padding:8px 0;
-  font-weight:700;
-  border-radius:10px;
-  letter-spacing:.03em;
-  font-size:.82rem;
-}
-
-/* Numeri giorno: chiari, ma NON sovrascriviamo la domenica */
-.cell:not(.sun) .num{ color: rgba(240,244,248,.86); }
-
-
-/* Topbar: niente fondo pieno oltre al vetro; glow resta il tuo */
-.topbar{
-  box-shadow:
-    inset 0 -1px 0 rgba(255,255,255,.04),
-    inset 0  1px 0 rgba(0,0,0,.55);
-}
-
-/* Wordmark POLIZIA: micro riflesso contemporaneo */
-.brandmark svg path{
-  filter:
-    drop-shadow(0 1px 0 rgba(255,255,255,.07))
-    drop-shadow(0 10px 24px rgba(56,124,255,.20));
-}
-
-/* Input/controlli coerenti */
-.settingsRow input,
-.settingsRow select,
-.orarioArea{
-  background: #0e141b !important;
-  border: 1px solid var(--gridBorder) !important;
-  color: var(--text) !important;
-}
-
-/* Dither inutile su scuro: */
-.dither{ display:none !important; }
-
-
+  .weekhead div{
+    background: rgba(56,124,255,.22) !important; border: 1px solid rgba(56,124,255,.34) !important;
+    color: #fff; text-align:center; padding:8px 0; font-weight:700; border-radius:10px; letter-spacing:.03em; font-size:.82rem;
+  }
+  .cell:not(.sun) .num{ color: rgba(240,244,248,.86); }
+  .topbar{ box-shadow: inset 0 -1px 0 rgba(255,255,255,.04), inset 0  1px 0 rgba(0,0,0,.55); }
+  .brandmark svg path{ filter: drop-shadow(0 1px 0 rgba(255,255,255,.07)) drop-shadow(0 10px 24px rgba(56,124,255,.20)); }
+  .settingsRow input, .settingsRow select, .orarioArea{
+    background: #0e141b !important; border: 1px solid var(--gridBorder) !important; color: var(--text) !important;
+  }
+  .dither{ display:none !important; }
   </style>
 </head>
-
+<!-- ======================= -->
+<!-- fine head             -->
+<!-- ======================= -->
+<!-- ======================= -->
+<!-- inizio body            -->
+<!-- ======================= -->
 <body>
-
   <div class="dither" aria-hidden="true"></div>
 
-  <!-- =======================================================
-       [HTML-TOPBAR] Logo + scritta POLIZIA + data
-       ======================================================= -->
-  <div class="topbar" aria-label="Intestazione Polizia">
+     <!-- =======================================================
+     [HTML-TOPBAR] Logo + scritta POLIZIA + omino a destra
+     ======================================================= -->
+<div class="topbar" aria-label="Intestazione Polizia">
   <div class="brandmark" aria-label="Polizia" role="img">
-  <svg viewBox="0 0 2048 426" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- SVG POLIZIA  -->
+    <svg viewBox="0 0 2048 426" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path transform="translate(602,146)" d="m0 0h157l10 4 7 7 3 8v14l-9 45-6 25-4 10-7 9-10 7-8 3-6 1-33 1h-118l-13-4-6-4-4-5-3-10 1-15 12-56 4-13 5-10 10-10 10-5zm54 22-9 2-4 4-4 15-11 52-1 9 3 5 6 2h42l7-2 5-6 7-28 7-37 1-11-3-4-4-1z" fill="#FEFEFE"/>
     <path transform="translate(1634,144)" d="m0 0h105l10 2 5 5 2 7 5 97v17l-3 5-3 2h-63l-4-5-2-27-2-4h-54l-6 3-5 8-8 17-6 7-3 1h-61l-4-3 1-9 12-25 17-35 12-25 7-12 9-10 7-6 14-7 9-2zm35 24-9 3-4 5-13 26-4 10 2 5 3 1h35l5-3v-17l-2-25-3-4-3-1z" fill="#FEFEFE"/>
     <path transform="translate(419,144)" d="m0 0h65l21 3 9 4 5 4 3 6 1 5v15l-3 18-6 17-6 10-5 6-10 6-8 3-6 1-103 1-7 3-4 8-4 15-4 6-5 4-3 1-22 1h-15l-19-1-5-3-1-2v-10l14-67 6-24 5-10 8-9 10-6 11-3 9-1zm-27 25-7 2-3 3-4 12-5 24 1 5 4 3h56l5-3 3-5 6-27v-11l-4-3z" fill="#FEFEFE"/>
@@ -913,30 +691,24 @@ body{
     <path transform="translate(775,148)" d="m0 0" fill="#FEFEFE"/>
     <path transform="translate(1156,144)" d="m0 0" fill="#FEFEFE"/>
   </svg>
-</div>
+  </div>
 
-</div>
-
-
-
-  <div class="todayDate" id="todayHeaderRow" style="display:flex;align-items:center;justify-content:center;gap:8px">
-  <span id="todayHeader"></span>
-  <!-- =========================================================
-       [UI-DROPBOX ICON HEADER] Stato collegamento (clic = collega)
-       ========================================================= -->
-  <button id="dbxIconHeader" class="dropboxIconBtn dbx-off" title="Collega Dropbox" aria-label="Collega Dropbox">
-    <!-- Logo Dropbox (SVG) -->
+  <!-- SLOT DESTRO CON OMINO -->
+<div class="topbar-right">
+  <button id="acctBtnHeader" class="dropboxIconBtn dbx-off" title="Accedi con Google" aria-label="Accedi con Google">
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.5 3L12 6.5 7 9.5 1.5 6zM17.5 3L23 6 17 9.5 12 6.5zM7 10.5l5 3.5-5 3.5L1.5 14zM17 10.5l5.5 3.5L17 17.5l-5-3.5zM12 18l5 3-5 3-5-3z" fill="currentColor"/>
+      <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
     </svg>
+    <span class="acct-badge off" aria-hidden="true"></span>
   </button>
+</div>
+
 </div>
 
   <!-- =======================================================
        [HTML-CALENDAR VIEW] Vista calendario
        ======================================================= -->
   <main>
-
     <section class="view active" id="view-calendar">
       <div class="monthbar">
         <button class="navbtn" id="prev">&#x276E;</button>
@@ -957,56 +729,54 @@ body{
           <label>Primo giorno</label>
           <input type="date" id="startDate" />
         </div>
-        
-      <!-- =========================================================
-     [UI-ACTIONS] Salva su Dropbox + Importa da Dropbox (icone nuove)
-     ========================================================= -->
-<div class="settingsRow" style="grid-template-columns:1fr; align-items:center; margin-top:6px">
-  <div class="actionIcons">
-    <!-- Salva su Dropbox -->
-    <button id="btnSaveCloud" class="btn-icon" aria-label="Salva su Dropbox" title="Salva su Dropbox">
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M7.7647 4H5a1 1 0 0 0-1 1v11.5376c0 .293.129.571.352.761L8.4258 20.7619A1 1 0 0 0 9.0735 21H19a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-2.7647M7.7647 4v5a1 1 0 0 0 1 1h6.4706a1 1 0 0 0 1-1V4M7.7647 4h8.4706"/>
-    <path d="M9 21v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5"/>
-  </svg>
-</button>
 
-    <!-- Importa da Dropbox -->
-    <button id="btnImportCloud" class="btn-icon" aria-label="Importa da Dropbox" title="Importa da Dropbox">
-  <svg viewBox="0 0 72 72" aria-hidden="true">
-    <path d="M20 15h14l6 6h20v32a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V19a4 4 0 0 1 4-4z"/>
-    <path d="M36 46V30"/>
-    <path d="M30 36l6-6 6 6"/>
-  </svg>
-</button>
-  </div>
-</div>
+        <!-- =========================================================
+             [UI-ACTIONS] Salva su Google + Importa da Google (icone)
+             ========================================================= -->
+        <div class="settingsRow" style="grid-template-columns:1fr; align-items:center; margin-top:6px">
+          <div class="actionIcons">
+            <!-- Salva su Google -->
+            <button id="btnSaveCloud" class="btn-icon" aria-label="Salva su Google" title="Salva su Google">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7.5 3h9a2 2 0 0 1 2 2v14a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2Z" />
+                <path d="M8 12h8M12 8v8" />
+              </svg>
+            </button>
 
-<!-- =========================================================
-     [UI-DROPBOX ICON SETTINGS] Icona + stato + Disconnetti
-     ========================================================= -->
-<div class="settingsRow" style="grid-template-columns:1fr;align-items:center">
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <button id="dbxIconSettings" class="dropboxIconBtn dbx-off" title="Collega Dropbox" aria-label="Collega Dropbox">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6.5 3L12 6.5 7 9.5 1.5 6zM17.5 3L23 6 17 9.5 12 6.5zM7 10.5l5 3.5-5 3.5L1.5 14zM17 10.5l5.5 3.5L17 17.5l-5-3.5zM12 18l5 3-5 3-5-3z" fill="currentColor"/>
-      </svg>
-    </button>
+            <!-- Importa da Google -->
+            <button id="btnImportCloud" class="btn-icon" aria-label="Importa da Google" title="Importa da Google">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7.5 3h9a2 2 0 0 1 2 2v14a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2Z" />
+                <path d="M12 16V8M12 8l-3 3M12 8l3 3" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
-    <span id="dropboxStatus" class="todayDate"></span>
+        <!-- =========================================================
+             [UI-ACCOUNT ICON SETTINGS] Icona + stato + Disconnetti
+             ========================================================= -->
+        <div class="settingsRow" style="grid-template-columns:1fr;align-items:center">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button id="acctBtnSettings" class="dropboxIconBtn dbx-off" title="Accedi con Google" aria-label="Accedi con Google">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
+              </svg>
+            </button>
 
-    <!-- Pulsante disconnessione: visibile solo quando connessi -->
-    <button id="dbxDisconnect" type="button" class="textbtn textbtn-danger" style="display:none">
-      Disconnetti
-    </button>
-  </div>
-</div>
+            <span id="cloudStatusSettings" class="todayDate"></span>
 
+            <!-- Pulsante disconnessione: visibile solo quando connessi -->
+            <button id="acctDisconnect" type="button" class="textbtn textbtn-danger" style="display:none">
+              Disconnetti
+            </button>
+          </div>
+        </div>
 
         <hr style="border:none;border-top:1px solid var(--gridBorder);margin:12px 0" />
 
         <!-- [SET-HEAD] Intestazioni turni -->
-          <div class="settingsRow turni-grid turni-head">
+        <div class="settingsRow turni-grid turni-head">
           <div style="font-weight:700;color:var(--muted)">Turno</div>
           <div style="font-weight:700;color:var(--muted)">Sigla</div>
           <div style="font-weight:700;color:var(--muted)">Orario</div>
@@ -1017,13 +787,12 @@ body{
 
         <!-- [SET-ADD ROW] Riga “Aggiungi turno” -->
         <div class="settingsRow turni-grid" style="align-items:center">
-  <div><input id="newNome"></div>
-  <div><input id="newSigla" class="siglaInput" maxlength="4"></div>
-  <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00"></textarea>
-  <div class="colorCell"><input id="newColor" class="colorInput" type="color" value="#8e88ff" title="Colore"></div>
-  <button id="btnAddTurno" type="button" class="iconbtn iconbtn-primary" title="Aggiungi">+</button>
-</div>
-
+          <div><input id="newNome"></div>
+          <div><input id="newSigla" class="siglaInput" maxlength="4"></div>
+          <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00"></textarea>
+          <div class="colorCell"><input id="newColor" class="colorInput" type="color" value="#8e88ff" title="Colore"></div>
+          <button id="btnAddTurno" type="button" class="iconbtn iconbtn-primary" title="Aggiungi">+</button>
+        </div>
 
         <!-- [SET-LIST] Elenco turni -->
         <div id="turniList"></div>
@@ -1031,71 +800,66 @@ body{
     </section>
 
     <!-- =========================================================
-     [UI-DROPBOX MODAL] Popup collegamento
-     ========================================================= -->
-<div id="dbxModal" class="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="dbxModalTitle">
-  <div class="modalCard">
-    <div class="modalHeader">
-      <div class="modalTitle" id="dbxModalTitle">Collega Dropbox</div>
-      <button id="dbxModalClose" class="iconbtn iconbtn-danger" title="Chiudi">✕</button>
+         [UI-ACCOUNT MODAL] Popup collegamento Google (simulato)
+         ========================================================= -->
+    <div id="acctModal" class="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="acctModalTitle">
+      <div class="modalCard">
+        <div class="modalHeader">
+          <div class="modalTitle" id="acctModalTitle">Accedi con Google</div>
+          <button id="acctModalClose" class="iconbtn iconbtn-danger" title="Chiudi">✕</button>
+        </div>
+        <div class="modalBody">
+          Verrà avviata la procedura di accesso a Google. In questa build è una simulazione: vedrai l’icona cambiare e potrai salvare/importare dati di prova. Inseriremo più avanti il tuo <em>Client ID</em> per attivare Drive AppData reale.
+        </div>
+        <div class="modalActions">
+          <button id="acctModalGo" class="savebtn">Procedi</button>
+        </div>
+      </div>
     </div>
-    <div class="modalBody">
-      Verrà aperta una finestra di Dropbox per l’autorizzazione. Dopo il collegamento, tornerai al calendario.
-    </div>
-    <div class="modalActions">
-      <button id="dbxModalGo" class="savebtn">Procedi</button>
-    </div>
-  </div>
-</div>
-
-
   </main>
+  <!-- =======================================================
+       [HTML-TABBAR] Navigazione inferiore
+       ======================================================= -->
+  <nav class="tabbar" aria-label="Barra schede">
+    <div class="tab active" data-tab="calendar" aria-label="Calendario">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </div>
+
+    <div class="tab" data-tab="settings" aria-label="Impostazioni">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+                 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51
+                 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06
+                 a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+                 a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06
+                 a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09
+                 a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09
+                 a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06
+                 a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+                 a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+  </nav>
 
   <!-- =======================================================
-     [HTML-TABBAR] Navigazione inferiore
-     ======================================================= -->
-<nav class="tabbar" aria-label="Barra schede">
-  <div class="tab active" data-tab="calendar" aria-label="Calendario">
-    <!-- Icona Calendario (stroke = currentColor, fill = none) -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-      <line x1="16" y1="2" x2="16" y2="6"></line>
-      <line x1="8" y1="2" x2="8" y2="6"></line>
-      <line x1="3" y1="10" x2="21" y2="10"></line>
-    </svg>
-    <!--<span>Calendario</span>--> <!-- togli la parte dei commenti per avere il nome sotto l'icona -->
-  </div>
-
-  <div class="tab" data-tab="settings" aria-label="Impostazioni">
-    <!-- Icona Impostazioni -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="3"></circle>
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
-               1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51
-               1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06
-               a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
-               a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06
-               a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09
-               a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09
-               a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06
-               a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
-               a1.65 1.65 0 0 0-1.51 1z"/>
-    </svg>
-    <!--<span>Impostazioni</span>--> <!-- togli la parte dei commenti per avere il nome sotto l'icona -->
-  </div>
-</nav>
-
-
-  <!-- =======================================================
-     [JS-MAIN] Script principale pagina Turni PDS
-     ======================================================= -->
-
+       [JS-MAIN] Script principale pagina Turni PDS
+       ======================================================= -->
   <script>
   "use strict";
+
+  // ======================= //
+  // inizio JSS (script)     //
+  // ======================= //
 
   // =========================================================
   // [FN: util_jsWeekdayUTC] Lunedì=0 … Domenica=6 (UTC)
@@ -1111,48 +875,44 @@ body{
   // [FN: util_fmtMonth] “ottobre 2025”
   // =========================================================
   function util_fmtMonth(fmt,y,m){ return fmt.format(new Date(y,m,1)) }
-  // =========================================================
-  // [FN: util_splitOrario] "07:00–13:00" -> {start:"07:00", end:"13:00"}
-  // [FN: util_joinOrarioMultiline] "riga1\nriga2" -> "riga1–riga2"
-  // =========================================================
-function util_splitOrario(s){
-  const parts = String(s||'').split(/[-–—]/).map(x=>x.trim());
-  return { start: parts[0]||'', end: parts[1]||'' };
-}
-function util_joinOrarioMultiline(txt){
-  const [rawS='', rawE=''] = String(txt||'').split(/\n/);
-  const s = (rawS || '').trim();
-  const e = (rawE || '').trim();
-  return (s || e) ? `${s}–${e}` : '';
-}
-
-// =======================================================
-// [STORAGE PAYLOAD] Cosa salviamo su Dropbox
-// =======================================================
-function storage_buildPayload(){
-  return {
-    _meta:{
-      app:"Turni Polizia di Stato",
-      version:1,
-      savedAt:new Date().toISOString()
-    },
-    settings: settings_effective(),     // {date, shift}
-    defs:     defs_effective()          // lista turni personalizzati
-  };
-}
-
-// Nome file: YYYY-MM-TURNI.json (es. 2025-10-TURNI.json)
-function storage_buildFilename(){
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = util_pad2(now.getMonth()+1);
-  return `${y}-${m}-TURNI.json`;
-}
-
-
 
   // =========================================================
-  // [BLOCK: JS-STATE] Formatter, date e riferimenti DOM
+  // [FN: util_splitOrario / util_joinOrarioMultiline]
+  // =========================================================
+  function util_splitOrario(s){
+    const parts = String(s||'').split(/[-–—]/).map(x=>x.trim());
+    return { start: parts[0]||'', end: parts[1]||'' };
+  }
+  function util_joinOrarioMultiline(txt){
+    const [rawS='', rawE=''] = String(txt||'').split(/\n/);
+    const s = (rawS || '').trim();
+    const e = (rawE || '').trim();
+    return (s || e) ? `${s}–${e}` : '';
+  }
+
+  // =======================================================
+  // [STORAGE PAYLOAD] JSON che salveremo (mock AppData)
+  // =======================================================
+  function storage_buildPayload(){
+    return {
+      _meta:{
+        app:"Turni Polizia di Stato",
+        version:1,
+        savedAt:new Date().toISOString()
+      },
+      settings: settings_effective(),     // {date, shift}
+      defs:     defs_effective()          // lista turni personalizzati
+    };
+  }
+  function storage_buildFilename(){
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = util_pad2(now.getMonth()+1);
+    return `${y}-${m}-TURNI.json`;
+  }
+
+  // =========================================================
+  // [BLOCK: JS-STATE]
   // =========================================================
   const itMonth = new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'});
   const today   = new Date();
@@ -1177,8 +937,7 @@ function storage_buildFilename(){
   ];
 
   // =========================================================
-  // [FN: defs_load / defs_save / defs_effective]
-  // Gestione definizioni turni personalizzate
+  // [FN: defs_*] Gestione definizioni turni personalizzate
   // =========================================================
   function defs_load(){ try{ return JSON.parse(localStorage.getItem(LS_TURNS))||null }catch{ return null } }
   function defs_save(list){ localStorage.setItem(LS_TURNS, JSON.stringify(list)) }
@@ -1210,7 +969,7 @@ function storage_buildFilename(){
   }
 
   // =========================================================
-  // [FN: shifts_codeForDate] Calcolo ciclo S→P→M→N→R + GL/AP
+  // [FN: shifts_codeForDate] ciclo S→P→M→N→R con GL/AP
   // =========================================================
   const BASE_SEQ=['S','P','M','N','R'];
   function shifts_codeForDate(d){
@@ -1230,7 +989,6 @@ function storage_buildFilename(){
 
   // =========================================================
   // [FN: ui_displayLabelFor / ui_colorForBase]
-  // Etichetta e colore per sigle base
   // =========================================================
   function ui_displayLabelFor(base){
     const f = defs_effective().find(x => x.key === base);
@@ -1242,7 +1000,7 @@ function storage_buildFilename(){
   }
 
   // =========================================================
-  // [FN: render_createCellHTML] HTML singola cella del mese
+  // [FN: render_*] Celle + intero mese
   // =========================================================
   function render_createCellHTML({day, sun, sigla, isToday, startCol}){
     const classes = ['cell']; if (sun) classes.push('sun'); if (isToday) classes.push('today');
@@ -1261,9 +1019,6 @@ function storage_buildFilename(){
     return `<div class="${classes.join(' ')}"${startAttr}><span class="num">${util_pad2(day)}</span>${siglaSpan}</div>`;
   }
 
-  // =========================================================
-  // [FN: render_buildMonth] Costruzione dell'intero mese
-  // =========================================================
   function render_buildMonth(year,month){
     grid.innerHTML='';
     const first=new Date(Date.UTC(year,month,1));
@@ -1282,7 +1037,7 @@ function storage_buildFilename(){
   }
 
   // =========================================================
-  // [FN: nav_shift] Navigazione mese precedente/successivo
+  // [FN: nav_shift] prev/next mese
   // =========================================================
   function nav_shift(delta){
     view=new Date(Date.UTC(view.getUTCFullYear(), view.getUTCMonth()+delta, 1));
@@ -1290,90 +1045,83 @@ function storage_buildFilename(){
   }
 
   // =========================================================
-  // [FN: ui_switchTab] Cambio vista (calendario/impostazioni)
+  // [FN: ui_switchTab] calendario <-> impostazioni
   // =========================================================
   function ui_switchTab(name){
-  const isSettings = (name === 'settings');
+    const isSettings = (name === 'settings');
 
-  document.body.classList.toggle('hide-topbar', isSettings);
-  document.body.classList.toggle('no-scroll', !isSettings); // ← blocca scroll solo in calendario
+    document.body.classList.toggle('hide-topbar', isSettings);
+    document.body.classList.toggle('no-scroll', !isSettings);
 
-  document.querySelectorAll('.tab').forEach(el =>
-    el.classList.toggle('active', el.dataset.tab === name)
-  );
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(`view-${name}`).classList.add('active');
+    document.querySelectorAll('.tab').forEach(el =>
+      el.classList.toggle('active', el.dataset.tab === name)
+    );
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
 
-  // riallinea il glow alla nuova geometria
-  ui_updateTopbarGlowCenter();
-}
-
+    ui_updateTopbarGlowCenter();
+  }
 
   // =========================================================
-  // [FN: ui_defsRenderList] Rende la lista dei turni
+  // [FN: ui_defsRenderList] lista turni
   // =========================================================
-function ui_defsRenderList(){
-  const list=defs_effective();
-  const wrap=document.getElementById('turniList');
-  wrap.innerHTML='';
-  list.forEach((t,idx)=>{
-    const row=document.createElement('div');
-    row.className='settingsRow turni-grid';
-    row.style.alignItems='center';
+  function ui_defsRenderList(){
+    const list=defs_effective();
+    const wrap=document.getElementById('turniList');
+    wrap.innerHTML='';
+    list.forEach((t,idx)=>{
+      const row=document.createElement('div');
+      row.className='settingsRow turni-grid';
+      row.style.alignItems='center';
 
-    const p = util_splitOrario(t.orario);
-    row.innerHTML = [
-      `<input value="${t.nome}" data-k="nome" data-i="${idx}" />`,
-      `<input value="${t.sigla}" maxlength="4" class="siglaInput" data-k="sigla" data-i="${idx}" />`,
-      `<textarea class="orarioArea" data-k="orarioMultiline" data-i="${idx}" rows="2">${p.start}\n${p.end}</textarea>`,
-      `<div class="colorCell"><input value="${t.color || '#8e88ff'}" class="colorInput" data-k="color" data-i="${idx}" type="color" /></div>`,
-      `<button type="button" class="iconbtn iconbtn-danger" data-act="del" data-i="${idx}">✕</button>`
-    ].join('');
+      const p = util_splitOrario(t.orario);
+      row.innerHTML = [
+        `<input value="${t.nome}" data-k="nome" data-i="${idx}" />`,
+        `<input value="${t.sigla}" maxlength="4" class="siglaInput" data-k="sigla" data-i="${idx}" />`,
+        `<textarea class="orarioArea" data-k="orarioMultiline" data-i="${idx}" rows="2">${p.start}\n${p.end}</textarea>`,
+        `<div class="colorCell"><input value="${t.color || '#8e88ff'}" class="colorInput" data-k="color" data-i="${idx}" type="color" /></div>`,
+        `<button type="button" class="iconbtn iconbtn-danger" data-act="del" data-i="${idx}">✕</button>`
+      ].join('');
 
-    wrap.appendChild(row);
-  });
+      wrap.appendChild(row);
+    });
 
-  // Pulsante elimina
-  wrap.querySelectorAll('button[data-act="del"]').forEach(b=>{
-    b.addEventListener('click', ()=> ui_defsDelete(parseInt(b.dataset.i)));
-  });
+    wrap.querySelectorAll('button[data-act="del"]').forEach(b=>{
+      b.addEventListener('click', ()=> ui_defsDelete(parseInt(b.dataset.i)));
+    });
 
-  // Input/textarea con aggiornamento live e a change
-  wrap.querySelectorAll('input, textarea').forEach(inp=>{
-    const h = ()=>{
-      ui_defsEditInline(parseInt(inp.dataset.i), inp.dataset.k, inp.value);
-      render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
-    };
-    inp.addEventListener('input', h);
-    inp.addEventListener('change', h);
-  });
-}
-
+    wrap.querySelectorAll('input, textarea').forEach(inp=>{
+      const h = ()=>{
+        ui_defsEditInline(parseInt(inp.dataset.i), inp.dataset.k, inp.value);
+        render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+      };
+      inp.addEventListener('input', h);
+      inp.addEventListener('change', h);
+    });
+  }
 
   // =========================================================
-  // [FN: ui_defsAdd / ui_defsClearNew / ui_defsDelete / ui_defsEditInline]
-  // CRUD dei turni
+  // [FN: CRUD turni]
   // =========================================================
   function ui_defsAdd(){
-  const nome  = document.getElementById('newNome').value.trim();
-  const sigla = document.getElementById('newSigla').value.trim().toUpperCase();
-  const orTxt = document.getElementById('newOrario').value; // può contenere \n
-  const color = document.getElementById('newColor').value.trim() || '#8e88ff';
-  if(!nome || !sigla) return;
-  const orario = util_joinOrarioMultiline(orTxt);
-  const list=defs_effective();
-  list.push({ key:'X'+Date.now(), nome, sigla, orario, color });
-  defs_save(list);
-  ui_defsClearNew();
-  ui_defsRenderList();
-}
-
+    const nome  = document.getElementById('newNome').value.trim();
+    const sigla = document.getElementById('newSigla').value.trim().toUpperCase();
+    const orTxt = document.getElementById('newOrario').value;
+    const color = document.getElementById('newColor').value.trim() || '#8e88ff';
+    if(!nome || !sigla) return;
+    const orario = util_joinOrarioMultiline(orTxt);
+    const list=defs_effective();
+    list.push({ key:'X'+Date.now(), nome, sigla, orario, color });
+    defs_save(list);
+    ui_defsClearNew();
+    ui_defsRenderList();
+  }
   function ui_defsClearNew(){
-  document.getElementById('newNome').value = '';
-  document.getElementById('newSigla').value = '';
-  document.getElementById('newOrario').value = '';   // <-- una sola riga per orario
-  document.getElementById('newColor').value = '#8e88ff';
-}
+    document.getElementById('newNome').value = '';
+    document.getElementById('newSigla').value = '';
+    document.getElementById('newOrario').value = '';
+    document.getElementById('newColor').value = '#8e88ff';
+  }
   function ui_defsDelete(i){
     const list=defs_effective();
     list.splice(i,1);
@@ -1381,19 +1129,18 @@ function ui_defsRenderList(){
     ui_defsRenderList();
   }
   function ui_defsEditInline(i,key,val){
-  const list=defs_effective();
-  if(!list[i]) return;
-
-  if(key==='orarioMultiline'){
-    list[i].orario = util_joinOrarioMultiline(val);
-  }else{
-    list[i][key]=val;
+    const list=defs_effective();
+    if(!list[i]) return;
+    if(key==='orarioMultiline'){
+      list[i].orario = util_joinOrarioMultiline(val);
+    }else{
+      list[i][key]=val;
+    }
+    defs_save(list);
   }
-  defs_save(list);
-}
 
   // =========================================================
-  // [FN: ui_settingsInit / ui_settingsApply] Init e Salva
+  // [FN: ui_settings*]
   // =========================================================
   function ui_settingsInit(){
     const c=settings_effective();
@@ -1408,484 +1155,261 @@ function ui_defsRenderList(){
   }
 
   // =========================================================
-// [FN: ui_updateTopbarGlowCenter] allinea glow a topbar reale
-// =========================================================
-function ui_updateTopbarGlowCenter(){
-  const bar = document.querySelector('.topbar');
-  if(!bar) return;
-  const r = bar.getBoundingClientRect();
-
-  // Centro assoluto della topbar (in px viewport) per i radial-gradient
-  const cx = r.left + r.width/2;
-  const cy = r.top  + r.height/2;
-  document.documentElement.style.setProperty('--cx', cx + 'px');
-  document.documentElement.style.setProperty('--cy', cy + 'px');
-
-  // Altezza reale della topbar: non cambiamo le tue misure, le leggiamo
-  document.documentElement.style.setProperty('--bar-h', r.height + 'px');
-}
-
+  // [FN: ui_updateTopbarGlowCenter] allinea glow
   // =========================================================
-  // [FN: boot_init] Avvio app
+  function ui_updateTopbarGlowCenter(){
+    const bar = document.querySelector('.topbar');
+    if(!bar) return;
+    const r = bar.getBoundingClientRect();
+    const cx = r.left + r.width/2;
+    const cy = r.top  + r.height/2;
+    document.documentElement.style.setProperty('--cx', cx + 'px');
+    document.documentElement.style.setProperty('--cy', cy + 'px');
+    document.documentElement.style.setProperty('--bar-h', r.height + 'px');
+  }
   // =========================================================
-  function boot_init(){
-  const fmt=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  const f=fmt.format(new Date());
-  document.getElementById('todayHeader').textContent=f.charAt(0).toUpperCase()+f.slice(1);
+  // [BLOCK: GOOGLE ACCOUNT – SIMULAZIONE COMPLETA]
+  // Nota: riuso classi .dropboxIconBtn / .dbx-on|off per non toccare CSS
+  // =========================================================
+  const GOOGLE_CLIENT_ID_PLACEHOLDER = 'INSERISCI_CLIENT_ID_QUI';
+  const LS_GOOGLE_TOKEN  = 'google_token';
+  const LS_GOOGLE_PHOTO  = 'google_user_photo';
+  const LS_GOOGLE_EMAIL  = 'google_user_email';
 
-  // Navigazione calendario
-  document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
-  document.getElementById('next').addEventListener('click', ()=>nav_shift(1));
+  function g_isConnected(){ return !!localStorage.getItem(LS_GOOGLE_TOKEN); }
 
-  // Cambio tab
-  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>ui_switchTab(t.dataset.tab)));
+function g_updateIcons(){
+  const on = g_isConnected();
+  const h  = document.getElementById("acctBtnHeader");
+  const s  = document.getElementById("acctBtnSettings");   // in impostazioni
+  const st2= document.getElementById("cloudStatusSettings"); // SOLO in impostazioni
+  const dis= document.getElementById("acctDisconnect");
 
-  // Impostazioni
-document.getElementById('btnAddTurno').addEventListener('click', ui_defsAdd);
-
-const btnSaveCloud  = document.getElementById('btnSaveCloud');
-const btnImportCloud= document.getElementById('btnImportCloud');
-if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToDropbox);
-if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDropbox);
-
-  // >>> QUI: bind icone e stato Dropbox all’avvio <<<
-  dbx_bindIconClicks();
-  dbx_updateIcons(); // allinea lo stato delle icone al boot
-
-  // Init UI
-  ui_settingsInit();
-  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
-
-  // Vista iniziale: calendario senza scroll globale
-  document.body.classList.add('no-scroll');
-
-
-  // Allinea il glow alla topbar
-  ui_updateTopbarGlowCenter();
-  addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
-  addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
-  requestAnimationFrame(ui_updateTopbarGlowCenter);
-}
-
-
-// =======================================================
-// [BLOCK: DROPBOX PKCE HELPERS] – Fase 8
-// =======================================================
-function generateCodeVerifier() {
-  const array = new Uint8Array(32);
-  window.crypto.getRandomValues(array);
-  return btoa(String.fromCharCode(...array))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-async function generateCodeChallenge(verifier) {
-  const data = new TextEncoder().encode(verifier);
-  const digest = await window.crypto.subtle.digest("SHA-256", data);
-  return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-// =======================================================
-// [BLOCK: DROPBOX UI HELPERS] Stato icone + modale
-// =======================================================
-function dbx_isConnected(){
-  return !!localStorage.getItem("dropbox_token");
-}
-function dbx_updateIcons(){
-  const on = dbx_isConnected();
-  const h  = document.getElementById("dbxIconHeader");
-  const s  = document.getElementById("dbxIconSettings");
-  const st = document.getElementById("dropboxStatus");
-  const dis= document.getElementById("dbxDisconnect");
+  const photo = localStorage.getItem(LS_GOOGLE_PHOTO);
 
   [h,s].forEach(el => {
     if(!el) return;
     el.classList.toggle("dbx-on",  on);
     el.classList.toggle("dbx-off", !on);
+
+    // Avatar base (foto se disponibile e connesso; altrimenti omino)
+    const inner = (on && photo)
+      ? `<img src="${photo}" alt="Avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
+      : `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
+           <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
+         </svg>`;
+
+    const badge = on
+      ? `<span class="acct-badge" aria-hidden="true"></span>`
+      : `<span class="acct-badge off" aria-hidden="true"></span>`;
+
+
+    el.innerHTML = inner + badge;
   });
 
-  if(st) st.textContent = on ? "✅ Connesso a Dropbox" : "❌ Non collegato";
+  // Testo di stato SOLO nella pagina Impostazioni
+  if(st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
+  if(dis) dis.style.display = on ? "inline-flex" : "none";
+}
 
-  if(dis){
-    dis.style.display = on ? "inline-flex" : "none";
+
+  function g_openModal(show){
+    const m = document.getElementById("acctModal");
+    if(!m) return;
+    m.classList.toggle("active", !!show);
   }
-}
 
-
-function dbx_openModal(show){
-  const m = document.getElementById("dbxModal");
-  if(!m) return;
-  m.classList.toggle("active", !!show);
-
-  // Aggiorna copy del modale in base alla modalità
-  const body = m.querySelector('.modalBody');
-  if(body){
-    if(isStandaloneDisplayMode()){
-      body.textContent = "Verrai reindirizzato a una pagina di Dropbox per l’autorizzazione. Dopo il collegamento tornerai al calendario.";
-    }else{
-      body.textContent = "Verrà aperta una finestra di Dropbox per l’autorizzazione. Dopo il collegamento, tornerai al calendario.";
-    }
-  }
-}
-
-// =======================================================
-// [DBX LOW-LEVEL HELPERS] chiamate API
-// =======================================================
-function dbx_token(){
-  return localStorage.getItem("dropbox_token") || "";
-}
-
-async function dbx_api(path, bodyObj){
-  const res = await fetch("https://api.dropboxapi.com/2" + path, {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization":"Bearer " + dbx_token()
-    },
-    body: JSON.stringify(bodyObj||{})
-  });
-  if(!res.ok){
-    const t = await res.text();
-    throw new Error(`Dropbox API ${path} failed: ${res.status} ${t}`);
-  }
-  return res.json();
-}
-
-// Upload binario (files/upload su content.dropboxapi.com)
-async function dbx_upload(filepath, uint8){
-  const args = {
-    path: filepath,
-    mode: "overwrite",
-    autorename: false,
-    mute: true
-  };
-  const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
-    method:"POST",
-    headers:{
-      "Authorization":"Bearer " + dbx_token(),
-      "Dropbox-API-Arg": JSON.stringify(args),
-      "Content-Type":"application/octet-stream"
-    },
-    body: uint8
-  });
-  if(!res.ok){
-    const t = await res.text();
-    throw new Error(`Dropbox upload failed: ${res.status} ${t}`);
-  }
-  return res.json();
-}
-
-async function dbx_download(filepath){
-  const res = await fetch("https://content.dropboxapi.com/2/files/download", {
-    method:"POST",
-    headers:{
-      "Authorization":"Bearer " + dbx_token(),
-      "Dropbox-API-Arg": JSON.stringify({ path: filepath })
-    }
-  });
-  if(!res.ok){
-    const t = await res.text();
-    throw new Error(`Dropbox download failed: ${res.status} ${t}`);
-  }
-  const text = await res.text();
-  return text;
-}
-
-// Crea cartella se non esiste. Restituisce true se già esiste o creata.
-async function dbx_ensureFolder(folderPath){
-  // Se esiste, bene; se 409 path/not_found, la creiamo.
-  try{
-    await dbx_api("/files/get_metadata", { path: folderPath });
-    return true;
-  }catch(e){
-    // prova a creare
+  function g_disconnect(){
+    const ok = confirm("Vuoi disconnettere l'app da Google?");
+    if(!ok) return;
     try{
-      await dbx_api("/files/create_folder_v2", { path: folderPath, autorename:false });
-      return true;
-    }catch(err){
-      // Se è un app-folder, la root è già "Apps/<AppName>" e non puoi usare "/Apps/.."
-      // Fallback: prova senza /Apps
-      if(String(err).includes("path/not_found") || String(err).includes("path/restricted_content")){
-        return false;
-      }
-      throw err;
+      localStorage.removeItem(LS_GOOGLE_TOKEN);
+      localStorage.removeItem(LS_GOOGLE_PHOTO);
+      localStorage.removeItem(LS_GOOGLE_EMAIL);
+    }catch{}
+    g_updateIcons();
+    ui_switchTab("settings");
+  }
+
+  function g_bindIconClicks(){
+    const h = document.getElementById("acctBtnHeader");
+    const s = document.getElementById("acctBtnSettings");
+    [h,s].forEach(el=>{
+      if(!el) return;
+      el.addEventListener("click", ()=>{
+        if(g_isConnected()) return;
+        g_openModal(true);
+      });
+    });
+
+    const dis = document.getElementById("acctDisconnect");
+    if(dis) dis.addEventListener("click", g_disconnect);
+
+    const go = document.getElementById("acctModalGo");
+    const cl = document.getElementById("acctModalClose");
+    if(go) go.addEventListener("click", async ()=>{
+      // SIMULAZIONE: “login” immediato
+      g_openModal(false);
+      localStorage.setItem(LS_GOOGLE_TOKEN, "SIMULATED_TOKEN");
+      // avatar fittizio (iniziale) – potrai sostituirlo con la foto Google reale
+      localStorage.setItem(LS_GOOGLE_PHOTO, "");
+      localStorage.setItem(LS_GOOGLE_EMAIL, "utente@example.com");
+      g_updateIcons();
+      ui_switchTab("calendar");
+    });
+    if(cl) cl.addEventListener("click", ()=> g_openModal(false));
+  }
+
+  // =========================================================
+  // [BLOCK: STORAGE SAVE/IMPORT] Mock AppData locale
+  // (stessa API di alto livello: cambieremo l'implementazione
+  //  quando inseriamo Drive AppData vero)
+  // =========================================================
+  function g_local_keyFor(fname){ return `gappdata:${fname}`; }
+
+  async function storage_saveToGoogle(){
+    if(!g_isConnected()){
+      alert("Non sei connesso a Google.");
+      return;
+    }
+    ui_settingsApply();
+
+    const payload = storage_buildPayload();
+    const jsonStr = JSON.stringify(payload, null, 2);
+    const fname   = storage_buildFilename();
+
+    try{
+      localStorage.setItem(g_local_keyFor(fname), jsonStr);
+      const st = document.getElementById("cloudStatusSettings");
+      if(st) st.textContent = `✅ Salvato (mock AppData): ${fname}`;
+    }catch(e){
+      alert("Errore nel salvataggio (mock).");
+      console.error(e);
     }
   }
-}
 
-// =======================================================
-// [STORAGE SAVE/IMPORT] Logica alto livello (cartella fissa /Apps/turni)
-// =======================================================
-async function storage_saveToDropbox(){
-  if(!dbx_isConnected()){
-    alert("Non sei connesso a Dropbox.");
-    return;
+  async function storage_importFromGoogle(){
+    if(!g_isConnected()){
+      alert("Non sei connesso a Google.");
+      return;
+    }
+    const fname = storage_buildFilename();
+    const key   = g_local_keyFor(fname);
+    try{
+      const text = localStorage.getItem(key);
+      if(!text){ throw new Error("File non trovato nel mock AppData."); }
+      const obj  = JSON.parse(text);
+
+      if(obj.settings) settings_save(obj.settings);
+      if(Array.isArray(obj.defs)) defs_save(obj.defs);
+
+      ui_settingsInit();
+      render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+
+      const st = document.getElementById("cloudStatusSettings");
+      if(st) st.textContent = `✅ Importato (mock AppData): ${fname}`;
+    }catch(e){
+      alert("Errore nell’importazione (mock) o file non trovato.");
+      console.error(e);
+    }
   }
 
-  ui_settingsApply();
+  // =========================================================
+  // [BLOCK: BOOTSTRAP] DOM ready
+  // =========================================================
+  function boot_init(){
 
-  const payload = storage_buildPayload();
-  const jsonStr  = JSON.stringify(payload, null, 2);
-  const bytes    = new TextEncoder().encode(jsonStr);
-  const fname    = storage_buildFilename();
+    document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
+    document.getElementById('next').addEventListener('click', ()=>nav_shift(1));
 
-  const base = "/Apps/turni";
-  await dbx_ensureFolder(base);
-  const path = `${base}/${fname}`;
+    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>ui_switchTab(t.dataset.tab)));
 
-  try{
-    await dbx_upload(path, bytes);
-    const st = document.getElementById("dropboxStatus");
-    if(st) st.textContent = `✅ Salvato: ${path}`;
-  }catch(e){
-    alert("Errore nel salvataggio su Dropbox.");
-    console.error(e);
-  }
-}
+    document.getElementById('btnAddTurno').addEventListener('click', ui_defsAdd);
 
+    // Bind azioni cloud (Google mock)
+    const btnSaveCloud  = document.getElementById('btnSaveCloud');
+    const btnImportCloud= document.getElementById('btnImportCloud');
+    if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToGoogle);
+    if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromGoogle);
 
-async function storage_importFromDropbox(){
-  if(!dbx_isConnected()){
-    alert("Non sei connesso a Dropbox.");
-    return;
-  }
+    // Account: bind icone + stato
+    g_bindIconClicks();
+    g_updateIcons();
 
-  const fname = storage_buildFilename();
-  const path  = `/Apps/turni/${fname}`;
-
-  try{
-    const text = await dbx_download(path);
-    const obj  = JSON.parse(text);
-
-    if(obj.settings) settings_save(obj.settings);
-    if(Array.isArray(obj.defs)) defs_save(obj.defs);
-
+    // Init UI
     ui_settingsInit();
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
 
-    const st = document.getElementById("dropboxStatus");
-    if(st) st.textContent = `✅ Importato da: ${path}`;
-  }catch(e){
-    alert("Errore nell’importazione da Dropbox o file non trovato.");
-    console.error(e);
+    // Vista iniziale: calendario senza scroll globale
+    document.body.classList.add('no-scroll');
+
+    // Glow
+    ui_updateTopbarGlowCenter();
+    addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
+    addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
+    requestAnimationFrame(ui_updateTopbarGlowCenter);
   }
-}
 
-
-
-// =======================================================
-// [BLOCK: DROPBOX DISCONNECT] Pulisce token e aggiorna UI
-// =======================================================
-function dbx_disconnect(){
-  // Conferma leggera
-  const ok = confirm("Vuoi disconnettere l'app da Dropbox?");
-  if(!ok) return;
-
-  try{
-    localStorage.removeItem("dropbox_token");
-    localStorage.removeItem("dbx_code_verifier");
-  }catch{}
-
-  dbx_updateIcons();                // aggiorna icone/stato
-  ui_switchTab("settings");         // resta in impostazioni
-  const st = document.getElementById("dropboxStatus");
-  if(st){ st.textContent = "❌ Non collegato"; }
-}
-
-
-/// =======================================================
-// [BLOCK: DROPBOX AUTH SMART] Popup quando possibile, altrimenti full redirect
-// =======================================================
-const DROPBOX_APP_KEY = "2aw9gg2ov9tmzuc";
-const DROPBOX_REDIRECT = "https://galabor.github.io/turni-pds/redirect";
-
-let dbxPopupRef = null;
-
-function isStandaloneDisplayMode(){
-  // iOS: navigator.standalone; PWA generico: media query display-mode
-  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-         || (window.navigator && window.navigator.standalone === true);
-}
-
-async function dbx_startAuthSmart(){
-  try{
-    const verifier  = generateCodeVerifier();
-    const challenge = await generateCodeChallenge(verifier);
-    localStorage.setItem("dbx_code_verifier", verifier);
-
-    const params = new URLSearchParams({
-      response_type:"code",
-      client_id: DROPBOX_APP_KEY,
-      redirect_uri: DROPBOX_REDIRECT,
-      token_access_type:"offline",
-      code_challenge_method:"S256",
-      code_challenge: challenge
-    });
-    const authUrl = `https://www.dropbox.com/oauth2/authorize?${params.toString()}`;
-
-    // In modalità standalone / iOS Add-to-Home o se i popup sono bloccati → redirect pieno
-    if (isStandaloneDisplayMode()) {
-      window.location.href = authUrl;
-      return;
-    }
-
-    // Popup centrato in modo robusto (compatibile multi-monitor e Safari)
-const W = 520, H = 680;
-const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : screen.left;
-const dualScreenTop  = window.screenTop  !== undefined ? window.screenTop  : screen.top;
-
-const width  = window.innerWidth  ? window.innerWidth  : document.documentElement.clientWidth  ? document.documentElement.clientWidth  : screen.width;
-const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
-const left = ((width  - W) / 2) + dualScreenLeft;
-const top  = ((height - H) / 2) + dualScreenTop;
-
-dbxPopupRef = window.open(
-  authUrl,
-  "dbx_auth",
-  `scrollbars=yes,width=${W},height=${H},top=${top},left=${left}`
-);
-
-
-    // Fallback: se il popup è nullo/subito chiuso, vai di redirect
-    setTimeout(()=>{
-      if(!dbxPopupRef || dbxPopupRef.closed){
-        window.location.href = authUrl;
-      }
-    }, 400);
-  }catch(e){
-    const st = document.getElementById("dropboxStatus");
-    if(st) st.textContent = "Errore nell’avvio del collegamento.";
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', boot_init);
+  } else {
+    boot_init();
   }
-}
-
-// Bind pulsanti icona + modale
-function dbx_bindIconClicks(){
-  const h = document.getElementById("dbxIconHeader");
-  const s = document.getElementById("dbxIconSettings");
-  [h,s].forEach(el=>{
-    if(!el) return;
-    el.addEventListener("click", ()=>{
-      if(dbx_isConnected()){
-        return; // già collegato
-      }
-      dbx_openModal(true);
-    });
-  });
-
-  // Pulsante Disconnetti
-  const dis = document.getElementById("dbxDisconnect");
-  if(dis) dis.addEventListener("click", dbx_disconnect);
-
-  // Modale: avanti/chiudi
-  const go = document.getElementById("dbxModalGo");
-  const cl = document.getElementById("dbxModalClose");
-  if(go) go.addEventListener("click", ()=>{ dbx_openModal(false); dbx_startAuthSmart(); });
-  if(cl) cl.addEventListener("click", ()=> dbx_openModal(false));
-}
-
-
-// Ricezione esito da redirect.html + sync storage cross-window
-(function(){
-// Origini attendibili (GitHub Pages)
-  const ALLOWED_ORIGINS = ["https://galabor.github.io"];
-
-  // Messaggio dal popup: token salvato → aggiorna UI, chiudi, torna al calendario
-  window.addEventListener("message",(ev)=>{
-    if(!ALLOWED_ORIGINS.includes(ev.origin)) return;
-    if(ev.data === "DBX_OK"){
-      dbx_updateIcons();
-      if(dbxPopupRef && !dbxPopupRef.closed) dbxPopupRef.close();
-      ui_switchTab("calendar");
-    }
-  });
-
-  // Evento storage: se un’altra window salva dropbox_token, aggiorna le icone live
-  window.addEventListener("storage",(ev)=>{
-    if(ev.key === "dropbox_token"){
-      dbx_updateIcons();
-    }
-  });
-})();
-
-
 
   // =========================================================
-// [BLOCK: BOOTSTRAP] DOM ready
-// =========================================================
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', boot_init);
-} else {
-  boot_init();
-}
+  // [SERVICE WORKER] – registrazione con auto-update (invariato)
+  // =========================================================
+  (function(){
+    if (!('serviceWorker' in navigator)) return;
 
-// =========================================================
-// [SERVICE WORKER] – registrazione con auto-update
-// =========================================================
-(function(){
-  if (!('serviceWorker' in navigator)) return;
+    const SW_VERSION = '2025-10-29-01';
+    const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
 
-  // Allinea il ?v=... a quello del SW (basta lo stesso numero finale)
-  const SW_VERSION = '2025-10-29-01';
-  const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
-
-  async function registerSW(){
-    try{
-      const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
-
-      // Se c'è già un worker "waiting", chiedi di attivarsi
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
-
-      // Quando arriva un nuovo SW (installing), aspetta "installed" e poi promuovilo subito
-      reg.addEventListener('updatefound', () => {
-        const nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            nw.postMessage({ type: 'SKIP_WAITING' });
+    async function registerSW(){
+      try{
+        const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
+        if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              nw.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!window.__reloadedForSW) {
+            window.__reloadedForSW = true;
+            location.reload();
           }
         });
-      });
-
-      // Quando il controller cambia, significa che il nuovo SW è attivo: ricarica l’app
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        // Evita loop: ricarica una sola volta
-        if (!window.__reloadedForSW) {
-          window.__reloadedForSW = true;
-          location.reload();
-        }
-      });
-
-      // Piccolo “tiramisù” periodico: controlla update all’avvio e quando torni in focus
-      reg.update().catch(()=>{});
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          reg.update().catch(()=>{});
-        }
-      });
-
-    }catch(e){
-      // pace
+        reg.update().catch(()=>{});
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            reg.update().catch(()=>{});
+          }
+        });
+      }catch(e){}
     }
-  }
 
-  // Registra appena possibile (più affidabile di 'load' sulle PWA installate)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', registerSW);
-  } else {
-    registerSW();
-  }
-})();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', registerSW);
+    } else {
+      registerSW();
+    }
+  })();
 
-
-</script>
-
+  // ======================= //
+  // fine JSS (script)       //
+  // ======================= //
+  </script>
 
 </body>
+<!-- ======================= -->
+<!-- fine body             -->
+<!-- ======================= -->
 </html>
+<!-- ======================= -->
+<!-- fine html             -->
+<!-- ======================= -->
