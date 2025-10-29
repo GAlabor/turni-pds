@@ -103,26 +103,180 @@
     gap:6px;
   }
 
-/* === Badge di stato accanto all’omino === */
-#acctBtnHeader {
+/* ========== [CSS-ACCOUNT MENU] ========== */
+.acct-menu{
+  position: fixed;                 /* resta nel body (portaled) */
+  left: -9999px;
+  top:  -9999px;
+  display: none;                   /* gestito da .show */
+  z-index: 2147483647;             /* sopra tutto */
+  min-width: 220px;
+  background: var(--surface-opaque, #0f141b);
+  border: 1px solid var(--gridBorder);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.03);
+  transform-origin: top right;
+  transform: scale(.985);
+  opacity: 0;
+  transition:
+    transform .12s ease-out,
+    opacity   .12s ease-out,
+    box-shadow .18s ease;
+}
+.acct-menu.show{
+  display:block;
+  opacity:1;
+  transform: scale(1);
+}
+
+/* Effetto glow/fade per apertura */
+.acct-menu{
+  transition:
+    opacity .22s ease,
+    transform .22s cubic-bezier(.2,.8,.3,1);
+  transform: translateY(4px) scale(.985);
+  opacity: 0;
+}
+.acct-menu.show{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  box-shadow:
+    0 20px 45px rgba(0,0,0,.5),
+    0 0 0 1px rgba(255,255,255,.05);
+}
+
+/* Sheen sottile sulle voci */
+.acct-item{
+  position: relative;
+  overflow: hidden;
+}
+.acct-item::after{
+  content:"";
+  position:absolute;
+  left:-80%; top:0;
+  width:60%; height:100%;
+  background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.25) 50%,transparent 100%);
+  transform:skewX(-20deg);
+  opacity:0;
+  transition:all .3s ease;
+}
+.acct-item:hover::after{
+  left:130%;
+  opacity:.6;
+}
+
+/* Glow morbido sullo stato verde */
+.acct-head-status.is-on{
+  border-color:rgba(46,204,113,.5);
+  background:rgba(46,204,113,.14);
+  color:#b6f5d0;
+  box-shadow:0 0 12px rgba(46,204,113,.25);
+}
+
+
+
+
+/* Testatina del menu: titolo + stato */
+.acct-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 10px 6px;
+  border-radius:8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+}
+.acct-head-title{
+  font-weight:700;
+  letter-spacing:.2px;
+  font-size:.92rem;
+  color:var(--text);
+}
+.acct-head-status{
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.25px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid var(--gridBorder);
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+  white-space:nowrap;
+}
+/* (Step 3 useremo queste due classi) */
+.acct-head-status.is-on{
+  border-color: rgba(46,204,113,.35);
+  background: rgba(46,204,113,.12);
+  color: #9be2b8;
+}
+.acct-head-status.is-off{
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+}
+
+.acct-sep{
+  height:0;
+  border-top:1px solid var(--gridBorder);
+  margin:6px 0;
+}
+
+/* Voci */
+.acct-item{
+  width:100%;
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  font-weight:600;
+  font-size:.92rem;
+  letter-spacing:.2px;
+  text-align:left;
+  padding:9px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:
+    background .16s ease,
+    box-shadow .16s ease,
+    transform .06s ease;
+}
+.acct-item:hover{
+  background: var(--actHover);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.acct-item:active{
+  background: var(--actActive);
+  transform: translateY(1px);
+}
+.acct-item.danger{ color:#ff6b6b; }
+.acct-item.danger:hover{
+  background: rgba(255,80,80,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,80,80,.18);
+}
+
+/* Icona omino nel topbar */
+#acctBtnHeader{
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
-
-#acctBtnHeader svg {
+#acctBtnHeader svg{
   width: 28px;
   height: 28px;
-  transition: transform .2s ease;
+  transition: transform .18s ease;
 }
+#acctBtnHeader:hover svg{ transform: translateZ(0) scale(1.05); }
 
 /* Desktop: omino leggermente più grande */
 @media (min-width: 720px) {
-  #acctBtnHeader svg {
-    width: 32px;
-    height: 32px;
-  }
+  #acctBtnHeader svg{ width: 32px; height: 32px; }
 }
 
 /* Badge stato */
@@ -137,12 +291,14 @@
   box-shadow:0 0 2px rgba(46,204,113,.55);
   transform:translate(1px,1px);
 }
-
 .acct-badge.off{
   background:#9ba4b0;
   box-shadow:none;
   opacity:.85;
 }
+
+
+
 
 
 
@@ -693,14 +849,38 @@
   </svg>
   </div>
 
-  <!-- SLOT DESTRO CON OMINO -->
+<!-- SLOT DESTRO CON OMINO + MENU -->
 <div class="topbar-right">
-  <button id="acctBtnHeader" class="dropboxIconBtn dbx-off" title="Accedi con Google" aria-label="Accedi con Google">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
-    </svg>
-    <span class="acct-badge off" aria-hidden="true"></span>
-  </button>
+  <button id="acctBtnHeader"
+          class="dropboxIconBtn dbx-off"
+          title="Account"
+          aria-label="Account"
+          aria-haspopup="menu"
+          aria-controls="acctMenu"
+          aria-expanded="false"
+          type="button"></button>
+
+  <!-- Menu a tendina (sibling del bottone, NON dentro) -->
+<div id="acctMenu" class="acct-menu" role="menu" aria-hidden="true"
+     style="position:fixed;display:none;left:-9999px;top:-9999px;z-index:9999;">
+
+  <!-- Head del menu: titolo + stato -->
+  <div class="acct-head" role="presentation" aria-hidden="false">
+    <div class="acct-head-title">Personale</div>
+    <div id="acctHeadStatus" class="acct-head-status">Sincronizzazione attiva</div>
+  </div>
+
+  <div class="acct-sep"></div>
+
+  <!-- Azioni -->
+  <button type="button" class="acct-item" data-act="login">Connetti con Google</button>
+  <button type="button" class="acct-item" data-act="sync">Sincronizza adesso</button>
+  <button type="button" class="acct-item" data-act="import-bak">Importa backup</button>
+  <div class="acct-sep"></div>
+  <button type="button" class="acct-item danger" data-act="logout">Disconnetti</button>
+</div>
+
+  
 </div>
 
 </div>
@@ -940,7 +1120,11 @@
   // [FN: defs_*] Gestione definizioni turni personalizzate
   // =========================================================
   function defs_load(){ try{ return JSON.parse(localStorage.getItem(LS_TURNS))||null }catch{ return null } }
-  function defs_save(list){ localStorage.setItem(LS_TURNS, JSON.stringify(list)) }
+  function defs_save(list){
+  localStorage.setItem(LS_TURNS, JSON.stringify(list));
+  // segna modifiche e tenta autosalvataggio (coalescenza interna)
+  autosave_schedule(400);
+}
   function defs_effective(){
     const l = defs_load();
     let out = Array.isArray(l) && l.length ? l : SHIFT_DEFAULTS.slice();
@@ -959,7 +1143,12 @@
   // [FN: settings_*] Primo giorno (data+base)
   // =========================================================
   function settings_load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY))||null }catch{ return null } }
-  function settings_save(obj){ localStorage.setItem(LS_KEY, JSON.stringify(obj)) }
+  function settings_save(obj){
+  localStorage.setItem(LS_KEY, JSON.stringify(obj));
+  // segna modifiche e tenta autosalvataggio (coalescenza interna)
+  autosave_schedule(400);
+}
+
   function settings_effective(){
     const s=settings_load();
     if(s && s.date && s.shift) return s;
@@ -1104,18 +1293,20 @@
   // [FN: CRUD turni]
   // =========================================================
   function ui_defsAdd(){
-    const nome  = document.getElementById('newNome').value.trim();
-    const sigla = document.getElementById('newSigla').value.trim().toUpperCase();
-    const orTxt = document.getElementById('newOrario').value;
-    const color = document.getElementById('newColor').value.trim() || '#8e88ff';
-    if(!nome || !sigla) return;
-    const orario = util_joinOrarioMultiline(orTxt);
-    const list=defs_effective();
-    list.push({ key:'X'+Date.now(), nome, sigla, orario, color });
-    defs_save(list);
-    ui_defsClearNew();
-    ui_defsRenderList();
-  }
+  const nome  = document.getElementById('newNome').value.trim();
+  const sigla = document.getElementById('newSigla').value.trim().toUpperCase();
+  const orTxt = document.getElementById('newOrario').value;
+  const color = document.getElementById('newColor').value.trim() || '#8e88ff';
+  if(!nome || !sigla) return;
+  const orario = util_joinOrarioMultiline(orTxt);
+  const list=defs_effective();
+  list.push({ key:'X'+Date.now(), nome, sigla, orario, color });
+  defs_save(list);
+  ui_defsClearNew();
+  ui_defsRenderList();
+  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  autosave_schedule();
+}
   function ui_defsClearNew(){
     document.getElementById('newNome').value = '';
     document.getElementById('newSigla').value = '';
@@ -1123,21 +1314,27 @@
     document.getElementById('newColor').value = '#8e88ff';
   }
   function ui_defsDelete(i){
-    const list=defs_effective();
-    list.splice(i,1);
-    defs_save(list);
-    ui_defsRenderList();
-  }
+  const list=defs_effective();
+  list.splice(i,1);
+  defs_save(list);
+  ui_defsRenderList();
+  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  autosave_schedule();
+}
+
   function ui_defsEditInline(i,key,val){
-    const list=defs_effective();
-    if(!list[i]) return;
-    if(key==='orarioMultiline'){
-      list[i].orario = util_joinOrarioMultiline(val);
-    }else{
-      list[i][key]=val;
-    }
-    defs_save(list);
+  const list=defs_effective();
+  if(!list[i]) return;
+  if(key==='orarioMultiline'){
+    list[i].orario = util_joinOrarioMultiline(val);
+  }else{
+    list[i][key]=val;
   }
+  defs_save(list);
+  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  autosave_schedule();
+}
+
 
   // =========================================================
   // [FN: ui_settings*]
@@ -1148,11 +1345,13 @@
     ui_defsRenderList();
   }
   function ui_settingsApply(){
-    const date=document.getElementById('startDate').value;
-    const shift=settings_effective().shift || 'S';
-    settings_save({date,shift});
-    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
-  }
+  const date=document.getElementById('startDate').value;
+  const shift=settings_effective().shift || 'S';
+  settings_save({date,shift});
+  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  autosave_schedule();
+}
+
 
   // =========================================================
   // [FN: ui_updateTopbarGlowCenter] allinea glow
@@ -1168,187 +1367,740 @@
     document.documentElement.style.setProperty('--bar-h', r.height + 'px');
   }
   // =========================================================
-  // [BLOCK: GOOGLE ACCOUNT – SIMULAZIONE COMPLETA]
-  // Nota: riuso classi .dropboxIconBtn / .dbx-on|off per non toccare CSS
-  // =========================================================
-  const GOOGLE_CLIENT_ID_PLACEHOLDER = 'INSERISCI_CLIENT_ID_QUI';
-  const LS_GOOGLE_TOKEN  = 'google_token';
-  const LS_GOOGLE_PHOTO  = 'google_user_photo';
-  const LS_GOOGLE_EMAIL  = 'google_user_email';
+// [BLOCK: GOOGLE ACCOUNT – OAUTH PKCE (REALE)]
+// Autenticazione Google: popup -> code -> token -> id_token
+// =========================================================
 
-  function g_isConnected(){ return !!localStorage.getItem(LS_GOOGLE_TOKEN); }
+const GOOGLE_CLIENT_ID = "280688458605-2l6l10drhsrhfct6540divn87h769aif.apps.googleusercontent.com";
+const GOOGLE_REDIRECT_URI = "https://galabor.github.io/turni-pds/redirect/";
+const GOOGLE_SCOPES = [
+  "openid",
+  "email",
+  "profile",
+  "https://www.googleapis.com/auth/drive.appdata"
+].join(" ");
 
+// Storage keys
+const LS_GOOGLE_TOKEN       = "google_access_token";
+const LS_GOOGLE_EXPIRES_AT  = "google_access_expires_at";
+const LS_GOOGLE_IDTOKEN     = "google_id_token";
+const LS_GOOGLE_EMAIL       = "google_user_email";
+const LS_GOOGLE_PHOTO       = "google_user_photo";
+const LS_GOOGLE_REFRESH     = "google_refresh_token";
+
+
+// Stato connessione
+function g_isConnected(){
+  const t = localStorage.getItem(LS_GOOGLE_TOKEN);
+  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT)||"0",10);
+  return !!t && Date.now() < exp - 10_000; // 10s di margine
+}
+
+// UI: aggiorna icone/avatar/stato
 function g_updateIcons(){
   const on = g_isConnected();
   const h  = document.getElementById("acctBtnHeader");
-  const s  = document.getElementById("acctBtnSettings");   // in impostazioni
-  const st2= document.getElementById("cloudStatusSettings"); // SOLO in impostazioni
+  const s  = document.getElementById("acctBtnSettings");
+  const st2= document.getElementById("cloudStatusSettings");
   const dis= document.getElementById("acctDisconnect");
 
-  const photo = localStorage.getItem(LS_GOOGLE_PHOTO);
-
-  [h,s].forEach(el => {
+  const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO)||"") : "";
+  [h,s].forEach(el=>{
     if(!el) return;
     el.classList.toggle("dbx-on",  on);
     el.classList.toggle("dbx-off", !on);
-
-    // Avatar base (foto se disponibile e connesso; altrimenti omino)
     const inner = (on && photo)
       ? `<img src="${photo}" alt="Avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
       : `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
          </svg>`;
-
     const badge = on
       ? `<span class="acct-badge" aria-hidden="true"></span>`
       : `<span class="acct-badge off" aria-hidden="true"></span>`;
-
-
     el.innerHTML = inner + badge;
   });
 
-  // Testo di stato SOLO nella pagina Impostazioni
   if(st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
   if(dis) dis.style.display = on ? "inline-flex" : "none";
 }
 
+// PKCE utils
+function b64url(buf){
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function sha256(txt){
+  const enc = new TextEncoder().encode(txt);
+  const digest = await crypto.subtle.digest("SHA-256", enc);
+  return b64url(digest);
+}
+function randomString(len=64){
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, x => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~"[x % 66]).join("");
+}
 
-  function g_openModal(show){
-    const m = document.getElementById("acctModal");
-    if(!m) return;
-    m.classList.toggle("active", !!show);
+// Avvia login: genera PKCE + popup OAuth
+async function g_login(){
+  try{
+    const verifier = randomString(64);
+    const challenge = await sha256(verifier);
+    const state = randomString(24);
+
+    // Salvo in sessionStorage, legato a questa finestra
+    sessionStorage.setItem("oauth_verifier:"+state, verifier);
+
+    const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+    authUrl.searchParams.set("client_id", GOOGLE_CLIENT_ID);
+    authUrl.searchParams.set("redirect_uri", GOOGLE_REDIRECT_URI);
+    authUrl.searchParams.set("response_type", "code");
+    authUrl.searchParams.set("scope", GOOGLE_SCOPES);
+    authUrl.searchParams.set("include_granted_scopes", "true");
+    authUrl.searchParams.set("access_type", "offline");
+    authUrl.searchParams.set("prompt", "consent"); // per ottenere id_token pulito
+    authUrl.searchParams.set("code_challenge", challenge);
+    authUrl.searchParams.set("code_challenge_method", "S256");
+    authUrl.searchParams.set("state", state);
+
+    const w = 520, h = 640;
+    const y = Math.max(0, (screen.height - h)/2);
+    const x = Math.max(0, (screen.width  - w)/2);
+    window.open(
+      authUrl.toString(),
+      "g_oauth",
+      `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`
+    );
+  }catch(e){
+    alert("Errore durante l'avvio dell'accesso a Google.");
   }
+}
 
-  function g_disconnect(){
-    const ok = confirm("Vuoi disconnettere l'app da Google?");
-    if(!ok) return;
+// Callback dal popup: riceve code e scambia per token
+window.addEventListener("message", async (ev)=>{
+  // Solo messaggi dalla nostra origin
+  if(ev.origin !== "https://galabor.github.io") return;
+  const data = ev.data || {};
+  if(data && data.type === "oauth2-code"){
+    if(data.error){
+      // utente ha annullato
+      return;
+    }
+    const state = data.state || "";
+    const verifier = sessionStorage.getItem("oauth_verifier:"+state) || "";
+    sessionStorage.removeItem("oauth_verifier:"+state);
+    const code = data.code || "";
+    if(!code || !verifier) return;
+
     try{
-      localStorage.removeItem(LS_GOOGLE_TOKEN);
-      localStorage.removeItem(LS_GOOGLE_PHOTO);
-      localStorage.removeItem(LS_GOOGLE_EMAIL);
-    }catch{}
+      const body = new URLSearchParams({
+        client_id:     GOOGLE_CLIENT_ID,
+        code:          code,
+        code_verifier: verifier,
+        grant_type:    "authorization_code",
+        redirect_uri:  GOOGLE_REDIRECT_URI
+      });
+      const res = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body
+      });
+      const tk = await res.json();
+
+      if(!tk || !tk.access_token){
+        alert("Accesso Google fallito (nessun token).");
+        return;
+      }
+
+      // Salva token ed expiry
+      const expiresAt = Date.now() + (tk.expires_in ? (tk.expires_in*1000) : 3600_000);
+      localStorage.setItem(LS_GOOGLE_TOKEN, tk.access_token);
+      localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
+
+      // id_token => email / picture
+      if(tk.id_token){
+        localStorage.setItem(LS_GOOGLE_IDTOKEN, tk.id_token);
+        try{
+          const parts = tk.id_token.split(".");
+          const payload = JSON.parse(atob(parts[1].replace(/-/g,"+").replace(/_/g,"/")));
+          if(payload && payload.email) localStorage.setItem(LS_GOOGLE_EMAIL, payload.email);
+          if(payload && payload.picture) localStorage.setItem(LS_GOOGLE_PHOTO, payload.picture);
+        }catch{}
+      }
+
+      if (tk.refresh_token) localStorage.setItem(LS_GOOGLE_REFRESH, tk.refresh_token);
+
+
+      g_updateIcons();
+      // opzionale: rientra su calendario
+      ui_switchTab("calendar");
+      storage_importFromGoogleAuto(); // import silenzioso al primo login
+    }catch(e){
+      alert("Errore durante il completamento dell’accesso a Google.");
+    }
+  }
+}, { passive:true });
+
+
+// Disconnessione: revoca e pulizia locale
+async function g_disconnect(){
+  const ok = confirm("Vuoi disconnettere l'app da Google?");
+  if(!ok) return;
+  try{
+    const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+    if(tok){
+      // Best-effort revoke
+      fetch("https://oauth2.googleapis.com/revoke?token="+encodeURIComponent(tok), { method:"POST" }).catch(()=>{});
+    }
+  }finally{
+    localStorage.removeItem(LS_GOOGLE_TOKEN);
+    localStorage.removeItem(LS_GOOGLE_EXPIRES_AT);
+    localStorage.removeItem(LS_GOOGLE_IDTOKEN);
+    localStorage.removeItem(LS_GOOGLE_EMAIL);
+    localStorage.removeItem(LS_GOOGLE_PHOTO);
+    localStorage.removeItem(LS_GOOGLE_REFRESH); // <-- questa mancava
     g_updateIcons();
     ui_switchTab("settings");
   }
+}
 
-  function g_bindIconClicks(){
-    const h = document.getElementById("acctBtnHeader");
-    const s = document.getElementById("acctBtnSettings");
-    [h,s].forEach(el=>{
-      if(!el) return;
-      el.addEventListener("click", ()=>{
-        if(g_isConnected()) return;
-        g_openModal(true);
-      });
-    });
 
-    const dis = document.getElementById("acctDisconnect");
-    if(dis) dis.addEventListener("click", g_disconnect);
+// Prova a rinnovare l'access token usando il refresh_token
+async function g_refreshAccessToken(){
+  const refresh = localStorage.getItem(LS_GOOGLE_REFRESH);
+  if(!refresh) throw new Error("Nessun refresh token disponibile");
 
-    const go = document.getElementById("acctModalGo");
-    const cl = document.getElementById("acctModalClose");
-    if(go) go.addEventListener("click", async ()=>{
-      // SIMULAZIONE: “login” immediato
-      g_openModal(false);
-      localStorage.setItem(LS_GOOGLE_TOKEN, "SIMULATED_TOKEN");
-      // avatar fittizio (iniziale) – potrai sostituirlo con la foto Google reale
-      localStorage.setItem(LS_GOOGLE_PHOTO, "");
-      localStorage.setItem(LS_GOOGLE_EMAIL, "utente@example.com");
-      g_updateIcons();
-      ui_switchTab("calendar");
-    });
-    if(cl) cl.addEventListener("click", ()=> g_openModal(false));
+  const body = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    grant_type: "refresh_token",
+    refresh_token: refresh
+  });
+
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body
+  });
+  const tk = await res.json();
+
+  if(!res.ok || !tk.access_token){
+    throw new Error("Refresh token fallito");
   }
 
-  // =========================================================
-  // [BLOCK: STORAGE SAVE/IMPORT] Mock AppData locale
-  // (stessa API di alto livello: cambieremo l'implementazione
-  //  quando inseriamo Drive AppData vero)
-  // =========================================================
-  function g_local_keyFor(fname){ return `gappdata:${fname}`; }
+  const expiresAt = Date.now() + (tk.expires_in ? (tk.expires_in*1000) : 3600_000);
+  localStorage.setItem(LS_GOOGLE_TOKEN, tk.access_token);
+  localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
-  async function storage_saveToGoogle(){
-    if(!g_isConnected()){
-      alert("Non sei connesso a Google.");
+  if (tk.id_token) {
+    localStorage.setItem(LS_GOOGLE_IDTOKEN, tk.id_token);
+    try{
+      const parts = tk.id_token.split(".");
+      const payload = JSON.parse(atob(parts[1].replace(/-/g,"+").replace(/_/g,"/")));
+      if(payload && payload.email)   localStorage.setItem(LS_GOOGLE_EMAIL, payload.email);
+      if(payload && payload.picture) localStorage.setItem(LS_GOOGLE_PHOTO, payload.picture);
+    }catch{}
+  }
+  return tk.access_token;
+}
+
+// Garantisce che ci sia un access token valido, altrimenti prova il refresh
+async function g_ensureValidAccess(){
+  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT)||"0",10);
+  if (tok && Date.now() < (exp - 10_000)) return tok;
+  // scaduto o assente: prova refresh
+  return await g_refreshAccessToken();
+}
+
+// Bind icone: NIENTE login sugli omini. Solo disconnessione.
+function g_bindIconClicks(){
+  const dis = document.getElementById("acctDisconnect");
+  if (dis) dis.addEventListener("click", g_disconnect);
+}
+
+
+// === MENU OMINO: toggle e azioni ===
+function acct_menuUpdateVisibility(){
+  const on = g_isConnected?.() || false;
+  const m = document.getElementById("acctMenu");
+  if(!m) return;
+
+  m.querySelector('[data-act="login"]').style.display      = on ? "none"  : "block";
+  m.querySelector('[data-act="sync"]').style.display       = on ? "block" : "none";
+  m.querySelector('[data-act="import-bak"]').style.display = on ? "block" : "none";
+  m.querySelector('[data-act="logout"]').style.display     = on ? "block" : "none";
+
+  acct_menuRenderHeadStatus(); // <-- aggiorna titolo-stato
+}
+
+
+// Aggiorna la testatina del menu ("Sincronizzazione attiva" / "Non collegato")
+function acct_menuRenderHeadStatus(){
+  const on = g_isConnected?.() || false;
+  const el = document.getElementById("acctHeadStatus");
+  if (!el) return;
+
+  if (on){
+    el.textContent = "Sincronizzazione attiva";
+    el.classList.add("is-on");
+    el.classList.remove("is-off");
+  } else {
+    el.textContent = "Non collegato";
+    el.classList.add("is-off");
+    el.classList.remove("is-on");
+  }
+}
+
+
+function acct_menuToggle(show){
+  // Sposta il menu nel <body> per evitare clipping con la topbar
+  acct_menuPortalize();
+
+  const m   = document.getElementById("acctMenu");
+  const btn = document.getElementById("acctBtnHeader");
+  if(!m || !btn) return;
+
+  const willShow = (typeof show === "boolean") ? show : (m.style.display === "none");
+
+  // CHIUSURA
+  if (!willShow){
+    m.style.display = "none";
+    m.style.left    = "-9999px";
+    m.style.top     = "-9999px";
+    m.setAttribute("aria-hidden", "true");
+    btn.setAttribute("aria-expanded", "false");
+    m.classList.remove("show");
+    return;
+  }
+
+  // APERTURA
+  m.style.display = "block";
+  m.style.left = "-9999px";
+  m.style.top  = "-9999px";
+  m.setAttribute("aria-hidden", "false");
+  btn.setAttribute("aria-expanded", "true");
+  m.classList.add("show");
+
+  // Aggiorna subito le voci e la testatina (verde/grigio)
+  acct_menuUpdateVisibility();
+
+  // Posizionamento dopo il reflow
+  requestAnimationFrame(()=>{
+    const r   = btn.getBoundingClientRect();
+    const gap = 8;
+    const vw  = window.innerWidth;
+    const vh  = window.innerHeight;
+
+    const mb  = m.getBoundingClientRect();
+    const mw  = Math.max(200, mb.width  || 200);
+    const mh  = Math.max( 80, mb.height ||  80);
+
+    let left = Math.min(Math.max(12, r.right - mw), vw - mw - 12);
+    let top  = Math.min(r.bottom + gap, vh - mh - 12);
+    if (r.left + mw + 12 > vw) left = Math.max(12, vw - mw - 12);
+
+    m.style.left = left + "px";
+    m.style.top  = top  + "px";
+  });
+}
+
+
+
+
+
+function acct_menuBind(){
+  const btn = document.getElementById("acctBtnHeader");
+  const m   = document.getElementById("acctMenu");
+  if(!btn || !m) return;
+
+  // 1) Toggle affidabile del menù (senza side-effects)
+  btn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    acct_menuToggle();
+  });
+
+  // 2) Azioni voci menù (login PRIMA di chiudere: mantiene il “user gesture” per il popup)
+  m.addEventListener("click", async (e)=>{
+    const t = e.target.closest(".acct-item");
+    if(!t) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const act = t.getAttribute("data-act");
+    if(act==="login"){
+      // Apri subito il popup (user gesture), poi chiudi il menù
+      g_login();
+      acct_menuToggle(false);
       return;
     }
-    ui_settingsApply();
-
-    const payload = storage_buildPayload();
-    const jsonStr = JSON.stringify(payload, null, 2);
-    const fname   = storage_buildFilename();
-
-    try{
-      localStorage.setItem(g_local_keyFor(fname), jsonStr);
-      const st = document.getElementById("cloudStatusSettings");
-      if(st) st.textContent = `✅ Salvato (mock AppData): ${fname}`;
-    }catch(e){
-      alert("Errore nel salvataggio (mock).");
-      console.error(e);
-    }
-  }
-
-  async function storage_importFromGoogle(){
-    if(!g_isConnected()){
-      alert("Non sei connesso a Google.");
+    if(act==="logout"){
+      acct_menuToggle(false);
+      g_disconnect();
       return;
     }
-    const fname = storage_buildFilename();
-    const key   = g_local_keyFor(fname);
-    try{
-      const text = localStorage.getItem(key);
-      if(!text){ throw new Error("File non trovato nel mock AppData."); }
-      const obj  = JSON.parse(text);
+    if(act==="sync"){
+      acct_menuToggle(false);
+      try{ await storage_saveToGoogle(); }catch{}
+      return;
+    }
+    if(act==="import-bak"){
+      acct_menuToggle(false);
+      try{ await storage_importBackupFromGoogle(); }catch{}
+      return;
+    }
+  });
 
-      if(obj.settings) settings_save(obj.settings);
-      if(Array.isArray(obj.defs)) defs_save(obj.defs);
+  // 3) Click fuori: chiudi (ma ignora click dentro menù o sul bottone)
+  document.addEventListener("click", (e)=>{
+    if (!m.classList.contains("show")) return;
+    if (e.target.closest("#acctMenu")) return;
+    if (e.target.closest("#acctBtnHeader")) return;
+    acct_menuToggle(false);
+  }, { capture:true });
 
-      ui_settingsInit();
-      render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+  // 4) Esc per chiudere
+  document.addEventListener("keydown", (e)=>{
+    if (e.key === "Escape" && m.classList.contains("show")) {
+      acct_menuToggle(false);
+    }
+  });
 
-      const st = document.getElementById("cloudStatusSettings");
-      if(st) st.textContent = `✅ Importato (mock AppData): ${fname}`;
-    }catch(e){
-      alert("Errore nell’importazione (mock) o file non trovato.");
-      console.error(e);
+  // 5) Aggiorna visibilità delle voci in base allo stato login
+  const _g_updateIcons = g_updateIcons;
+  g_updateIcons = function(){
+    _g_updateIcons();
+    acct_menuUpdateVisibility();
+  };
+}
+
+// Sposta il menu nel <body> per evitare qualsiasi clipping/stacking con la topbar
+function acct_menuPortalize(){
+  const m = document.getElementById("acctMenu");
+  if (m && m.parentElement !== document.body) {
+    document.body.appendChild(m);
+  }
+}
+
+
+
+
+
+// bootstrap per lo stato account (riuso in boot_init esistente)
+g_updateIcons();
+
+
+// =========================================================
+// [BLOCK: STORAGE SAVE/IMPORT] Drive AppData (REALE)
+// + Autosave con debounce
+// =========================================================
+
+const DRIVE_FILENAME = "TURNI.json";
+const DRIVE_BACKUP_NAME = "TURNI.backup.json";
+let __lastSavedSnapshot = null; // firma dell’ultimo payload salvato sul cloud
+
+// Helper: richiesta autenticata a Drive API (con auto refresh e 1 retry)
+async function drive_request(url, opts = {}) {
+  // Assicura un access token valido (o prova refresh)
+  try { await g_ensureValidAccess(); } catch { throw new Error("Non autenticato a Google."); }
+
+  let tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+
+  const doFetch = async () => {
+    const headers = Object.assign(
+      { Authorization: "Bearer " + tok },
+      opts.headers || {}
+    );
+    return fetch(url, Object.assign({}, opts, { headers }));
+  };
+
+  // Primo tentativo
+  let res = await doFetch();
+
+  // Se è scaduto nel frattempo, prova UNA volta a rinfrescare e ritentare
+  if (res.status === 401 || res.status === 403) {
+    try {
+      tok = await g_refreshAccessToken();
+      res = await doFetch();
+    } catch {
+      // se anche il refresh fallisce, lasceremo gestire sotto
     }
   }
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`Drive API error ${res.status}: ${txt}`);
+  }
+  return res;
+}
+
+// Trova per nome nell'appDataFolder
+async function drive_findByName(name) {
+  const q = encodeURIComponent(
+    `name = '${name}' and 'appDataFolder' in parents and trashed = false`
+  );
+  const url = `https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&fields=files(id,name,modifiedTime)&pageSize=1&orderBy=modifiedTime desc`;
+  const res = await drive_request(url);
+  const json = await res.json();
+  return (json.files && json.files[0]) ? json.files[0] : null;
+}
+
+// Wrapper: trova il canonico
+async function drive_findCanonical() {
+  return drive_findByName(DRIVE_FILENAME);
+}
+
+
+
+// Crea o aggiorna via upload multipart (metadata + contenuto)
+async function drive_upload_json(contentObj, existingId = null) {
+  const metadata = {
+    name: DRIVE_FILENAME,
+    mimeType: "application/json",
+    parents: ["appDataFolder"]
+  };
+  const boundary = "foo_bar_" + Math.random().toString(36).slice(2);
+  const body =
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    JSON.stringify(metadata) + `\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    JSON.stringify(contentObj) + `\r\n` +
+    `--${boundary}--`;
+
+  const method = existingId ? "PATCH" : "POST";
+  const url = existingId
+    ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`
+    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+
+  const res = await drive_request(url, {
+    method,
+    headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+    body
+  });
+  return res.json();
+}
+
+// Crea o aggiorna un file con nome specifico (usato per backup)
+async function drive_upload_named_json(name, contentObj, existingId = null) {
+  const metadata = {
+    name,
+    mimeType: "application/json",
+    parents: ["appDataFolder"]
+  };
+  const boundary = "foo_bar_" + Math.random().toString(36).slice(2);
+  const body =
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    JSON.stringify(metadata) + `\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    JSON.stringify(contentObj) + `\r\n` +
+    `--${boundary}--`;
+
+  const method = existingId ? "PATCH" : "POST";
+  const url = existingId
+    ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`
+    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+
+  const res = await drive_request(url, {
+    method,
+    headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+    body
+  });
+  return res.json();
+}
+
+
+// Scarica il contenuto del file (alt=media)
+async function drive_download_json(fileId) {
+  const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+  const res = await drive_request(url);
+  return res.json();
+}
+
+// Salva (manuale, usato internamente dall'autosave)
+async function storage_saveToGoogle() {
+  if (!g_isConnected()) return;
+
+  // Sincronizza eventuali cambi da UI
+  ui_settingsApply();
+
+  const payload  = storage_buildPayload();
+  const snapshot = JSON.stringify(payload);
+  if (__lastSavedSnapshot === snapshot) return; // nulla di nuovo, salta
+
+  try {
+    // Salvataggio canonico
+    const existing = await drive_findCanonical();
+    const saved = await drive_upload_json(payload, existing ? existing.id : null);
+
+    // Salvataggio backup speculare
+    const existingBak = await drive_findByName(DRIVE_BACKUP_NAME);
+    await drive_upload_named_json(DRIVE_BACKUP_NAME, payload, existingBak ? existingBak.id : null);
+
+    __lastSavedSnapshot = snapshot;
+
+    const st = document.getElementById("cloudStatusSettings");
+    if (st) st.textContent = `✅ Salvato su Drive (con backup): ${saved.name}`;
+  } catch (e) {
+    console.error(e);
+    // niente alert in autosave
+  }
+}
+
+
+
+// Importa il file canone
+async function storage_importFromGoogle() {
+  if (!g_isConnected()) {
+    alert("Non sei connesso a Google.");
+    return;
+  }
+  try {
+    const file = await drive_findCanonical();
+    if (!file) {
+      alert("Nessun file trovato in Drive AppData.");
+      return;
+    }
+    const obj = await drive_download_json(file.id);
+
+    if (obj.settings) settings_save(obj.settings);
+    if (Array.isArray(obj.defs)) defs_save(obj.defs);
+
+    ui_settingsInit();
+    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+    // allinea la firma: da ora in poi non risalviamo se non cambia davvero
+    __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+
+    const st = document.getElementById("cloudStatusSettings");
+    if (st) st.textContent = `✅ Importato da Drive AppData: ${file.name}`;
+  } catch (e) {
+    console.error(e);
+    alert("Errore nell’importazione da Drive.");
+  }
+}
+
+  // Importa esplicitamente il backup
+async function storage_importBackupFromGoogle() {
+  if (!g_isConnected()) { alert("Non sei connesso a Google."); return; }
+  try{
+    const bak = await drive_findByName(DRIVE_BACKUP_NAME);
+    if(!bak){ alert("Nessun backup trovato."); return; }
+    const obj = await drive_download_json(bak.id);
+
+    if (obj.settings) settings_save(obj.settings);
+    if (Array.isArray(obj.defs)) defs_save(obj.defs);
+
+    ui_settingsInit();
+    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+
+    __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+
+    const st = document.getElementById("cloudStatusSettings");
+    if (st) st.textContent = `✅ Importato backup: ${bak.name}`;
+  }catch(e){
+    console.error(e);
+    alert("Errore nell’importazione del backup.");
+  }
+}
+
+
+
+/* =======================
+   AUTOSAVE ENGINE (debounce)
+   ======================= */
+let __autosave_timer = null;
+let __autosave_pending = false;
+
+function autosave_schedule(delayMs = 800) {
+  __autosave_pending = true;
+  clearTimeout(__autosave_timer);
+  __autosave_timer = setTimeout(async () => {
+    try {
+      if (g_isConnected()) {
+        await storage_saveToGoogle();
+      }
+    } catch (e) {
+      // non blocchiamo l'UI per errori cloud
+      console.error("Autosave error:", e);
+    } finally {
+      __autosave_pending = false;
+    }
+  }, delayMs);
+}
+
+// Per forzare immediatamente (se mai ti servirà)
+async function autosave_now() {
+  clearTimeout(__autosave_timer);
+  if (!g_isConnected()) return;
+  try { await storage_saveToGoogle(); } catch(e){ console.error(e); }
+  __autosave_pending = false;
+}
+
+
 
   // =========================================================
   // [BLOCK: BOOTSTRAP] DOM ready
   // =========================================================
   function boot_init(){
 
-    document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
-    document.getElementById('next').addEventListener('click', ()=>nav_shift(1));
+  document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
+  document.getElementById('next').addEventListener('click', ()=>nav_shift(1));
 
-    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>ui_switchTab(t.dataset.tab)));
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>ui_switchTab(t.dataset.tab)));
 
-    document.getElementById('btnAddTurno').addEventListener('click', ui_defsAdd);
+  document.getElementById('btnAddTurno').addEventListener('click', ui_defsAdd);
 
-    // Bind azioni cloud (Google mock)
-    const btnSaveCloud  = document.getElementById('btnSaveCloud');
-    const btnImportCloud= document.getElementById('btnImportCloud');
-    if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToGoogle);
-    if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromGoogle);
+  // Bind azioni cloud (restano, ma l'utente non deve usarle: l'autosave pensa a tutto)
+  const btnSaveCloud  = document.getElementById('btnSaveCloud');
+  const btnImportCloud= document.getElementById('btnImportCloud');
+  if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToGoogle);
+  if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromGoogle);
 
-    // Account: bind icone + stato
-    g_bindIconClicks();
-    g_updateIcons();
+// Account: bind icone + stato
+g_bindIconClicks();
+g_updateIcons();
 
-    // Init UI
-    ui_settingsInit();
-    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+// Porta il menu nel <body> prima di collegare gli handler
+acct_menuPortalize();
+acct_menuBind();
 
-    // Vista iniziale: calendario senza scroll globale
-    document.body.classList.add('no-scroll');
+  // Init UI
+  ui_settingsInit();
+  render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+
+  // Autosave anche quando cambia la data di ancoraggio
+  const sd = document.getElementById('startDate');
+  if (sd) sd.addEventListener('change', ui_settingsApply);
+
+  // Vista iniziale: calendario senza scroll globale
+  document.body.classList.add('no-scroll');
 
     // Glow
-    ui_updateTopbarGlowCenter();
-    addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
-    addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
-    requestAnimationFrame(ui_updateTopbarGlowCenter);
+  ui_updateTopbarGlowCenter();
+  addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
+  addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
+  requestAnimationFrame(ui_updateTopbarGlowCenter);
+
+  // Fallback brutale: aggancia direttamente i click del menu
+  const m = document.getElementById('acctMenu');
+  if (m) {
+    const aLogin = m.querySelector('[data-act="login"]');
+    const aSync  = m.querySelector('[data-act="sync"]');
+    const aBak   = m.querySelector('[data-act="import-bak"]');
+    const aOut   = m.querySelector('[data-act="logout"]');
+
+    if (aLogin) aLogin.addEventListener('click', ()=>{ acct_menuToggle(false); g_login(); });
+    if (aSync)  aSync.addEventListener('click',  ()=>{ acct_menuToggle(false); storage_saveToGoogle().catch(()=>{}); });
+    if (aBak)   aBak.addEventListener('click',   ()=>{ acct_menuToggle(false); storage_importBackupFromGoogle().catch(()=>{}); });
+    if (aOut)   aOut.addEventListener('click',   ()=>{ acct_menuToggle(false); g_disconnect(); });
   }
+}
+
+
+
+
 
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', boot_init);
