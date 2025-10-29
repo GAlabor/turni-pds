@@ -298,7 +298,7 @@ body.no-scroll main{
      [CSS-SETTINGS CARD] Struttura card impostazioni
      ========================================================= */
   .settingsCard{background:var(--card);border:1px solid var(--gridBorder);border-radius:10px;padding:14px;margin-top:10px}
-  .settingsRow{display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:center;margin:8px 0}
+  .settingsRow{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center;margin:8px 0}
   .settingsRow label{font-weight:600;color:var(--muted)}
   .settingsRow input,.settingsRow select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--gridBorder);background:var(--card);color:var(--text);height:var(--fieldH)}
   .savebtn{margin-top:12px;padding:10px 14px;border:0;border-radius:10px;background:var(--iosBlue);color:#fff;font-weight:700;cursor:pointer}
@@ -525,7 +525,6 @@ body.no-scroll main{
 
 
 /* micro-spazi */
-.settingsRow{ gap:8px; }
 @media (max-width:560px){
   .settingsRow{ gap:6px; }
   .turni-grid > div:first-child input{ padding-left:8px; } /* Turno parte un filo più a sx */
@@ -1157,7 +1156,7 @@ function storage_buildFilename(){
   // =========================================================
   const itMonth = new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'});
   const today   = new Date();
-  let   view    = new Date(Date.UTC(2025,9,1)); // demo: ottobre 2025
+  let   view    = new Date(Date.UTC(today.getFullYear(), today.getMonth(), 1));
 
   const grid        = document.querySelector('.grid');
   const monthLabel  = document.getElementById('monthLabel');
