@@ -52,28 +52,7 @@
 --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.08;
 --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.024;
 --tail: color-mix(in oklch, rgb(var(--blue-rgb)) 0%, var(--bg) 100%);
-
-
-
   }
-  @media (prefers-color-scheme: dark){
-  :root{ 
-    --bg:#0b0c10; 
-    --card:#14161a; 
-    --gridBorder:#222831; 
-    --text:#e6e8ec; 
-    --muted:#98a3af; 
-    --today:#103a7a;
-    /* === Glow vars override (dark) === */
-    --blue-rgb: 27,111,255;
-    --glow-x: 42%;
-    --core-a1: 0.95; --core-a2: 0.82; --core-a3: 0.68; --core-a4: 0.50; --core-a5: 0.34;
-    --mid-a1: 0.18;  --mid-a2: 0.12;  --mid-a3: 0.07;
-    --far-a1: 0.08;  --far-a2: 0.05;  --far-a3: 0.025;
-    --tail: rgba(0,0,0,0);
-  }
-}
-
 
   /* =========================================================
      [CSS-BASE] Reset e tipografia
@@ -172,28 +151,6 @@
   /* rimosso il blur che causava gli “aloni” */
 }
 
-
-
-
-
-
-.topbar .brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-}
-
-/* La scritta POLIZIA */
-.brand-title {
-  font-weight: 800;
-  letter-spacing: 0.2em;
-}
-
 .todayDate{
   font-size: 0.9rem;
   text-align: center;
@@ -283,9 +240,7 @@ body.no-scroll main{
 .cell{
   position:relative;
   min-height:84px;
-  background:var(--card);
   border-radius:12px;
-  border:0;                    /* niente griglia dura */
   display:flex;
   align-items:center;
   justify-content:center;
@@ -440,7 +395,6 @@ body.no-scroll main{
   /* =========================================================
      [CSS-FORMS TWEAKS] Campi, bottoni e griglia turni
      ========================================================= */
-  .orarioInput{width:100%}
   .thin-sep{height:0;border-top:1px solid var(--gridBorder);margin:6px 0}
   .iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:8px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0}
   .iconbtn-primary{background:var(--iosBlue);color:#fff}
@@ -624,8 +578,6 @@ body.no-scroll main{
 /* Stato connesso: blu tema */
 .dbx-on{ color: var(--iosBlue); }
 .dbx-on svg path{ fill: currentColor; }
-
-/*.dbx-on svg path{ fill:#1976d2; } vecchio colore per stato connesso */
 
 /* Modale leggero */
 .modalBackdrop{
@@ -845,8 +797,9 @@ body{
   font-size:.82rem;
 }
 
-/* Numeri giorno più leggibili su scuro */
-.num{ color: rgba(240,244,248,.86) !important; }
+/* Numeri giorno: chiari, ma NON sovrascriviamo la domenica */
+.cell:not(.sun) .num{ color: rgba(240,244,248,.86); }
+
 
 /* Topbar: niente fondo pieno oltre al vetro; glow resta il tuo */
 .topbar{
@@ -1054,7 +1007,7 @@ body{
         <hr style="border:none;border-top:1px solid var(--gridBorder);margin:12px 0" />
 
         <!-- [SET-HEAD] Intestazioni turni -->
-        <div class="settingsRow turni-grid turni-head" style="grid-template-columns:1fr 80px 2fr 90px 44px; align-items:center">
+          <div class="settingsRow turni-grid turni-head">
           <div style="font-weight:700;color:var(--muted)">Turno</div>
           <div style="font-weight:700;color:var(--muted)">Sigla</div>
           <div style="font-weight:700;color:var(--muted)">Orario</div>
@@ -1064,7 +1017,7 @@ body{
         <div class="thin-sep"></div>
 
         <!-- [SET-ADD ROW] Riga “Aggiungi turno” -->
-        <div class="settingsRow turni-grid" style="grid-template-columns:1fr 80px 2fr 90px 44px; align-items:center">
+        <div class="settingsRow turni-grid" style="align-items:center">
   <div><input id="newNome"></div>
   <div><input id="newSigla" class="siglaInput" maxlength="4"></div>
   <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00"></textarea>
@@ -1367,7 +1320,6 @@ function ui_defsRenderList(){
   list.forEach((t,idx)=>{
     const row=document.createElement('div');
     row.className='settingsRow turni-grid';
-    row.style.gridTemplateColumns='1fr 80px 2fr 90px 44px';
     row.style.alignItems='center';
 
     const p = util_splitOrario(t.orario);
@@ -1497,9 +1449,6 @@ const btnImportCloud= document.getElementById('btnImportCloud');
 if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToDropbox);
 if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDropbox);
 
-  // Placeholder multilinea coerente ovunque
-  document.getElementById('newOrario').placeholder = "00:00\n00:00";
-
   // >>> QUI: bind icone e stato Dropbox all’avvio <<<
   dbx_bindIconClicks();
   dbx_updateIcons(); // allinea lo stato delle icone al boot
@@ -1517,7 +1466,6 @@ if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromDr
   addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
-  setTimeout(ui_updateTopbarGlowCenter, 80);
 }
 
 
@@ -1883,7 +1831,7 @@ if (document.readyState === 'loading') {
   if (!('serviceWorker' in navigator)) return;
 
   // Allinea il ?v=... a quello del SW (basta lo stesso numero finale)
-  const SW_VERSION = '2025-10-22-03';
+  const SW_VERSION = '2025-10-29-01';
   const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
 
   async function registerSW(){
