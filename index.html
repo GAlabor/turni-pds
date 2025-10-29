@@ -1475,81 +1475,95 @@ async function g_login(){
   }
 }
 
-// Callback dal popup: riceve code e scambia per token
+// ================= Callback OAuth popup -> main =================
 window.addEventListener("message", async (ev) => {
-  // Solo messaggi dalla nostra origin
+  // Accettiamo solo messaggi provenienti dal redirect (che gira su GitHub Pages)
   if (ev.origin !== "https://galabor.github.io") return;
 
   const data = ev.data || {};
-  if (!data || data.type !== "oauth2-code") return;
-
-  // Utente ha annullato/negato nel popup
-  if (data.error) return;
-
-  const state    = data.state || "";
-  const verifier = sessionStorage.getItem("oauth_verifier:" + state) || "";
-  sessionStorage.removeItem("oauth_verifier:" + state);
-
-  const code = data.code || "";
-  if (!code || !verifier) return;
-
-  try {
-    const body = new URLSearchParams({
-      client_id:     GOOGLE_CLIENT_ID,
-      code:          code,
-      code_verifier: verifier,
-      grant_type:    "authorization_code",
-      redirect_uri:  GOOGLE_REDIRECT_URI
-    });
-
-    const res = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body
-    });
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "(no body)");
-      console.error("Token exchange failed:", res.status, txt);
-      alert("Google token error " + res.status + ":\n" + txt.slice(0, 500));
+  if (data && data.type === "oauth2-code") {
+    if (data.error) {
+      console.error("OAuth cancelled/denied:", data.error);
+      alert("Accesso annullato o negato.");
       return;
     }
 
-    const tk = await res.json();
+    const state    = data.state || "";
+    const verifier = sessionStorage.getItem("oauth_verifier:" + state) || "";
+    sessionStorage.removeItem("oauth_verifier:" + state);
 
-    if (!tk || !tk.access_token) {
-      console.error("No access_token in response:", tk);
-      alert("Accesso Google fallito (nessun token nella risposta).");
+    const code = data.code || "";
+    if (!code || !verifier) {
+      console.error("Missing code or verifier", { codePresent: !!code, verifierPresent: !!verifier });
+      alert("Errore OAuth: codice o verifier mancanti.");
       return;
     }
 
-    // Salva token ed expiry
-    const expiresAt = Date.now() + (tk.expires_in ? (tk.expires_in * 1000) : 3600_000);
-    localStorage.setItem(LS_GOOGLE_TOKEN, tk.access_token);
-    localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
+    try {
+      const body = new URLSearchParams({
+        client_id:     GOOGLE_CLIENT_ID,
+        code:          code,
+        code_verifier: verifier,
+        grant_type:    "authorization_code",
+        redirect_uri:  GOOGLE_REDIRECT_URI
+      });
 
-    // id_token => email / picture
-    if (tk.id_token) {
-      localStorage.setItem(LS_GOOGLE_IDTOKEN, tk.id_token);
-      try {
-        const parts   = tk.id_token.split(".");
-        const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-        if (payload && payload.email)   localStorage.setItem(LS_GOOGLE_EMAIL,  payload.email);
-        if (payload && payload.picture) localStorage.setItem(LS_GOOGLE_PHOTO,  payload.picture);
-      } catch {}
+      const res = await fetch("https://oauth2.googleapis.com/token", {
+        method:  "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body
+      });
+
+      // Se la risposta è non-OK, mostriamo il corpo per capire l’errore
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "(no body)");
+        console.error("Token exchange failed:", res.status, txt);
+        alert("Google token error " + res.status + ":\n" + txt.slice(0, 800));
+        return;
+      }
+
+      const tk = await res.json();
+
+      if (!tk || !tk.access_token) {
+        console.error("No access_token in response:", tk);
+        const msg = (tk && (tk.error_description || tk.error)) ? (tk.error_description || tk.error) : "nessun token nella risposta";
+        alert("Accesso Google fallito (" + msg + ").");
+        return;
+      }
+
+      // Salva token + scadenza
+      const expiresAt = Date.now() + (tk.expires_in ? (tk.expires_in * 1000) : 3600_000);
+      localStorage.setItem(LS_GOOGLE_TOKEN, tk.access_token);
+      localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
+
+      // id_token => email / picture (opzionale ma utile)
+      if (tk.id_token) {
+        localStorage.setItem(LS_GOOGLE_IDTOKEN, tk.id_token);
+        try {
+          const parts   = tk.id_token.split(".");
+          const payload = JSON.parse(atob(parts[1].replace(/-/g,"+").replace(/_/g,"/")));
+          if (payload && payload.email)   localStorage.setItem(LS_GOOGLE_EMAIL, payload.email);
+          if (payload && payload.picture) localStorage.setItem(LS_GOOGLE_PHOTO, payload.picture);
+        } catch {}
+      }
+
+      if (tk.refresh_token) {
+        localStorage.setItem(LS_GOOGLE_REFRESH, tk.refresh_token);
+      }
+
+      g_updateIcons();
+      ui_switchTab("calendar");
+      if (typeof storage_importFromGoogleAuto === "function") {
+        storage_importFromGoogleAuto();
+      }
+
+    } catch (e) {
+      console.error("OAuth complete error:", e);
+      alert("Errore durante il completamento dell’accesso a Google.\n" + (e && e.message ? e.message : ""));
     }
-
-    // Il refresh_token non è garantito ad ogni login
-    if (tk.refresh_token) localStorage.setItem(LS_GOOGLE_REFRESH, tk.refresh_token);
-
-    g_updateIcons();
-    ui_switchTab("calendar");
-    storage_importFromGoogleAuto?.();
-  } catch (e) {
-    console.error("OAuth complete error:", e);
-    alert("Errore durante il completamento dell’accesso a Google.\n" + (e && e.message ? e.message : ""));
   }
 }, { passive: true });
+
 
 
 
