@@ -29,10 +29,25 @@
   <title>Turni Polizia di Stato</title>
 
   <!-- Manifest con query di versione -->
-  <link rel="manifest" href="/turni-pds/manifest.webmanifest">
+  <script>
+  // in locale serviamo da /, su GitHub da /turni-pds/
+  (function() {
+    var base = location.hostname === "localhost"
+      ? ""
+      : "/turni-pds";
+    var link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = base + "/manifest.webmanifest";
+    document.head.appendChild(link);
+  })();
+</script>
+
 
   <!-- Colore tema -->
   <meta name="theme-color" content="#387cff">
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 
   <style>
   /* ====== TUTTI I TUOI STILI INVARIATI (copiati 1:1) ====== */
@@ -1366,13 +1381,14 @@
     document.documentElement.style.setProperty('--cy', cy + 'px');
     document.documentElement.style.setProperty('--bar-h', r.height + 'px');
   }
-  // =========================================================
-// [BLOCK: GOOGLE ACCOUNT – OAUTH PKCE (REALE)]
-// Autenticazione Google: popup -> code -> token -> id_token
+// =========================================================
+// [GOOGLE AUTH v2 - GIS popup + access_token]
 // =========================================================
 
+// client web (quello che avevi già)
 const GOOGLE_CLIENT_ID = "280688458605-2l6l10drhsrhfct6540divn87h769aif.apps.googleusercontent.com";
-const GOOGLE_REDIRECT_URI = "https://galabor.github.io/turni-pds/redirect/";
+
+// scope che ci servono
 const GOOGLE_SCOPES = [
   "openid",
   "email",
@@ -1380,196 +1396,151 @@ const GOOGLE_SCOPES = [
   "https://www.googleapis.com/auth/drive.appdata"
 ].join(" ");
 
-// Storage keys
+// storage keys (stessi nomi di prima, così il resto del codice non cambia)
 const LS_GOOGLE_TOKEN       = "google_access_token";
 const LS_GOOGLE_EXPIRES_AT  = "google_access_expires_at";
 const LS_GOOGLE_IDTOKEN     = "google_id_token";
 const LS_GOOGLE_EMAIL       = "google_user_email";
 const LS_GOOGLE_PHOTO       = "google_user_photo";
-const LS_GOOGLE_REFRESH     = "google_refresh_token";
+const LS_GOOGLE_REFRESH     = "google_refresh_token"; // con GIS resterà quasi sempre vuoto
 
+let __gisLoaded   = false;
+let __gisLoading  = false;
+let __gisTokenCli = null;
 
-// Stato connessione
-function g_isConnected(){
-  const t = localStorage.getItem(LS_GOOGLE_TOKEN);
-  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT)||"0",10);
-  return !!t && Date.now() < exp - 10_000; // 10s di margine
+// carica lo script ufficiale Google Identity Services
+function g_loadGisScript() {
+  return new Promise((resolve, reject) => {
+    if (__gisLoaded) {
+      resolve();
+      return;
+    }
+    if (__gisLoading) {
+      // se sta già caricando, aspetta che finisca
+      const iv = setInterval(() => {
+        if (__gisLoaded) {
+          clearInterval(iv);
+          resolve();
+        }
+      }, 80);
+      return;
+    }
+    __gisLoading = true;
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true;
+    s.defer = true;
+    s.onload = () => {
+      __gisLoaded = true;
+      __gisLoading = false;
+      resolve();
+    };
+    s.onerror = () => {
+      __gisLoading = false;
+      reject(new Error("Impossibile caricare Google Identity Services."));
+    };
+    document.head.appendChild(s);
+  });
 }
 
-// UI: aggiorna icone/avatar/stato
-function g_updateIcons(){
-  const on = g_isConnected();
-  const h  = document.getElementById("acctBtnHeader");
-  const s  = document.getElementById("acctBtnSettings");
-  const st2= document.getElementById("cloudStatusSettings");
-  const dis= document.getElementById("acctDisconnect");
+// token valido?
+function g_isConnected(){
+  const t   = localStorage.getItem(LS_GOOGLE_TOKEN);
+  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+  return !!t && Date.now() < (exp - 10_000);
+}
 
-  const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO)||"") : "";
-  [h,s].forEach(el=>{
-    if(!el) return;
+// UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
+// questa era nel blocco vecchio, la rimettiamo UGUALE così il resto non si rompe
+function g_updateIcons(){
+  const on  = g_isConnected();
+  const h   = document.getElementById("acctBtnHeader");
+  const s   = document.getElementById("acctBtnSettings");
+  const st2 = document.getElementById("cloudStatusSettings");
+  const dis = document.getElementById("acctDisconnect");
+
+  const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
+
+  [h, s].forEach(el => {
+    if (!el) return;
     el.classList.toggle("dbx-on",  on);
     el.classList.toggle("dbx-off", !on);
+
     const inner = (on && photo)
       ? `<img src="${photo}" alt="Avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
       : `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
          </svg>`;
+
     const badge = on
       ? `<span class="acct-badge" aria-hidden="true"></span>`
       : `<span class="acct-badge off" aria-hidden="true"></span>`;
+
     el.innerHTML = inner + badge;
   });
 
-  if(st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
-  if(dis) dis.style.display = on ? "inline-flex" : "none";
+  if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
+  if (dis) dis.style.display = on ? "inline-flex" : "none";
 }
 
-// PKCE utils
-function b64url(buf){
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
-    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-async function sha256(txt){
-  const enc = new TextEncoder().encode(txt);
-  const digest = await crypto.subtle.digest("SHA-256", enc);
-  return b64url(digest);
-}
-function randomString(len=64){
-  const arr = new Uint8Array(len);
-  crypto.getRandomValues(arr);
-  return Array.from(arr, x => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~"[x % 66]).join("");
+// bind del pulsante "disconnetti" nelle impostazioni
+function g_bindIconClicks(){
+  const dis = document.getElementById("acctDisconnect");
+  if (dis) dis.addEventListener("click", g_disconnect);
 }
 
-// Avvia login: genera PKCE + popup OAuth
+// login nuova: chiede subito il token (popup GIS)
 async function g_login(){
   try{
-    const verifier = randomString(64);
-    const challenge = await sha256(verifier);
-    const state = randomString(24);
+    await g_loadGisScript();
 
-    // Salvo in sessionStorage, legato a questa finestra
-    sessionStorage.setItem("oauth_verifier:"+state, verifier);
+    if (!__gisTokenCli && window.google && google.accounts && google.accounts.oauth2) {
+      __gisTokenCli = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_SCOPES,
+        callback: (response) => {
+          if (!response || !response.access_token) {
+            alert("Accesso Google fallito (nessun access_token).");
+            return;
+          }
 
-    const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-    authUrl.searchParams.set("client_id", GOOGLE_CLIENT_ID);
-    authUrl.searchParams.set("redirect_uri", GOOGLE_REDIRECT_URI);
-    authUrl.searchParams.set("response_type", "code");
-    authUrl.searchParams.set("scope", GOOGLE_SCOPES);
-    authUrl.searchParams.set("include_granted_scopes", "true");
-    authUrl.searchParams.set("access_type", "offline");
-    authUrl.searchParams.set("prompt", "consent"); // per ottenere id_token pulito
-    authUrl.searchParams.set("code_challenge", challenge);
-    authUrl.searchParams.set("code_challenge_method", "S256");
-    authUrl.searchParams.set("state", state);
+          const expiresAt = Date.now() + (response.expires_in ? (response.expires_in * 1000) : 3_400_000);
 
-    const w = 520, h = 640;
-    const y = Math.max(0, (screen.height - h)/2);
-    const x = Math.max(0, (screen.width  - w)/2);
-    window.open(
-      authUrl.toString(),
-      "g_oauth",
-      `width=${w},height=${h},left=${x},top=${y},resizable=yes,scrollbars=yes`
-    );
+          localStorage.setItem(LS_GOOGLE_TOKEN, response.access_token);
+          localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
+
+          // aggiorna UI
+          g_updateIcons();
+
+          // torna al calendario
+          if (typeof ui_switchTab === "function") {
+            ui_switchTab("calendar");
+          }
+
+          // se hai l'auto-import, chiamalo
+          if (typeof storage_importFromGoogleAuto === "function") {
+            storage_importFromGoogleAuto();
+          }
+        }
+      });
+    }
+
+    if (!__gisTokenCli) {
+      alert("Google Identity non inizializzato.");
+      return;
+    }
+
+    // chiede il token
+    __gisTokenCli.requestAccessToken({
+      prompt: "consent"     // così la prima volta mostra lo scope brutto
+    });
+
   }catch(e){
-    alert("Errore durante l'avvio dell'accesso a Google.");
+    console.error(e);
+    alert("Errore durante l’accesso a Google.\n" + (e && e.message ? e.message : ""));
   }
 }
 
-// ================= Callback OAuth popup -> main =================
-window.addEventListener("message", async (ev) => {
-  // Accettiamo solo messaggi da origini conosciute (GitHub Pages o localhost)
-  const allowedOrigins = [
-    "https://galabor.github.io",
-    "http://localhost:8000"
-  ];
-  if (!allowedOrigins.includes(ev.origin)) {
-    console.warn("Messaggio ignorato da origine non autorizzata:", ev.origin);
-    return;
-  }
-
-  const data = ev.data || {};
-  if (!data || data.type !== "oauth2-code") return;
-
-  if (data.error) {
-    console.error("OAuth cancelled/denied:", data.error);
-    alert("Accesso annullato o negato.");
-    return;
-  }
-
-  const state    = data.state || "";
-  const verifier = sessionStorage.getItem("oauth_verifier:" + state) || "";
-  sessionStorage.removeItem("oauth_verifier:" + state);
-
-  const code = data.code || "";
-  if (!code || !verifier) {
-    console.error("Missing code or verifier", { codePresent: !!code, verifierPresent: !!verifier });
-    alert("Errore OAuth: codice o verifier mancanti.");
-    return;
-  }
-
-  try {
-    const body = new URLSearchParams({
-      client_id:     GOOGLE_CLIENT_ID,
-      code:          code,
-      code_verifier: verifier,
-      grant_type:    "authorization_code",
-      redirect_uri:  GOOGLE_REDIRECT_URI
-    });
-
-    const res = await fetch("https://oauth2.googleapis.com/token", {
-      method:  "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body
-    });
-
-    // Se la risposta è non-OK, mostriamo il corpo per capire l’errore
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "(no body)");
-      console.error("Token exchange failed:", res.status, txt);
-      alert("Google token error " + res.status + ":\n" + txt.slice(0, 800));
-      return;
-    }
-
-    const tk = await res.json();
-
-    if (!tk || !tk.access_token) {
-      console.error("No access_token in response:", tk);
-      const msg = (tk && (tk.error_description || tk.error)) ? (tk.error_description || tk.error) : "nessun token nella risposta";
-      alert("Accesso Google fallito (" + msg + ").");
-      return;
-    }
-
-    // Salva token + scadenza
-    const expiresAt = Date.now() + (tk.expires_in ? (tk.expires_in * 1000) : 3600_000);
-    localStorage.setItem(LS_GOOGLE_TOKEN, tk.access_token);
-    localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
-
-    // id_token => email / picture (opzionale ma utile)
-    if (tk.id_token) {
-      localStorage.setItem(LS_GOOGLE_IDTOKEN, tk.id_token);
-      try {
-        const parts   = tk.id_token.split(".");
-        const payload = JSON.parse(atob(parts[1].replace(/-/g,"+").replace(/_/g,"/")));
-        if (payload && payload.email)   localStorage.setItem(LS_GOOGLE_EMAIL, payload.email);
-        if (payload && payload.picture) localStorage.setItem(LS_GOOGLE_PHOTO, payload.picture);
-      } catch {}
-    }
-
-    if (tk.refresh_token) {
-      localStorage.setItem(LS_GOOGLE_REFRESH, tk.refresh_token);
-    }
-
-    g_updateIcons();
-    ui_switchTab("calendar");
-    if (typeof storage_importFromGoogleAuto === "function") {
-      storage_importFromGoogleAuto();
-    }
-
-  } catch (e) {
-    console.error("OAuth complete error:", e);
-    alert("Errore durante il completamento dell’accesso a Google.\n" + (e && e.message ? e.message : ""));
-  }
-}, { passive: true });
 
 
 
