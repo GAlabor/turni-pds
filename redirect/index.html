@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex" />
   <meta name="referrer" content="no-referrer" />
   <style>
-    html,body {
+    html, body {
       height: 100%;
     }
     body {
@@ -33,41 +33,37 @@
     <div id="status">Sto completando l’accesso a Google…</div>
   </div>
 
-<script>
-(function(){
-  // Prepara payload dal querystring
-  const params = new URLSearchParams(location.search);
-  const payload = {
-    type: "oauth2-code",
-    code: params.get("code") || "",
-    scope: params.get("scope") || "",
-    state: params.get("state") || "",
-    error: params.get("error") || "",
-    prompt: params.get("prompt") || "",
-    authuser: params.get("authuser") || ""
-  };
+  <script>
+  (function(){
+    const params = new URLSearchParams(location.search);
+    const payload = {
+      type: "oauth2-code",
+      code: params.get("code") || "",
+      scope: params.get("scope") || "",
+      state: params.get("state") || "",
+      error: params.get("error") || "",
+      prompt: params.get("prompt") || "",
+      authuser: params.get("authuser") || ""
+    };
 
-  // Messaggio utente per feedback
-  const st = document.getElementById("status");
-  st.textContent = payload.error
-    ? "Accesso annullato o negato. Puoi chiudere questa scheda."
-    : "Accesso completato. Puoi chiudere questa scheda.";
+    const st = document.getElementById("status");
+    st.textContent = payload.error
+      ? "Accesso annullato o negato. Puoi chiudere questa scheda."
+      : "Accesso completato. Puoi chiudere questa scheda.";
 
-  // Invia SEMPRE all'opener con targetOrigin="*"
-  // (La finestra principale filtra comunque con allowedOrigins)
-  try {
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage(payload, "*");
+    try {
+      if (window.opener && !window.opener.closed) {
+        // in produzione metti l'origin reale al posto di "*"
+        window.opener.postMessage(payload, "*");
+      }
+    } catch (e) {
+      console.warn("postMessage fallito nel redirect:", e);
     }
-  } catch(e){
-    // Non bloccare: chiudiamo lo stesso
-    console.warn("postMessage fallito nel redirect:", e);
-  }
 
-  // Chiudi dopo un attimo
-  setTimeout(()=> window.close(), 800);
-})();
-</script>
-
+    setTimeout(function(){
+      window.close();
+    }, 800);
+  })();
+  </script>
 </body>
 </html>

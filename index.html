@@ -1607,6 +1607,7 @@ async function g_refreshAccessToken(){
   return tk.access_token;
 }
 
+
 // Garantisce che ci sia un access token valido, altrimenti prova il refresh
 async function g_ensureValidAccess(){
   const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
@@ -1615,6 +1616,21 @@ async function g_ensureValidAccess(){
   // scaduto o assente: prova refresh
   return await g_refreshAccessToken();
 }
+
+/*
+// TEST: forza il percorso "token scaduto"
+async function g_ensureValidAccess(){
+  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+
+  // 👇 COMMENTA la riga normale e forziamo lo "scaduto"
+  // if (tok && Date.now() < (exp - 10_000)) return tok;
+
+  // 👇 Forziamo SEMPRE a passare dal refresh / nuovo token
+  return await g_refreshAccessToken();
+}
+  */
+
 
 // Bind icone: NIENTE login sugli omini. Solo disconnessione.
 function g_bindIconClicks(){
@@ -1858,11 +1874,18 @@ async function drive_findCanonical() {
 
 // Crea o aggiorna via upload multipart (metadata + contenuto)
 async function drive_upload_json(contentObj, existingId = null) {
+  // metadata base, valido SEMPRE
   const metadata = {
     name: DRIVE_FILENAME,
-    mimeType: "application/json",
-    parents: ["appDataFolder"]
+    mimeType: "application/json"
   };
+
+  // se è una CREAZIONE (POST) allora si può indicare il parent
+  const isCreate = !existingId;
+  if (isCreate) {
+    metadata.parents = ["appDataFolder"];
+  }
+
   const boundary = "foo_bar_" + Math.random().toString(36).slice(2);
   const body =
     `--${boundary}\r\n` +
@@ -1873,10 +1896,10 @@ async function drive_upload_json(contentObj, existingId = null) {
     JSON.stringify(contentObj) + `\r\n` +
     `--${boundary}--`;
 
-  const method = existingId ? "PATCH" : "POST";
-  const url = existingId
-    ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`
-    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+  const method = isCreate ? "POST" : "PATCH";
+  const url = isCreate
+    ? `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`
+    : `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`;
 
   const res = await drive_request(url, {
     method,
@@ -1885,14 +1908,20 @@ async function drive_upload_json(contentObj, existingId = null) {
   });
   return res.json();
 }
+
 
 // Crea o aggiorna un file con nome specifico (usato per backup)
 async function drive_upload_named_json(name, contentObj, existingId = null) {
   const metadata = {
     name,
-    mimeType: "application/json",
-    parents: ["appDataFolder"]
+    mimeType: "application/json"
   };
+
+  const isCreate = !existingId;
+  if (isCreate) {
+    metadata.parents = ["appDataFolder"];
+  }
+
   const boundary = "foo_bar_" + Math.random().toString(36).slice(2);
   const body =
     `--${boundary}\r\n` +
@@ -1903,10 +1932,10 @@ async function drive_upload_named_json(name, contentObj, existingId = null) {
     JSON.stringify(contentObj) + `\r\n` +
     `--${boundary}--`;
 
-  const method = existingId ? "PATCH" : "POST";
-  const url = existingId
-    ? `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`
-    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+  const method = isCreate ? "POST" : "PATCH";
+  const url = isCreate
+    ? `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`
+    : `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`;
 
   const res = await drive_request(url, {
     method,
@@ -1915,6 +1944,7 @@ async function drive_upload_named_json(name, contentObj, existingId = null) {
   });
   return res.json();
 }
+
 
 
 // Scarica il contenuto del file (alt=media)
@@ -1924,35 +1954,78 @@ async function drive_download_json(fileId) {
   return res.json();
 }
 
+function showSaveStatus(text, color) {
+  let el = document.getElementById('saveStatus');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'saveStatus';
+    el.style.position = 'fixed';
+    el.style.top = '10px';
+    el.style.right = '10px';
+    el.style.background = 'rgba(0,0,0,.75)';
+    el.style.color = 'white';
+    el.style.padding = '6px 12px';
+    el.style.borderRadius = '8px';
+    el.style.fontSize = '14px';
+    el.style.fontWeight = '500';
+    el.style.zIndex = '9999';
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .3s';
+    document.body.appendChild(el);
+  }
+
+  el.textContent = text;
+  el.style.background = color;
+  el.style.opacity = '1';
+
+  clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(() => {
+    el.style.opacity = '0';
+  }, 3000);
+}
+
+
+
 // Salva (manuale, usato internamente dall'autosave)
 async function storage_saveToGoogle() {
-  if (!g_isConnected()) return;
+  if (!g_isConnected()) {
+    showSaveStatus("Non collegato a Google", "rgba(220,0,0,.85)");
+    return;
+  }
 
-  // Sincronizza eventuali cambi da UI
+  // allinea UI
   ui_settingsApply();
 
   const payload  = storage_buildPayload();
   const snapshot = JSON.stringify(payload);
-  if (__lastSavedSnapshot === snapshot) return; // nulla di nuovo, salta
+
+  if (__lastSavedSnapshot === snapshot) {
+    showSaveStatus("Nessuna modifica da salvare", "rgba(0,120,255,.55)");
+    return;
+  }
+
+  showSaveStatus("Sincronizzazione…", "rgba(0,120,255,.85)");
 
   try {
-    // Salvataggio canonico
     const existing = await drive_findCanonical();
     const saved = await drive_upload_json(payload, existing ? existing.id : null);
 
-    // Salvataggio backup speculare
     const existingBak = await drive_findByName(DRIVE_BACKUP_NAME);
     await drive_upload_named_json(DRIVE_BACKUP_NAME, payload, existingBak ? existingBak.id : null);
 
     __lastSavedSnapshot = snapshot;
 
     const st = document.getElementById("cloudStatusSettings");
-    if (st) st.textContent = `✅ Salvato su Drive (con backup): ${saved.name}`;
+    if (st) st.textContent = `✅ Salvato su Drive (con backup): ${saved.name || DRIVE_FILENAME}`;
+
+    showSaveStatus("Salvato", "rgba(0,180,0,.9)");
   } catch (e) {
     console.error(e);
-    // niente alert in autosave
+    showSaveStatus("Errore salvataggio", "rgba(220,0,0,.9)");
   }
 }
+
+
 
 
 
@@ -2012,13 +2085,15 @@ async function storage_importBackupFromGoogle() {
 
 
 
-/* =======================
-   AUTOSAVE ENGINE (debounce)
-   ======================= */
+// =======================
+// AUTOSAVE ENGINE (disattivato per test)
+// =======================
 let __autosave_timer = null;
 let __autosave_pending = false;
+const AUTOSAVE_ENABLED = false;
 
 function autosave_schedule(delayMs = 800) {
+  if (!AUTOSAVE_ENABLED) return;
   __autosave_pending = true;
   clearTimeout(__autosave_timer);
   __autosave_timer = setTimeout(async () => {
@@ -2027,7 +2102,6 @@ function autosave_schedule(delayMs = 800) {
         await storage_saveToGoogle();
       }
     } catch (e) {
-      // non blocchiamo l'UI per errori cloud
       console.error("Autosave error:", e);
     } finally {
       __autosave_pending = false;
@@ -2035,14 +2109,11 @@ function autosave_schedule(delayMs = 800) {
   }, delayMs);
 }
 
-// Per forzare immediatamente (se mai ti servirà)
 async function autosave_now() {
-  clearTimeout(__autosave_timer);
   if (!g_isConnected()) return;
   try { await storage_saveToGoogle(); } catch(e){ console.error(e); }
   __autosave_pending = false;
 }
-
 
 
   // =========================================================
