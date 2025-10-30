@@ -1483,12 +1483,6 @@ function g_updateIcons(){
   if (dis) dis.style.display = on ? "inline-flex" : "none";
 }
 
-// bind del pulsante "disconnetti" nelle impostazioni
-function g_bindIconClicks(){
-  const dis = document.getElementById("acctDisconnect");
-  if (dis) dis.addEventListener("click", g_disconnect);
-}
-
 // login nuova: chiede subito il token (popup GIS)
 async function g_login(){
   try{
@@ -1498,30 +1492,43 @@ async function g_login(){
       __gisTokenCli = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPES,
-        callback: (response) => {
-          if (!response || !response.access_token) {
-            alert("Accesso Google fallito (nessun access_token).");
-            return;
-          }
 
-          const expiresAt = Date.now() + (response.expires_in ? (response.expires_in * 1000) : 3_400_000);
+callback: async (response) => {
+  if (!response || !response.access_token) {
+    alert("Accesso Google fallito (nessun access_token).");
+    return;
+  }
 
-          localStorage.setItem(LS_GOOGLE_TOKEN, response.access_token);
-          localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
+  const expiresAt = Date.now() + (response.expires_in ? (response.expires_in * 1000) : 3_400_000);
+  localStorage.setItem(LS_GOOGLE_TOKEN, response.access_token);
+  localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
-          // aggiorna UI
-          g_updateIcons();
+  // aggiorniamo subito icone
+  g_updateIcons();
 
-          // torna al calendario
-          if (typeof ui_switchTab === "function") {
-            ui_switchTab("calendar");
-          }
+  // proviamo a prendere mail/foto (non è obbligatorio ma è comodo)
+  g_fetchUserInfo().catch(()=>{});
 
-          // se hai l'auto-import, chiamalo
-          if (typeof storage_importFromGoogleAuto === "function") {
-            storage_importFromGoogleAuto();
-          }
-        }
+  // TEST DRIVE: controlla se l'utente ha davvero spuntato
+  const okDrive = await g_testDrivePermission();
+  if (!okDrive) {
+    // QUI: lui ha cliccato continua senza spunta
+    g_disconnect(true);   // disconnessione SENZA conferma
+    alert("Non hai fornito le autorizzazioni necessarie al salvataggio su Drive.\nRifai l’accesso e metti la spunta.");
+    return;
+  }
+
+  // tutto ok, lo riportiamo al calendario
+  if (typeof ui_switchTab === "function") {
+    ui_switchTab("calendar");
+  }
+
+  if (typeof storage_importFromGoogleAuto === "function") {
+    storage_importFromGoogleAuto();
+  }
+}
+
+
       });
     }
 
@@ -1547,9 +1554,17 @@ async function g_login(){
 
 
 // Disconnessione: revoca e pulizia locale
-async function g_disconnect(){
-  const ok = confirm("Vuoi disconnettere l'app da Google?");
-  if(!ok) return;
+let __lastDisconnectAt = 0;
+async function g_disconnect(silent = false){
+  // anti doppio trigger a pochi ms di distanza
+  const now = Date.now();
+  if (now - __lastDisconnectAt < 500) return;
+  __lastDisconnectAt = now;
+
+  if (!silent) {
+    const ok = confirm("Vuoi disconnettere l'app da Google?");
+    if (!ok) return;
+  }
   try{
     const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
     if(tok){
@@ -1562,11 +1577,63 @@ async function g_disconnect(){
     localStorage.removeItem(LS_GOOGLE_IDTOKEN);
     localStorage.removeItem(LS_GOOGLE_EMAIL);
     localStorage.removeItem(LS_GOOGLE_PHOTO);
-    localStorage.removeItem(LS_GOOGLE_REFRESH); // <-- questa mancava
+    localStorage.removeItem(LS_GOOGLE_REFRESH);
     g_updateIcons();
-    ui_switchTab("settings");
+    // torniamo al CALENDARIO, non alle impostazioni
+    ui_switchTab("calendar");
   }
 }
+
+// bind del pulsante "disconnetti" nelle impostazioni (versione unica e stabile)
+function g_bindIconClicks(){
+  const dis = document.getElementById("acctDisconnect");
+  if (!dis) return;
+
+  // rimuove eventuali listener precedenti per evitare doppi click
+  dis.replaceWith(dis.cloneNode(true));
+  const newDis = document.getElementById("acctDisconnect");
+
+  // collega il click alla disconnessione
+  newDis.addEventListener("click", () => g_disconnect(false));
+}
+
+
+
+
+// Verifica che Drive sia realmente autorizzato (spunta data)
+async function g_testDrivePermission() {
+  try {
+    await drive_request(
+      "https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=1&fields=files(id)"
+    );
+    return true;
+  } catch (e) {
+    console.warn("Drive non autorizzato:", e);
+    showSaveStatus("❌ Manca il permesso Drive (spunta non data)", "#b91c1c");
+    return false;
+  }
+}
+
+
+
+// === Recupera info utente Google ===
+async function g_fetchUserInfo() {
+  try {
+    const tok = await g_ensureValidAccess();
+    const res = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+      headers: { Authorization: "Bearer " + tok }
+    });
+    if (!res.ok) return;
+    const info = await res.json();
+    if (info.email) localStorage.setItem("google_user_email", info.email);
+    if (info.picture) localStorage.setItem("google_user_photo", info.picture);
+    g_updateIcons();
+    console.log("👤 Google user info:", info);
+  } catch (e) {
+    console.warn("userinfo fallita:", e);
+  }
+}
+
 
 
 // Prova a rinnovare l'access token usando il refresh_token
@@ -1630,13 +1697,6 @@ async function g_ensureValidAccess(){
   return await g_refreshAccessToken();
 }
   */
-
-
-// Bind icone: NIENTE login sugli omini. Solo disconnessione.
-function g_bindIconClicks(){
-  const dis = document.getElementById("acctDisconnect");
-  if (dis) dis.addEventListener("click", g_disconnect);
-}
 
 
 // === MENU OMINO: toggle e azioni ===
@@ -1759,11 +1819,11 @@ function acct_menuBind(){
       g_disconnect();
       return;
     }
-    if(act==="sync"){
-      acct_menuToggle(false);
-      try{ await storage_saveToGoogle(); }catch{}
-      return;
-    }
+    if (act === "sync") {
+  acct_menuToggle(false);
+  try { await storage_syncNewestFromDrive(); } catch {}
+  return;
+}
     if(act==="import-bak"){
       acct_menuToggle(false);
       try{ await storage_importBackupFromGoogle(); }catch{}
@@ -1997,6 +2057,43 @@ async function drive_download_json(fileId) {
   return res.json();
 }
 
+// DEBUG: elenca tutto quello che c'è nell'appDataFolder di QUESTO progetto
+async function drive_debugListAll() {
+  try {
+    const url = "https://www.googleapis.com/drive/v3/files"
+      + "?spaces=appDataFolder"
+      + "&fields=files(id,name,modifiedTime,size),nextPageToken"
+      + "&pageSize=100";
+    const res = await drive_request(url);
+    const json = await res.json();
+    console.log("📦 appDataFolder:", json.files || []);
+  } catch (e) {
+    console.error("Errore nel list appDataFolder:", e);
+  }
+}
+
+// Ritorna tutti i file TURNI* nell'appDataFolder, ordinati dal più recente al più vecchio
+async function drive_listTurniFiles() {
+  const url = "https://www.googleapis.com/drive/v3/files"
+    + "?spaces=appDataFolder"
+    + "&q=" + encodeURIComponent("name contains 'TURNI' and trashed = false and 'appDataFolder' in parents")
+    + "&fields=files(id,name,modifiedTime),nextPageToken"
+    + "&pageSize=100";
+
+  const res = await drive_request(url);
+  const json = await res.json();
+  const files = Array.isArray(json.files) ? json.files : [];
+
+  // ordina per modifiedTime decrescente (prima il più nuovo)
+  files.sort((a,b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
+  return files;
+}
+
+
+
+
+
+
 function showSaveStatus(text, color) {
   let el = document.getElementById('saveStatus');
   if (!el) {
@@ -2014,6 +2111,7 @@ function showSaveStatus(text, color) {
     el.style.zIndex = '9999';
     el.style.opacity = '0';
     el.style.transition = 'opacity .3s';
+    el.style.pointerEvents = 'none';
     document.body.appendChild(el);
   }
 
@@ -2029,62 +2127,60 @@ function showSaveStatus(text, color) {
 
 
 
-// Salva (manuale, usato internamente dall'autosave)
+// Salva (manuale) con rotazione 9 versioni
 async function storage_saveToGoogle() {
-  if (!g_isConnected()) {
-    showSaveStatus("Non collegato a Google", "rgba(220,0,0,.85)");
-    return;
-  }
+  if (!g_isConnected()) return;
 
-  // allinea UI
+  // prendi quello che c'è adesso
   ui_settingsApply();
-
   const payload  = storage_buildPayload();
   const snapshot = JSON.stringify(payload);
 
-  // se niente è cambiato non serve salvare
+  // se non è cambiato niente, basta
   if (__lastSavedSnapshot === snapshot) {
-    showSaveStatus("Nessuna modifica da salvare", "rgba(0,120,255,.55)");
+    showSaveStatus("Nessuna modifica da salvare", "#2d3748");
     return;
   }
 
-  showSaveStatus("Sincronizzazione…", "rgba(0,120,255,.85)");
-
   try {
-    // 1. salva/aggiorna il file canonico
-    const existing = await drive_findCanonical();
-    const saved = await drive_upload_json(payload, existing ? existing.id : null);
+    // 1. carica l'elenco attuale
+    const files = await drive_listTurniFiles();
 
-    // 2. salva una versione con timestamp (sempre CREATE)
-    const versionName = drive_buildVersionedName();
-    await drive_upload_named_json(versionName, payload, null);
+    // 2. troviamo il canonico se esiste
+    const canonical = files.find(f => f.name === "TURNI.json") || null;
 
-    // 3. tieni solo le ultime DRIVE_MAX_VERSIONS
-    try {
-      const versions = await drive_listVersions(); // ordinate per modifiedTime desc
-      if (versions.length > DRIVE_MAX_VERSIONS) {
-        const toDelete = versions.slice(DRIVE_MAX_VERSIONS);
-        for (const f of toDelete) {
+    // 3. salva/aggiorna il canonico
+    await drive_upload_json(payload, canonical ? canonical.id : null);
+
+    // 4. crea UNA versione con timestamp
+    const ts = new Date();
+    const tsName = `TURNI-${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")}-${String(ts.getHours()).padStart(2,"0")}${String(ts.getMinutes()).padStart(2,"0")}${String(ts.getSeconds()).padStart(2,"0")}.json`;
+    await drive_upload_named_json(tsName, payload, null);
+
+    // 5. ricarica dopo il salvataggio per sapere quanti siamo
+    const after = await drive_listTurniFiles();
+
+    // tieni i primi 10 (1 principale + 9 versioni)
+    const MAX_FILES = 10;
+    if (after.length > MAX_FILES) {
+      const toDelete = after.slice(MAX_FILES); // tutti quelli oltre il decimo
+      for (const f of toDelete) {
+        try {
           await drive_deleteById(f.id);
+        } catch (e) {
+          console.warn("Cleanup versioni fallito:", e);
         }
       }
-    } catch (e) {
-      // non blocchiamo il salvataggio se la potatura fallisce
-      console.warn("Cleanup versioni fallito:", e);
     }
 
-    // 4. aggiorna firma e UI
     __lastSavedSnapshot = snapshot;
-
-    const st = document.getElementById("cloudStatusSettings");
-    if (st) st.textContent = `✅ Salvato su Drive: ${saved.name || DRIVE_FILENAME}`;
-
-    showSaveStatus("Salvato", "rgba(0,180,0,.9)");
+    showSaveStatus("✅ Salvato su Drive", "#15803d");
   } catch (e) {
     console.error(e);
-    showSaveStatus("Errore salvataggio", "rgba(220,0,0,.9)");
+    showSaveStatus("❌ Errore salvataggio", "#b91c1c");
   }
 }
+
 
 
 
@@ -2144,6 +2240,38 @@ async function storage_importBackupFromGoogle() {
     alert("Errore nell’importazione del backup.");
   }
 }
+
+// Prende il file TURNI più recente e lo applica
+async function storage_syncNewestFromDrive() {
+  if (!g_isConnected()) {
+    alert("Non sei connesso a Google.");
+    return;
+  }
+  try {
+    const files = await drive_listTurniFiles();
+    if (!files.length) {
+      alert("Nessun file TURNI trovato in Drive.");
+      return;
+    }
+
+    // il primo è il più recente perché li abbiamo ordinati
+    const latest = files[0];
+    const obj = await drive_download_json(latest.id);
+
+    if (obj.settings) settings_save(obj.settings);
+    if (Array.isArray(obj.defs)) defs_save(obj.defs);
+
+    ui_settingsInit();
+    render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
+
+    __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+    showSaveStatus(`✅ Sincronizzato: ${latest.name}`, "#0f766e");
+  } catch (e) {
+    console.error(e);
+    showSaveStatus("❌ Errore sincronizzazione", "#b91c1c");
+  }
+}
+
 
 
 
@@ -2221,19 +2349,20 @@ acct_menuBind();
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
 
-  // Fallback brutale: aggancia direttamente i click del menu
-  const m = document.getElementById('acctMenu');
-  if (m) {
-    const aLogin = m.querySelector('[data-act="login"]');
-    const aSync  = m.querySelector('[data-act="sync"]');
-    const aBak   = m.querySelector('[data-act="import-bak"]');
-    const aOut   = m.querySelector('[data-act="logout"]');
+// Fallback brutale: solo login/sync/import se per qualche motivo il bind principale salta
+const m = document.getElementById('acctMenu');
+if (m) {
+  const aLogin = m.querySelector('[data-act="login"]');
+  const aSync  = m.querySelector('[data-act="sync"]');
+  const aBak   = m.querySelector('[data-act="import-bak"]');
 
-    if (aLogin) aLogin.addEventListener('click', ()=>{ acct_menuToggle(false); g_login(); });
-    if (aSync)  aSync.addEventListener('click',  ()=>{ acct_menuToggle(false); storage_saveToGoogle().catch(()=>{}); });
-    if (aBak)   aBak.addEventListener('click',   ()=>{ acct_menuToggle(false); storage_importBackupFromGoogle().catch(()=>{}); });
-    if (aOut)   aOut.addEventListener('click',   ()=>{ acct_menuToggle(false); g_disconnect(); });
-  }
+  if (aLogin) aLogin.addEventListener('click', ()=>{ acct_menuToggle(false); g_login(); });
+  if (aSync)  aSync.addEventListener('click',  ()=>{ acct_menuToggle(false); storage_syncNewestFromDrive().catch(()=>{}); });
+  if (aBak)   aBak.addEventListener('click',   ()=>{ acct_menuToggle(false); storage_importBackupFromGoogle().catch(()=>{}); });
+  // niente logout qui, lo fa già acct_menuBind()
+}
+
+
 }
 
 
