@@ -1136,24 +1136,36 @@
   // [FN: defs_*] Gestione definizioni turni personalizzate
   // =========================================================
   function defs_load(){ try{ return JSON.parse(localStorage.getItem(LS_TURNS))||null }catch{ return null } }
-  function defs_save(list){
+  
+function defs_save(list){
+  // salva SOLO quello che gli passi, senza altre magie
   localStorage.setItem(LS_TURNS, JSON.stringify(list));
-  // segna modifiche e tenta autosalvataggio (coalescenza interna)
-  autosave_schedule(400);
+  // niente autosave qui, perché ora lo vogliamo solo manuale
 }
-  function defs_effective(){
-    const l = defs_load();
-    let out = Array.isArray(l) && l.length ? l : SHIFT_DEFAULTS.slice();
-    out = out.map(item => ({
-      key:   (item.key||(['S','P','M','N','R'].includes(item.sigla)?item.sigla:'S')),
-      nome:  item.nome||'',
-      sigla: item.sigla||'',
-      orario:item.orario||'',
-      color: item.color||'#8e88ff'
-    }));
-    defs_save(out);
-    return out;
+
+function defs_effective(){
+  // leggiamo quello che c'è
+  const l = defs_load();
+
+  // se c’è roba valida, la restituiamo e BASTA
+  if (Array.isArray(l) && l.length) {
+    return l;
   }
+
+  // se non c’è niente, usiamo i default
+  // e in questo caso SOLTANTO li salviamo
+  const out = SHIFT_DEFAULTS.map(item => ({
+    key:   item.key || item.sigla || 'S',
+    nome:  item.nome || '',
+    sigla: item.sigla || '',
+    orario:item.orario || '',
+    color: item.color || '#8e88ff'
+  }));
+
+  defs_save(out);
+  return out;
+}
+
 
   // =========================================================
   // [FN: settings_*] Primo giorno (data+base)
