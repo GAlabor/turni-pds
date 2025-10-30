@@ -1818,6 +1818,9 @@ g_updateIcons();
 const DRIVE_FILENAME = "TURNI.json";
 const DRIVE_BACKUP_NAME = "TURNI.backup.json";
 let __lastSavedSnapshot = null; // firma dell’ultimo payload salvato sul cloud
+const DRIVE_VERSION_PREFIX = "TURNI-";               // es. TURNI-2025-10-30-12-18-05.json
+const DRIVE_MAX_VERSIONS  = 9;                       // quante versioni tenere
+
 
 // Helper: richiesta autenticata a Drive API (con auto refresh e 1 retry)
 async function drive_request(url, opts = {}) {
@@ -1869,6 +1872,46 @@ async function drive_findByName(name) {
 async function drive_findCanonical() {
   return drive_findByName(DRIVE_FILENAME);
 }
+
+// Lista tutte le versioni tipo TURNI-YYYY-MM-DD-HH-mm-ss.json
+async function drive_listVersions() {
+  const q = encodeURIComponent(
+    `name contains '${DRIVE_VERSION_PREFIX}' and 'appDataFolder' in parents and trashed = false`
+  );
+  const url = `https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&fields=files(id,name,modifiedTime)&pageSize=100&orderBy=modifiedTime desc`;
+  const res = await drive_request(url);
+  const json = await res.json();
+  return Array.isArray(json.files) ? json.files : [];
+}
+
+// Crea un nome versione con timestamp
+function drive_buildVersionedName() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const mm   = pad(d.getMonth() + 1);
+  const dd   = pad(d.getDate());
+  const hh   = pad(d.getHours());
+  const mi   = pad(d.getMinutes());
+  const ss   = pad(d.getSeconds());
+  return `${DRIVE_VERSION_PREFIX}${yyyy}-${mm}-${dd}-${hh}-${mi}-${ss}.json`;
+}
+
+// Cancella su Drive per id (best effort)
+async function drive_deleteById(fileId) {
+  const url = `https://www.googleapis.com/drive/v3/files/${fileId}`;
+  try {
+    await drive_request(url, { method: "DELETE" });
+  } catch (e) {
+    // se è un 404 lo ignoriamo, vuol dire che non c'è più e va bene così
+    if (e && e.message && e.message.includes("404")) {
+      return;
+    }
+    throw e;
+  }
+}
+
+
 
 
 
@@ -1999,6 +2042,7 @@ async function storage_saveToGoogle() {
   const payload  = storage_buildPayload();
   const snapshot = JSON.stringify(payload);
 
+  // se niente è cambiato non serve salvare
   if (__lastSavedSnapshot === snapshot) {
     showSaveStatus("Nessuna modifica da salvare", "rgba(0,120,255,.55)");
     return;
@@ -2007,16 +2051,33 @@ async function storage_saveToGoogle() {
   showSaveStatus("Sincronizzazione…", "rgba(0,120,255,.85)");
 
   try {
+    // 1. salva/aggiorna il file canonico
     const existing = await drive_findCanonical();
     const saved = await drive_upload_json(payload, existing ? existing.id : null);
 
-    const existingBak = await drive_findByName(DRIVE_BACKUP_NAME);
-    await drive_upload_named_json(DRIVE_BACKUP_NAME, payload, existingBak ? existingBak.id : null);
+    // 2. salva una versione con timestamp (sempre CREATE)
+    const versionName = drive_buildVersionedName();
+    await drive_upload_named_json(versionName, payload, null);
 
+    // 3. tieni solo le ultime DRIVE_MAX_VERSIONS
+    try {
+      const versions = await drive_listVersions(); // ordinate per modifiedTime desc
+      if (versions.length > DRIVE_MAX_VERSIONS) {
+        const toDelete = versions.slice(DRIVE_MAX_VERSIONS);
+        for (const f of toDelete) {
+          await drive_deleteById(f.id);
+        }
+      }
+    } catch (e) {
+      // non blocchiamo il salvataggio se la potatura fallisce
+      console.warn("Cleanup versioni fallito:", e);
+    }
+
+    // 4. aggiorna firma e UI
     __lastSavedSnapshot = snapshot;
 
     const st = document.getElementById("cloudStatusSettings");
-    if (st) st.textContent = `✅ Salvato su Drive (con backup): ${saved.name || DRIVE_FILENAME}`;
+    if (st) st.textContent = `✅ Salvato su Drive: ${saved.name || DRIVE_FILENAME}`;
 
     showSaveStatus("Salvato", "rgba(0,180,0,.9)");
   } catch (e) {
@@ -2024,6 +2085,7 @@ async function storage_saveToGoogle() {
     showSaveStatus("Errore salvataggio", "rgba(220,0,0,.9)");
   }
 }
+
 
 
 
