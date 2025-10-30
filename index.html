@@ -888,11 +888,12 @@
   <div class="acct-sep"></div>
 
   <!-- Azioni -->
-  <button type="button" class="acct-item" data-act="login">Connetti con Google</button>
-  <button type="button" class="acct-item" data-act="sync">Sincronizza adesso</button>
-  <button type="button" class="acct-item" data-act="import-bak">Importa backup</button>
-  <div class="acct-sep"></div>
-  <button type="button" class="acct-item danger" data-act="logout">Disconnetti</button>
+<button type="button" class="acct-item" data-act="login">Connetti con Google</button>
+<button type="button" class="acct-item" data-act="save">Salva su Google</button>
+<button type="button" class="acct-item" data-act="sync">Sincronizza adesso</button>
+<button type="button" class="acct-item" data-act="import-bak">Importa backup</button>
+<div class="acct-sep"></div>
+<button type="button" class="acct-item danger" data-act="logout">Disconnetti</button>
 </div>
 
   
@@ -1360,6 +1361,7 @@
     ui_defsRenderList();
   }
   function ui_settingsApply(){
+  __hasUnsavedChanges = true;
   const date=document.getElementById('startDate').value;
   const shift=settings_effective().shift || 'S';
   settings_save({date,shift});
@@ -1705,13 +1707,21 @@ function acct_menuUpdateVisibility(){
   const m = document.getElementById("acctMenu");
   if(!m) return;
 
-  m.querySelector('[data-act="login"]').style.display      = on ? "none"  : "block";
-  m.querySelector('[data-act="sync"]').style.display       = on ? "block" : "none";
-  m.querySelector('[data-act="import-bak"]').style.display = on ? "block" : "none";
-  m.querySelector('[data-act="logout"]').style.display     = on ? "block" : "none";
+  const elLogin  = m.querySelector('[data-act="login"]');
+  const elSave   = m.querySelector('[data-act="save"]');
+  const elSync   = m.querySelector('[data-act="sync"]');
+  const elImport = m.querySelector('[data-act="import-bak"]');
+  const elOut    = m.querySelector('[data-act="logout"]');
 
-  acct_menuRenderHeadStatus(); // <-- aggiorna titolo-stato
+  if (elLogin)  elLogin.style.display  = on ? "none"  : "block";
+  if (elSave)   elSave.style.display   = on ? "block" : "none";
+  if (elSync)   elSync.style.display   = on ? "block" : "none";
+  if (elImport) elImport.style.display = on ? "block" : "none";
+  if (elOut)    elOut.style.display    = on ? "block" : "none";
+
+  acct_menuRenderHeadStatus();
 }
+
 
 
 // Aggiorna la testatina del menu ("Sincronizzazione attiva" / "Non collegato")
@@ -1808,28 +1818,47 @@ function acct_menuBind(){
     e.stopPropagation();
 
     const act = t.getAttribute("data-act");
-    if(act==="login"){
-      // Apri subito il popup (user gesture), poi chiudi il menù
+
+    if (act === "login") {
       g_login();
       acct_menuToggle(false);
       return;
     }
-    if(act==="logout"){
+
+    if (act === "logout") {
       acct_menuToggle(false);
       g_disconnect();
       return;
     }
-    if (act === "sync") {
-  acct_menuToggle(false);
-  try { await storage_syncNewestFromDrive(); } catch {}
-  return;
-}
-    if(act==="import-bak"){
+
+    if (act === "save") {
       acct_menuToggle(false);
-      try{ await storage_importBackupFromGoogle(); }catch{}
+      try {
+        await storage_saveToGoogle();
+      } catch {}
+      return;
+    }
+
+    if (act === "sync") {
+      acct_menuToggle(false);
+      try {
+        await storage_syncNewestFromDrive();
+      } catch {}
+      return;
+    }
+
+    if (act === "import-bak") {
+      acct_menuToggle(false);
+      try {
+        await storage_importBackupFromGoogle();
+      } catch {}
       return;
     }
   });
+
+
+
+
 
   // 3) Click fuori: chiudi (ma ignora click dentro menù o sul bottone)
   document.addEventListener("click", (e)=>{
@@ -1878,6 +1907,7 @@ g_updateIcons();
 const DRIVE_FILENAME = "TURNI.json";
 const DRIVE_BACKUP_NAME = "TURNI.backup.json";
 let __lastSavedSnapshot = null; // firma dell’ultimo payload salvato sul cloud
+let __hasUnsavedChanges = false; // segna se ci sono modifiche non salvate
 const DRIVE_VERSION_PREFIX = "TURNI-";               // es. TURNI-2025-10-30-12-18-05.json
 const DRIVE_MAX_VERSIONS  = 9;                       // quante versioni tenere
 
@@ -2072,22 +2102,31 @@ async function drive_debugListAll() {
   }
 }
 
-// Ritorna tutti i file TURNI* nell'appDataFolder, ordinati dal più recente al più vecchio
+// Ritorna tutti i file TURNI-YYYY-MM-DD-HH-MM-SS.json nell'appDataFolder, ordinati dal più recente al più vecchio
 async function drive_listTurniFiles() {
-  const url = "https://www.googleapis.com/drive/v3/files"
+  const query =
+    "name contains 'TURNI-' and trashed = false and 'appDataFolder' in parents";
+
+  const url =
+    "https://www.googleapis.com/drive/v3/files"
     + "?spaces=appDataFolder"
-    + "&q=" + encodeURIComponent("name contains 'TURNI' and trashed = false and 'appDataFolder' in parents")
-    + "&fields=files(id,name,modifiedTime),nextPageToken"
+    + "&q=" + encodeURIComponent(query)
+    + "&fields=files(id,name,modifiedTime,size),nextPageToken"
     + "&pageSize=100";
 
   const res = await drive_request(url);
   const json = await res.json();
   const files = Array.isArray(json.files) ? json.files : [];
 
+  // filtra qualsiasi file strano che non rispetta il pattern TURNI-YYYY...
+  const turniFiles = files.filter(f => /^TURNI-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.json$/.test(f.name));
+
   // ordina per modifiedTime decrescente (prima il più nuovo)
-  files.sort((a,b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
-  return files;
+  turniFiles.sort((a,b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
+
+  return turniFiles;
 }
+
 
 
 
@@ -2127,59 +2166,56 @@ function showSaveStatus(text, color) {
 
 
 
-// Salva (manuale) con rotazione 9 versioni
+// Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
   if (!g_isConnected()) return;
 
-  // prendi quello che c'è adesso
+  // Aggiorna i dati correnti dalla UI
   ui_settingsApply();
+
   const payload  = storage_buildPayload();
   const snapshot = JSON.stringify(payload);
 
-  // se non è cambiato niente, basta
+  // se non è cambiato niente
   if (__lastSavedSnapshot === snapshot) {
     showSaveStatus("Nessuna modifica da salvare", "#2d3748");
     return;
   }
 
   try {
-    // 1. carica l'elenco attuale
-    const files = await drive_listTurniFiles();
-
-    // 2. troviamo il canonico se esiste
-    const canonical = files.find(f => f.name === "TURNI.json") || null;
-
-    // 3. salva/aggiorna il canonico
-    await drive_upload_json(payload, canonical ? canonical.id : null);
-
-    // 4. crea UNA versione con timestamp
-    const ts = new Date();
-    const tsName = `TURNI-${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,"0")}-${String(ts.getDate()).padStart(2,"0")}-${String(ts.getHours()).padStart(2,"0")}${String(ts.getMinutes()).padStart(2,"0")}${String(ts.getSeconds()).padStart(2,"0")}.json`;
-    await drive_upload_named_json(tsName, payload, null);
-
-    // 5. ricarica dopo il salvataggio per sapere quanti siamo
-    const after = await drive_listTurniFiles();
-
-    // tieni i primi 10 (1 principale + 9 versioni)
+    // prendo TUTTI i TURNI* già presenti
+    const files = await drive_listTurniFiles(); // già ordinati dal più nuovo al più vecchio
     const MAX_FILES = 10;
+    const newName = drive_buildVersionedName(); // es. TURNI-2025-10-30-14-55-22.json
+
+    if (files.length < MAX_FILES) {
+      // meno di 10? creo un nuovo file
+      await drive_upload_named_json(newName, payload, null);
+    } else {
+      // 10 o più? sovrascrivo il più vecchio (l'ultimo della lista)
+      const oldest = files[files.length - 1];
+      await drive_upload_named_json(newName, payload, oldest.id);
+    }
+
+    // ricarico per tenere pulito
+    const after = await drive_listTurniFiles();
     if (after.length > MAX_FILES) {
-      const toDelete = after.slice(MAX_FILES); // tutti quelli oltre il decimo
-      for (const f of toDelete) {
-        try {
-          await drive_deleteById(f.id);
-        } catch (e) {
-          console.warn("Cleanup versioni fallito:", e);
-        }
+      const extra = after.slice(MAX_FILES);
+      for (const f of extra) {
+        try { await drive_deleteById(f.id); } catch {}
       }
     }
 
     __lastSavedSnapshot = snapshot;
+    __hasUnsavedChanges = false;
     showSaveStatus("✅ Salvato su Drive", "#15803d");
   } catch (e) {
     console.error(e);
     showSaveStatus("❌ Errore salvataggio", "#b91c1c");
   }
 }
+
+
 
 
 
@@ -2217,13 +2253,49 @@ async function storage_importFromGoogle() {
   }
 }
 
-  // Importa esplicitamente il backup
+  // Importa una delle versioni TURNI* dall'appDataFolder, con avviso se perderai modifiche
 async function storage_importBackupFromGoogle() {
-  if (!g_isConnected()) { alert("Non sei connesso a Google."); return; }
-  try{
-    const bak = await drive_findByName(DRIVE_BACKUP_NAME);
-    if(!bak){ alert("Nessun backup trovato."); return; }
-    const obj = await drive_download_json(bak.id);
+  if (!g_isConnected()) {
+    alert("Non sei connesso a Google.");
+    return;
+  }
+
+  try {
+    const files = await drive_listTurniFiles();
+    if (!files.length) {
+      alert("Nessun backup disponibile su Drive.");
+      return;
+    }
+
+    const names = files.map((f, idx) => `${idx+1}. ${f.name}`).join("\n");
+    const ans = prompt(
+      "Seleziona il backup da ripristinare (numero):\n\n" + names + "\n\nLascia vuoto per annullare.",
+      "1"
+    );
+    if (!ans) return;
+
+    const selIdx = parseInt(ans, 10) - 1;
+    const chosen = files[selIdx];
+    if (!chosen) {
+      alert("Numero non valido.");
+      return;
+    }
+
+    // confronto con locale prima di importare
+    const localPayload  = storage_buildPayload();
+    const localSnapshot = JSON.stringify(localPayload);
+
+     if (__hasUnsavedChanges) {
+      const go = confirm(
+        "Hai modifiche locali non salvate.\n" +
+        "Se importi un backup, le perderai.\n\n" +
+        "Vuoi procedere comunque?"
+      );
+      if (!go) return;
+    }
+
+
+    const obj = await drive_download_json(chosen.id);
 
     if (obj.settings) settings_save(obj.settings);
     if (Array.isArray(obj.defs)) defs_save(obj.defs);
@@ -2232,45 +2304,66 @@ async function storage_importBackupFromGoogle() {
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
 
     __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
-
-    const st = document.getElementById("cloudStatusSettings");
-    if (st) st.textContent = `✅ Importato backup: ${bak.name}`;
-  }catch(e){
+    showSaveStatus(`✅ Ripristinato: ${chosen.name}`, "#0f766e");
+  } catch (e) {
     console.error(e);
-    alert("Errore nell’importazione del backup.");
+    showSaveStatus("❌ Errore nel ripristino da Drive", "#b91c1c");
   }
 }
 
-// Prende il file TURNI più recente e lo applica
+
+
+
+
+// Prende il TURNI* più recente e lo applica, ma avvisa se perdi roba
 async function storage_syncNewestFromDrive() {
   if (!g_isConnected()) {
     alert("Non sei connesso a Google.");
     return;
   }
+
   try {
+    // prendo tutti i TURNI* su Drive
     const files = await drive_listTurniFiles();
     if (!files.length) {
       alert("Nessun file TURNI trovato in Drive.");
       return;
     }
 
-    // il primo è il più recente perché li abbiamo ordinati
     const latest = files[0];
-    const obj = await drive_download_json(latest.id);
 
-    if (obj.settings) settings_save(obj.settings);
-    if (Array.isArray(obj.defs)) defs_save(obj.defs);
+    // se hai modifiche non salvate, avvisa prima
+    if (__hasUnsavedChanges) {
+      const go = confirm(
+        "Attenzione: hai modifiche locali non salvate.\n" +
+        "Se sincronizzi ora verranno sovrascritte dai dati Drive.\n\n" +
+        "Vuoi procedere lo stesso?"
+      );
+      if (!go) return;
+    }
+
+    // scarico quello remoto
+    const remoteObj = await drive_download_json(latest.id);
+
+    // applico il remoto
+    if (remoteObj.settings) settings_save(remoteObj.settings);
+    if (Array.isArray(remoteObj.defs)) defs_save(remoteObj.defs);
 
     ui_settingsInit();
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
 
+    // da ora in poi il locale è uguale al remoto
     __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+    __hasUnsavedChanges = false;
+
     showSaveStatus(`✅ Sincronizzato: ${latest.name}`, "#0f766e");
   } catch (e) {
     console.error(e);
     showSaveStatus("❌ Errore sincronizzazione", "#b91c1c");
   }
 }
+
+
 
 
 
@@ -2348,21 +2441,6 @@ acct_menuBind();
   addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
-
-// Fallback brutale: solo login/sync/import se per qualche motivo il bind principale salta
-const m = document.getElementById('acctMenu');
-if (m) {
-  const aLogin = m.querySelector('[data-act="login"]');
-  const aSync  = m.querySelector('[data-act="sync"]');
-  const aBak   = m.querySelector('[data-act="import-bak"]');
-
-  if (aLogin) aLogin.addEventListener('click', ()=>{ acct_menuToggle(false); g_login(); });
-  if (aSync)  aSync.addEventListener('click',  ()=>{ acct_menuToggle(false); storage_syncNewestFromDrive().catch(()=>{}); });
-  if (aBak)   aBak.addEventListener('click',   ()=>{ acct_menuToggle(false); storage_importBackupFromGoogle().catch(()=>{}); });
-  // niente logout qui, lo fa già acct_menuBind()
-}
-
-
 }
 
 
