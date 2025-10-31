@@ -1497,7 +1497,9 @@ function g_updateIcons(){
   if (dis) dis.style.display = on ? "inline-flex" : "none";
 }
 
-// login nuova: chiede subito il token (popup GIS)
+
+
+// login nuova: chiede subito il token (popup GIS) e lo manda anche alla mini-API
 async function g_login(){
   try{
     await g_loadGisScript();
@@ -1506,43 +1508,78 @@ async function g_login(){
       __gisTokenCli = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPES,
+        callback: async (response) => {
+          if (!response || !response.access_token) {
+            alert("Accesso Google fallito (nessun access_token).");
+            return;
+          }
 
-callback: async (response) => {
-  if (!response || !response.access_token) {
-    alert("Accesso Google fallito (nessun access_token).");
-    return;
-  }
+          // 1) salviamo localmente l'access token (come prima)
+          const expiresAt = Date.now() + (response.expires_in ? (response.expires_in * 1000) : 3_400_000);
+          localStorage.setItem(LS_GOOGLE_TOKEN, response.access_token);
+          localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
-  const expiresAt = Date.now() + (response.expires_in ? (response.expires_in * 1000) : 3_400_000);
-  localStorage.setItem(LS_GOOGLE_TOKEN, response.access_token);
-  localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
+          // 2) aggiorna subito la UI
+          g_updateIcons();
 
-  // aggiorniamo subito icone
-  g_updateIcons();
+          // 3) prova a prendere i dati utente (email, foto) — come prima
+          //    MA ci serve l'email per mandarla alla tua mini-API
+          let userEmail = "";
+          try {
+            const tok = response.access_token;
+            const r = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+              headers: { Authorization: "Bearer " + tok }
+            });
+            if (r.ok) {
+              const info = await r.json();
+              if (info.email) {
+                userEmail = info.email;
+                localStorage.setItem(LS_GOOGLE_EMAIL, info.email);
+              }
+              if (info.picture) {
+                localStorage.setItem(LS_GOOGLE_PHOTO, info.picture);
+              }
+              g_updateIcons();
+            }
+          } catch (_) {
+            // se non riusciamo a leggere userinfo non blocchiamo il login
+          }
 
-  // proviamo a prendere mail/foto (non è obbligatorio ma è comodo)
-  g_fetchUserInfo().catch(()=>{});
+          // 4) controlla permesso Drive (come prima)
+          const okDrive = await g_testDrivePermission();
+          if (!okDrive) {
+            g_disconnect(true);
+            alert("Non hai fornito le autorizzazioni necessarie al salvataggio su Drive.\nRifai l’accesso e metti la spunta.");
+            return;
+          }
 
-  // TEST DRIVE: controlla se l'utente ha davvero spuntato
-  const okDrive = await g_testDrivePermission();
-  if (!okDrive) {
-    // QUI: lui ha cliccato continua senza spunta
-    g_disconnect(true);   // disconnessione SENZA conferma
-    alert("Non hai fornito le autorizzazioni necessarie al salvataggio su Drive.\nRifai l’accesso e metti la spunta.");
-    return;
-  }
+          // 5) MANDA TUTTO ALLA TUA MINI-API per farsi salvare il refresh lato server
+          //    (se la mail non l'abbiamo presa, usiamo stringa vuota, il server se la terrà così)
+          try {
+            await fetch("https://turni-mini-api.onrender.com/oauth2/callback", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                // lato browser NON abbiamo il refresh_token (Google non lo manda),
+                // quindi gli mandiamo l'access_token e la mail, e sarà la mini-API
+                // a fare lo scambio completo perché ha client_secret e redirect.
+                email: userEmail,
+                access_token: response.access_token
+              })
+            }).catch(()=>{});
+          } catch (_) {
+            // non blocchiamo l'utente se il server è addormentato
+          }
 
-  // tutto ok, lo riportiamo al calendario
-  if (typeof ui_switchTab === "function") {
-    ui_switchTab("calendar");
-  }
+          // 6) torna al calendario come prima
+          if (typeof ui_switchTab === "function") {
+            ui_switchTab("calendar");
+          }
 
-  if (typeof storage_importFromGoogleAuto === "function") {
-    storage_importFromGoogleAuto();
-  }
-}
-
-
+          if (typeof storage_importFromGoogleAuto === "function") {
+            storage_importFromGoogleAuto();
+          }
+        }
       });
     }
 
@@ -1561,6 +1598,7 @@ callback: async (response) => {
     alert("Errore durante l’accesso a Google.\n" + (e && e.message ? e.message : ""));
   }
 }
+
 
 
 
