@@ -2223,9 +2223,17 @@ function showSaveStatus(text, color) {
 
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
-  if (!g_isConnected()) return;
+  // 1. prima cosa: mi assicuro di avere un access token valido
+  const tok = await g_ensureValidAccess();
+  if (!tok) {
+    // qui ci arrivi solo se il refresh fallisce davvero (es. Render spento per ore
+    // e il refresh in Firestore non c’è)
+    showSaveStatus("Connessione a Google scaduta. Rifai l’accesso.", "#c53030");
+    return;
+  }
+  
 
-  // Aggiorna i dati correnti dalla UI
+  // Allinea prima i dati dalla UI
   ui_settingsApply();
 
   const payload  = storage_buildPayload();
