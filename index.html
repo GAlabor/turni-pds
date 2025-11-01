@@ -1459,10 +1459,12 @@ function g_loadGisScript() {
 
 // token valido?
 function g_isConnected(){
-  const t   = localStorage.getItem(LS_GOOGLE_TOKEN);
-  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
-  return !!t && Date.now() < (exp - 10_000);
+  // Considero "connesso" se ho almeno UN access token salvato.
+  // Anche se è scaduto, lo posso rinfrescare via mini-API.
+  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+  return !!tok;
 }
+
 
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 // questa era nel blocco vecchio, la rimettiamo UGUALE così il resto non si rompe
