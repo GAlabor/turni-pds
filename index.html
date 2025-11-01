@@ -1688,43 +1688,46 @@ async function g_fetchUserInfo() {
 
 
 
-// Prova a rinnovare l'access token usando il refresh_token
+// Rinnova l'access token chiedendolo alla tua mini-API su Render
 async function g_refreshAccessToken(){
-  const refresh = localStorage.getItem(LS_GOOGLE_REFRESH);
-  if(!refresh) throw new Error("Nessun refresh token disponibile");
+  // se abbiamo l'email dell'utente, la mandiamo, altrimenti va bene anche senza
+  const email = localStorage.getItem(LS_GOOGLE_EMAIL) || null;
 
-  const body = new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID,
-    grant_type: "refresh_token",
-    refresh_token: refresh
-  });
-
-  const res = await fetch("https://oauth2.googleapis.com/token", {
+  const res = await fetch("https://turni-mini-api.onrender.com/oauth2/refresh", {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(email ? { email } : {})
   });
-  const tk = await res.json();
 
-  if(!res.ok || !tk.access_token){
-    throw new Error("Refresh token fallito");
+  if (!res.ok) {
+    // qui il server può rispondere: {error:"No refresh token yet"}
+    const txt = await res.text().catch(() => "");
+    throw new Error("Impossibile rinnovare il token via mini-API: " + txt);
   }
 
-  const expiresAt = Date.now() + (tk.expires_in ? (tk.expires_in*1000) : 3600_000);
-  localStorage.setItem(LS_GOOGLE_TOKEN, tk.access_token);
+  const data = await res.json();
+  if (!data.access_token) {
+    throw new Error("Risposta mini-API senza access_token");
+  }
+
+  // data.expires_in arriva tipo 3599 secondi → lo portiamo a ms
+  const expiresAt = Date.now() + ((data.expires_in || 3600) * 1000) - 15_000;
+
+  // salviamo ESATTAMENTE come facevi tu prima
+  localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
   localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
-  if (tk.id_token) {
-    localStorage.setItem(LS_GOOGLE_IDTOKEN, tk.id_token);
-    try{
-      const parts = tk.id_token.split(".");
-      const payload = JSON.parse(atob(parts[1].replace(/-/g,"+").replace(/_/g,"/")));
-      if(payload && payload.email)   localStorage.setItem(LS_GOOGLE_EMAIL, payload.email);
-      if(payload && payload.picture) localStorage.setItem(LS_GOOGLE_PHOTO, payload.picture);
-    }catch{}
-  }
-  return tk.access_token;
+  // non abbiamo un nuovo refresh lato browser → NON lo salviamo
+  // l'avatar lo aggiorniamo al prossimo giro
+  g_updateIcons?.();
+
+  return data.access_token;
 }
+
+
+
 
 
 // Garantisce che ci sia un access token valido, altrimenti prova il refresh
