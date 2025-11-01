@@ -2263,17 +2263,24 @@ function showSaveStatus(text, color) {
 
 
 
+
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
-  // 1. prima cosa: mi assicuro di avere un access token valido
-  const tok = await g_ensureValidAccess();
-  if (!tok) {
-    // qui ci arrivi solo se il refresh fallisce davvero (es. Render spento per ore
-    // e il refresh in Firestore non c’è)
-    showSaveStatus("Connessione a Google scaduta. Rifai l’accesso.", "#c53030");
+  // se non sei connesso proprio, esci
+  if (!g_isConnected()) {
+    showSaveStatus("Non sei collegato a Google.", "#e53e3e");
     return;
   }
-  
+
+  // prova PRIMA di tutto a garantirti il token
+  try {
+    await g_ensureValidAccess();
+  } catch (err) {
+    // qui non spacchiamo niente: semplicemente non possiamo andare online
+    console.warn("storage_saveToGoogle: impossibile ottenere token valido:", err);
+    showSaveStatus("Online non disponibile (token/mini-API). Modifiche NON caricate su Drive.", "#e53e3e");
+    return;
+  }
 
   // Allinea prima i dati dalla UI
   ui_settingsApply();
@@ -2284,6 +2291,7 @@ async function storage_saveToGoogle() {
   // se non è cambiato niente
   if (__lastSavedSnapshot === snapshot) {
     showSaveStatus("Nessuna modifica da salvare", "#2d3748");
+    __hasUnsavedChanges = false;
     return;
   }
 
@@ -2291,34 +2299,34 @@ async function storage_saveToGoogle() {
     // prendo TUTTI i TURNI* già presenti
     const files = await drive_listTurniFiles(); // già ordinati dal più nuovo al più vecchio
     const MAX_FILES = 10;
-    const newName = drive_buildVersionedName(); // es. TURNI-2025-10-30-14-55-22.json
 
-    if (files.length < MAX_FILES) {
-      // meno di 10? creo un nuovo file
-      await drive_upload_named_json(newName, payload, null);
-    } else {
-      // 10 o più? sovrascrivo il più vecchio (l'ultimo della lista)
-      const oldest = files[files.length - 1];
-      await drive_upload_named_json(newName, payload, oldest.id);
-    }
+    // carico il nuovo contenuto
+    await drive_uploadTurniFile(snapshot);
 
-    // ricarico per tenere pulito
-    const after = await drive_listTurniFiles();
-    if (after.length > MAX_FILES) {
-      const extra = after.slice(MAX_FILES);
-      for (const f of extra) {
-        try { await drive_deleteById(f.id); } catch {}
+    // aggiorno l'ultimo snapshot
+    __lastSavedSnapshot = snapshot;
+    __hasUnsavedChanges = false;
+
+    // se ho più di 10 file, cancello i più vecchi
+    if (files && files.length > MAX_FILES) {
+      const toDelete = files.slice(MAX_FILES);
+      for (const f of toDelete) {
+        try {
+          await drive_deleteFile(f.id);
+        } catch (e) {
+          // non è grave
+          console.warn("Impossibile cancellare vecchio backup:", f.id, e);
+        }
       }
     }
 
-    __lastSavedSnapshot = snapshot;
-    __hasUnsavedChanges = false;
-    showSaveStatus("✅ Salvato su Drive", "#15803d");
-  } catch (e) {
-    console.error(e);
-    showSaveStatus("❌ Errore salvataggio", "#b91c1c");
+    showSaveStatus("Salvato su Drive", "#38a169");
+  } catch (err) {
+    console.error("Errore salvataggio Google:", err);
+    showSaveStatus("Errore durante il salvataggio su Drive", "#e53e3e");
   }
 }
+
 
 
 
