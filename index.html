@@ -2335,21 +2335,11 @@ function showSaveStatus(text, color) {
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
   if (!g_isConnected()) {
-    showSaveStatus("Non sei collegato a Google.", "#e53e3e");
+    showSaveStatus("Non sei connesso a Google", "#e53e3e");
     return;
   }
 
-  // 1) mi garantisco un access token valido
-  let accessToken;
-  try {
-    accessToken = await g_ensureValidAccess();
-  } catch (err) {
-    console.warn("storage_saveToGoogle: impossibile ottenere token valido:", err);
-    showSaveStatus("Online non disponibile (token/mini-API). Modifiche NON caricate su Drive.", "#e53e3e");
-    return;
-  }
-
-  // 2) allineo la UI
+  // Allinea prima i dati dalla UI
   ui_settingsApply();
 
   const payload  = storage_buildPayload();
@@ -2362,16 +2352,29 @@ async function storage_saveToGoogle() {
     return;
   }
 
+  let accessToken;
   try {
-    // prendo TUTTI i TURNI* già presenti, usando IL token che ho già
-    const files = await drive_listTurniFiles(accessToken);
+    // QUI: può fallire se la mini-API è giù
+    accessToken = await g_ensureValidAccess();
+  } catch (err) {
+    console.warn("storage_saveToGoogle: token non ottenuto:", err && err.message ? err.message : err);
+
+    // caso specifico: mini-API non raggiungibile
+    if (err && err.message && err.message.includes("Mini-API KO")) {
+      showSaveStatus("Server di rinnovo offline. Riprova tra poco.", "#e53e3e");
+    } else {
+      showSaveStatus("Impossibile ottenere un token valido.", "#e53e3e");
+    }
+    return;
+  }
+
+  try {
+    // prendo TUTTI i TURNI* già presenti
+    const files = await drive_listTurniFiles(accessToken); // già ordinati dal più nuovo al più vecchio
     const MAX_FILES = 10;
 
     // carico il nuovo contenuto, sempre con LO STESSO token
     await drive_uploadTurniFile(snapshot, accessToken);
-
-    __lastSavedSnapshot = snapshot;
-    __hasUnsavedChanges = false;
 
     // cancello eventuali vecchi
     if (files && files.length > MAX_FILES) {
@@ -2385,12 +2388,16 @@ async function storage_saveToGoogle() {
       }
     }
 
-    showSaveStatus("Salvato su Drive", "#38a169");
+    // tutto ok
+    __lastSavedSnapshot = snapshot;
+    __hasUnsavedChanges = false;
+    showSaveStatus("Salvato su Google Drive", "#38a169");
   } catch (err) {
-    console.error("Errore salvataggio Google:", err);
-    showSaveStatus("Errore durante il salvataggio su Drive", "#e53e3e");
+    console.error("Errore durante il salvataggio su Drive:", err);
+    showSaveStatus("Errore durante il salvataggio", "#e53e3e");
   }
 }
+
 
 
 
