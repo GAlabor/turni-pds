@@ -2199,30 +2199,98 @@ async function drive_debugListAll() {
   }
 }
 
-// Ritorna tutti i file TURNI-YYYY-MM-DD-HH-MM-SS.json nell'appDataFolder, ordinati dal più recente al più vecchio
-async function drive_listTurniFiles() {
-  const query =
-    "name contains 'TURNI-' and trashed = false and 'appDataFolder' in parents";
 
-  const url =
-    "https://www.googleapis.com/drive/v3/files"
-    + "?spaces=appDataFolder"
-    + "&q=" + encodeURIComponent(query)
-    + "&fields=files(id,name,modifiedTime,size),nextPageToken"
-    + "&pageSize=100";
 
-  const res = await drive_request(url);
-  const json = await res.json();
-  const files = Array.isArray(json.files) ? json.files : [];
+// ritorna la lista dei file TURNI* in appDataFolder ordinati dal più nuovo
+async function drive_listTurniFiles(accessToken) {
+  const q = encodeURIComponent("name contains 'TURNI'");  // se il tuo prefisso è diverso, lo cambiamo dopo
+  const url = "https://www.googleapis.com/drive/v3/files"
+            + "?spaces=appDataFolder"
+            + "&q=" + q
+            + "&fields=files(id,name,modifiedTime,size)"
+            + "&pageSize=100"
+            + "&orderBy=modifiedTime desc";
 
-  // filtra qualsiasi file strano che non rispetta il pattern TURNI-YYYY...
-  const turniFiles = files.filter(f => /^TURNI-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.json$/.test(f.name));
+  const res = await fetch(url, {
+    headers: {
+      "Authorization": "Bearer " + accessToken
+    }
+  });
 
-  // ordina per modifiedTime decrescente (prima il più nuovo)
-  turniFiles.sort((a,b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error("drive_listTurniFiles fallita: " + res.status + " " + txt);
+  }
 
-  return turniFiles;
+  const data = await res.json();
+  return data.files || [];
 }
+
+
+
+
+// crea un nuovo file TURNI-YYYYMMDD-HHMMSS.json in appDataFolder
+async function drive_uploadTurniFile(snapshotJsonString, accessToken) {
+  const now  = new Date();
+  const name =
+    "TURNI-" +
+    now.getFullYear().toString().padStart(4, "0") +
+    (now.getMonth() + 1).toString().padStart(2, "0") +
+    now.getDate().toString().padStart(2, "0") +
+    "-" +
+    now.getHours().toString().padStart(2, "0") +
+    now.getMinutes().toString().padStart(2, "0") +
+    now.getSeconds().toString().padStart(2, "0") +
+    ".json";
+
+  const metadata = {
+    name,
+    parents: ["appDataFolder"]
+  };
+
+  const boundary = "-------314159265358979323846";
+  const body =
+    "--" + boundary + "\r\n" +
+    "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify(metadata) + "\r\n" +
+    "--" + boundary + "\r\n" +
+    "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
+    snapshotJsonString + "\r\n" +
+    "--" + boundary + "--";
+
+  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + accessToken,
+      "Content-Type": "multipart/related; boundary=" + boundary
+    },
+    body
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error("drive_uploadTurniFile fallita: " + res.status + " " + txt);
+  }
+
+  return await res.json();
+}
+
+
+async function drive_deleteFile(fileId, accessToken) {
+  const res = await fetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId), {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + accessToken
+    }
+  });
+
+  // se è già sparito, amen
+  if (!res.ok && res.status !== 404) {
+    const txt = await res.text();
+    throw new Error("drive_deleteFile fallita: " + res.status + " " + txt);
+  }
+}
+
 
 
 
@@ -2266,23 +2334,22 @@ function showSaveStatus(text, color) {
 
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
-  // se non sei connesso proprio, esci
   if (!g_isConnected()) {
     showSaveStatus("Non sei collegato a Google.", "#e53e3e");
     return;
   }
 
-  // prova PRIMA di tutto a garantirti il token
+  // 1) mi garantisco un access token valido
+  let accessToken;
   try {
-    await g_ensureValidAccess();
+    accessToken = await g_ensureValidAccess();
   } catch (err) {
-    // qui non spacchiamo niente: semplicemente non possiamo andare online
     console.warn("storage_saveToGoogle: impossibile ottenere token valido:", err);
     showSaveStatus("Online non disponibile (token/mini-API). Modifiche NON caricate su Drive.", "#e53e3e");
     return;
   }
 
-  // Allinea prima i dati dalla UI
+  // 2) allineo la UI
   ui_settingsApply();
 
   const payload  = storage_buildPayload();
@@ -2296,25 +2363,23 @@ async function storage_saveToGoogle() {
   }
 
   try {
-    // prendo TUTTI i TURNI* già presenti
-    const files = await drive_listTurniFiles(); // già ordinati dal più nuovo al più vecchio
+    // prendo TUTTI i TURNI* già presenti, usando IL token che ho già
+    const files = await drive_listTurniFiles(accessToken);
     const MAX_FILES = 10;
 
-    // carico il nuovo contenuto
-    await drive_uploadTurniFile(snapshot);
+    // carico il nuovo contenuto, sempre con LO STESSO token
+    await drive_uploadTurniFile(snapshot, accessToken);
 
-    // aggiorno l'ultimo snapshot
     __lastSavedSnapshot = snapshot;
     __hasUnsavedChanges = false;
 
-    // se ho più di 10 file, cancello i più vecchi
+    // cancello eventuali vecchi
     if (files && files.length > MAX_FILES) {
       const toDelete = files.slice(MAX_FILES);
       for (const f of toDelete) {
         try {
-          await drive_deleteFile(f.id);
+          await drive_deleteFile(f.id, accessToken);
         } catch (e) {
-          // non è grave
           console.warn("Impossibile cancellare vecchio backup:", f.id, e);
         }
       }
@@ -2326,6 +2391,7 @@ async function storage_saveToGoogle() {
     showSaveStatus("Errore durante il salvataggio su Drive", "#e53e3e");
   }
 }
+
 
 
 
