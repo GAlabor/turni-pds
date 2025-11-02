@@ -1738,49 +1738,52 @@ async function g_refreshAccessToken(){
 // 2. se è scaduto -> prova il refresh via mini-API
 // 3. se il refresh fallisce -> lancia errore (lo gestirà chi chiama)
 // ===============================
+// Garantisce che ci sia un access token valido, altrimenti prova il refresh sulla mini-API
 async function g_ensureValidAccess() {
   const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
   const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
 
-  // 1) se ho token e non è scaduto, uso quello
+  // token ancora buono → lo usiamo
   if (tok && Date.now() < (exp - 10_000)) {
     return tok;
   }
 
-  // 2) altrimenti provo il refresh passando dal nostro server
+  // token scaduto → proviamo la mini-API
+  const userEmail = localStorage.getItem("google_user_email") || "shared@turni-pds";
+
   try {
-    const resp = await fetch("https://turni-mini-api.onrender.com/oauth2/refresh", {
-      method: "POST"
+    const res = await fetch("https://turni-mini-api.onrender.com/oauth2/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: userEmail })
     });
 
-    if (!resp.ok) {
-      throw new Error("refresh HTTP " + resp.status);
+    // se proprio il server risponde 500/400 ecc.
+    if (!res.ok) {
+      console.warn("g_ensureValidAccess: risposta non OK dalla mini-API:", res.status);
+      throw new Error("Mini-API KO");
     }
 
-    const data = await resp.json();
-    if (!data.access_token) {
-      throw new Error("refresh: nessun access_token");
+    const data = await res.json();
+    if (!data || !data.access_token) {
+      console.warn("g_ensureValidAccess: nessun access_token nella risposta");
+      throw new Error("Mini-API KO");
     }
 
-    // salvo nuovo token e scadenza
-    const newTok = data.access_token;
-    const expiresAt = Date.now() + (data.expires_in ? data.expires_in * 1000 : 3_400_000);
-
-    localStorage.setItem(LS_GOOGLE_TOKEN, newTok);
+    // salviamo il nuovo token
+    const expiresAt = Date.now() + ((data.expires_in || 3600) * 1000);
+    localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
     localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
-    // aggiorno icone se ce l'hai
-    if (typeof g_updateIcons === "function") {
-      g_updateIcons();
-    }
+    return data.access_token;
 
-    return newTok;
   } catch (err) {
+    // QUI NORMALIZZIAMO SEMPRE
     console.warn("g_ensureValidAccess: refresh fallito", err);
-    // qui NON apro popup. Lascio che chi chiama decida.
-    throw err;
+    throw new Error("Mini-API KO");
   }
 }
+
 
 
 
