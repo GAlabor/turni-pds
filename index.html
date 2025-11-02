@@ -1477,7 +1477,6 @@ function g_updateIcons() {
 
   const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
 
-  // === icone header / settings ===
   [h, s].forEach(el => {
     if (!el) return;
     el.classList.toggle("dbx-on",  on);
@@ -1496,33 +1495,33 @@ function g_updateIcons() {
     el.innerHTML = inner + badge;
   });
 
-  // === scritta nelle impostazioni ===
   if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
   if (dis) dis.style.display = on ? "inline-flex" : "none";
 
-  // === MENU DELL'OMINO ===
-  const menu = document.getElementById("acctMenu");
-  if (menu) {
-    const liLogin = menu.querySelector('[data-act="login"]');
-    const liSync  = menu.querySelector('[data-act="sync"]');
-    const liImp   = menu.querySelector('[data-act="import-bak"]');
-    const liOut   = menu.querySelector('[data-act="logout"]');
+  // 👇 AGGIUNTA: allinea il MENÙ allo stato
+  const m = document.getElementById("acctMenu");
+  if (m) {
+    const liLogin = m.querySelector('[data-act="login"]');
+    const liSync  = m.querySelector('[data-act="sync"]');
+    const liImp   = m.querySelector('[data-act="import-bak"]');
+    const liOut   = m.querySelector('[data-act="logout"]');
 
-    if (on) {
-      // connesso → vedo azioni e logout, nascondo login
-      if (liLogin) liLogin.style.display = "none";
-      if (liSync)  liSync.style.display  = "";
-      if (liImp)   liImp.style.display   = "";
-      if (liOut)   liOut.style.display   = "";
-    } else {
-      // NON connesso → vedo solo login
-      if (liLogin) liLogin.style.display = "";
+    // se NON connesso -> faccio vedere solo "login"
+    if (!on) {
+      if (liLogin) liLogin.style.display = "block";
       if (liSync)  liSync.style.display  = "none";
       if (liImp)   liImp.style.display   = "none";
       if (liOut)   liOut.style.display   = "none";
+    } else {
+      // se connesso -> faccio vedere le altre
+      if (liLogin) liLogin.style.display = "none";
+      if (liSync)  liSync.style.display  = "block";
+      if (liImp)   liImp.style.display   = "block";
+      if (liOut)   liOut.style.display   = "block";
     }
   }
 }
+
 
 
 
