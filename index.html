@@ -1458,12 +1458,25 @@ function g_loadGisScript() {
 }
 
 // token valido?
+// Sei connesso SOLO se:
+// - hai un access token
+// - NON è scaduto
+// - hai anche l'email dell'utente
 function g_isConnected(){
-  // Considero "connesso" se ho almeno UN access token salvato.
-  // Anche se è scaduto, lo posso rinfrescare via mini-API.
-  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
-  return !!tok;
+  const tok  = localStorage.getItem(LS_GOOGLE_TOKEN);
+  const exp  = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+  // alcuni punti del codice usano LS_GOOGLE_EMAIL, altri usavano "google_user_email"
+  const mail = localStorage.getItem(LS_GOOGLE_EMAIL) || localStorage.getItem("google_user_email");
+
+  if (!tok) return false;
+  if (!mail) return false;
+
+  // se è scaduto o quasi scaduto → NON connesso
+  if (Date.now() >= (exp - 10_000)) return false;
+
+  return true;
 }
+
 
 
 
