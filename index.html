@@ -1469,56 +1469,61 @@ function g_isConnected(){
 
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 function g_updateIcons() {
-  // leggiamo quello che abbiamo in storage
-  const email  = localStorage.getItem(LS_GOOGLE_EMAIL) || "";
-  const photo  = localStorage.getItem(LS_GOOGLE_PHOTO) || "";
-  const expRaw = localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0";
-  const exp    = parseInt(expRaw, 10) || 0;
-  const now    = Date.now();
-
-  // è online SOLO se:
-  // - c'è la mail
-  // - e il token non è scaduto
-  const isOnline = !!email && exp > 0 && now < (exp - 10_000);
-
+  const on  = g_isConnected();
   const h   = document.getElementById("acctBtnHeader");
   const s   = document.getElementById("acctBtnSettings");
   const st2 = document.getElementById("cloudStatusSettings");
   const dis = document.getElementById("acctDisconnect");
 
-  // scegliamo l'icona/foto
-  const innerOnline = (photo)
-    ? `<img src="${photo}" alt="Avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
-    : `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
-         <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
-       </svg>`;
+  const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
 
-  const innerOffline =
-    `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
-       <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
-     </svg>`;
-
-  const badgeOnline  = `<span class="acct-badge" aria-hidden="true"></span>`;
-  const badgeOffline = `<span class="acct-badge off" aria-hidden="true"></span>`;
-
+  // === icone header / settings ===
   [h, s].forEach(el => {
     if (!el) return;
-    el.classList.toggle("dbx-on",  isOnline);
-    el.classList.toggle("dbx-off", !isOnline);
+    el.classList.toggle("dbx-on",  on);
+    el.classList.toggle("dbx-off", !on);
 
-    // montiamo HTML
-    if (isOnline) {
-      el.innerHTML = innerOnline + badgeOnline;
-      el.title = email || "Connesso a Google";
-    } else {
-      el.innerHTML = innerOffline + badgeOffline;
-      el.title = "Accedi a Google";
-    }
+    const inner = (on && photo)
+      ? `<img src="${photo}" alt="Avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
+      : `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
+           <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
+         </svg>`;
+
+    const badge = on
+      ? `<span class="acct-badge" aria-hidden="true"></span>`
+      : `<span class="acct-badge off" aria-hidden="true"></span>`;
+
+    el.innerHTML = inner + badge;
   });
 
-  if (st2) st2.textContent = isOnline ? "✅ Connesso a Google" : "❌ Non collegato";
-  if (dis) dis.style.display = isOnline ? "inline-flex" : "none";
+  // === scritta nelle impostazioni ===
+  if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
+  if (dis) dis.style.display = on ? "inline-flex" : "none";
+
+  // === MENU DELL'OMINO ===
+  const menu = document.getElementById("acctMenu");
+  if (menu) {
+    const liLogin = menu.querySelector('[data-act="login"]');
+    const liSync  = menu.querySelector('[data-act="sync"]');
+    const liImp   = menu.querySelector('[data-act="import-bak"]');
+    const liOut   = menu.querySelector('[data-act="logout"]');
+
+    if (on) {
+      // connesso → vedo azioni e logout, nascondo login
+      if (liLogin) liLogin.style.display = "none";
+      if (liSync)  liSync.style.display  = "";
+      if (liImp)   liImp.style.display   = "";
+      if (liOut)   liOut.style.display   = "";
+    } else {
+      // NON connesso → vedo solo login
+      if (liLogin) liLogin.style.display = "";
+      if (liSync)  liSync.style.display  = "none";
+      if (liImp)   liImp.style.display   = "none";
+      if (liOut)   liOut.style.display   = "none";
+    }
+  }
 }
+
 
 
 
