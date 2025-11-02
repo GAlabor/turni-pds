@@ -1469,17 +1469,17 @@ function g_isConnected(){
 
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 function g_updateIcons() {
-  const on = g_isConnected();
+  const on  = g_isConnected();
+  const h   = document.getElementById("acctBtnHeader");
+  const s   = document.getElementById("acctBtnSettings");
+  const st2 = document.getElementById("cloudStatusSettings");
+  const dis = document.getElementById("acctDisconnect");
 
-  const email = localStorage.getItem(LS_GOOGLE_EMAIL) || localStorage.getItem("google_user_email") || "";
   const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
 
-  // 1. Bottoni (header, settings)
-  const ids = ["acctBtnHeader", "acctBtnSettings"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
+  // === icone header / settings ===
+  [h, s].forEach(el => {
     if (!el) return;
-
     el.classList.toggle("dbx-on",  on);
     el.classList.toggle("dbx-off", !on);
 
@@ -1496,34 +1496,34 @@ function g_updateIcons() {
     el.innerHTML = inner + badge;
   });
 
-  // 2. Testo stato in impostazioni (se esiste)
-  const st2 = document.getElementById("cloudStatusSettings");
-  if (st2) {
-    st2.textContent = on
-      ? (email ? `✅ Connesso come ${email}` : "✅ Connesso a Google")
-      : "❌ Non collegato";
-  }
+  // === scritta nelle impostazioni ===
+  if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
+  if (dis) dis.style.display = on ? "inline-flex" : "none";
 
-  // 3. Pulsante "disconnetti" (se esiste)
-  const dis = document.getElementById("acctDisconnect");
-  if (dis) {
-    dis.style.display = on ? "inline-flex" : "none";
-  }
+  // === MENU DELL'OMINO ===
+  const menu = document.getElementById("acctMenu");
+  if (menu) {
+    const liLogin = menu.querySelector('[data-act="login"]');
+    const liSync  = menu.querySelector('[data-act="sync"]');
+    const liImp   = menu.querySelector('[data-act="import-bak"]');
+    const liOut   = menu.querySelector('[data-act="logout"]');
 
-  // 4. MENU: mostra/nascondi voci in base allo stato
-  const m = document.getElementById("acctMenu");
-  if (m) {
-    const liLogin = m.querySelector('[data-act="login"]');
-    const liSync  = m.querySelector('[data-act="sync"]');
-    const liImp   = m.querySelector('[data-act="import-bak"]');
-    const liOut   = m.querySelector('[data-act="logout"]');
-
-    if (liLogin) liLogin.style.display = on ? "none"  : "block";
-    if (liSync)  liSync.style.display  = on ? "block" : "none";
-    if (liImp)   liImp.style.display   = on ? "block" : "none";
-    if (liOut)   liOut.style.display   = on ? "block" : "none";
+    if (on) {
+      // connesso → vedo azioni e logout, nascondo login
+      if (liLogin) liLogin.style.display = "none";
+      if (liSync)  liSync.style.display  = "";
+      if (liImp)   liImp.style.display   = "";
+      if (liOut)   liOut.style.display   = "";
+    } else {
+      // NON connesso → vedo solo login
+      if (liLogin) liLogin.style.display = "";
+      if (liSync)  liSync.style.display  = "none";
+      if (liImp)   liImp.style.display   = "none";
+      if (liOut)   liOut.style.display   = "none";
+    }
   }
 }
+
 
 
 
