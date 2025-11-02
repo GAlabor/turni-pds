@@ -1672,21 +1672,37 @@ async function g_testDrivePermission() {
 
 // === Recupera info utente Google ===
 async function g_fetchUserInfo() {
+  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+  if (!tok) return null;
+
   try {
-    const tok = await g_ensureValidAccess();
-    const res = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
-      headers: { Authorization: "Bearer " + tok }
+    const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: {
+        "Authorization": "Bearer " + tok
+      }
     });
-    if (!res.ok) return;
+    if (!res.ok) return null;
+
     const info = await res.json();
-    if (info.email) localStorage.setItem("google_user_email", info.email);
-    if (info.picture) localStorage.setItem("google_user_photo", info.picture);
-    g_updateIcons();
-    console.log("👤 Google user info:", info);
-  } catch (e) {
-    console.warn("userinfo fallita:", e);
+
+    if (info.email) {
+      localStorage.setItem(LS_GOOGLE_EMAIL, info.email);
+    }
+    if (info.picture) {
+      localStorage.setItem(LS_GOOGLE_PHOTO, info.picture);
+    }
+
+    if (typeof g_updateIcons === "function") {
+      g_updateIcons();
+    }
+
+    return info;
+  } catch (err) {
+    console.warn("g_fetchUserInfo: errore nel leggere userinfo", err);
+    return null;
   }
 }
+
 
 
 
@@ -1738,70 +1754,57 @@ async function g_refreshAccessToken(){
 // 2. se è scaduto -> prova il refresh via mini-API
 // 3. se il refresh fallisce -> lancia errore (lo gestirà chi chiama)
 // ===============================
-// Garantisce che ci sia un access token valido, altrimenti prova il refresh sulla mini-API
+// Garantisce che ci sia un access token valido, altrimenti prova il refresh per-utente
 async function g_ensureValidAccess() {
   const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
   const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
 
-  // token ancora buono → lo usiamo
+  // se il token è ancora valido, usalo
   if (tok && Date.now() < (exp - 10_000)) {
     return tok;
   }
 
-  // token scaduto → proviamo la mini-API
-  const userEmail = localStorage.getItem("google_user_email") || "shared@turni-pds";
+  // token scaduto → chiediamo al nostro mini-server
+  const email = localStorage.getItem(LS_GOOGLE_EMAIL) || "";
+  const baseUrl = "https://turni-mini-api.onrender.com/oauth2/refresh";
+  const url = email ? `${baseUrl}?email=${encodeURIComponent(email)}` : baseUrl;
 
+  let res;
   try {
-    const res = await fetch("https://turni-mini-api.onrender.com/oauth2/refresh", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user: userEmail })
-    });
-
-    // se proprio il server risponde 500/400 ecc.
-    if (!res.ok) {
-      console.warn("g_ensureValidAccess: risposta non OK dalla mini-API:", res.status);
-      throw new Error("Mini-API KO");
-    }
-
-    const data = await res.json();
-    if (!data || !data.access_token) {
-      console.warn("g_ensureValidAccess: nessun access_token nella risposta");
-      throw new Error("Mini-API KO");
-    }
-
-    // salviamo il nuovo token
-    const expiresAt = Date.now() + ((data.expires_in || 3600) * 1000);
-    localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
-    localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
-
-    return data.access_token;
-
+    res = await fetch(url, { method: "POST" });
   } catch (err) {
-    // QUI NORMALIZZIAMO SEMPRE
-    console.warn("g_ensureValidAccess: refresh fallito", err);
-    throw new Error("Mini-API KO");
+    console.warn("g_ensureValidAccess: fetch verso mini-API fallito", err);
+    throw new Error("Server di rinnovo offline");
   }
+
+  if (!res.ok) {
+    console.warn("g_ensureValidAccess: refresh HTTP", res.status);
+    throw new Error("refresh HTTP " + res.status);
+  }
+
+  const data = await res.json();
+  if (!data.access_token) {
+    console.warn("g_ensureValidAccess: risposta senza access_token", data);
+    throw new Error("refresh senza token");
+  }
+
+  // salviamo il nuovo token e scadenza
+  const newExp = Date.now() + (data.expires_in ? (data.expires_in * 1000) : 3_400_000);
+  localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
+  localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(newExp));
+
+  // se il server ci rimanda anche l'email e noi non l'avevamo → salvala
+  if (data.email && !localStorage.getItem(LS_GOOGLE_EMAIL)) {
+    localStorage.setItem(LS_GOOGLE_EMAIL, data.email);
+  }
+
+  return data.access_token;
 }
 
 
 
 
 
-
-/*
-// TEST: forza il percorso "token scaduto"
-async function g_ensureValidAccess(){
-  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
-  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
-
-  // 👇 COMMENTA la riga normale e forziamo lo "scaduto"
-  // if (tok && Date.now() < (exp - 10_000)) return tok;
-
-  // 👇 Forziamo SEMPRE a passare dal refresh / nuovo token
-  return await g_refreshAccessToken();
-}
-  */
 
 
 // === MENU OMINO: toggle e azioni ===
