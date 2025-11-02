@@ -1469,16 +1469,17 @@ function g_isConnected(){
 
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 function g_updateIcons() {
-  const on  = g_isConnected();
-  const h   = document.getElementById("acctBtnHeader");
-  const s   = document.getElementById("acctBtnSettings");
-  const st2 = document.getElementById("cloudStatusSettings");
-  const dis = document.getElementById("acctDisconnect");
+  const on = g_isConnected();
 
+  const email = localStorage.getItem(LS_GOOGLE_EMAIL) || localStorage.getItem("google_user_email") || "";
   const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
 
-  [h, s].forEach(el => {
+  // 1. Bottoni (header, settings)
+  const ids = ["acctBtnHeader", "acctBtnSettings"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
     if (!el) return;
+
     el.classList.toggle("dbx-on",  on);
     el.classList.toggle("dbx-off", !on);
 
@@ -1495,10 +1496,21 @@ function g_updateIcons() {
     el.innerHTML = inner + badge;
   });
 
-  if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
-  if (dis) dis.style.display = on ? "inline-flex" : "none";
+  // 2. Testo stato in impostazioni (se esiste)
+  const st2 = document.getElementById("cloudStatusSettings");
+  if (st2) {
+    st2.textContent = on
+      ? (email ? `✅ Connesso come ${email}` : "✅ Connesso a Google")
+      : "❌ Non collegato";
+  }
 
-  // 👇 AGGIUNTA: allinea il MENÙ allo stato
+  // 3. Pulsante "disconnetti" (se esiste)
+  const dis = document.getElementById("acctDisconnect");
+  if (dis) {
+    dis.style.display = on ? "inline-flex" : "none";
+  }
+
+  // 4. MENU: mostra/nascondi voci in base allo stato
   const m = document.getElementById("acctMenu");
   if (m) {
     const liLogin = m.querySelector('[data-act="login"]');
@@ -1506,19 +1518,10 @@ function g_updateIcons() {
     const liImp   = m.querySelector('[data-act="import-bak"]');
     const liOut   = m.querySelector('[data-act="logout"]');
 
-    // se NON connesso -> faccio vedere solo "login"
-    if (!on) {
-      if (liLogin) liLogin.style.display = "block";
-      if (liSync)  liSync.style.display  = "none";
-      if (liImp)   liImp.style.display   = "none";
-      if (liOut)   liOut.style.display   = "none";
-    } else {
-      // se connesso -> faccio vedere le altre
-      if (liLogin) liLogin.style.display = "none";
-      if (liSync)  liSync.style.display  = "block";
-      if (liImp)   liImp.style.display   = "block";
-      if (liOut)   liOut.style.display   = "block";
-    }
+    if (liLogin) liLogin.style.display = on ? "none"  : "block";
+    if (liSync)  liSync.style.display  = on ? "block" : "none";
+    if (liImp)   liImp.style.display   = on ? "block" : "none";
+    if (liOut)   liOut.style.display   = on ? "block" : "none";
   }
 }
 
