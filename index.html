@@ -1457,25 +1457,14 @@ function g_loadGisScript() {
   });
 }
 
-// token valido?
-// Sei connesso SOLO se:
-// - hai un access token
-// - NON è scaduto
-// - hai anche l'email dell'utente
-function g_isConnected(){
-  const tok  = localStorage.getItem(LS_GOOGLE_TOKEN);
-  const exp  = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
-  // alcuni punti del codice usano LS_GOOGLE_EMAIL, altri usavano "google_user_email"
-  const mail = localStorage.getItem(LS_GOOGLE_EMAIL) || localStorage.getItem("google_user_email");
 
-  if (!tok) return false;
-  if (!mail) return false;
-
-  // se è scaduto o quasi scaduto → NON connesso
-  if (Date.now() >= (exp - 10_000)) return false;
-
-  return true;
+// [VERSIONE “TOLLERANTE”]
+function g_isConnected() {
+  const email = (localStorage.getItem(LS_GOOGLE_EMAIL) || "").trim();
+  const tok   = (localStorage.getItem(LS_GOOGLE_TOKEN) || "").trim();
+  return email.length > 0 || tok.length > 0;
 }
+
 
 
 
@@ -1540,9 +1529,64 @@ function g_updateIcons() {
 
 
 
+// Risveglio leggero del mini-server (no attesa, no errori a video)
+
+async function g_preWakeMiniApi() {
+  // ping veloce per scaldare Render
+  fetch("https://turni-mini-api.onrender.com/", { method: "GET" })
+    .catch(() => { /* non bloccare nulla */ });
+
+  // dopo 400 ms, prova un refresh “silenzioso” se hai un’email salvata
+  setTimeout(async () => {
+    try {
+      const email = localStorage.getItem(LS_GOOGLE_EMAIL) || "";
+      if (!email) return;
+      const res = await fetch(
+        "https://turni-mini-api.onrender.com/oauth2/refresh?email=" + encodeURIComponent(email),
+        { method: "POST" }
+      );
+      // Non importa l’esito. Se va, bene; se no, ci penserà g_ensureValidAccess al click.
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data && data.access_token) {
+          const exp = Date.now() + ((data.expires_in || 3600) * 1000) - 15000;
+          localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
+          localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(exp));
+          // niente g_updateIcons: lo stato UI non dipende dal token
+        }
+      }
+    } catch { /* silenzio, è pre-wake */ }
+  }, 400);
+}
+
+
+
+// Promise con timeout: se il server è lento, non blocchiamo la UI
+function pTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
+  ]);
+}
+
+// Refresh proattivo: se il token è scaduto, prova a rinnovare “in silenzio”
+async function g_proactiveRefresh() {
+  try {
+    const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+    const stillValid = exp && Date.now() < (exp - 10_000);
+    if (stillValid) return;
+    await pTimeout(g_ensureValidAccess(), 8000);
+  } catch (_) {
+    // ignora: è proattivo, al click ci penserà g_ensureValidAccess
+  }
+}
+
+
+
+
+
 
 // login nuova: prende token con GIS, salva mail/foto, aggiorna UI.
-// NON chiama più /oauth2/callback dal browser.
 async function g_login() {
   try {
     // 1. ci assicuriamo di avere lo script GIS
@@ -1735,7 +1779,7 @@ async function g_fetchUserInfo() {
 
 
 // Rinnova l'access token chiedendolo alla tua mini-API su Render
-async function g_refreshAccessToken(){
+async function g_refreshAccessToken() {
   // se abbiamo l'email dell'utente, la mandiamo, altrimenti va bene anche senza
   const email = localStorage.getItem(LS_GOOGLE_EMAIL) || null;
 
@@ -2679,46 +2723,73 @@ acct_menuBind();
   // =========================================================
   // [SERVICE WORKER] – registrazione con auto-update (invariato)
   // =========================================================
-  (function(){
-    if (!('serviceWorker' in navigator)) return;
+  
+(function(){
+  if (!('serviceWorker' in navigator)) return;
 
-    const SW_VERSION = '2025-10-29-01';
-    const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
+  const SW_VERSION = '2025-10-29-01';  // lascia il tuo
+  const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
 
-    async function registerSW(){
-      try{
-        const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
-        if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          if (!nw) return;
-          nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              nw.postMessage({ type: 'SKIP_WAITING' });
-            }
-          });
-        });
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!window.__reloadedForSW) {
-            window.__reloadedForSW = true;
-            location.reload();
+  async function registerSW(){
+    try{
+      const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
+      if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            nw.postMessage({ type: 'SKIP_WAITING' });
           }
         });
-        reg.update().catch(()=>{});
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            reg.update().catch(()=>{});
-          }
-        });
-      }catch(e){}
+      });
+
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!window.__reloadedForSW) {
+          window.__reloadedForSW = true;
+          location.reload();
+        }
+      });
+
+      // Aggiorna quando ritorna in foreground
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          reg.update().catch(()=>{});
+          // rigo 460  INIEZIONE: risveglio + refresh proattivo
+          g_preWakeMiniApi && g_preWakeMiniApi();
+          setTimeout(() => { g_proactiveRefresh && g_proactiveRefresh(); }, 200);
+        }
+      });
+
+      // Primo update esplicito
+      reg.update().catch(()=>{});
+    }catch(e){
+      // niente drammi
     }
+  }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', registerSW);
-    } else {
+  if (document.readyState === 'loading') {
+    // rigo 480  INIEZIONE: risveglio + refresh proattivo alla fine del DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      g_preWakeMiniApi && g_preWakeMiniApi();
+      setTimeout(() => { g_proactiveRefresh && g_proactiveRefresh(); }, 500);
       registerSW();
-    }
-  })();
+    });
+  } else {
+    // rigo 490  INIEZIONE: risveglio + refresh proattivo subito (document già pronto)
+    g_preWakeMiniApi && g_preWakeMiniApi();
+    setTimeout(() => { g_proactiveRefresh && g_proactiveRefresh(); }, 500);
+    registerSW();
+  }
+})();
+
+(function(){
+  // Pre-wake del mini-server: non blocca nulla e non mostra popup
+  try { g_preWakeMiniApi(); } catch {}
+})();
+
+
 
   // ======================= //
   // fine JSS (script)       //
