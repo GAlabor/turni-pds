@@ -1057,48 +1057,6 @@
   // inizio JSS (script)     //
   // ======================= //
 
-// =============================
-// [VERSIONE APP / MINI-API]
-// =============================
-const APP_VERSION_MAIN = "1.0";   // <— quando aggiorni la web-app, alza qui
-const APP_VERSION_MINI = "0.1";   // <— quando aggiorni la mini-API, alza qui
-
-function composeVersion(main, mini){
-  // "1.0"  +  "0.1"  => "1.0.0.1"
-  const mParts = String(main).trim().split(".");
-  const aParts = String(mini).trim().split(".");
-  while (mParts.length < 2) mParts.push("0");
-  while (aParts.length < 2) aParts.push("0");
-  return `${mParts[0]}.${mParts[1]}.${aParts[0]}.${aParts[1]}`;
-}
-
-function mount_versionBadge(){
-  const v = composeVersion(APP_VERSION_MAIN, APP_VERSION_MINI);
-  const el = document.createElement("div");
-  el.id = "appVersionBadge";
-  el.textContent = "v " + v;
-  // stile inline: niente dipendenze dal tuo CSS
-  Object.assign(el.style, {
-    position: "fixed",
-    left: "10px",
-    top: "10px",
-    zIndex: "99999",
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
-    fontSize: "12px",
-    letterSpacing: ".2px",
-    color: "rgba(240,244,248,.9)",
-    background: "rgba(16,22,30,.55)",
-    border: "1px solid rgba(255,255,255,.08)",
-    borderRadius: "8px",
-    padding: "4px 8px",
-    backdropFilter: "blur(6px) saturate(140%)",
-    WebkitBackdropFilter: "blur(6px) saturate(140%)",
-    boxShadow: "0 6px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03)"
-  });
-  document.body.appendChild(el);
-}
-
-
   // =========================================================
   // [FN: util_jsWeekdayUTC] Lunedì=0 … Domenica=6 (UTC)
   // =========================================================
@@ -1511,18 +1469,7 @@ function g_isConnected() {
 
 
 
-function util_initialsFromEmail(email){
-  const e = String(email || "").trim().toLowerCase();
-  if (!e) return "??";
-  const base = e.split("@")[0];
-  const parts = base.replace(/[._-]+/g, " ").split(" ").filter(Boolean);
-  if (parts.length === 1) {
-    return parts[0].slice(0,2).toUpperCase();
-  }
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-}
-
-// UI: aggiorna le icone (nuova logica Accedi / Avatar senza pallini)
+// UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 function g_updateIcons() {
   const on  = g_isConnected();
   const h   = document.getElementById("acctBtnHeader");
@@ -1530,66 +1477,47 @@ function g_updateIcons() {
   const st2 = document.getElementById("cloudStatusSettings");
   const dis = document.getElementById("acctDisconnect");
 
-  const email = on ? (localStorage.getItem(LS_GOOGLE_EMAIL) || "") : "";
   const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
 
-  const renderLoggedOut = () => {
-    return `<span style="
-      display:inline-flex;align-items:center;justify-content:center;
-      min-width:56px;height:28px;padding:0 10px;border-radius:8px;
-      font-weight:700;font-size:13px;letter-spacing:.2px;line-height:28px;
-      background:transparent;color:#e6e9ee;border:1px solid rgba(255,255,255,.18);
-    ">Accedi</span>`;
-  };
-
-  const renderInitials = (em) => {
-    const ini = util_initialsFromEmail(em);
-    return `<span aria-label="Account" style="
-      display:inline-flex;align-items:center;justify-content:center;
-      width:28px;height:28px;border-radius:50%;
-      background:#1a2230;color:#e6e9ee;font-weight:800;font-size:12px;
-      border:1px solid rgba(255,255,255,.15);
-    ">${ini}</span>`;
-  };
-
-  const renderAvatar = (url) => {
-    return `<img src="${url}" alt="Avatar" referrerpolicy="no-referrer" 
-      style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.15)">`;
-  };
-
+  // === icone header / settings ===
   [h, s].forEach(el => {
     if (!el) return;
     el.classList.toggle("dbx-on",  on);
     el.classList.toggle("dbx-off", !on);
-    let inner = "";
-    if (!on) {
-      inner = renderLoggedOut();
-    } else if (photo) {
-      inner = renderAvatar(photo);
-    } else if (email) {
-      inner = renderInitials(email);
-    } else {
-      inner = renderInitials("??");
-    }
-    el.innerHTML = inner; // niente badge di stato
+
+    const inner = (on && photo)
+      ? `<img src="${photo}" alt="Avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
+      : `<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px">
+           <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
+         </svg>`;
+
+    const badge = on
+      ? `<span class="acct-badge" aria-hidden="true"></span>`
+      : `<span class="acct-badge off" aria-hidden="true"></span>`;
+
+    el.innerHTML = inner + badge;
   });
 
+  // === scritta nelle impostazioni ===
   if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
   if (dis) dis.style.display = on ? "inline-flex" : "none";
 
-  // Aggiorna visibilità del menu se esiste
+  // === MENU DELL'OMINO ===
   const menu = document.getElementById("acctMenu");
   if (menu) {
     const liLogin = menu.querySelector('[data-act="login"]');
     const liSync  = menu.querySelector('[data-act="sync"]');
     const liImp   = menu.querySelector('[data-act="import-bak"]');
     const liOut   = menu.querySelector('[data-act="logout"]');
+
     if (on) {
+      // connesso → vedo azioni e logout, nascondo login
       if (liLogin) liLogin.style.display = "none";
       if (liSync)  liSync.style.display  = "";
       if (liImp)   liImp.style.display   = "";
       if (liOut)   liOut.style.display   = "";
     } else {
+      // NON connesso → vedo solo login
       if (liLogin) liLogin.style.display = "";
       if (liSync)  liSync.style.display  = "none";
       if (liImp)   liImp.style.display   = "none";
@@ -1602,100 +1530,56 @@ function g_updateIcons() {
 
 
 
-// Risveglio leggero del mini-server (no attesa, no errori a video)
-
-async function g_preWakeMiniApi() {
-  // ping veloce per scaldare Render
-  fetch("https://turni-mini-api.onrender.com/", { method: "GET" })
-    .catch(() => { /* non bloccare nulla */ });
-
-  // dopo 400 ms, prova un refresh “silenzioso” se hai un’email salvata
-  setTimeout(async () => {
-    try {
-      const email = localStorage.getItem(LS_GOOGLE_EMAIL) || "";
-      if (!email) return;
-      const res = await fetch(
-        "https://turni-mini-api.onrender.com/oauth2/refresh?email=" + encodeURIComponent(email),
-        { method: "POST" }
-      );
-      // Non importa l’esito. Se va, bene; se no, ci penserà g_ensureValidAccess al click.
-      if (res.ok) {
-        const data = await res.json().catch(() => null);
-        if (data && data.access_token) {
-          const exp = Date.now() + ((data.expires_in || 3600) * 1000) - 15000;
-          localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
-          localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(exp));
-          // niente g_updateIcons: lo stato UI non dipende dal token
-        }
-      }
-    } catch { /* silenzio, è pre-wake */ }
-  }, 400);
-}
-
-
-
-// Promise con timeout: se il server è lento, non blocchiamo la UI
-function pTimeout(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
-  ]);
-}
-
-// Refresh proattivo: se il token è scaduto, prova a rinnovare “in silenzio”
-async function g_proactiveRefresh() {
-  try {
-    const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
-    const stillValid = exp && Date.now() < (exp - 10_000);
-    if (stillValid) return;
-    await pTimeout(g_ensureValidAccess(), 8000);
-  } catch (_) {
-    // ignora: è proattivo, al click ci penserà g_ensureValidAccess
-  }
-}
-
-
-
-
-
-
+// login nuova: prende token con GIS, salva mail/foto, aggiorna UI.
+// login nuova: prende token con GIS, salva mail/foto, aggiorna UI.
+// NON chiama più /oauth2/callback dal browser.
 async function g_login() {
   try {
+    // 1. ci assicuriamo di avere lo script GIS
     await g_loadGisScript();
 
+    // 2. se non abbiamo ancora il client lo creiamo
     if (!__gisTokenCli && window.google && google.accounts && google.accounts.oauth2) {
       __gisTokenCli = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: GOOGLE_SCOPES,
         callback: async (response) => {
+          // --- callback del token ---
           if (!response || !response.access_token) {
             alert("Accesso Google fallito (nessun access_token).");
             return;
           }
 
+          // 2.a salviamo token + scadenza
           const expiresAt = Date.now() + (response.expires_in ? (response.expires_in * 1000) : 3_400_000);
           localStorage.setItem(LS_GOOGLE_TOKEN, response.access_token);
           localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
+          // 2.b aggiorna subito icone/menu
           g_updateIcons && g_updateIcons();
 
-          // userinfo per email/foto
+          // 2.c proviamo a leggere userinfo per prendere email e foto
+          let gotEmail = false;
           try {
             const r = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
               headers: { Authorization: "Bearer " + response.access_token }
             });
             if (r.ok) {
               const info = await r.json();
-              if (info.email)  localStorage.setItem(LS_GOOGLE_EMAIL, info.email);
-              if (info.picture) localStorage.setItem(LS_GOOGLE_PHOTO, info.picture);
+              if (info.email) {
+                localStorage.setItem(LS_GOOGLE_EMAIL, info.email);
+                gotEmail = true;
+              }
+              if (info.picture) {
+                localStorage.setItem(LS_GOOGLE_PHOTO, info.picture);
+              }
               g_updateIcons && g_updateIcons();
-            } else {
-              // se fallisce, pazienza: resti loggato comunque
-              localStorage.removeItem(LS_GOOGLE_EMAIL);
             }
-          } catch {}
+          } catch (_) {
+            // non blocchiamo il login
+          }
 
-          // Verifica permesso Drive
+          // 2.d controlliamo che abbia davvero dato Drive
           const okDrive = await g_testDrivePermission();
           if (!okDrive) {
             g_disconnect(true);
@@ -1703,10 +1587,19 @@ async function g_login() {
             return;
           }
 
-          // UI: torna al calendario e fai import “canonico”
-          if (typeof ui_switchTab === "function") ui_switchTab("calendar");
-          if (typeof storage_importFromGoogle === "function") {
-            try { await storage_importFromGoogle(); } catch {}
+          // 2.e se non siamo riusciti a leggere userinfo, almeno togliamo l’eventuale mail vecchia
+          if (!gotEmail) {
+            // NON sappiamo chi è → niente mail vecchia
+            localStorage.removeItem(LS_GOOGLE_EMAIL);
+            g_updateIcons && g_updateIcons();
+          }
+
+          // 2.f torna al calendario e fai import auto (come avevi)
+          if (typeof ui_switchTab === "function") {
+            ui_switchTab("calendar");
+          }
+          if (typeof storage_importFromGoogleAuto === "function") {
+            storage_importFromGoogleAuto();
           }
         }
       });
@@ -1717,7 +1610,11 @@ async function g_login() {
       return;
     }
 
-    __gisTokenCli.requestAccessToken({ prompt: "consent" });
+    // 3. chiediamo il token (prima volta mostra lo scope brutto)
+    __gisTokenCli.requestAccessToken({
+      prompt: "consent"
+    });
+
   } catch (e) {
     console.error(e);
     alert("Errore durante l’accesso a Google.\n" + (e && e.message ? e.message : ""));
@@ -2577,16 +2474,8 @@ async function storage_importBackupFromGoogle() {
     return;
   }
 
-  let accessToken;
   try {
-    accessToken = await g_ensureValidAccess();
-  } catch (e) {
-    showSaveStatus("Impossibile ottenere un token valido.", "#e53e3e");
-    return;
-  }
-
-  try {
-    const files = await drive_listTurniFiles(accessToken);
+    const files = await drive_listTurniFiles();
     if (!files.length) {
       alert("Nessun backup disponibile su Drive.");
       return;
@@ -2606,7 +2495,11 @@ async function storage_importBackupFromGoogle() {
       return;
     }
 
-    if (__hasUnsavedChanges) {
+    // confronto con locale prima di importare
+    const localPayload  = storage_buildPayload();
+    const localSnapshot = JSON.stringify(localPayload);
+
+     if (__hasUnsavedChanges) {
       const go = confirm(
         "Hai modifiche locali non salvate.\n" +
         "Se importi un backup, le perderai.\n\n" +
@@ -2614,6 +2507,7 @@ async function storage_importBackupFromGoogle() {
       );
       if (!go) return;
     }
+
 
     const obj = await drive_download_json(chosen.id);
 
@@ -2635,7 +2529,6 @@ async function storage_importBackupFromGoogle() {
 
 
 
-
 // Prende il TURNI* più recente e lo applica, ma avvisa se perdi roba
 async function storage_syncNewestFromDrive() {
   if (!g_isConnected()) {
@@ -2643,16 +2536,9 @@ async function storage_syncNewestFromDrive() {
     return;
   }
 
-  let accessToken;
   try {
-    accessToken = await g_ensureValidAccess();
-  } catch (e) {
-    showSaveStatus("Impossibile ottenere un token valido.", "#e53e3e");
-    return;
-  }
-
-  try {
-    const files = await drive_listTurniFiles(accessToken);
+    // prendo tutti i TURNI* su Drive
+    const files = await drive_listTurniFiles();
     if (!files.length) {
       alert("Nessun file TURNI trovato in Drive.");
       return;
@@ -2660,6 +2546,7 @@ async function storage_syncNewestFromDrive() {
 
     const latest = files[0];
 
+    // se hai modifiche non salvate, avvisa prima
     if (__hasUnsavedChanges) {
       const go = confirm(
         "Attenzione: hai modifiche locali non salvate.\n" +
@@ -2669,14 +2556,17 @@ async function storage_syncNewestFromDrive() {
       if (!go) return;
     }
 
+    // scarico quello remoto
     const remoteObj = await drive_download_json(latest.id);
 
+    // applico il remoto
     if (remoteObj.settings) settings_save(remoteObj.settings);
     if (Array.isArray(remoteObj.defs)) defs_save(remoteObj.defs);
 
     ui_settingsInit();
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
 
+    // da ora in poi il locale è uguale al remoto
     __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
     __hasUnsavedChanges = false;
 
@@ -2686,7 +2576,6 @@ async function storage_syncNewestFromDrive() {
     showSaveStatus("❌ Errore sincronizzazione", "#b91c1c");
   }
 }
-
 
 
 
@@ -2729,9 +2618,6 @@ async function autosave_now() {
   // =========================================================
   function boot_init(){
 
-  // Version badge in alto a sinistra
-  try { mount_versionBadge(); } catch {}
-
   document.getElementById('prev').addEventListener('click', ()=>nav_shift(-1));
   document.getElementById('next').addEventListener('click', ()=>nav_shift(1));
 
@@ -2739,19 +2625,19 @@ async function autosave_now() {
 
   document.getElementById('btnAddTurno').addEventListener('click', ui_defsAdd);
 
-  // Bind azioni cloud
+  // Bind azioni cloud (restano, ma l'utente non deve usarle: l'autosave pensa a tutto)
   const btnSaveCloud  = document.getElementById('btnSaveCloud');
   const btnImportCloud= document.getElementById('btnImportCloud');
   if(btnSaveCloud)   btnSaveCloud.addEventListener('click', storage_saveToGoogle);
   if(btnImportCloud) btnImportCloud.addEventListener('click', storage_importFromGoogle);
 
-  // Account: bind icone + stato
-  g_bindIconClicks();
-  g_updateIcons();
+// Account: bind icone + stato
+g_bindIconClicks();
+g_updateIcons();
 
-  // Porta il menu nel <body> prima di collegare gli handler
-  acct_menuPortalize();
-  acct_menuBind();
+// Porta il menu nel <body> prima di collegare gli handler
+acct_menuPortalize();
+acct_menuBind();
 
   // Init UI
   ui_settingsInit();
@@ -2764,7 +2650,7 @@ async function autosave_now() {
   // Vista iniziale: calendario senza scroll globale
   document.body.classList.add('no-scroll');
 
-  // Glow
+    // Glow
   ui_updateTopbarGlowCenter();
   addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
@@ -2782,19 +2668,21 @@ async function autosave_now() {
   }
 
   // =========================================================
-  // [SERVICE WORKER] – registrazione con auto-update (invariato)
-  // =========================================================
-  
-(function(){
+// [SERVICE WORKER] – registrazione con auto-update (invariato)
+// =========================================================
+(function() {
   if (!('serviceWorker' in navigator)) return;
 
-  const SW_VERSION = '2025-10-29-01';  // lascia il tuo
+  const SW_VERSION = '2025-10-29-01';
   const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
 
-  async function registerSW(){
-    try{
+  async function registerSW() {
+    try {
       const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
-      if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
 
       reg.addEventListener('updatefound', () => {
         const nw = reg.installing;
@@ -2813,41 +2701,20 @@ async function autosave_now() {
         }
       });
 
-      // Aggiorna quando ritorna in foreground
+      reg.update().catch(() => {});
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-          reg.update().catch(()=>{});
-          // rigo 460  INIEZIONE: risveglio + refresh proattivo
-          g_preWakeMiniApi && g_preWakeMiniApi();
-          setTimeout(() => { g_proactiveRefresh && g_proactiveRefresh(); }, 200);
+          reg.update().catch(() => {});
         }
       });
-
-      // Primo update esplicito
-      reg.update().catch(()=>{});
-    }catch(e){
-      // niente drammi
-    }
+    } catch (e) {}
   }
 
   if (document.readyState === 'loading') {
-    // rigo 480  INIEZIONE: risveglio + refresh proattivo alla fine del DOM load
-    document.addEventListener('DOMContentLoaded', () => {
-      g_preWakeMiniApi && g_preWakeMiniApi();
-      setTimeout(() => { g_proactiveRefresh && g_proactiveRefresh(); }, 500);
-      registerSW();
-    });
+    document.addEventListener('DOMContentLoaded', registerSW);
   } else {
-    // rigo 490  INIEZIONE: risveglio + refresh proattivo subito (document già pronto)
-    g_preWakeMiniApi && g_preWakeMiniApi();
-    setTimeout(() => { g_proactiveRefresh && g_proactiveRefresh(); }, 500);
     registerSW();
   }
-})();
-
-(function(){
-  // Pre-wake del mini-server: non blocca nulla e non mostra popup
-  try { g_preWakeMiniApi(); } catch {}
 })();
 
 
