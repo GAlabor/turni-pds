@@ -1448,23 +1448,26 @@ function g_loadGisScript() {
 
 // [VERSIONE “TOLLERANTE”]
 function g_isConnected() {
-  const email = (localStorage.getItem(LS_GOOGLE_EMAIL) || "").trim();
-  const tok   = (localStorage.getItem(LS_GOOGLE_TOKEN) || "").trim();
-  return email.length > 0 || tok.length > 0;
+  const hasEmail = !!localStorage.getItem(LS_GOOGLE_EMAIL);
+  const exp      = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+  const hasTok   = !!localStorage.getItem(LS_GOOGLE_TOKEN);
+  const notExpired = Date.now() < exp;
+  return hasEmail && hasTok && notExpired;
 }
+
 
 
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 function g_updateIcons() {
-  const on  = g_isConnected();
-  const h   = document.getElementById("acctBtnHeader");
-  const s   = document.getElementById("acctBtnSettings");
-  const st2 = document.getElementById("cloudStatusSettings");
-  const dis = document.getElementById("acctDisconnect");
+  const on    = g_isConnected();
+  const h     = document.getElementById("acctBtnHeader");
+  const s     = document.getElementById("acctBtnSettings");
+  const st2   = document.getElementById("cloudStatusSettings");
+  const dis   = document.getElementById("acctDisconnect");
+  const menu  = document.getElementById("acctMenu"); // il tuo menu dell’omino
 
   const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
 
-  // === icone header / settings ===
   [h, s].forEach(el => {
     if (!el) return;
     el.classList.toggle("dbx-on",  on);
@@ -1483,33 +1486,23 @@ function g_updateIcons() {
     el.innerHTML = inner + badge;
   });
 
-  // === scritta nelle impostazioni ===
   if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
   if (dis) dis.style.display = on ? "inline-flex" : "none";
 
-  // === MENU DELL'OMINO ===
-  const menu = document.getElementById("acctMenu");
-  if (menu) {
-    const liLogin = menu.querySelector('[data-act="login"]');
-    const liSync  = menu.querySelector('[data-act="sync"]');
-    const liImp   = menu.querySelector('[data-act="import-bak"]');
-    const liOut   = menu.querySelector('[data-act="logout"]');
+  // Stato voci menu coerente
+  // Adatta gli ID alle tue voci (usa quelli che hai in pagina)
+  const mSave   = document.getElementById("menuSaveGoogle");
+  const mSync   = document.getElementById("menuSyncGoogle");
+  const mImport = document.getElementById("menuImportGoogle");
+  const mLogin  = document.getElementById("menuLoginGoogle");
+  const mLogout = document.getElementById("menuLogoutGoogle");
 
-    if (on) {
-      // connesso → vedo azioni e logout, nascondo login
-      if (liLogin) liLogin.style.display = "none";
-      if (liSync)  liSync.style.display  = "";
-      if (liImp)   liImp.style.display   = "";
-      if (liOut)   liOut.style.display   = "";
-    } else {
-      // NON connesso → vedo solo login
-      if (liLogin) liLogin.style.display = "";
-      if (liSync)  liSync.style.display  = "none";
-      if (liImp)   liImp.style.display   = "none";
-      if (liOut)   liOut.style.display   = "none";
-    }
-  }
+  // Abilita/mostra a seconda dello stato
+  [mSave, mSync, mImport, mLogout].forEach(el => { if (el) el.style.display = on ? "" : "none"; });
+  if (mLogin)  mLogin.style.display  = on ? "none" : "";
+  if (menu)    menu.classList.toggle("is-connected", on);
 }
+
 
 
 // login nuova: prende token con GIS, salva mail/foto, aggiorna UI.
@@ -2289,6 +2282,13 @@ function showSaveStatus(text, color) {
 
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
+
+// GUARD: senza email niente salvataggio
+{
+  const email = localStorage.getItem(LS_GOOGLE_EMAIL);
+  if (!email) { ui_toast && ui_toast("Accedi con Google per salvare"); g_updateIcons && g_updateIcons(); return; }
+}
+
   if (!g_isConnected()) {
     showSaveStatus("Non sei connesso a Google", "#e53e3e");
     return;
