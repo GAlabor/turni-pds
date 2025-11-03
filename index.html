@@ -192,8 +192,6 @@
 }
 
 
-
-
 /* Testatina del menu: titolo + stato */
 .acct-head{
   display:flex;
@@ -311,12 +309,6 @@
   box-shadow:none;
   opacity:.85;
 }
-
-
-
-
-
-
 
   .topbar::before{
     content: "";
@@ -755,10 +747,6 @@
     0 0 20px 8px rgba(var(--blue-rgb),.10);
   pointer-events: none;
 }
-
-
-
-
   
   .weekhead div{
     background: rgba(56,124,255,.22) !important; border: 1px solid rgba(56,124,255,.34) !important;
@@ -1466,9 +1454,6 @@ function g_isConnected() {
 }
 
 
-
-
-
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
 function g_updateIcons() {
   const on  = g_isConnected();
@@ -1527,12 +1512,8 @@ function g_updateIcons() {
 }
 
 
-
-
-
 // login nuova: prende token con GIS, salva mail/foto, aggiorna UI.
-// login nuova: prende token con GIS, salva mail/foto, aggiorna UI.
-// NON chiama più /oauth2/callback dal browser.
+
 async function g_login() {
   try {
     // 1. ci assicuriamo di avere lo script GIS
@@ -1622,10 +1603,6 @@ async function g_login() {
 }
 
 
-
-
-
-
 // Disconnessione: revoca e pulizia locale
 let __lastDisconnectAt = 0;
 async function g_disconnect(silent = false){
@@ -1671,8 +1648,6 @@ function g_bindIconClicks(){
 }
 
 
-
-
 // Verifica che Drive sia realmente autorizzato (spunta data)
 async function g_testDrivePermission() {
   try {
@@ -1686,7 +1661,6 @@ async function g_testDrivePermission() {
     return false;
   }
 }
-
 
 
 // === Recupera info utente Google ===
@@ -1723,13 +1697,10 @@ async function g_fetchUserInfo() {
 }
 
 
-
-
-// Rinnova l'access token chiedendolo alla tua mini-API su Render
-async function g_refreshAccessToken() {
+  // Rinnova l'access token chiedendolo alla tua mini-API su Render
   // se abbiamo l'email dell'utente, la mandiamo, altrimenti va bene anche senza
+  async function g_refreshAccessToken() {
   const email = localStorage.getItem(LS_GOOGLE_EMAIL) || null;
-
   const res = await fetch("https://turni-mini-api.onrender.com/oauth2/refresh", {
     method: "POST",
     headers: {
@@ -1757,7 +1728,6 @@ async function g_refreshAccessToken() {
   localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
   // non abbiamo un nuovo refresh lato browser → NON lo salviamo
-  // l'avatar lo aggiorniamo al prossimo giro
   g_updateIcons?.();
 
   return data.access_token;
@@ -1765,14 +1735,6 @@ async function g_refreshAccessToken() {
 
 
 
-
-
-// ===============================
-// Garantisce che ci sia un access token valido
-// 1. se è valido in LS -> lo ritorna
-// 2. se è scaduto -> prova il refresh via mini-API
-// 3. se il refresh fallisce -> lancia errore (lo gestirà chi chiama)
-// ===============================
 // Garantisce che ci sia un access token valido, altrimenti prova il refresh per-utente
 async function g_ensureValidAccess() {
   const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
@@ -1821,11 +1783,6 @@ async function g_ensureValidAccess() {
 }
 
 
-
-
-
-
-
 // === MENU OMINO: toggle e azioni ===
 function acct_menuUpdateVisibility(){
   const on = g_isConnected?.() || false;
@@ -1846,7 +1803,6 @@ function acct_menuUpdateVisibility(){
 
   acct_menuRenderHeadStatus();
 }
-
 
 
 // Aggiorna la testatina del menu ("Sincronizzazione attiva" / "Non collegato")
@@ -1919,10 +1875,6 @@ function acct_menuToggle(show){
   });
 }
 
-
-
-
-
 function acct_menuBind(){
   const btn = document.getElementById("acctBtnHeader");
   const m   = document.getElementById("acctMenu");
@@ -1982,9 +1934,6 @@ function acct_menuBind(){
   });
 
 
-
-
-
   // 3) Click fuori: chiudi (ma ignora click dentro menù o sul bottone)
   document.addEventListener("click", (e)=>{
     if (!m.classList.contains("show")) return;
@@ -2015,9 +1964,6 @@ function acct_menuPortalize(){
     document.body.appendChild(m);
   }
 }
-
-
-
 
 
 // bootstrap per lo stato account (riuso in boot_init esistente)
@@ -2127,9 +2073,6 @@ async function drive_deleteById(fileId) {
 }
 
 
-
-
-
 // Crea o aggiorna via upload multipart (metadata + contenuto)
 async function drive_upload_json(contentObj, existingId = null) {
   // metadata base, valido SEMPRE
@@ -2204,7 +2147,6 @@ async function drive_upload_named_json(name, contentObj, existingId = null) {
 }
 
 
-
 // Scarica il contenuto del file (alt=media)
 async function drive_download_json(fileId) {
   const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
@@ -2226,8 +2168,6 @@ async function drive_debugListAll() {
     console.error("Errore nel list appDataFolder:", e);
   }
 }
-
-
 
 // ritorna la lista dei file TURNI* in appDataFolder ordinati dal più nuovo
 async function drive_listTurniFiles(accessToken) {
@@ -2253,9 +2193,6 @@ async function drive_listTurniFiles(accessToken) {
   const data = await res.json();
   return data.files || [];
 }
-
-
-
 
 // crea un nuovo file TURNI-YYYYMMDD-HHMMSS.json in appDataFolder
 async function drive_uploadTurniFile(snapshotJsonString, accessToken) {
@@ -2303,7 +2240,6 @@ async function drive_uploadTurniFile(snapshotJsonString, accessToken) {
   return await res.json();
 }
 
-
 async function drive_deleteFile(fileId, accessToken) {
   const res = await fetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId), {
     method: "DELETE",
@@ -2318,13 +2254,6 @@ async function drive_deleteFile(fileId, accessToken) {
     throw new Error("drive_deleteFile fallita: " + res.status + " " + txt);
   }
 }
-
-
-
-
-
-
-
 
 function showSaveStatus(text, color) {
   let el = document.getElementById('saveStatus');
@@ -2356,8 +2285,6 @@ function showSaveStatus(text, color) {
     el.style.opacity = '0';
   }, 3000);
 }
-
-
 
 
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
@@ -2425,17 +2352,6 @@ async function storage_saveToGoogle() {
     showSaveStatus("Errore durante il salvataggio", "#e53e3e");
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 // Importa il file canone
 async function storage_importFromGoogle() {
@@ -2508,7 +2424,6 @@ async function storage_importBackupFromGoogle() {
       if (!go) return;
     }
 
-
     const obj = await drive_download_json(chosen.id);
 
     if (obj.settings) settings_save(obj.settings);
@@ -2524,9 +2439,6 @@ async function storage_importBackupFromGoogle() {
     showSaveStatus("❌ Errore nel ripristino da Drive", "#b91c1c");
   }
 }
-
-
-
 
 
 // Prende il TURNI* più recente e lo applica, ma avvisa se perdi roba
@@ -2576,10 +2488,6 @@ async function storage_syncNewestFromDrive() {
     showSaveStatus("❌ Errore sincronizzazione", "#b91c1c");
   }
 }
-
-
-
-
 
 
 // =======================
@@ -2656,10 +2564,6 @@ acct_menuBind();
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
 }
-
-
-
-
 
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', boot_init);
