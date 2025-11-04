@@ -2620,49 +2620,50 @@ acct_menuBind();
     boot_init();
   }
 
-  // =========================================================
-  // [SERVICE WORKER] – registrazione con auto-update (invariato)
-  // =========================================================
-  (function(){
-    if (!('serviceWorker' in navigator)) return;
+  // [SERVICE WORKER] – registrazione con auto-update (fix percorsi localhost/GitHub)
+(function(){
+  if (!('serviceWorker' in navigator)) return;
 
-    const SW_VERSION = '2025-10-29-01';
-    const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
+  const SW_VERSION = '2025-11-04-01'; // bump
+  const BASE  = (location.hostname === 'localhost') ? '' : '/turni-pds';
+  const SW_URL = `${BASE}/service-worker.js?v=${SW_VERSION}`;
+  const SCOPE  = `${BASE}/`;
 
-    async function registerSW(){
-      try{
-        const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
-        if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          if (!nw) return;
-          nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              nw.postMessage({ type: 'SKIP_WAITING' });
-            }
-          });
-        });
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!window.__reloadedForSW) {
-            window.__reloadedForSW = true;
-            location.reload();
+  async function registerSW(){
+    try{
+      const reg = await navigator.serviceWorker.register(SW_URL, { scope: SCOPE });
+      if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            nw.postMessage({ type: 'SKIP_WAITING' });
           }
         });
-        reg.update().catch(()=>{});
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            reg.update().catch(()=>{});
-          }
-        });
-      }catch(e){}
-    }
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!window.__reloadedForSW) {
+          window.__reloadedForSW = true;
+          location.reload();
+        }
+      });
+      reg.update().catch(()=>{});
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          reg.update().catch(()=>{});
+        }
+      });
+    }catch(e){}
+  }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', registerSW);
-    } else {
-      registerSW();
-    }
-  })();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', registerSW);
+  } else {
+    registerSW();
+  }
+})();
+
 
   // ======================= //
   // fine JSS (script)       //
