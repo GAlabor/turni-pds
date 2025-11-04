@@ -4,7 +4,7 @@
 // Nota: la registrazione nell'index usa BASE '' in localhost e '/turni-pds' su Pages.
 // Qui ricaviamo dinamicamente il ROOT dallo scope registrato, così i percorsi non rompono.
 
-const VERSION    = '2025-11-04-01';                 // bump ad ogni deploy assieme all’index
+const VERSION    = '2025-11-04-03';                 // bump ad ogni deploy assieme all’index
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope reale della registrazione, es:
