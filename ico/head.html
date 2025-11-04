@@ -1,18 +1,39 @@
 <!-- ====== ICONS ====== -->
-<link rel="icon" type="image/png" sizes="16x16" href="/turni-pds/ico/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/turni-pds/ico/favicon-32x32.png">
-<link rel="icon" type="image/x-icon"           href="/turni-pds/ico/favicon.ico">
-<link rel="shortcut icon"                       href="/turni-pds/ico/favicon.ico">
+<!-- ICONS: inject dinamico per localhost vs GitHub Pages -->
+<script>
+(function(){
+  var BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
+  var links = [
+    // Favicon per la TAB
+    { rel: "icon", type: "image/png", sizes: "16x16", href: BASE + "/ico/favicon-16x16.png" },
+    { rel: "icon", type: "image/png", sizes: "32x32", href: BASE + "/ico/favicon-32x32.png" },
+    { rel: "icon", type: "image/x-icon",                 href: BASE + "/ico/favicon.ico"     },
+    { rel: "shortcut icon",                               href: BASE + "/ico/favicon.ico"     },
 
-<!-- Apple touch -->
-<link rel="apple-touch-icon" sizes="120x120" href="/turni-pds/ico/apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/turni-pds/ico/apple-touch-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="167x167" href="/turni-pds/ico/apple-touch-icon-167x167.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/turni-pds/ico/apple-touch-icon-180x180.png">
+    // Apple Touch (iOS usa QUESTE, non il manifest)
+    { rel: "apple-touch-icon", sizes: "180x180", href: BASE + "/ico/apple-touch-icon-180x180.png" },
 
-<!-- PWA large icons (opzionali per tab, utili per install) -->
-<link rel="icon" type="image/png" sizes="192x192" href="/turni-pds/ico/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/turni-pds/ico/icon-512.png">
+    // PWA big icons (non per la tab, ma utili)
+    { rel: "icon", type: "image/png", sizes: "192x192", href: BASE + "/ico/icon-192.png" },
+    { rel: "icon", type: "image/png", sizes: "512x512", href: BASE + "/ico/icon-512.png" }
+  ];
+
+  links.forEach(function(def){
+    var el = document.createElement("link");
+    Object.keys(def).forEach(function(k){ el.setAttribute(k, def[k]); });
+    document.head.appendChild(el);
+  });
+
+  // Paracadute per Edge in locale che tende a chiedere /favicon.ico alla root
+  if (location.hostname === "localhost") {
+    var fallback = document.createElement("link");
+    fallback.setAttribute("rel","icon");
+    fallback.setAttribute("href","/favicon.ico");
+    document.head.appendChild(fallback);
+  }
+})();
+</script>
+
 
 
 <!-- ====== THEME & META ====== -->

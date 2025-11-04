@@ -28,19 +28,48 @@
 
   <title>Turni Polizia di Stato</title>
 
-  <!-- Manifest con query di versione -->
-  <script>
-  // in locale serviamo da /, su GitHub da /turni-pds/
-  (function() {
-    var base = location.hostname === "localhost"
-      ? ""
-      : "/turni-pds";
-    var link = document.createElement("link");
-    link.rel = "manifest";
-    link.href = base + "/manifest.webmanifest";
-    document.head.appendChild(link);
-  })();
+<!-- Manifest + ICONS (iniezione dinamica base-aware) -->
+<script>
+(function () {
+  var BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
+
+  // 1) Manifest
+  var m = document.createElement("link");
+  m.rel = "manifest";
+  m.href = BASE + "/manifest.webmanifest";
+  document.head.appendChild(m);
+
+  // 2) Favicon + PWA + Apple
+  var links = [
+    // favicon per TAB
+    { rel: "icon", type: "image/png", sizes: "16x16", href: BASE + "/ico/favicon-16x16.png" },
+    { rel: "icon", type: "image/png", sizes: "32x32", href: BASE + "/ico/favicon-32x32.png" },
+    { rel: "icon", type: "image/x-icon",               href: BASE + "/ico/favicon.ico"       },
+    { rel: "shortcut icon",                             href: BASE + "/ico/favicon.ico"       },
+
+    // Apple touch (iOS usa queste, non il manifest)
+    { rel: "apple-touch-icon", sizes: "180x180", href: BASE + "/ico/apple-touch-icon-180x180.png" },
+
+    // PWA large icons (non per la tab, utili per install)
+    { rel: "icon", type: "image/png", sizes: "192x192", href: BASE + "/ico/icon-192.png" },
+    { rel: "icon", type: "image/png", sizes: "512x512", href: BASE + "/ico/icon-512.png" }
+  ];
+  links.forEach(function (def) {
+    var el = document.createElement("link");
+    for (var k in def) el.setAttribute(k, def[k]);
+    document.head.appendChild(el);
+  });
+
+  // 3) Fallback per Edge in locale: alcuni chiedono /favicon.ico alla root
+  if (location.hostname === "localhost") {
+    var f = document.createElement("link");
+    f.setAttribute("rel", "icon");
+    f.setAttribute("href", "/favicon.ico");
+    document.head.appendChild(f);
+  }
+})();
 </script>
+
 
 
   <!-- Colore tema -->
