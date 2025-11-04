@@ -191,7 +191,6 @@
   box-shadow:0 0 12px rgba(46,204,113,.25);
 }
 
-
 /* Testatina del menu: titolo + stato */
 .acct-head{
   display:flex;
@@ -1445,28 +1444,52 @@ function g_loadGisScript() {
   });
 }
 
-
-// [VERSIONE “TOLLERANTE”]
-function g_isConnected() {
-  const hasEmail = !!localStorage.getItem(LS_GOOGLE_EMAIL);
-  const exp      = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
-  const hasTok   = !!localStorage.getItem(LS_GOOGLE_TOKEN);
-  const notExpired = Date.now() < exp;
-  return hasEmail && hasTok && notExpired;
+// token valido?
+// Sei connesso SOLO se:
+// - hai un access token
+// - NON è scaduto
+// - hai anche l'email dell'utente
+// Connesso se e solo se esiste un access token NON scaduto.
+// L'email NON è più requisito (verrà recuperata in background se manca).
+function g_isConnected(){
+  const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+  const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+  if (!tok) return false;
+  if (Date.now() >= (exp - 10_000)) return false;
+  return true;
 }
 
 
-
 // UI: aggiorna le icone (testa se connesso e mostra avatar/badge)
-function g_updateIcons() {
-  const on    = g_isConnected();
-  const h     = document.getElementById("acctBtnHeader");
-  const s     = document.getElementById("acctBtnSettings");
-  const st2   = document.getElementById("cloudStatusSettings");
-  const dis   = document.getElementById("acctDisconnect");
-  const menu  = document.getElementById("acctMenu"); // il tuo menu dell’omino
+// UI: aggiorna le icone. Se il token risulta scaduto prova un refresh UNA volta.
+// Se siamo connessi ma manca la foto, prova a leggerla (silenziosamente) e poi ridisegna.
+async function g_updateIcons() {
+  const mail = localStorage.getItem(LS_GOOGLE_EMAIL) || localStorage.getItem("google_user_email") || "";
 
-  const photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
+  // Determina lo stato tentando un refresh se serve
+  let on = false;
+  try {
+    await g_ensureValidAccess(); // se serve, rinfresca
+    const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
+    const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
+    on = !!(tok && Date.now() < (exp - 10_000));
+  } catch {
+    on = false;
+  }
+
+  // Se connesso ma senza foto, prova a recuperare userinfo UNA volta
+  let photo = on ? (localStorage.getItem(LS_GOOGLE_PHOTO) || "") : "";
+  if (on && !photo) {
+    try {
+      await g_fetchUserInfo(); // aggiorna LS_GOOGLE_PHOTO se disponibile
+      photo = localStorage.getItem(LS_GOOGLE_PHOTO) || "";
+    } catch {}
+  }
+
+  const h   = document.getElementById("acctBtnHeader");
+  const s   = document.getElementById("acctBtnSettings");
+  const st2 = document.getElementById("cloudStatusSettings");
+  const dis = document.getElementById("acctDisconnect");
 
   [h, s].forEach(el => {
     if (!el) return;
@@ -1489,18 +1512,10 @@ function g_updateIcons() {
   if (st2) st2.textContent = on ? "✅ Connesso a Google" : "❌ Non collegato";
   if (dis) dis.style.display = on ? "inline-flex" : "none";
 
-  // Stato voci menu coerente
-  // Adatta gli ID alle tue voci (usa quelli che hai in pagina)
-  const mSave   = document.getElementById("menuSaveGoogle");
-  const mSync   = document.getElementById("menuSyncGoogle");
-  const mImport = document.getElementById("menuImportGoogle");
-  const mLogin  = document.getElementById("menuLoginGoogle");
-  const mLogout = document.getElementById("menuLogoutGoogle");
-
-  // Abilita/mostra a seconda dello stato
-  [mSave, mSync, mImport, mLogout].forEach(el => { if (el) el.style.display = on ? "" : "none"; });
-  if (mLogin)  mLogin.style.display  = on ? "none" : "";
-  if (menu)    menu.classList.toggle("is-connected", on);
+  // riallinea il menu in base allo stato finale
+  if (typeof acct_menuUpdateVisibility === "function") {
+    acct_menuUpdateVisibility();
+  }
 }
 
 
@@ -1595,7 +1610,6 @@ async function g_login() {
   }
 }
 
-
 // Disconnessione: revoca e pulizia locale
 let __lastDisconnectAt = 0;
 async function g_disconnect(silent = false){
@@ -1640,7 +1654,6 @@ function g_bindIconClicks(){
   newDis.addEventListener("click", () => g_disconnect(false));
 }
 
-
 // Verifica che Drive sia realmente autorizzato (spunta data)
 async function g_testDrivePermission() {
   try {
@@ -1654,7 +1667,6 @@ async function g_testDrivePermission() {
     return false;
   }
 }
-
 
 // === Recupera info utente Google ===
 async function g_fetchUserInfo() {
@@ -1689,11 +1701,11 @@ async function g_fetchUserInfo() {
   }
 }
 
-
-  // Rinnova l'access token chiedendolo alla tua mini-API su Render
+// Rinnova l'access token chiedendolo alla tua mini-API su Render
+async function g_refreshAccessToken(){
   // se abbiamo l'email dell'utente, la mandiamo, altrimenti va bene anche senza
-  async function g_refreshAccessToken() {
   const email = localStorage.getItem(LS_GOOGLE_EMAIL) || null;
+
   const res = await fetch("https://turni-mini-api.onrender.com/oauth2/refresh", {
     method: "POST",
     headers: {
@@ -1721,66 +1733,91 @@ async function g_fetchUserInfo() {
   localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(expiresAt));
 
   // non abbiamo un nuovo refresh lato browser → NON lo salviamo
+  // l'avatar lo aggiorniamo al prossimo giro
   g_updateIcons?.();
 
   return data.access_token;
 }
 
 
-
 // Garantisce che ci sia un access token valido, altrimenti prova il refresh per-utente
+// Garantisce un access token valido.
+// 1) Se il token locale è ancora valido, lo restituisce.
+// 2) Altrimenti chiama la mini-API con POST JSON (email nel body se c'è).
+// 3) Retry UNA volta su errori temporanei (500/502/503/429) con piccola attesa.
+// Garantisce un access token valido: se scaduto/chissà, chiede alla mini-API (POST JSON)
+// Tenta UN retry breve se la mini-API risponde 5xx (server che si sveglia).
 async function g_ensureValidAccess() {
   const tok = localStorage.getItem(LS_GOOGLE_TOKEN);
   const exp = parseInt(localStorage.getItem(LS_GOOGLE_EXPIRES_AT) || "0", 10);
 
-  // se il token è ancora valido, usalo
+  // Token ancora valido
   if (tok && Date.now() < (exp - 10_000)) {
     return tok;
   }
 
-  // token scaduto → chiediamo al nostro mini-server
   const email = localStorage.getItem(LS_GOOGLE_EMAIL) || "";
-  const baseUrl = "https://turni-mini-api.onrender.com/oauth2/refresh";
-  const url = email ? `${baseUrl}?email=${encodeURIComponent(email)}` : baseUrl;
+  const url   = "https://turni-mini-api.onrender.com/oauth2/refresh";
+  const body  = email ? { email } : {};
 
-  let res;
+  const attempt = async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+
+    const data = await res.json();
+    if (!data || !data.access_token) {
+      throw new Error("refresh senza token");
+    }
+
+    const newExp = Date.now() + (data.expires_in ? (data.expires_in * 1000) : 3_400_000);
+    localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
+    localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(newExp));
+    if (data.email && !localStorage.getItem(LS_GOOGLE_EMAIL)) {
+      localStorage.setItem(LS_GOOGLE_EMAIL, data.email);
+    }
+    return data.access_token;
+  };
+
   try {
-    res = await fetch(url, { method: "POST" });
-  } catch (err) {
-    console.warn("g_ensureValidAccess: fetch verso mini-API fallito", err);
-    throw new Error("Server di rinnovo offline");
+    return await attempt();
+  } catch (e) {
+    // Se il server sta ronfando e risponde 5xx, aspetta un soffio e ritenta una volta
+    const msg = String(e && e.message || "");
+    if (msg.includes("HTTP 5")) {
+      await new Promise(r => setTimeout(r, 1200));
+      return await attempt();
+    }
+    throw e;
   }
-
-  if (!res.ok) {
-    console.warn("g_ensureValidAccess: refresh HTTP", res.status);
-    throw new Error("refresh HTTP " + res.status);
-  }
-
-  const data = await res.json();
-  if (!data.access_token) {
-    console.warn("g_ensureValidAccess: risposta senza access_token", data);
-    throw new Error("refresh senza token");
-  }
-
-  // salviamo il nuovo token e scadenza
-  const newExp = Date.now() + (data.expires_in ? (data.expires_in * 1000) : 3_400_000);
-  localStorage.setItem(LS_GOOGLE_TOKEN, data.access_token);
-  localStorage.setItem(LS_GOOGLE_EXPIRES_AT, String(newExp));
-
-  // se il server ci rimanda anche l'email e noi non l'avevamo → salvala
-  if (data.email && !localStorage.getItem(LS_GOOGLE_EMAIL)) {
-    localStorage.setItem(LS_GOOGLE_EMAIL, data.email);
-  }
-
-  return data.access_token;
 }
 
 
+
 // === MENU OMINO: toggle e azioni ===
-function acct_menuUpdateVisibility(){
-  const on = g_isConnected?.() || false;
+// Aggiorna la visibilità voci menù provando prima un refresh silenzioso se serve
+async function acct_menuUpdateVisibility(){
   const m = document.getElementById("acctMenu");
   if(!m) return;
+
+  // Stato "grezzo"
+  let on = (typeof g_isConnected === "function") ? g_isConnected() : false;
+
+  // Se risulta off, prova UN refresh silenzioso
+  if (!on) {
+    try {
+      await g_ensureValidAccess();
+      on = g_isConnected();
+    } catch {
+      // resta off
+    }
+  }
 
   const elLogin  = m.querySelector('[data-act="login"]');
   const elSave   = m.querySelector('[data-act="save"]');
@@ -1794,7 +1831,17 @@ function acct_menuUpdateVisibility(){
   if (elImport) elImport.style.display = on ? "block" : "none";
   if (elOut)    elOut.style.display    = on ? "block" : "none";
 
-  acct_menuRenderHeadStatus();
+  // Testatina di stato
+  const elHead = document.getElementById("acctHeadStatus");
+  if (elHead){
+    if (on){
+      elHead.textContent = "Sincronizzazione attiva";
+      elHead.classList.add("is-on"); elHead.classList.remove("is-off");
+    } else {
+      elHead.textContent = "Non collegato";
+      elHead.classList.add("is-off"); elHead.classList.remove("is-on");
+    }
+  }
 }
 
 
@@ -1926,7 +1973,6 @@ function acct_menuBind(){
     }
   });
 
-
   // 3) Click fuori: chiudi (ma ignora click dentro menù o sul bottone)
   document.addEventListener("click", (e)=>{
     if (!m.classList.contains("show")) return;
@@ -1957,7 +2003,6 @@ function acct_menuPortalize(){
     document.body.appendChild(m);
   }
 }
-
 
 // bootstrap per lo stato account (riuso in boot_init esistente)
 g_updateIcons();
@@ -2139,7 +2184,6 @@ async function drive_upload_named_json(name, contentObj, existingId = null) {
   return res.json();
 }
 
-
 // Scarica il contenuto del file (alt=media)
 async function drive_download_json(fileId) {
   const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
@@ -2161,6 +2205,7 @@ async function drive_debugListAll() {
     console.error("Errore nel list appDataFolder:", e);
   }
 }
+
 
 // ritorna la lista dei file TURNI* in appDataFolder ordinati dal più nuovo
 async function drive_listTurniFiles(accessToken) {
@@ -2233,6 +2278,7 @@ async function drive_uploadTurniFile(snapshotJsonString, accessToken) {
   return await res.json();
 }
 
+
 async function drive_deleteFile(fileId, accessToken) {
   const res = await fetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId), {
     method: "DELETE",
@@ -2282,13 +2328,6 @@ function showSaveStatus(text, color) {
 
 // Salva (manuale) con rotazione 10 versioni, senza TURNI.json
 async function storage_saveToGoogle() {
-
-// GUARD: senza email niente salvataggio
-{
-  const email = localStorage.getItem(LS_GOOGLE_EMAIL);
-  if (!email) { ui_toast && ui_toast("Accedi con Google per salvare"); g_updateIcons && g_updateIcons(); return; }
-}
-
   if (!g_isConnected()) {
     showSaveStatus("Non sei connesso a Google", "#e53e3e");
     return;
@@ -2353,6 +2392,8 @@ async function storage_saveToGoogle() {
   }
 }
 
+
+
 // Importa il file canone
 async function storage_importFromGoogle() {
   if (!g_isConnected()) {
@@ -2383,7 +2424,9 @@ async function storage_importFromGoogle() {
   }
 }
 
-  // Importa una delle versioni TURNI* dall'appDataFolder, con avviso se perderai modifiche
+
+// Importa una delle versioni TURNI* dall'appDataFolder, con avviso se perderai modifiche
+// Importa una delle versioni TURNI* dall'appDataFolder
 async function storage_importBackupFromGoogle() {
   if (!g_isConnected()) {
     alert("Non sei connesso a Google.");
@@ -2391,7 +2434,8 @@ async function storage_importBackupFromGoogle() {
   }
 
   try {
-    const files = await drive_listTurniFiles();
+    const accessToken = await g_ensureValidAccess();
+    const files = await drive_listTurniFiles(accessToken);
     if (!files.length) {
       alert("Nessun backup disponibile su Drive.");
       return;
@@ -2411,11 +2455,7 @@ async function storage_importBackupFromGoogle() {
       return;
     }
 
-    // confronto con locale prima di importare
-    const localPayload  = storage_buildPayload();
-    const localSnapshot = JSON.stringify(localPayload);
-
-     if (__hasUnsavedChanges) {
+    if (typeof __hasUnsavedChanges !== "undefined" && __hasUnsavedChanges) {
       const go = confirm(
         "Hai modifiche locali non salvate.\n" +
         "Se importi un backup, le perderai.\n\n" +
@@ -2432,7 +2472,9 @@ async function storage_importBackupFromGoogle() {
     ui_settingsInit();
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
 
-    __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+    if (typeof storage_buildPayload === "function") {
+      __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+    }
     showSaveStatus(`✅ Ripristinato: ${chosen.name}`, "#0f766e");
   } catch (e) {
     console.error(e);
@@ -2441,7 +2483,10 @@ async function storage_importBackupFromGoogle() {
 }
 
 
+
+
 // Prende il TURNI* più recente e lo applica, ma avvisa se perdi roba
+// Prende il TURNI* più recente e lo applica, avvisando se perdi roba
 async function storage_syncNewestFromDrive() {
   if (!g_isConnected()) {
     alert("Non sei connesso a Google.");
@@ -2449,8 +2494,11 @@ async function storage_syncNewestFromDrive() {
   }
 
   try {
-    // prendo tutti i TURNI* su Drive
-    const files = await drive_listTurniFiles();
+    // 1) TOKEN VALIDO
+    const accessToken = await g_ensureValidAccess();
+
+    // 2) LISTA FILE con TOKEN
+    const files = await drive_listTurniFiles(accessToken);
     if (!files.length) {
       alert("Nessun file TURNI trovato in Drive.");
       return;
@@ -2458,8 +2506,8 @@ async function storage_syncNewestFromDrive() {
 
     const latest = files[0];
 
-    // se hai modifiche non salvate, avvisa prima
-    if (__hasUnsavedChanges) {
+    // 3) Avviso se hai modifiche locali
+    if (typeof __hasUnsavedChanges !== "undefined" && __hasUnsavedChanges) {
       const go = confirm(
         "Attenzione: hai modifiche locali non salvate.\n" +
         "Se sincronizzi ora verranno sovrascritte dai dati Drive.\n\n" +
@@ -2468,19 +2516,20 @@ async function storage_syncNewestFromDrive() {
       if (!go) return;
     }
 
-    // scarico quello remoto
+    // 4) SCARICO e APPLICO
     const remoteObj = await drive_download_json(latest.id);
-
-    // applico il remoto
     if (remoteObj.settings) settings_save(remoteObj.settings);
     if (Array.isArray(remoteObj.defs)) defs_save(remoteObj.defs);
 
     ui_settingsInit();
     render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
 
-    // da ora in poi il locale è uguale al remoto
-    __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
-    __hasUnsavedChanges = false;
+    if (typeof storage_buildPayload === "function") {
+      __lastSavedSnapshot = JSON.stringify(storage_buildPayload());
+    }
+    if (typeof __hasUnsavedChanges !== "undefined") {
+      __hasUnsavedChanges = false;
+    }
 
     showSaveStatus(`✅ Sincronizzato: ${latest.name}`, "#0f766e");
   } catch (e) {
@@ -2572,55 +2621,48 @@ acct_menuBind();
   }
 
   // =========================================================
-// [SERVICE WORKER] – registrazione con auto-update (invariato)
-// =========================================================
-(function() {
-  if (!('serviceWorker' in navigator)) return;
+  // [SERVICE WORKER] – registrazione con auto-update (invariato)
+  // =========================================================
+  (function(){
+    if (!('serviceWorker' in navigator)) return;
 
-  const SW_VERSION = '2025-10-29-01';
-  const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
+    const SW_VERSION = '2025-10-29-01';
+    const SW_URL = `/turni-pds/service-worker.js?v=${SW_VERSION}`;
 
-  async function registerSW() {
-    try {
-      const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
-
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
-
-      reg.addEventListener('updatefound', () => {
-        const nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener('statechange', () => {
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            nw.postMessage({ type: 'SKIP_WAITING' });
+    async function registerSW(){
+      try{
+        const reg = await navigator.serviceWorker.register(SW_URL, { scope: '/turni-pds/' });
+        if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              nw.postMessage({ type: 'SKIP_WAITING' });
+            }
+          });
+        });
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!window.__reloadedForSW) {
+            window.__reloadedForSW = true;
+            location.reload();
           }
         });
-      });
+        reg.update().catch(()=>{});
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            reg.update().catch(()=>{});
+          }
+        });
+      }catch(e){}
+    }
 
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!window.__reloadedForSW) {
-          window.__reloadedForSW = true;
-          location.reload();
-        }
-      });
-
-      reg.update().catch(() => {});
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          reg.update().catch(() => {});
-        }
-      });
-    } catch (e) {}
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', registerSW);
-  } else {
-    registerSW();
-  }
-})();
-
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', registerSW);
+    } else {
+      registerSW();
+    }
+  })();
 
   // ======================= //
   // fine JSS (script)       //
