@@ -1565,6 +1565,12 @@ acct_menuBind();
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
   requestAnimationFrame(ui_updateTopbarGlowCenter);
   setInterval(() => fetch("https://turni-mini-api.onrender.com/ping").catch(()=>{}), 14 * 60 * 1000);
+  // Se l’app è installata come PWA, sveglia Render dopo 5 secondi
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    setTimeout(() => {
+      fetch("https://turni-mini-api.onrender.com/ping").catch(()=>{});
+    }, 5000);
+  }
 }
 
 
