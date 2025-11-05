@@ -1573,7 +1573,6 @@ acct_menuBind();
   }
 }
 
-
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', boot_init);
   } else {

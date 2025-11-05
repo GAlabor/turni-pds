@@ -692,21 +692,31 @@
   max-height: 38px; /* o il valore che usavi per l'SVG originale */
 }
 
-/* =========================================================
-   [UI tweak] Riduci scritta "Accedi" nella PWA standalone
-   ========================================================= */
-@media (display-mode: standalone) {
+/* ==============================================
+   [FIX] Bottone "Accedi" – dimensioni più compatte
+   ============================================== */
+#acctBtnHeader.acct-login {
+  font-size: 0.78rem !important;
+  height: 28px !important;
+  min-width: 68px !important;
+  padding: 0 8px !important;
+  border-radius: 6px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.2px;
+}
+
+/* In modalità PWA o schermi stretti: ancora più compatto */
+@media (display-mode: standalone), (max-width: 480px) {
   #acctBtnHeader.acct-login {
-    min-width: 80px;
-    height: 32px;
-    font-size: .8rem;
-    padding: 0 10px;
-  }
-  #acctBtnHeader .acct-login-label {
-    font-size: .8rem;
-    letter-spacing: .1px;
+    font-size: 0.74rem !important;
+    height: 26px !important;
+    min-width: 60px !important;
+    padding: 0 6px !important;
+    border-radius: 5px !important;
   }
 }
+
+
 
 
 
