@@ -1,48 +1,41 @@
 // ==============================
-// Turni PDS — Service Worker
+// Turni PDS — Service Worker (pulito)
 // ==============================
-// Nota: la registrazione nell'index usa BASE '' in localhost e '/turni-pds' su Pages.
-// Qui ricaviamo dinamicamente il ROOT dallo scope registrato, così i percorsi non rompono.
 
-const VERSION    = '2025-11-04-03';                 // bump ad ogni deploy assieme all’index
+const VERSION    = '2025-11-06-02';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
-// Scope reale della registrazione, es:
-// - localhost  → scope "http://localhost:8000/"
-// - GitHub     → scope "https://.../turni-pds/"
-// Da qui ricaviamo il ROOT da premettere ai path ("" o "/turni-pds")
+// Scope e root dinamici
 const SCOPE_URL = new URL(self.registration.scope);
-const ROOT = SCOPE_URL.pathname.replace(/\/$/, ''); // "" oppure "/turni-pds"
+const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
 
-// Precache minimo per offline affidabile (icone spostate in /ico)
+// Precache minimo per offline affidabile
 const PRECACHE_URLS = [
   `${ROOT}/`,
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
+  `${ROOT}/app.css`,
+  `${ROOT}/app.js`,
+  `${ROOT}/version.txt`,
+  `${ROOT}/logo_polizia.svg`,
+  `${ROOT}/favicon.ico`,
   `${ROOT}/ico/icon-192.png`,
   `${ROOT}/ico/icon-512.png`,
-  `${ROOT}/redirect/`,
-  `${ROOT}/redirect/index.html`
+  `${ROOT}/ico/icon-1024.png`
 ];
 
-// Normalizza richieste HTML verso l’index corretto nello scope
+// Normalizza richieste HTML verso index
 function normalizeHTMLRequest(req) {
   const url = new URL(req.url);
-
-  // Solo same-origin
   if (url.origin !== self.location.origin) return req;
-
-  // Fuori dallo scope? Non tocchiamo nulla
   if (!(url.pathname === ROOT || url.pathname.startsWith(ROOT + '/'))) return req;
 
-  // Navigazioni o Accept: text/html → potremmo rimpiazzare con la nostra index
-  const wantsHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  const wantsHTML =
+    req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
 
-  if (wantsHTML) {
-    // Home dello scope → servi index.html
-    if (url.pathname === ROOT || url.pathname === ROOT + '/') {
-      return new Request(`${ROOT}/index.html`, { credentials: 'same-origin' });
-    }
+  if (wantsHTML && (url.pathname === ROOT || url.pathname === ROOT + '/')) {
+    return new Request(`${ROOT}/index.html`, { credentials: 'same-origin' });
   }
   return req;
 }
@@ -51,7 +44,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
     await cache.addAll(PRECACHE_URLS);
-    await self.skipWaiting(); // prendi controllo subito
+    await self.skipWaiting();
   })());
 });
 
@@ -65,46 +58,31 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-// Consenti al client di forzare l’attivazione della nuova versione
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // Ignora non-GET
   if (req.method !== 'GET') return;
-
-  // Ignora cross-origin (Drive/OAuth/Google ecc.)
   const sameOrigin = new URL(req.url).origin === self.location.origin;
   if (!sameOrigin) return;
 
-  // HTML: network-first con fallback coerente alla pagina richiesta
-  const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  const isHTML =
+    req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+
   if (isHTML) {
     const htmlReq = normalizeHTMLRequest(req);
     event.respondWith((async () => {
       try {
         const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
-
-        // Decidi la chiave cache in base al path richiesto
-        const url = new URL(htmlReq.url);
-        let cacheKey = `${ROOT}/index.html`;
-        if (url.pathname.startsWith(`${ROOT}/redirect/`)) {
-          cacheKey = `${ROOT}/redirect/index.html`;
-        }
-
         const cache = await caches.open(CACHE_NAME);
-        cache.put(cacheKey, fresh.clone());
+        cache.put(`${ROOT}/index.html`, fresh.clone());
         return fresh;
       } catch {
-        // Fallback: prova la pagina coerente con la richiesta
-        const isRedirect = new URL(htmlReq.url).pathname.startsWith(`${ROOT}/redirect/`);
-        const fallbackKey = isRedirect ? `${ROOT}/redirect/index.html` : `${ROOT}/index.html`;
-        const cached = await caches.match(fallbackKey);
+        const cached = await caches.match(`${ROOT}/index.html`);
         return cached || new Response('<h1>Offline</h1><p>Nessuna cache disponibile.</p>', {
           headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: 503
         });
@@ -113,11 +91,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Asset statici: cache-first con refresh in background
+  // Asset statici → cache-first con refresh in background
   event.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) {
-      // Aggiorna in background
       event.waitUntil((async () => {
         try {
           const fresh = await fetch(req, { cache: 'no-store' });
@@ -133,7 +110,6 @@ self.addEventListener('fetch', (event) => {
       cache.put(req, resp.clone());
       return resp;
     } catch {
-      // Fallback estremo: se è una navigazione prova la home
       if (req.mode === 'navigate') {
         const home = await caches.match(`${ROOT}/index.html`);
         if (home) return home;

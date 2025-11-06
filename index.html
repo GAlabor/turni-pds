@@ -1,15 +1,10 @@
-<!-- inizio html            -->
-<!-- ======================= -->
 <!doctype html>
 <html lang="it">
-<!-- ======================= -->
-<!-- inizio head            -->
-<!-- ======================= -->
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Canonicalizza l’URL su /turni-pds/ ed evita il BFCache zombie -->
+  <!-- Canonicalizza l’URL su /turni-pds/ -->
   <script>
   (function(){
     var p = location.pathname;
@@ -19,111 +14,66 @@
   })();
   </script>
 
-  <!-- Spingi i browser a non cacheare l'HTML -->
+  <!-- Evita cache dell'HTML -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
   <title>Turni Polizia di Stato</title>
 
-<!-- Manifest + ICONS (iniezione dinamica base-aware) -->
-<script>
-(function () {
-  var BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
+  <!-- Manifest + ICONS (iniezione dinamica base-aware) -->
+  <script>
+  (function () {
+    var BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
 
-  // 1) Manifest
-  var m = document.createElement("link");
-  m.rel = "manifest";
-  m.href = BASE + "/manifest.webmanifest";
-  document.head.appendChild(m);
+    // Manifest
+    var m = document.createElement("link");
+    m.rel = "manifest";
+    m.href = BASE + "/manifest.webmanifest";
+    document.head.appendChild(m);
 
-  // 2) Favicon + PWA + Apple
-  var links = [
-    // favicon per TAB
-    { rel: "icon", type: "image/png", sizes: "16x16", href: BASE + "/ico/favicon-16x16.png" },
-    { rel: "icon", type: "image/png", sizes: "32x32", href: BASE + "/ico/favicon-32x32.png" },
-    { rel: "icon", type: "image/x-icon",               href: BASE + "/ico/favicon.ico"       },
-    { rel: "shortcut icon",                             href: BASE + "/ico/favicon.ico"       },
+    // Icone
+    var links = [
+      { rel: "icon", type: "image/png", sizes: "16x16", href: BASE + "/ico/favicon-16x16.png" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: BASE + "/ico/favicon-32x32.png" },
+      { rel: "icon", type: "image/png", sizes: "48x48", href: BASE + "/ico/favicon-48x48.png" },
+      { rel: "icon", type: "image/x-icon",               href: BASE + "/favicon.ico"          },
+      { rel: "shortcut icon",                             href: BASE + "/favicon.ico"          },
+      { rel: "apple-touch-icon", sizes: "180x180", href: BASE + "/ico/apple-touch-icon-180x180-flat.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: BASE + "/ico/icon-192.png" },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: BASE + "/ico/icon-512.png" }
+    ];
+    links.forEach(function (def) {
+      var el = document.createElement("link");
+      for (var k in def) el.setAttribute(k, def[k]);
+      document.head.appendChild(el);
+    });
 
-    // Apple touch (iOS usa queste, non il manifest)
-    { rel: "apple-touch-icon", sizes: "180x180", href: BASE + "/ico/apple-touch-icon-180x180-flat.png" },
+    // Fallback favicon in locale
+    if (location.hostname === "localhost") {
+      var f = document.createElement("link");
+      f.setAttribute("rel", "icon");
+      f.setAttribute("href", "/favicon.ico");
+      document.head.appendChild(f);
+    }
+  })();
+  </script>
 
-    // PWA large icons (non per la tab, utili per install)
-    { rel: "icon", type: "image/png", sizes: "192x192", href: BASE + "/ico/icon-192.png" },
-    { rel: "icon", type: "image/png", sizes: "512x512", href: BASE + "/ico/icon-512.png" }
-  ];
-  links.forEach(function (def) {
-    var el = document.createElement("link");
-    for (var k in def) el.setAttribute(k, def[k]);
-    document.head.appendChild(el);
-  });
+  <!-- Tema scuro coerente -->
+  <meta name="theme-color" content="#0a0f14">
 
-  // 3) Fallback per Edge in locale: alcuni chiedono /favicon.ico alla root
-  if (location.hostname === "localhost") {
-    var f = document.createElement("link");
-    f.setAttribute("rel", "icon");
-    f.setAttribute("href", "/favicon.ico");
-    document.head.appendChild(f);
-  }
-})();
-</script>
-
-  <!-- Colore tema -->
-  <meta name="theme-color" content="#387cff">
-
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <!--- STYLE --->
   <link rel="stylesheet" href="app.css">
-
-
 </head>
-<!-- ======================= -->
-<!-- fine head             -->
-<!-- ======================= -->
-<!-- ======================= -->
-<!-- inizio body            -->
-<!-- ======================= -->
 <body>
-  <div class="dither" aria-hidden="true"></div>
 
-     <!-- =======================================================
-     [HTML-TOPBAR] Logo + scritta POLIZIA + omino a destra
-     ======================================================= -->
-<div class="topbar" aria-label="Intestazione Polizia">
-  <div class="brandmark" aria-label="Polizia" role="img">
-    <!-- SVG POLIZIA  -->
-    <div id="logoContainer"></div>
+  <!-- TOPBAR -->
+  <div class="topbar" aria-label="Intestazione Polizia">
+    <div class="brandmark" aria-label="Polizia" role="img">
+      <div id="logoContainer"></div>
+    </div>
   </div>
 
-<!-- SLOT DESTRO CON OMINO + MENU -->
-<div class="topbar-right">
-  <button id="acctBtnHeader"
-          class="dropboxIconBtn dbx-off"
-          title="Account"
-          aria-label="Account"
-          aria-haspopup="menu"
-          aria-controls="acctMenu"
-          aria-expanded="false"
-          type="button"></button>
-
-  <!-- Menu a tendina -->
-<div id="acctMenu" class="acct-menu" role="menu" aria-hidden="true"
-     style="position:fixed;display:none;left:-9999px;top:-9999px;z-index:9999;">
-  <button type="button" class="acct-item" data-act="save">Salva</button>
-  <button type="button" class="acct-item" data-act="sync">Sincronizza</button>
-  <button type="button" class="acct-item" data-act="backup">Backup</button>
-  <div class="acct-sep"></div>
-  <button type="button" class="acct-item danger" data-act="logout">Disconnetti</button>
-</div>
-
-</div>
-
-</div>
-
-  <!-- =======================================================
-       [HTML-CALENDAR VIEW] Vista calendario
-       ======================================================= -->
+  <!-- CALENDAR VIEW -->
   <main>
     <section class="view active" id="view-calendar">
       <div class="monthbar">
@@ -131,67 +81,22 @@
         <div class="title" id="monthLabel">ottobre 2025</div>
         <button class="navbtn" id="next">&#x276F;</button>
       </div>
-      <div class="weekhead"><div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div></div>
+      <div class="weekhead">
+        <div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div>
+      </div>
       <section class="grid" role="grid" aria-labelledby="monthLabel"></section>
     </section>
 
-    <!-- =====================================================
-         [HTML-SETTINGS VIEW] Vista impostazioni
-         ===================================================== -->
+    <!-- SETTINGS VIEW -->
     <section class="view" id="view-settings">
       <div class="settingsCard" id="set-turni">
-        <!-- [SET-REF SHIFT] Primo giorno -->
         <div class="settingsRow" style="grid-template-columns:120px 1fr">
           <label>Primo giorno</label>
           <input type="date" id="startDate" />
         </div>
 
-        <!-- =========================================================
-             [UI-ACTIONS] Salva su Google + Importa da Google (icone)
-             ========================================================= -->
-        <div class="settingsRow" style="grid-template-columns:1fr; align-items:center; margin-top:6px">
-          <div class="actionIcons">
-            <!-- Salva su Google -->
-            <button id="btnSaveCloud" class="btn-icon" aria-label="Salva su Google" title="Salva su Google">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7.5 3h9a2 2 0 0 1 2 2v14a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2Z" />
-                <path d="M8 12h8M12 8v8" />
-              </svg>
-            </button>
-
-            <!-- Importa da Google -->
-            <button id="btnImportCloud" class="btn-icon" aria-label="Importa da Google" title="Importa da Google">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7.5 3h9a2 2 0 0 1 2 2v14a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2Z" />
-                <path d="M12 16V8M12 8l-3 3M12 8l3 3" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- =========================================================
-             [UI-ACCOUNT ICON SETTINGS] Icona + stato + Disconnetti
-             ========================================================= -->
-        <div class="settingsRow" style="grid-template-columns:1fr;align-items:center">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <button id="acctBtnSettings" class="dropboxIconBtn dbx-off" title="Accedi con Google" aria-label="Accedi con Google">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" fill="currentColor"/>
-              </svg>
-            </button>
-
-            <span id="cloudStatusSettings" class="todayDate"></span>
-
-            <!-- Pulsante disconnessione: visibile solo quando connessi -->
-            <button id="acctDisconnect" type="button" class="textbtn textbtn-danger" style="display:none">
-              Disconnetti
-            </button>
-          </div>
-        </div>
-
         <hr style="border:none;border-top:1px solid var(--gridBorder);margin:12px 0" />
 
-        <!-- [SET-HEAD] Intestazioni turni -->
         <div class="settingsRow turni-grid turni-head">
           <div style="font-weight:700;color:var(--muted)">Turno</div>
           <div style="font-weight:700;color:var(--muted)">Sigla</div>
@@ -201,7 +106,6 @@
         </div>
         <div class="thin-sep"></div>
 
-        <!-- [SET-ADD ROW] Riga “Aggiungi turno” -->
         <div class="settingsRow turni-grid" style="align-items:center">
           <div><input id="newNome"></div>
           <div><input id="newSigla" class="siglaInput" maxlength="4"></div>
@@ -210,32 +114,12 @@
           <button id="btnAddTurno" type="button" class="iconbtn iconbtn-primary" title="Aggiungi">+</button>
         </div>
 
-        <!-- [SET-LIST] Elenco turni -->
         <div id="turniList"></div>
       </div>
     </section>
-
-    <!-- =========================================================
-         [UI-ACCOUNT MODAL] Popup collegamento Google (simulato)
-         ========================================================= -->
-    <div id="acctModal" class="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="acctModalTitle">
-      <div class="modalCard">
-        <div class="modalHeader">
-          <div class="modalTitle" id="acctModalTitle">Accedi con Google</div>
-          <button id="acctModalClose" class="iconbtn iconbtn-danger" title="Chiudi">✕</button>
-        </div>
-        <div class="modalBody">
-          <!-- Verrà avviata la procedura di accesso a Google. In questa build è una simulazione: vedrai l’icona cambiare e potrai salvare/importare dati di prova. Inseriremo più avanti il tuo <em>Client ID</em> per attivare Drive AppData reale.-->
-        </div>
-        <div class="modalActions">
-          <button id="acctModalGo" class="savebtn">Procedi</button>
-        </div>
-      </div>
-    </div>
   </main>
-  <!-- =======================================================
-       [HTML-TABBAR] Navigazione inferiore
-       ======================================================= -->
+
+  <!-- TABBAR -->
   <nav class="tabbar" aria-label="Barra schede">
     <div class="tab active" data-tab="calendar" aria-label="Calendario">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -267,15 +151,24 @@
     </div>
   </nav>
 
-<!-- SCRIPT PRINCIPALE-->
-<script src="app.js" defer></script>
+  <!-- Etichetta versione -->
+  <div id="versionLabel" class="version-label"></div>
 
+  <script src="app.js" defer></script>
+
+  <!-- Lettura versione da file esterno -->
+  <script>
+  (async function(){
+    try {
+      const res = await fetch("version.txt", { cache: "no-store" });
+      if (!res.ok) throw new Error();
+      const text = await res.text();
+      document.getElementById("versionLabel").textContent = text.trim();
+    } catch {
+      document.getElementById("versionLabel").textContent = "";
+    }
+  })();
+  </script>
 
 </body>
-<!-- ======================= -->
-<!-- fine body             -->
-<!-- ======================= -->
 </html>
-<!-- ======================= -->
-<!-- fine html             -->
-<!-- ======================= -->
