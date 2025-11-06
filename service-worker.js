@@ -1,8 +1,8 @@
 // ==============================
-// Turni PDS — Service Worker (pulito)
+// Turni PDS — Service Worker (migliorato con navigationPreload)
 // ==============================
 
-const VERSION    = '2025-11-06-02';
+const VERSION    = '2025-11-06-04';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -51,9 +51,13 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    );
+    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+
+    // Abilita navigationPreload per velocizzare i navigate fetch
+    if (self.registration.navigationPreload) {
+      try { await self.registration.navigationPreload.enable(); } catch {}
+    }
+
     await self.clients.claim();
   })());
 });
@@ -75,11 +79,21 @@ self.addEventListener('fetch', (event) => {
 
   if (isHTML) {
     const htmlReq = normalizeHTMLRequest(req);
+
     event.respondWith((async () => {
+      const cache = await caches.open(CACHE_NAME);
+
+      // prova preloadResponse se disponibile
+      const preload = event.preloadResponse ? await event.preloadResponse : null;
+      if (preload) {
+        // aggiorna cache e ritorna preload
+        try { cache.put(`${ROOT}/index.html`, preload.clone()); } catch {}
+        return preload;
+      }
+
       try {
         const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(`${ROOT}/index.html`, fresh.clone());
+        try { cache.put(`${ROOT}/index.html`, fresh.clone()); } catch {}
         return fresh;
       } catch {
         const cached = await caches.match(`${ROOT}/index.html`);

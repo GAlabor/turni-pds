@@ -28,7 +28,11 @@
 
 /* BASE */
 *{box-sizing:border-box}
+html, body { height: 100%; }
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,"Helvetica Neue",Arial}
+body.no-scroll { overflow: hidden; }
+
+main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 
 /* TOPBAR (glow) */
 .topbar{
@@ -74,7 +78,6 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .brandmark svg{display:block;height:24px;width:auto;transform: scale(var(--wmScale, 1.80));transform-origin: center;}
 
 /* LAYOUT */
-main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 .monthbar{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; margin:10px 0 6px; }
 .monthbar .title{ text-align:center }
 
@@ -89,9 +92,6 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 .navbtn:active{ background:var(--actActive); color:var(--actColorHi); transform:translateY(1px); }
 
 .weekhead{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; padding:3px 3px 0; }
-html, body { height: 100%; }
-body.no-scroll { overflow: hidden; }
-body.no-scroll main{ margin-bottom: calc(var(--tabH) + 12px); overflow: clip; }
 .view{ display:none } .view.active{ display:block }
 
 /* CALENDAR GRID */
@@ -107,7 +107,6 @@ body.no-scroll main{ margin-bottom: calc(var(--tabH) + 12px); overflow: clip; }
 .T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
 .cell:hover::before{ background:var(--actHover); }
 .cell:active::before{ background:var(--actActive); }
-.cell.selected::before{ background:var(--actActive); }
 
 @media(max-width:560px){
   .grid{ grid-auto-rows:minmax(48px,1fr); }
@@ -137,7 +136,7 @@ body.no-scroll main{ margin-bottom: calc(var(--tabH) + 12px); overflow: clip; }
 .tab.active{ color:var(--tabColorActive); background:var(--tabActiveBg); font-weight:700; }
 .tab:hover{ background:var(--tabHoverBg); color:var(--tabColorActive); transform:translateY(-1px); }
 .tab:active{ background:var(--tabActiveBg); transform:translateY(1px); }
-.tab span{ line-height:1; }
+
 @media (max-width:560px){ :root{ --tabW:48px; --tabH:40px; --tabIcon:18px; } }
 
 /* FORMS */
@@ -148,7 +147,7 @@ body.no-scroll main{ margin-bottom: calc(var(--tabH) + 12px); overflow: clip; }
 .iconbtn:active{transform:translateY(1px)}
 @media(max-width:560px){ .settingsRow{grid-template-columns:120px 1fr} }
 
-/* Hide topbar in settings when requested */
+/* Hide topbar in settings quando richiesto */
 .hide-topbar .topbar{ display: none !important; }
 .hide-topbar main{ margin-top: 8px; }
 
@@ -244,12 +243,11 @@ body{ background: var(--bg) fixed !important; color: var(--text); }
   background: #0e141b !important; border: 1px solid var(--gridBorder) !important; color: var(--text) !important;
 }
 
-/* === Version badge responsive === */
+/* === Version badge coerente === */
 .version-label {
   position: fixed;
-  bottom: 0;              /* <-- invece di 6px */
+  bottom: 6px;
   left: 10px;
-  transform: translateY(-4px); /* piccolo margine visivo verso l’alto */
   font-weight: 600;
   letter-spacing: .2px;
   color: var(--muted, #bbb);
@@ -259,19 +257,6 @@ body{ background: var(--bg) fixed !important; color: var(--text); }
   z-index: 9999;
   font-size: 14px;
 }
-
-/* schermi larghi: un filo più grande */
-@media (min-width: 1200px) {
-  .version-label { font-size: 15px; }
-}
-
-/* webapp installata (PWA standalone): più compatto */
-@media (display-mode: standalone) {
-  .version-label { font-size: 11px; opacity: .65; }
-}
-
-/* telefoni/tablet in browser: riduci un po' */
-@media (max-width: 600px) {
-  .version-label { font-size: 12px; }
-}
-
+@media (min-width: 1200px) { .version-label { font-size: 15px; } }
+@media (display-mode: standalone) { .version-label { font-size: 11px; opacity: .65; } }
+@media (max-width: 600px) { .version-label { font-size: 12px; } }

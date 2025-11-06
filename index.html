@@ -77,11 +77,11 @@
   <main>
     <section class="view active" id="view-calendar">
       <div class="monthbar">
-        <button class="navbtn" id="prev">&#x276E;</button>
-        <div class="title" id="monthLabel">ottobre 2025</div>
-        <button class="navbtn" id="next">&#x276F;</button>
+        <button class="navbtn" id="prev" aria-label="Mese precedente">&#x276E;</button>
+        <div class="title" id="monthLabel" aria-live="polite"></div>
+        <button class="navbtn" id="next" aria-label="Mese successivo">&#x276F;</button>
       </div>
-      <div class="weekhead">
+      <div class="weekhead" aria-hidden="true">
         <div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div>
       </div>
       <section class="grid" role="grid" aria-labelledby="monthLabel"></section>
@@ -91,7 +91,7 @@
     <section class="view" id="view-settings">
       <div class="settingsCard" id="set-turni">
         <div class="settingsRow" style="grid-template-columns:120px 1fr">
-          <label>Primo giorno</label>
+          <label for="startDate">Primo giorno</label>
           <input type="date" id="startDate" />
         </div>
 
@@ -107,9 +107,9 @@
         <div class="thin-sep"></div>
 
         <div class="settingsRow turni-grid" style="align-items:center">
-          <div><input id="newNome"></div>
-          <div><input id="newSigla" class="siglaInput" maxlength="4"></div>
-          <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00"></textarea>
+          <div><input id="newNome" aria-label="Nome turno"></div>
+          <div><input id="newSigla" class="siglaInput" maxlength="4" aria-label="Sigla turno"></div>
+          <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00" aria-label="Orario turno su due righe"></textarea>
           <div class="colorCell"><input id="newColor" class="colorInput" type="color" value="#8e88ff" title="Colore"></div>
           <button id="btnAddTurno" type="button" class="iconbtn iconbtn-primary" title="Aggiungi">+</button>
         </div>

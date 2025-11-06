@@ -1,4 +1,4 @@
-// [JS-MAIN] Turni PDS — versione pulita (nessuna persistenza, nessun account)
+// [JS-MAIN] Turni PDS — versione con fix sicurezza/performance
 
 "use strict";
 
@@ -7,7 +7,22 @@
 // ======================= //
 function util_jsWeekdayUTC(d){ return (d.getUTCDay()+6)%7 } // Lunedì=0 … Domenica=6
 function util_pad2(n){ return n.toString().padStart(2,'0') }
-function util_fmtMonth(fmt,y,m){ return fmt.format(new Date(y,m,1)) }
+function util_fmtMonth(fmt,y,m){ return fmt.format(new Date(Date.UTC(y,m,1))) }
+
+// Escaping base per testo da inserire in HTML
+function esc(s){
+  return String(s ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+// Valida colore in formato #rgb/#rrggbb/#rrggbbaa
+function isSafeHexColor(s){
+  return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(String(s||"").trim());
+}
 
 function util_splitOrario(s){
   const parts = String(s||'').split(/[-–—]/).map(x=>x.trim());
@@ -24,8 +39,12 @@ function util_joinOrarioMultiline(txt){
 // STATO IN MEMORIA        //
 // ======================= //
 const itMonth = new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'});
-const today   = new Date();
-let   view    = new Date(Date.UTC(today.getFullYear(), today.getMonth(), 1));
+
+// Today coerente in UTC
+const now = new Date();
+const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+let view = new Date(Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), 1));
 
 const grid        = document.querySelector('.grid');
 const monthLabel  = document.getElementById('monthLabel');
@@ -41,11 +60,11 @@ const SHIFT_DEFAULTS = [
 
 let TURNI_DEFS = SHIFT_DEFAULTS.map(x => ({...x})); // copia
 let SETTINGS = (() => {
-  const t = new Date();
-  return { date: `${t.getFullYear()}-${util_pad2(t.getMonth()+1)}-${util_pad2(t.getDate())}`, shift: 'S' };
+  const t = todayUTC;
+  return { date: `${t.getUTCFullYear()}-${util_pad2(t.getUTCMonth()+1)}-${util_pad2(t.getUTCDate())}`, shift: 'S' };
 })();
 
-// Helpers “effective” ora leggono solo RAM
+// Helpers “effective” leggono solo RAM
 function defs_effective(){ return TURNI_DEFS; }
 function settings_effective(){ return SETTINGS; }
 
@@ -77,44 +96,71 @@ function ui_displayLabelFor(base){
 }
 function ui_colorForBase(base){
   const f = defs_effective().find(x => x.key === base);
-  return (f && f.color) ? f.color : '#8e88ff';
+  return (f && isSafeHexColor(f.color)) ? f.color : '#8e88ff';
 }
 
 // ======================= //
 // RENDERING               //
 // ======================= //
-function render_createCellHTML({day, sun, sigla, isToday, startCol}){
-  const classes = ['cell']; if (sun) classes.push('sun'); if (isToday) classes.push('today');
-  const startAttr = startCol ? ` style="grid-column-start:${startCol}"` : '';
+function createCellElement({day, sun, sigla, isToday, startCol}){
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  if (sun) cell.classList.add('sun');
+  if (isToday) cell.classList.add('today');
+  if (startCol) cell.style.gridColumnStart = String(startCol);
+
+  const num = document.createElement('span');
+  num.className = 'num';
+  num.textContent = util_pad2(day);
+  cell.appendChild(num);
 
   const isGLAP = (sigla === 'GL' || sigla === 'AP');
   const label  = isGLAP ? sigla : ui_displayLabelFor(sigla);
-  const color  = isGLAP ? null  : ui_colorForBase(sigla);
 
-  let siglaSpan = '';
   if (label) {
-    siglaSpan = isGLAP
-      ? `<span class="sigla ${sigla==='GL'?'T-GL':'T-AP'}">${label}</span>`
-      : `<span class="sigla" style="color:${color}">${label}</span>`;
+    const sig = document.createElement('span');
+    sig.className = 'sigla';
+    if (isGLAP) {
+      sig.classList.add(sigla === 'GL' ? 'T-GL' : 'T-AP');
+      sig.textContent = label;
+    } else {
+      sig.textContent = label;
+      const color = ui_colorForBase(sigla);
+      sig.style.color = color;
+    }
+    cell.appendChild(sig);
   }
-  return `<div class="${classes.join(' ')}"${startAttr}><span class="num">${util_pad2(day)}</span>${siglaSpan}</div>`;
+
+  return cell;
 }
 
 function render_buildMonth(year,month){
-  grid.innerHTML='';
+  // month label
+  monthLabel.textContent = util_fmtMonth(itMonth,year,month);
+
+  // costruisci fragment
+  const frag = document.createDocumentFragment();
   const first=new Date(Date.UTC(year,month,1));
   const last =new Date(Date.UTC(year,month+1,0));
   const lead =util_jsWeekdayUTC(first);
-  monthLabel.textContent=util_fmtMonth(itMonth,year,month);
 
   for(let day=1; day<=last.getUTCDate(); day++){
     const d=new Date(Date.UTC(year,month,day));
     const isSun = util_jsWeekdayUTC(d)===6;
-    const isT   = d.getUTCFullYear()===today.getFullYear() && d.getUTCMonth()===today.getMonth() && d.getUTCDate()===today.getDate();
+
+    const isT =
+      d.getUTCFullYear()===todayUTC.getUTCFullYear() &&
+      d.getUTCMonth()===todayUTC.getUTCMonth() &&
+      d.getUTCDate()===todayUTC.getUTCDate();
+
     const sigla = shifts_codeForDate(d);
     const startCol = (day===1)? (lead+1) : undefined;
-    grid.insertAdjacentHTML('beforeend', render_createCellHTML({day,sun:isSun,sigla,isToday:isT,startCol}));
+
+    frag.appendChild(createCellElement({day,sun:isSun,sigla,isToday:isT,startCol}));
   }
+
+  // flush in un colpo
+  grid.replaceChildren(frag);
 }
 
 function nav_shift(delta){
@@ -136,46 +182,101 @@ function ui_switchTab(name){
 // ======================= //
 // CRUD TURNI (RAM)        //
 // ======================= //
+function buildTurnoRow(t, idx){
+  const row = document.createElement('div');
+  row.className = 'settingsRow turni-grid';
+  row.style.alignItems = 'center';
+
+  // Nome
+  const c1 = document.createElement('div');
+  const nome = document.createElement('input');
+  nome.value = t.nome || '';
+  nome.dataset.k = 'nome';
+  nome.dataset.i = String(idx);
+  c1.appendChild(nome);
+
+  // Sigla
+  const c2 = document.createElement('div');
+  const sigla = document.createElement('input');
+  sigla.value = t.sigla || '';
+  sigla.maxLength = 4;
+  sigla.className = 'siglaInput';
+  sigla.dataset.k = 'sigla';
+  sigla.dataset.i = String(idx);
+  c2.appendChild(sigla);
+
+  // Orario multiline
+  const c3 = document.createElement('textarea');
+  c3.className = 'orarioArea';
+  c3.rows = 2;
+  const p = util_splitOrario(t.orario);
+  c3.value = (p.start || '') + '\n' + (p.end || '');
+  c3.dataset.k = 'orarioMultiline';
+  c3.dataset.i = String(idx);
+
+  // Colore
+  const c4wrap = document.createElement('div');
+  c4wrap.className = 'colorCell';
+  const color = document.createElement('input');
+  color.type = 'color';
+  color.value = isSafeHexColor(t.color) ? t.color : '#8e88ff';
+  color.className = 'colorInput';
+  color.dataset.k = 'color';
+  color.dataset.i = String(idx);
+  c4wrap.appendChild(color);
+
+  // Delete
+  const del = document.createElement('button');
+  del.type = 'button';
+  del.className = 'iconbtn iconbtn-danger';
+  del.dataset.act = 'del';
+  del.dataset.i = String(idx);
+  del.textContent = '✕';
+
+  // Monta griglia: 5 colonne
+  row.appendChild(c1);
+  row.appendChild(c2);
+  const c3wrap = document.createElement('div');
+  c3wrap.appendChild(c3);
+  row.appendChild(c3wrap);
+  row.appendChild(c4wrap);
+  row.appendChild(del);
+
+  // Eventi
+  del.addEventListener('click', ()=> ui_defsDelete(idx));
+
+  const onChange = (inp) => {
+    ui_defsEditInline(parseInt(inp.dataset.i), inp.dataset.k, inp.value);
+    // niente chiamata extra a render_buildMonth qui: la fa ui_defsEditInline
+  };
+
+  [nome, sigla, c3, color].forEach(inp=>{
+    inp.addEventListener('input', ()=>onChange(inp));
+    inp.addEventListener('change', ()=>onChange(inp));
+  });
+
+  return row;
+}
+
 function ui_defsRenderList(){
   const list=defs_effective();
   const wrap=document.getElementById('turniList');
+  const frag = document.createDocumentFragment();
   wrap.innerHTML='';
+
   list.forEach((t,idx)=>{
-    const row=document.createElement('div');
-    row.className='settingsRow turni-grid';
-    row.style.alignItems='center';
-
-    const p = util_splitOrario(t.orario);
-    row.innerHTML = [
-      `<input value="${t.nome}" data-k="nome" data-i="${idx}" />`,
-      `<input value="${t.sigla}" maxlength="4" class="siglaInput" data-k="sigla" data-i="${idx}" />`,
-      `<textarea class="orarioArea" data-k="orarioMultiline" data-i="${idx}" rows="2">${p.start}\n${p.end}</textarea>`,
-      `<div class="colorCell"><input value="${t.color || '#8e88ff'}" class="colorInput" data-k="color" data-i="${idx}" type="color" /></div>`,
-      `<button type="button" class="iconbtn iconbtn-danger" data-act="del" data-i="${idx}">✕</button>`
-    ].join('');
-
-    wrap.appendChild(row);
+    frag.appendChild(buildTurnoRow(t, idx));
   });
 
-  wrap.querySelectorAll('button[data-act="del"]').forEach(b=>{
-    b.addEventListener('click', ()=> ui_defsDelete(parseInt(b.dataset.i)));
-  });
-
-  wrap.querySelectorAll('input, textarea').forEach(inp=>{
-    const h = ()=>{
-      ui_defsEditInline(parseInt(inp.dataset.i), inp.dataset.k, inp.value);
-      render_buildMonth(view.getUTCFullYear(), view.getUTCMonth());
-    };
-    inp.addEventListener('input', h);
-    inp.addEventListener('change', h);
-  });
+  wrap.appendChild(frag);
 }
 
 function ui_defsAdd(){
   const nome  = document.getElementById('newNome').value.trim();
   const sigla = document.getElementById('newSigla').value.trim().toUpperCase();
   const orTxt = document.getElementById('newOrario').value;
-  const color = document.getElementById('newColor').value.trim() || '#8e88ff';
+  const colorRaw = document.getElementById('newColor').value.trim();
+  const color = isSafeHexColor(colorRaw) ? colorRaw : '#8e88ff';
   if(!nome || !sigla) return;
   const orario = util_joinOrarioMultiline(orTxt);
   TURNI_DEFS = [...TURNI_DEFS, { key:'X'+Date.now(), nome, sigla, orario, color }];
@@ -199,6 +300,10 @@ function ui_defsEditInline(i,key,val){
   const next = [...TURNI_DEFS];
   if(key==='orarioMultiline'){
     next[i] = { ...next[i], orario: util_joinOrarioMultiline(val) };
+  }else if(key==='color'){
+    next[i] = { ...next[i], color: isSafeHexColor(val) ? val : next[i].color };
+  }else if(key==='sigla'){
+    next[i] = { ...next[i], sigla: String(val||'').toUpperCase() };
   }else{
     next[i] = { ...next[i], [key]: val };
   }
@@ -251,7 +356,7 @@ function boot_init(){
 
   document.body.classList.add('no-scroll');
 
-  // Glow: chiamata unica + listeners (niente doppioni)
+  // Glow: chiamata unica + listeners
   ui_updateTopbarGlowCenter();
   addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
@@ -281,7 +386,7 @@ async function loadLogo() {
 (function(){
   if (!('serviceWorker' in navigator)) return;
 
-  const SW_VERSION = '2025-11-04-03';
+  const SW_VERSION = '2025-11-06-04';
   const BASE  = (location.hostname === 'localhost') ? '' : '/turni-pds';
   const SW_URL = `${BASE}/service-worker.js?v=${SW_VERSION}`;
   const SCOPE  = `${BASE}/`;
@@ -289,6 +394,7 @@ async function loadLogo() {
   async function registerSW(){
     try {
       const reg = await navigator.serviceWorker.register(SW_URL, { scope: SCOPE });
+
       if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
 
       reg.addEventListener('updatefound', () => {
