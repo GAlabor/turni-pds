@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker (migliorato con navigationPreload)
 // ==============================
 
-const VERSION    = '2025-11-06-04';
+const VERSION    = '2025-11-07 V1.5'; //VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -16,12 +16,13 @@ const PRECACHE_URLS = [
   `${ROOT}/manifest.webmanifest`,
   `${ROOT}/app.css`,
   `${ROOT}/app.js`,
-  `${ROOT}/version.txt`,
-  `${ROOT}/logo_polizia.svg`,
+  `${ROOT}/svg/logo_polizia.svg`,
   `${ROOT}/favicon.ico`,
   `${ROOT}/ico/icon-192.png`,
   `${ROOT}/ico/icon-512.png`,
-  `${ROOT}/ico/icon-1024.png`
+  `${ROOT}/ico/icon-1024.png`,
+  `${ROOT}/svg/calendar.svg`,
+  `${ROOT}/svg/settings.svg`,
 ];
 
 // Normalizza richieste HTML verso index

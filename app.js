@@ -24,6 +24,13 @@ function isSafeHexColor(s){
   return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(String(s||"").trim());
 }
 
+function app_base(){
+  if (location.hostname === 'localhost') return '';
+  const seg = location.pathname.split('/').filter(Boolean)[0] || 'turni-pds';
+  return '/' + seg;
+}
+
+
 function util_splitOrario(s){
   const parts = String(s||'').split(/[-–—]/).map(x=>x.trim());
   return { start: parts[0]||'', end: parts[1]||'' };
@@ -361,7 +368,8 @@ function boot_init(){
   addEventListener('resize', ui_updateTopbarGlowCenter, { passive:true });
   addEventListener('scroll', ui_updateTopbarGlowCenter, { passive:true });
 
-  loadLogo();
+  loadLogo()
+  loadTabbarIcons();
 }
 
 if (document.readyState === 'loading') {
@@ -370,29 +378,86 @@ if (document.readyState === 'loading') {
   boot_init();
 }
 
-// Logo SVG (solo estetica)
+// Logo SVG (solo estetica) — nuovo path in /svg e base dinamico
 async function loadLogo() {
   try {
-    const res = await fetch("logo_polizia.svg");
+    const res = await fetch(`${app_base()}/svg/logo_polizia.svg`, { cache: 'no-store', credentials: 'same-origin' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const svgText = await res.text();
     const container = document.getElementById("logoContainer");
     if (container) container.innerHTML = svgText;
   } catch (err) {
-    console.error("Errore nel caricamento del logo.svg:", err);
+    console.error("Errore nel caricamento di /svg/logo_polizia.svg:", err);
   }
 }
 
-// SERVICE WORKER — solo asset, nessun dato utente
+// Inietta snippet SVG nei gusci <svg> della tabbar
+async function loadTabbarIcons(){
+  try {
+    // Calendar: file contiene le 4 shape (rect + 3 line)
+    const cal = await fetch(`${app_base()}/svg/calendar.svg`, { cache: 'no-store', credentials: 'same-origin' });
+    if (cal.ok) {
+      const txt = await cal.text();
+      const host = document.getElementById('icoCalendar');
+      if (host) host.innerHTML = txt;
+    } else {
+      console.error('calendar.svg HTTP', cal.status);
+    }
+
+    // Settings: file contiene il solo <path> lungo. Il <circle> resta inline.
+    const set = await fetch(`${app_base()}/svg/settings.svg`, { cache: 'no-store', credentials: 'same-origin' });
+    if (set.ok) {
+      const txt = await set.text();
+      const host = document.getElementById('icoSettings');
+      if (host) {
+        const temp = document.createElement('div');
+        temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
+        // appendiamo tutti i figli dello snippet dentro l’<svg> host
+        const nodes = temp.querySelector('svg').childNodes;
+        nodes.forEach(n => host.appendChild(n.cloneNode(true)));
+      }
+    } else {
+      console.error('settings.svg HTTP', set.status);
+    }
+  } catch (err) {
+    console.error('Errore caricamento icone tabbar:', err);
+  }
+}
+
+
+// SERVICE WORKER — versione unica letta dal file SW (niente version.txt)
 (function(){
   if (!('serviceWorker' in navigator)) return;
 
-  const SW_VERSION = '2025-11-06-04';
   const BASE  = (location.hostname === 'localhost') ? '' : '/turni-pds';
-  const SW_URL = `${BASE}/service-worker.js?v=${SW_VERSION}`;
-  const SCOPE  = `${BASE}/`;
+  const SCOPE = `${BASE}/`;
+
+  async function getSWVersion() {
+    // Legge il file del SW e parse-a la costante VERSION
+    const url = `${BASE}/service-worker.js`;
+    const res = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
+    const text = await res.text();
+    const m = text.match(/const\s+VERSION\s*=\s*['"]([^'"]+)['"]/);
+    if (!m) throw new Error('VERSION non trovata nel service-worker.js');
+    return m[1];
+  }
+
+  function setVersionLabel(fullVersion) {
+    // Estrae solo ciò che segue la "V" (senza la V). Esempio: "1.1"
+    const m = fullVersion.match(/V\s*([0-9.]+)/i);
+    const label = m ? m[1] : '';
+    const el = document.getElementById('versionLabel');
+    if (el) el.textContent = label;
+  }
 
   async function registerSW(){
     try {
+      const swVersion = await getSWVersion();
+      setVersionLabel(swVersion);
+
+      // Bust dell’URL del SW basato sulla VERSION letta
+      const SW_URL = `${BASE}/service-worker.js?v=${encodeURIComponent(swVersion)}`;
+
       const reg = await navigator.serviceWorker.register(SW_URL, { scope: SCOPE });
 
       if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -420,6 +485,9 @@ async function loadLogo() {
       });
     } catch(e) {
       console.warn("Service Worker registration failed:", e);
+      // In caso di errore, niente label.
+      const el = document.getElementById('versionLabel');
+      if (el) el.textContent = '';
     }
   }
 
@@ -429,3 +497,4 @@ async function loadLogo() {
     registerSW();
   }
 })();
+
