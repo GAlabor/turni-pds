@@ -141,7 +141,7 @@ function createCellElement({day, sun, sigla, isToday, startCol}){
   return cell;
 }
 
-function render_buildMonth(year,month){
+function render_buildMonth(year,month) {
   // month label
   monthLabel.textContent = util_fmtMonth(itMonth,year,month);
 

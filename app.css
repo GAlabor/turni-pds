@@ -96,24 +96,88 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 
 /* CALENDAR GRID */
 .grid{
-  display:grid; grid-template-columns:repeat(7,1fr);
-  grid-auto-rows:minmax(62px,1fr); gap:3px; padding:3px;
+  display:grid; 
+  grid-template-columns:repeat(7,1fr);
+  grid-auto-rows:minmax(62px,1fr); 
+  gap:6px; 
+  padding:3px;
 }
 .cell{ position:relative; min-height:84px; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 .cell::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:transparent; transition:background .18s ease; pointer-events:none; }
 .num{ position:absolute; left:8px; top:6px; font-size:18px; color:var(--muted); font-weight:800; z-index:1; }
 .sun .num{ color:var(--sunday); }
-.sigla{ font-size:23px; font-weight:400; letter-spacing:.5px; opacity:.95; position:relative; top:8px; z-index:1; }
+
+.sigla{
+  font-size:23px;
+  font-weight:600;            /* prima 400: un filo più corposa per leggibilità */
+  letter-spacing:.45px;
+  position:relative; top:8px; z-index:1;
+
+  /* anti-sfarinamento su fondi chiari/scuri */
+  -webkit-text-stroke:.35px rgba(0,0,0,.25);
+          text-shadow:
+            0 0 1px rgba(0,0,0,.22),
+            0 1px 1.2px rgba(0,0,0,.22),
+            0 0 6px rgba(0,0,0,.18);
+}
+  /* Sigla più leggibile quando la cella è "oggi" (overlay attivo) */
+.today .sigla{
+  -webkit-text-stroke:.45px rgba(0,0,0,.35);
+          text-shadow:
+            0 0 1px rgba(0,0,0,.30),
+            0 1px 1.4px rgba(0,0,0,.30),
+            0 0 8px rgba(0,0,0,.24),
+            0 0 10px rgba(255,255,255,.10); /* piccolo alone freddo coerente col tema */
+}
+
+
 .T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
 .cell:hover::before{ background:var(--actHover); }
 .cell:active::before{ background:var(--actActive); }
 
-@media(max-width:560px){
-  .grid{ grid-auto-rows:minmax(48px,1fr); }
-  .cell{ min-height:auto; padding:4px 0; }
-  .num{ font-size:15px; font-weight:800; top:4px; color:var(--text); line-height:1; -webkit-text-stroke:.15px transparent; }
-  .sigla{ font-size:18px; top:9px; opacity:.9; }
+@media (max-width:560px){
+  /* meno bordo laterale: un filo più di spazio utile alle celle */
+  main{ padding: 0 6px; } /* prima 0 10px */
+
+  /* griglia più fitta: meno spazio tra le celle orizzontale e verticale */
+  .grid{
+    grid-auto-rows: minmax(52px, 1fr); /* invariata l’altezza base */
+    gap: 2px;       /* prima 3px */
+    padding: 2px;   /* prima 3px */
+  }
+
+  /* celle meno “a bottone”: raggio più basso, ombra più sobria */
+  .cell{
+    min-height: auto;
+    padding: 4px 0;
+    border-radius: 9px; /* prima 12/14 */
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow:
+      0 4px 10px rgba(0,0,0,.16),
+      inset 0 1px 0 rgba(255,255,255,.16);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
+      var(--cell-bg) !important;
+  }
+  .cell:hover::before{
+    background: rgba(255,255,255,.06);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.28);
+  }
+
+  /* tipografia dentro cella: compatta ma leggibile */
+  .num{
+    font-size: 15px;   /* era 15: lasciamo la stessa dimensione */
+    top: 4px; left: 8px;
+    -webkit-text-stroke: .15px transparent;
+  }
+  .sigla{
+  font-size:18px;
+  top:13px;            /* era 9px: più in basso di 4px */
+  opacity:.9;
+  line-height:1.1;     /* aggiunto per stabilizzarla verticalmente */
+  }
 }
+
 
 /* SETTINGS */
 .settingsCard{background:var(--card);border:1px solid var(--gridBorder);border-radius:10px;padding:14px;margin-top:10px}
@@ -308,16 +372,22 @@ svg, .brandmark svg path, .no-text-shadow{ text-shadow:none; }
 /* Se oggi è domenica, resta rosso */
 .today.cell.sun .num{ color: var(--sunday) !important; }
 
-/* === Giorno “Oggi” === */
+/* === Giorno “Oggi” — selezione attiva con bordo oro leggero === */
 .today::before{
   content:""; position:absolute; inset:0; border-radius:inherit;
-  background: radial-gradient(120% 120% at 50% 40%, rgba(255,255,255,.26), rgba(255,255,255,.06) 70%);
+
+  /* base uguale alla tab attiva, per coerenza cromatica */
+  background: var(--tabActiveBg);
+
+  /* mix di vetro e bordo dorato sottile */
   box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,.50),
-    0 0 0 3px rgba(255,255,255,.10),
-    0 0 12px 4px rgba(255,255,255,.22);
+    inset 0 0 0 1px rgba(255,215,128,.7),   /* filo dorato (richiamo aquila) */
+    inset 0 1px 0 rgba(255,255,255,.22),    /* lieve bordo interno chiaro */
+    0 8px 18px rgba(0,0,0,.18);             /* ombra morbida di profondità */
+
   pointer-events:none;
 }
+
 
 /* === Intestazione giorni === */
 .weekhead div{
