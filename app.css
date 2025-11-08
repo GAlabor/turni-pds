@@ -109,26 +109,26 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 
 .sigla{
   font-size:23px;
-  font-weight:600;            /* prima 400: un filo più corposa per leggibilità */
+  font-weight:600;
   letter-spacing:.45px;
   position:relative; top:8px; z-index:1;
 
-  /* anti-sfarinamento su fondi chiari/scuri */
-  -webkit-text-stroke:.35px rgba(0,0,0,.25);
-          text-shadow:
-            0 0 1px rgba(0,0,0,.22),
-            0 1px 1.2px rgba(0,0,0,.22),
-            0 0 6px rgba(0,0,0,.18);
+  /* glow chiaro coerente col colore del turno */
+  text-shadow:
+    0 0 8px color-mix(in oklch, currentColor 55%, transparent),
+    0 0 2px color-mix(in oklch, currentColor 35%, transparent),
+    0 1px 1px rgba(255,255,255,.25);
+  -webkit-text-stroke:.15px color-mix(in oklch, currentColor 25%, black 75%);
 }
-  /* Sigla più leggibile quando la cella è "oggi" (overlay attivo) */
+
 .today .sigla{
-  -webkit-text-stroke:.45px rgba(0,0,0,.35);
-          text-shadow:
-            0 0 1px rgba(0,0,0,.30),
-            0 1px 1.4px rgba(0,0,0,.30),
-            0 0 8px rgba(0,0,0,.24),
-            0 0 10px rgba(255,255,255,.10); /* piccolo alone freddo coerente col tema */
+  text-shadow:
+    0 0 10px color-mix(in oklch, currentColor 70%, transparent),
+    0 0 3px color-mix(in oklch, currentColor 45%, transparent),
+    0 1px 1px rgba(255,255,255,.28);
+  -webkit-text-stroke:.18px color-mix(in oklch, currentColor 22%, black 78%);
 }
+
 
 
 .T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
@@ -136,47 +136,57 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 .cell:active::before{ background:var(--actActive); }
 
 @media (max-width:560px){
-  /* meno bordo laterale: un filo più di spazio utile alle celle */
-  main{ padding: 0 6px; } /* prima 0 10px */
+  /* bordo laterale un filo ridotto per guadagnare area utile */
+  main{ padding: 0 6px; }
 
-  /* griglia più fitta: meno spazio tra le celle orizzontale e verticale */
+  /* griglia più fitta ma stabile */
   .grid{
-    grid-auto-rows: minmax(52px, 1fr); /* invariata l’altezza base */
-    gap: 2px;       /* prima 3px */
-    padding: 2px;   /* prima 3px */
+    /* l’altezza la decide l’aspect-ratio della .cell, non la riga */
+    grid-auto-rows: auto;
+    gap: 2px;       /* meno spazio tra le celle */
+    padding: 2px;
   }
 
-  /* celle meno “a bottone”: raggio più basso, ombra più sobria */
+  /* CELLA QUADRATA: mai più “rettangolone” verticale */
   .cell{
-    min-height: auto;
+    aspect-ratio: 1 / 1;   /* forza forma quadrata in base alla larghezza della colonna */
+    min-height: unset;     /* ignora vecchi min-height */
+    height: auto;
     padding: 4px 0;
-    border-radius: 9px; /* prima 12/14 */
-    border: 1px solid rgba(255,255,255,.18);
-    box-shadow:
-      0 4px 10px rgba(0,0,0,.16),
-      inset 0 1px 0 rgba(255,255,255,.16);
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
-      var(--cell-bg) !important;
-  }
-  .cell:hover::before{
-    background: rgba(255,255,255,.06);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.28);
+    border-radius: 9px;    /* meno “a bottone” */
+    overflow: hidden;
   }
 
-  /* tipografia dentro cella: compatta ma leggibile */
+  /* numeri e sigle: piccoli aggiustamenti verticali */
   .num{
-    font-size: 15px;   /* era 15: lasciamo la stessa dimensione */
-    top: 4px; left: 8px;
-    -webkit-text-stroke: .15px transparent;
+    font-size: 15px;
+    font-weight: 800;
+    left: 8px; top: 6px;
+    -webkit-text-stroke:.15px transparent;
   }
   .sigla{
-  font-size:18px;
-  top:13px;            /* era 9px: più in basso di 4px */
-  opacity:.9;
-  line-height:1.1;     /* aggiunto per stabilizzarla verticalmente */
+    font-size: 18px;
+    top: 10px;            /* se la vuoi ancora più bassa: 12–13px */
+    letter-spacing:.45px;
+    font-weight: 600;
+    -webkit-text-stroke:.35px rgba(0,0,0,.25);
+    text-shadow:
+      0 0 1px rgba(0,0,0,.22),
+      0 1px 1.2px rgba(0,0,0,.22),
+      0 0 6px rgba(0,0,0,.18);
+  }
+
+  /* su “oggi” mantieni il rinforzo di leggibilità */
+  .today .sigla{
+    -webkit-text-stroke:.45px rgba(0,0,0,.35);
+    text-shadow:
+      0 0 1px rgba(0,0,0,.30),
+      0 1px 1.4px rgba(0,0,0,.30),
+      0 0 8px rgba(0,0,0,.24),
+      0 0 10px rgba(255,255,255,.10);
   }
 }
+
 
 
 /* SETTINGS */
