@@ -1,16 +1,31 @@
-/* === STYLE (pulito) === */
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&display=swap');
+/* === TYPE === */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Rajdhani:wght@500;600&display=swap');
 
-/* ROOT VARS */
+/* === ROOT VARS (base) === */
 :root{
   --iosBlue:#1976d2; --iosBlue-600:#1565c0;
-  --bg:#f3f5f8; --card:#ffffff; --gridBorder:#d9dee6;
+
+  /* Palette celeste/istituzionale coerente con l’icona */
+  --bg:
+    radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #1b56c9 0%, #1a5fd9 38%, #1450bd 68%, #0f3e95 100%);
+
+  --card:#ffffff;             /* usato come base per fallback chiari */
+  --gridBorder:#d9dee6;       /* sovrascritto nel tema vetro */
   --text:#0b1320; --muted:#7a8595;
-  --sunday:#c62828; --today:#cfe3ff;
+
+  /* Stati calendario */
+  --sunday:#e04d4d;           /* rosso vivo solo per numero domenica */
+  --today: rgba(255,255,255,.20);
+
+  /* Turni default */
   --T-GL:#c68bcf; --T-AP:#a47ac9;
+
+  /* dimensioni comuni */
   --fieldH:44px;
 
-  --bar-h: 60px; --seam: 20px; --blue-rgb: 25,118,210;
+  /* Topbar glow params */
+  --bar-h: 60px; --seam: 20px; --blue-rgb: 74,158,255;
   --cx: 50%; --cy: 50%; --glow-x: 50%;
   --core-a1: 0.94; --core-a2: 0.82; --core-a3: 0.66; --core-a4: 0.48; --core-a5: 0.34;
   --mid-a1: 0.18; --mid-a2: 0.12; --mid-a3: 0.08;
@@ -19,46 +34,61 @@
 
   /* Tabbar + icons */
   --tabW: 56px; --tabH: 46px; --tabIcon: 22px;
-  --tabColor: #b7bcc6; --tabColorActive: #e3e7ec;
-  --tabHoverBg: rgba(255,255,255,.10); --tabActiveBg: rgba(255,255,255,.14);
+  --tabColor:#eef4ff; --tabColorActive:#ffffff;
+  --tabHoverBg:rgba(255,255,255,.12); --tabActiveBg:rgba(255,255,255,.18);
 
   /* Action icons */
   --actBtn:44px; --actIcon:24px; --actStroke:2.25px;
-  --actColor:#bcc3cc; --actColorHi:#e6e9ee;
+  --actColor:#cbd4e6; --actColorHi:#ffffff;
+
+  /* interazioni */
+  --actHover:rgba(255,255,255,.08);
+  --actActive:rgba(255,255,255,.16);
+
+  /* superfici vetro */
+  --surface-glass: rgba(12,24,48,.28);
+  --surface-opaque:#163a7a;
+  --cell-bg:#15428e;
+
+  /* focus ring */
+  --focus-ring: 0 0 0 2px rgba(var(--blue-rgb), .45);
 }
 
-/* BASE */
+/* === BASE === */
 *{box-sizing:border-box}
 html, body { height: 100%; }
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, 'Helvetica Neue', Arial;
+  background: var(--bg) fixed !important;
+  color:#ffffff;
+  font-family:'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, 'Helvetica Neue', Arial;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
-
-
 body.no-scroll { overflow: hidden; }
+main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom)); padding:0 10px; }
 
-main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
+svg, .brandmark svg path, .no-text-shadow{ text-shadow:none; }
+.glow-text { text-shadow: 0 1px 1px rgba(0,0,0,.25); }
 
-/* TOPBAR (glow) */
+/* === TOPBAR (glow sobrio) === */
 .topbar{
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 10px; justify-content: center;
   padding: 10px 12px; color: #fff; background: transparent;
-  will-change: transform; transform: translateZ(0); backface-visibility: hidden; contain: paint; overflow: visible;
-  box-shadow: inset 0 -1px 0 var(--bg), inset 0  1px 0 var(--bg);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,.26), 0 5px 18px rgba(0,0,0,.24);
 }
 .topbar::before{
   content: ""; position: absolute; left:0; right:0; top:0;
   height: calc(var(--bar-h) + var(--seam) + 2px); pointer-events:none;
   background:
     linear-gradient(to right,
-      var(--bg) 0%,
-      color-mix(in oklch, var(--bg) 85%, transparent) 8%,
+      transparent 0%,
+      color-mix(in oklch, rgba(255,255,255,.3) 25%, transparent) 8%,
       transparent 18%, transparent 82%,
-      color-mix(in oklch, var(--bg) 85%, transparent) 92%, var(--bg) 100%),
+      color-mix(in oklch, rgba(255,255,255,.3) 25%, transparent) 92%, transparent 100%),
     radial-gradient(ellipse 85% 160% at var(--cx) var(--cy),
       rgba(var(--blue-rgb), var(--far-a1)) 0%,
       rgba(var(--blue-rgb), var(--far-a2)) 32%,
@@ -84,17 +114,20 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 }
 .brandmark{display:flex;align-items:center;justify-content:center;line-height:0}
 .brandmark svg{display:block;height:24px;width:auto;transform: scale(var(--wmScale, 1.80));transform-origin: center;}
+.brandmark svg path{
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 6px 12px rgba(255,255,255,.18));
+}
 
-/* LAYOUT */
+/* === LAYOUT === */
 .monthbar{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; margin:10px 0 6px; }
-.monthbar .title{ text-align:center }
+.monthbar .title{ text-align:center; font-weight:600; letter-spacing:.2px }
 
 /* Nav buttons */
 .navbtn{
   appearance:none;border:0;background:transparent;color:var(--actColor);
   font-size:22px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:10px;
   -webkit-tap-highlight-color:transparent;
-  transition: background .18s ease, color .18s ease, transform .06s ease;
+  transition: background .16s ease, color .16s ease, transform .06s ease;
 }
 .navbtn:hover{ background:var(--actHover); color:var(--actColorHi); transform:translateY(-1px); }
 .navbtn:active{ background:var(--actActive); color:var(--actColorHi); transform:translateY(1px); }
@@ -102,7 +135,7 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 .weekhead{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; padding:3px 3px 0; }
 .view{ display:none } .view.active{ display:block }
 
-/* CALENDAR GRID */
+/* === CALENDAR GRID === */
 .grid{
   display:grid; 
   grid-template-columns:repeat(7,1fr);
@@ -110,121 +143,136 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
   gap:6px; 
   padding:3px;
 }
-.cell{ position:relative; min-height:84px; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.cell::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:transparent; transition:background .18s ease; pointer-events:none; }
-.num{ position:absolute; left:8px; top:6px; font-size:18px; color:var(--muted); font-weight:800; z-index:1; }
-.sun .num{ color:var(--sunday); }
+.cell{
+  position:relative; min-height:84px; border-radius:14px; display:flex; align-items:center; justify-content:center; overflow:hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.05)), var(--cell-bg) !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.18);
+  color:#fff;
+}
+.cell::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:transparent; transition:background .14s ease, box-shadow .14s ease; pointer-events:none; }
+.cell:hover::before{
+  background: rgba(255,255,255,.06);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.30);
+}
+.cell:active::before{ background: var(--actActive); }
 
+/* Focus per celle editabili */
+.cell:focus-within{
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.30), var(--focus-ring);
+}
+
+/* Numeri giorno */
+.num{
+  position:absolute; left:8px; top:6px; z-index:1;
+  font-size:18px; font-weight:700; color: rgba(255,255,255,.98);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
+}
+/* Domeniche: solo NUMERO rosso */
+.cell.sun .num{ color: var(--sunday) !important; }
+.today.cell.sun .num{ color: var(--sunday) !important; }
+
+/* Giorno “Oggi” — evidenza coerente */
+.today::before{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  background: var(--tabActiveBg);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,215,128,.7),   /* filo dorato soft */
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 8px 18px rgba(0,0,0,.18);
+  pointer-events:none;
+}
+
+/* === SIGLE (UNA definizione base) === */
 .sigla{
+  font-family:'Rajdhani', 'Manrope', system-ui, sans-serif;
   font-size:23px;
   font-weight:600;
-  letter-spacing:.45px;
+  letter-spacing:.35px;
   position:relative; top:8px; z-index:1;
-
-  /* glow chiaro coerente col colore del turno */
+  -webkit-text-stroke:.12px color-mix(in oklch, currentColor 20%, black 80%);
   text-shadow:
-    0 0 8px color-mix(in oklch, currentColor 55%, transparent),
-    0 0 2px color-mix(in oklch, currentColor 35%, transparent),
-    0 1px 1px rgba(255,255,255,.25);
-  -webkit-text-stroke:.15px color-mix(in oklch, currentColor 25%, black 75%);
+    0 0 6px color-mix(in oklch, currentColor 45%, transparent),
+    0 1px 1px rgba(255,255,255,.22);
 }
-
+/* Rafforzo leggibilità su “oggi” (UNA definizione base) */
 .today .sigla{
+  -webkit-text-stroke:.16px color-mix(in oklch, currentColor 18%, black 82%);
   text-shadow:
-    0 0 10px color-mix(in oklch, currentColor 70%, transparent),
-    0 0 3px color-mix(in oklch, currentColor 45%, transparent),
-    0 1px 1px rgba(255,255,255,.28);
-  -webkit-text-stroke:.18px color-mix(in oklch, currentColor 22%, black 78%);
+    0 0 7px color-mix(in oklch, currentColor 58%, transparent),
+    0 1px 1px rgba(255,255,255,.25);
 }
 
-
-
+/* Turni colorati */
 .T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
-.cell:hover::before{ background:var(--actHover); }
-.cell:active::before{ background:var(--actActive); }
 
+/* === RESPONSIVE: mobile === */
 @media (max-width:560px){
-  /* bordo laterale un filo ridotto per guadagnare area utile */
   main{ padding: 0 6px; }
 
-  /* griglia più fitta ma stabile */
-  .grid{
-    /* l’altezza la decide l’aspect-ratio della .cell, non la riga */
-    grid-auto-rows: auto;
-    gap: 2px;       /* meno spazio tra le celle */
-    padding: 2px;
-  }
+  .grid{ grid-auto-rows: auto; gap: 2px; padding: 2px; }
 
-  /* CELLA QUADRATA: mai più “rettangolone” verticale */
   .cell{
-    aspect-ratio: 1 / 1;   /* forza forma quadrata in base alla larghezza della colonna */
-    min-height: unset;     /* ignora vecchi min-height */
+    aspect-ratio: 1 / 1;
+    min-height: unset;
     height: auto;
     padding: 4px 0;
-    border-radius: 9px;    /* meno “a bottone” */
+    border-radius: 10px;
     overflow: hidden;
   }
 
-  /* numeri e sigle: piccoli aggiustamenti verticali */
   .num{
     font-size: 15px;
     font-weight: 800;
     left: 8px; top: 6px;
     -webkit-text-stroke:.15px transparent;
   }
+
+  /* override SOLO per mobile */
   .sigla{
     font-size: 18px;
-    top: 10px;            /* se la vuoi ancora più bassa: 12–13px */
-    letter-spacing:.45px;
+    top: 10px;
+    letter-spacing:.25px;
     font-weight: 600;
-    -webkit-text-stroke:.35px rgba(0,0,0,.25);
+    -webkit-text-stroke:.34px rgba(0,0,0,.28);
     text-shadow:
-      0 0 1px rgba(0,0,0,.22),
-      0 1px 1.2px rgba(0,0,0,.22),
-      0 0 6px rgba(0,0,0,.18);
+      0 1px 1px rgba(0,0,0,.22);
   }
 
-  /* su “oggi” mantieni il rinforzo di leggibilità */
   .today .sigla{
-    -webkit-text-stroke:.45px rgba(0,0,0,.35);
+    -webkit-text-stroke:.4px rgba(0,0,0,.34);
     text-shadow:
-      0 0 1px rgba(0,0,0,.30),
-      0 1px 1.4px rgba(0,0,0,.30),
-      0 0 8px rgba(0,0,0,.24),
-      0 0 10px rgba(255,255,255,.10);
+      0 1px 1.2px rgba(0,0,0,.28);
   }
 }
 
-
-
-/* SETTINGS */
-.settingsCard{background:var(--card);border:1px solid var(--gridBorder);border-radius:10px;padding:14px;margin-top:10px}
+/* === SETTINGS === */
+.settingsCard{
+  background: linear-gradient(180deg, var(--surface-glass), rgba(10,20,40,.20)) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,.22);
+  border-radius: 14px;
+  padding:14px; margin-top:10px;
+}
 .settingsRow{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center;margin:8px 0}
-.settingsRow label{font-weight:600;color:var(--muted)}
-.settingsRow input,.settingsRow select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--gridBorder);background:var(--card);color:var(--text);height:var(--fieldH)}
-
-/* TABBAR */
-.tabbar{
-  position:fixed; bottom:0; left:0; right:0;
-  background:var(--card); border-top:1px solid var(--gridBorder);
-  display:flex; justify-content:space-around; gap:10px; padding:8px 10px; z-index:10;
+.settingsRow label{font-weight:600;color:#dfeaff}
+.settingsRow input,.settingsRow select{
+  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.26);
+  background: rgba(12,24,48,.26);color:#fff;height:var(--fieldH);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
 }
-.tab{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-  width:var(--tabW); height:var(--tabH); border-radius:12px; background:transparent;
-  color:var(--tabColor); font-size:12px; cursor:pointer; -webkit-tap-highlight-color:transparent;
-  transition: background-color .18s ease, color .18s ease, transform .06s ease;
+.settingsRow input::placeholder, .orarioArea::placeholder{ color: rgba(255,255,255,.82); }
+.settingsRow select:focus, .settingsRow input:focus, .orarioArea:focus{
+  outline: none; box-shadow: var(--focus-ring); border-color: rgba(255,255,255,.48) !important;
 }
-.tab svg{ width:var(--tabIcon); height:var(--tabIcon); display:block; fill:none; stroke:currentColor; stroke-width:2.25; stroke-linecap:round; stroke-linejoin:round; }
-.tab.active{ color:var(--tabColorActive); background:var(--tabActiveBg); font-weight:700; }
-.tab:hover{ background:var(--tabHoverBg); color:var(--tabColorActive); transform:translateY(-1px); }
-.tab:active{ background:var(--tabActiveBg); transform:translateY(1px); }
 
-@media (max-width:560px){ :root{ --tabW:48px; --tabH:40px; --tabIcon:18px; } }
-
-/* FORMS */
-.thin-sep{height:0;border-top:1px solid var(--gridBorder);margin:6px 0}
-.iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:8px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0}
+/* === FORMS === */
+.thin-sep{height:0;border-top:1px solid rgba(255,255,255,.24);margin:6px 0}
+.iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:10px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer}
 .iconbtn-primary{background:var(--iosBlue);color:#fff}
+.iconbtn-primary:hover{ background: color-mix(in oklch, var(--iosBlue) 85%, white 15%); }
 .iconbtn-danger{background:#b42325;color:#fff}
 .iconbtn:active{transform:translateY(1px)}
 @media(max-width:560px){ .settingsRow{grid-template-columns:120px 1fr} }
@@ -233,179 +281,68 @@ main{ max-width:760px; margin:8px auto 90px; padding:0 10px; }
 .hide-topbar .topbar{ display: none !important; }
 .hide-topbar main{ margin-top: 8px; }
 
-/* COLOR PICKER */
+/* === COLOR PICKER === */
 .colorCell{ display:flex; align-items:center; justify-content:center; }
 .colorInput{
   -webkit-appearance:none; appearance:none;
   width:var(--fieldH); height:var(--fieldH);
-  border:1px solid var(--gridBorder); border-radius:8px; background:transparent;
+  border:1px solid rgba(255,255,255,.26); border-radius:10px; background:transparent;
 }
 .colorInput::-webkit-color-swatch-wrapper{ padding:0; }
-.colorInput::-webkit-color-swatch{ border:none; border-radius:6px; }
-.colorInput::-moz-color-swatch{ border:none; border-radius:6px; }
+.colorInput::-webkit-color-swatch{ border:none; border-radius:8px; }
+.colorInput::-moz-color-swatch{ border:none; border-radius:8px; }
 @media (max-width:560px){ :root{ --fieldH:40px; } }
 
-/* GRID TURNI */
+/* === GRID TURNI === */
 .turni-grid{ grid-template-columns: 1fr 64px 1.05fr 52px 44px !important; align-items:center; }
-.siglaInput{ width:100%; text-transform:uppercase; text-align:center; letter-spacing:.5px; }
+.siglaInput{ width:100%; text-transform:uppercase; text-align:center; letter-spacing:.4px; font-family:'Rajdhani','Manrope',system-ui,sans-serif; }
 @media (max-width:560px){
   .turni-grid{ grid-template-columns: 1fr 60px 0.85fr 46px 44px !important; }
 }
 
-/* DATE FIELD */
+/* === DATE FIELD === */
 .settingsRow input[type="date"]{
   width:95%; min-width:0; font-size:1rem; height:38px; line-height:38px;
-  text-align:center; margin:0 auto; display:block; border-radius:8px;
+  text-align:center; margin:0 auto; display:block; border-radius:10px;
 }
 @media (max-width:560px){
   .settingsRow input[type="date"]{ width:92%; font-size:1.05rem; height:36px; line-height:36px; }
 }
 
-/* MULTILINE SCHEDULE */
+/* === MULTILINE SCHEDULE === */
 .orarioArea{
   display:block; width:100%; height:calc(var(--fieldH) + 2px);
-  padding:6px 8px; resize:none; line-height:1.05; font-size:0.86rem;
-  border:1px solid var(--gridBorder); border-radius:8px; background:var(--card); color:var(--text);
+  padding:6px 8px; resize:none; line-height:1.08; font-size:0.9rem;
+  border:1px solid rgba(255,255,255,.26); border-radius:10px; background: rgba(12,24,48,.26); color:#fff;
   white-space:pre;
 }
-@media (max-width:560px){ .orarioArea{ font-size:0.8rem; height:calc(var(--fieldH)); } }
+@media (max-width:560px){ .orarioArea{ font-size:0.86rem; height:calc(var(--fieldH)); } }
 
-
-
-
-
-
-
-
-
-
-/* THEME: Moderno 2025 — SkyBright Celeste (v3.1 domeniche rosse) */
-:root{
-  /* sfondo: celeste più arioso, meno “navy” sul fondo */
-  --bg:
-    radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.35) 0%, rgba(255,255,255,0) 60%),
-    linear-gradient(180deg, #1b56c9 0%, #1a5fd9 38%, #1450bd 68%, #0f3e95 100%);
-
-  /* superfici */
-  --surface-glass: rgba(12,24,48,.28);
-  --surface-opaque:#163a7a;
-  --cell-bg:#15428e;
-
-  /* griglie/bordi più sottili */
-  --gridBorder: rgba(255,255,255,.14);
-  --border-soft: rgba(255,255,255,.12);
-
-  /* testo: togli l’ombra globale, tieni micro-ombra dove serve */
-  --text:#ffffff;
-  --muted:#dfeaff;
-  --text-shadow: 0 1px 1px rgba(0,0,0,.25);
-
-  --blue-rgb: 74,158,255;
-  --today: rgba(255,255,255,.20);
-  --sunday:#e04d4d; /* rosso vivo solo per numeri domenicali */
-
-  --actHover:rgba(255,255,255,.08);
-  --actActive:rgba(255,255,255,.16);
-
-  --tabColor:#eef4ff;
-  --tabColorActive:#ffffff;
-  --tabHoverBg:rgba(255,255,255,.12);
-  --tabActiveBg:rgba(255,255,255,.18);
-
-  /* anello focus coerente */
-  --focus-ring: 0 0 0 2px rgba(var(--blue-rgb), .45);
-}
-
-/* === Fondo generale === */
-body{
-  background: var(--bg) fixed !important;
-  color: var(--text);
-  text-shadow: none;
-}
-
-svg, .brandmark svg path, .no-text-shadow{ text-shadow:none; }
-.glow-text { text-shadow: var(--text-shadow); }
-
-/* === Topbar e Tabbar === */
-.topbar, .tabbar{
+/* === TABBAR === */
+.tabbar{
+  position:fixed; bottom:0; left:0; right:0;
   background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06)) !important;
+  border-top:1px solid rgba(255,255,255,.22);
+  display:flex; justify-content:space-around; gap:10px;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  z-index:10;
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow:
-    0 8px 22px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,.30);
-  color:#fff;
 }
-.topbar{
-  box-shadow:
-    inset 0 -1px 0 rgba(255,255,255,.26),
-    0 5px 18px rgba(0,0,0,.24);
+.tab{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  width:var(--tabW); height:var(--tabH); border-radius:12px; background:transparent;
+  color: var(--tabColor); font-size:12px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition: background-color .16s ease, color .16s ease, transform .06s ease, box-shadow .16s ease;
 }
+.tab svg{ width:var(--tabIcon); height:var(--tabIcon); display:block; fill:none; stroke:currentColor; stroke-width:2.25; stroke-linecap:round; stroke-linejoin:round; }
+.tab:hover{ background: var(--tabHoverBg); color:#fff; transform:translateY(-1px); }
+.tab:active{ background: var(--tabActiveBg); transform:translateY(1px); }
+.tab:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
+.tab.active{ color: var(--tabColorActive); background: var(--tabActiveBg); font-weight:700; }
+.tabbar .tab.active svg{ stroke-width:2.6; }
 
-/* === Card impostazioni === */
-.settingsCard{
-  background: linear-gradient(180deg, var(--surface-glass), rgba(10,20,40,.20)) !important;
-  border: 1px solid rgba(255,255,255,.22) !important;
-  box-shadow: 0 8px 22px rgba(0,0,0,.22);
-  border-radius: 14px;
-}
-
-/* === Celle calendario === */
-.cell{
-  position: relative;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.05)),
-    var(--cell-bg) !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
-  border-radius:14px;
-  box-shadow:
-    0 8px 18px rgba(0,0,0,.20),
-    inset 0 1px 0 rgba(255,255,255,.18);
-  color:#fff;
-}
-.cell:hover::before{
-  content:""; position:absolute; inset:0; border-radius:inherit;
-  background: rgba(255,255,255,.06);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.30);
-}
-
-/* focus per celle editabili */
-.cell:focus-within{
-  outline: none;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.30),
-    var(--focus-ring);
-}
-
-/* numeri e testo nelle celle */
-.cell .num{
-  color: rgba(255,255,255,.98);
-  font-weight: 700;
-  text-shadow: var(--text-shadow);
-}
-
-/* === Domeniche: solo NUMERO rosso === */
-.cell.sun .num{ color: var(--sunday) !important; }
-/* Se oggi è domenica, resta rosso */
-.today.cell.sun .num{ color: var(--sunday) !important; }
-
-/* === Giorno “Oggi” — selezione attiva con bordo oro leggero === */
-.today::before{
-  content:""; position:absolute; inset:0; border-radius:inherit;
-
-  /* base uguale alla tab attiva, per coerenza cromatica */
-  background: var(--tabActiveBg);
-
-  /* mix di vetro e bordo dorato sottile */
-  box-shadow:
-    inset 0 0 0 1px rgba(255,215,128,.7),   /* filo dorato (richiamo aquila) */
-    inset 0 1px 0 rgba(255,255,255,.22),    /* lieve bordo interno chiaro */
-    0 8px 18px rgba(0,0,0,.18);             /* ombra morbida di profondità */
-
-  pointer-events:none;
-}
-
+@media (max-width:560px){ :root{ --tabW:48px; --tabH:40px; --tabIcon:18px; } }
 
 /* === Intestazione giorni === */
 .weekhead div{
@@ -414,56 +351,44 @@ svg, .brandmark svg path, .no-text-shadow{ text-shadow:none; }
   color:#ffffff; text-align:center; padding:8px 0; font-weight:800;
   border-radius:12px; letter-spacing:.03em; font-size:.9rem;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
-  text-shadow: var(--text-shadow);
+  text-shadow: 0 1px 1px rgba(0,0,0,.25);
 }
 
-/* === Topbar Glow (logo) più sobrio === */
-.brandmark svg path{
-  filter:
-    drop-shadow(0 1px 0 rgba(255,255,255,.18))
-    drop-shadow(0 6px 12px rgba(255,255,255,.18));
-}
-
-/* === Input coerenti e leggibili === */
-.settingsRow input, .settingsRow select, .orarioArea{
-  background: rgba(12,24,48,.26) !important;
-  border: 1px solid rgba(255,255,255,.26) !important;
-  color: #fff !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
-  border-radius: 10px;
-}
-.settingsRow input::placeholder, .orarioArea::placeholder{ color: rgba(255,255,255,.75); }
-.settingsRow select:focus, .settingsRow input:focus, .orarioArea:focus{
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-color: rgba(255,255,255,.48) !important;
-}
-
-/* === Tab attive/hover === */
-.tabbar .tab{ color: var(--tabColor); }
-.tabbar .tab:hover{ background: var(--tabHoverBg); color:#fff; }
-.tabbar .tab.active{ background: var(--tabActiveBg); color: var(--tabColorActive); }
-
-/* === Badge versione === */
+/* === Version badge === */
 .version-label{
   position: fixed;
   bottom: 6px;
   left: 10px;
   font-weight: 600;
   letter-spacing: .2px;
-  color: var(--muted, #e6eeff);
+  color: #e6eeff;
   opacity: .9;
   pointer-events: none;
   user-select: none;
   z-index: 9999;
   font-size: 14px;
-  text-shadow: var(--text-shadow);
+  text-shadow: 0 1px 1px rgba(0,0,0,.45);
 }
 @media (min-width: 1200px){ .version-label{ font-size: 15px; } }
 @media (display-mode: standalone){ .version-label{ font-size: 11px; opacity: .78; } }
 @media (max-width: 600px){ .version-label{ font-size: 12px; } }
 
-/* riduci animazioni se l’utente lo chiede */
+/* === Riduzione motion === */
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ transition: none !important; animation: none !important; }
+}
+
+/* === Glow topbar più sobrio su desktop larghi === */
+@media (min-width: 1200px){
+  :root{ --glow-x: 46%; }
+  .topbar::before{
+    -webkit-mask-image: linear-gradient(to bottom,#000 0,#000 var(--bar-h),
+      rgba(0,0,0,0.55) calc(var(--bar-h) + var(--seam)*.35),
+      rgba(0,0,0,0.22) calc(var(--bar-h)+var(--seam)*.75),
+      transparent calc(var(--bar-h)+var(--seam)));
+            mask-image: linear-gradient(to bottom,#000 0,#000 var(--bar-h),
+      rgba(0,0,0,0.55) calc(var(--bar-h) + var(--seam)*.35),
+      rgba(0,0,0,0.22) calc(var(--bar-h)+var(--seam)*.75),
+      transparent calc(var(--bar-h)+var(--seam)));
+  }
 }

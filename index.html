@@ -21,6 +21,10 @@
 
   <title>Turni Polizia di Stato</title>
 
+  <!-- Preconnect font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <!-- Manifest + ICONS (iniezione dinamica base-aware) -->
   <script>
   (function () {
@@ -59,7 +63,9 @@
   })();
   </script>
 
-  <!-- Tema scuro coerente -->
+  <!-- Tema PWA coerente con chiaro/scuro -->
+  <meta name="theme-color" content="#0f3e95" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0f14" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#0a0f14">
 
   <link rel="stylesheet" href="app.css">
@@ -122,27 +128,23 @@
   <!-- TABBAR -->
   <nav class="tabbar" aria-label="Barra schede">
     <div class="tab active" data-tab="calendar" aria-label="Calendario">
-  <svg id="icoCalendar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-       fill="none" stroke="currentColor" stroke-width="2"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
-</div>
-
+      <svg id="icoCalendar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+    </div>
 
     <div class="tab" data-tab="settings" aria-label="Impostazioni">
-  <svg id="icoSettings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-       fill="none" stroke="currentColor" stroke-width="2"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <circle cx="12" cy="12" r="3"></circle>
-  </svg>
-</div>
-
-
+      <svg id="icoSettings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    </div>
   </nav>
 
   <!-- Etichetta versione -->
   <div id="versionLabel" class="version-label"></div>
 
   <script src="app.js" defer></script>
-
 </body>
 </html>
