@@ -81,8 +81,25 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
 }
 
 /* === HEADER MESE + DOW === */
-.monthbar{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; margin:10px 0 8px; }
-.monthbar .title{ text-align:center; font-weight:800; letter-spacing:.2px; font-size: clamp(18px, 4vw, 22px); }
+.monthbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 10px;
+}
+
+.monthbar .title {
+  text-align: center;
+  font-family: var(--font-ui);
+  font-weight: 600;                 /* sotto a .weekhead(700) e .sigla/.num(800) */
+  font-size: clamp(18px, 2.8vw, 22px);
+  line-height: 1.15;                /* niente “effetto tappo” */
+  letter-spacing: 0.03em;           /* tracking coerente, non rigido in px */
+  color: rgba(255,255,255,0.96);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.28); /* più fine del 1x3 */
+}
+
 
 /* Nav btn: bolla tonda trasparente stile iOS */
 .navbtn{
@@ -410,11 +427,20 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
 .tab.active svg{ stroke-width:2.7; }
 
 /* === Version badge === */
-.version-label{
-  position: fixed; bottom: 6px; left: 10px;
-  font-weight: 700; letter-spacing: .2px; color: #e6eeff; opacity: .9;
-  pointer-events: none; user-select: none; z-index: 9999; font-size: 14px;
-  text-shadow: 0 1px 1px rgba(0,0,0,.45);
+.version-label {
+  position: fixed;
+  bottom: 6px;
+  left: 10px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: rgba(255,255,255,0.82);
+  opacity: 0.9;
+  pointer-events: none;
+  user-select: none;
+  z-index: 9999;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* === Reduce motion === */
