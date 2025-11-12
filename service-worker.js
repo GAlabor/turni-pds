@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker (migliorato con navigationPreload)
 // ==============================
 
-const VERSION    = '2025-11-07 V1.1'; //VERSIONE APP CORRENTE
+const VERSION    = '2025-11-07 V1.4'; //VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
