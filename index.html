@@ -14,29 +14,23 @@
   })();
   </script>
 
-  <!-- Evita cache dell'HTML -->
+  <!-- No-cache HTML -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
   <title>Turni Polizia di Stato</title>
 
-  <!-- Preconnect font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Manifest + ICONS (iniezione dinamica base-aware) -->
+  <!-- Manifest + ICONS (base-aware) -->
   <script>
   (function () {
     var BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
 
-    // Manifest
     var m = document.createElement("link");
     m.rel = "manifest";
     m.href = BASE + "/manifest.webmanifest";
     document.head.appendChild(m);
 
-    // Icone
     var links = [
       { rel: "icon", type: "image/png", sizes: "16x16", href: BASE + "/ico/favicon-16x16.png" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: BASE + "/ico/favicon-32x32.png" },
@@ -53,7 +47,6 @@
       document.head.appendChild(el);
     });
 
-    // Fallback favicon in locale
     if (location.hostname === "localhost") {
       var f = document.createElement("link");
       f.setAttribute("rel", "icon");
@@ -63,7 +56,7 @@
   })();
   </script>
 
-  <!-- Tema PWA coerente con chiaro/scuro -->
+  <!-- Tema PWA -->
   <meta name="theme-color" content="#0f3e95" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0a0f14" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#0a0f14">
@@ -90,7 +83,7 @@
       <div class="weekhead" aria-hidden="true">
         <div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div>
       </div>
-      <section class="grid" role="grid" aria-labelledby="monthLabel"></section>
+      <section class="grid anim" role="grid" aria-labelledby="monthLabel"></section>
     </section>
 
     <!-- SETTINGS VIEW -->
@@ -101,13 +94,13 @@
           <input type="date" id="startDate" />
         </div>
 
-        <hr style="border:none;border-top:1px solid var(--gridBorder);margin:12px 0" />
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.20);margin:12px 0" />
 
         <div class="settingsRow turni-grid turni-head">
-          <div style="font-weight:700;color:var(--muted)">Turno</div>
-          <div style="font-weight:700;color:var(--muted)">Sigla</div>
-          <div style="font-weight:700;color:var(--muted)">Orario</div>
-          <div style="font-weight:700;color:var(--muted)">Colore</div>
+          <div style="font-weight:700;color:#eef4ff">Turno</div>
+          <div style="font-weight:700;color:#eef4ff">Sigla</div>
+          <div style="font-weight:700;color:#eef4ff">Orario</div>
+          <div style="font-weight:700;color:#eef4ff">Colore</div>
           <div></div>
         </div>
         <div class="thin-sep"></div>
