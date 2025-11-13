@@ -4,20 +4,23 @@
              "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
 
   /* Palette su blu istituzionale con sfondo fisso */
-  --bg:
-    radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.22) 0%, rgba(255,255,255,0) 60%),
-    linear-gradient(180deg, #1b56c9 0%, #1a5fd9 38%, #1450bd 68%, #0f3e95 100%);
+--bg:
+  radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.10) 0%, rgba(255,255,255,0) 65%),
+  linear-gradient(180deg, #1a4fbf 0%, #1a5acb 38%, #1649a8 68%, #133b88 100%);
+
 
   /* superfici translucide */
   --pill-bg: rgba(255,255,255,.12);
   --pill-brd: rgba(255,255,255,.18);
 
   /* testi */
-  --text:#ffffff; --muted:#c9d5eb;
+  --text: #f8fbff;
+  --muted: #d2d8e6;
+
 
   /* calendario */
   --sunday:#ff6a6a;
-  --cell-brd: rgba(255,255,255,.24);
+  --cell-brd: rgba(255,255,255,.18);
   --cell-hov: rgba(255,255,255,.14);
   --today-brd: rgba(255,255,255,.82);
   --today-bg:  rgba(255,255,255,.10);
@@ -39,7 +42,7 @@
   --navBtnSize: 44px;   /* desktop default */
 
   /* focus */
-  --focus-ring: 0 0 0 2px rgba(74,158,255,.45);
+  --focus-ring: 0 0 0 2px rgba(74,170,240,.45);
 
   /* feedback */
   --lift: -1px;
@@ -63,21 +66,40 @@ body.no-scroll { overflow: hidden; }
 main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom)); padding:0 10px; }
 
 /* === TOPBAR uniforme con lo sfondo === */
-.topbar{
-  position: sticky; top: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: center;
-  padding:10px 12px; height:46px; color:#fff;
-  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid color-mix(in oklch, var(--pill-brd) 80%, transparent);
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,.16), 0 10px 28px rgba(7,23,54,.18);
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 46px;
+  padding: 10px 12px;
+
+  /* Trasparenza totale */
+  background: transparent;
+
+  /* Un minimo di vetro, ma quasi impercettibile */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  /* Linea sottilissima che non rompe la fusione */
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+
+  /* Ombra super leggera, giusto per distacco naturale */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+
+  color: #fff;
 }
+
+
+
 .brandmark{display:flex;align-items:center;justify-content:center;line-height:0}
 .brandmark svg{
   display:block; height:44px; width:auto;
   shape-rendering:geometricPrecision; text-rendering:optimizeLegibility;
-  filter: drop-shadow(0 1px 0 rgba(0,0,0,.25)) drop-shadow(0 6px 14px rgba(0,0,0,.18));
 }
 
 /* === HEADER MESE + DOW === */
@@ -201,7 +223,7 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden;
   background: transparent !important;
   border: 1px solid var(--cell-brd) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
   color:#fff;
   min-height:84px; border-radius:14px;
   cursor:pointer;
@@ -230,8 +252,9 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
     transform: translateY(var(--lift));
   }
   .cell:hover::before{
-    background: var(--cell-hov);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+    background: rgba(255,255,255,.10);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+
   }
 }
 
@@ -269,10 +292,10 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
 
 /* Oggi: bordo + bg */
 .today{
-  border-color: var(--today-brd) !important;
-  box-shadow: inset 0 0 0 1px var(--today-brd), inset 0 1px 0 rgba(255,255,255,.16);
+  border-color: rgba(255,255,255,.65) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), inset 0 1px 0 rgba(255,255,255,.12);
 }
-.today::before{ background: var(--today-bg); }
+.today::before{ background: rgba(255,255,255,.08); }
 
 /* === SIGLE === */
 .sigla{
@@ -505,3 +528,24 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
     opacity:1; transform: scale(1.02);
   }
 }
+
+/* === Desktop: celle alte finché c'è spazio === */
+@media (min-width: 561px) {
+  main {
+    padding-bottom: 110px; /* spazio sicuro sopra la tabbar, senza collisioni */
+  }
+
+.grid {
+  min-height: calc(100vh - 240px);
+  height: auto;
+  display: grid;
+  grid-auto-rows: minmax(100px, 1fr); /* celle più “adulte” */
+}
+
+.cell {
+  height: 100%;
+  min-height: 100px; /* garantisce uniformità anche nei mesi a 6 righe */
+}
+
+}
+
