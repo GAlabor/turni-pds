@@ -4,10 +4,9 @@
              "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
 
   /* Palette su blu istituzionale con sfondo fisso */
---bg:
-  radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.10) 0%, rgba(255,255,255,0) 65%),
-  linear-gradient(180deg, #1a4fbf 0%, #1a5acb 38%, #1649a8 68%, #133b88 100%);
-
+  --bg:
+    radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.07) 0%, rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, #1547a7 0%, #1650b7 35%, #14449c 70%, #113a87 100%);
 
   /* superfici translucide */
   --pill-bg: rgba(255,255,255,.12);
@@ -16,7 +15,6 @@
   /* testi */
   --text: #f8fbff;
   --muted: #d2d8e6;
-
 
   /* calendario */
   --sunday:#ff6a6a;
@@ -34,12 +32,12 @@
   /* Tabbar + icons (flex) */
   --tabH: 40px;
   --tabIcon: 26px;
-  --tabMaxW: 90px;      /* larghezza massima colonna tab */
+  --tabMaxW: 90px;
   --tabColor:#e2ebff;
   --tabColorActive:#ffffff;
 
-  /* frecce mese (bolla tonda) */
-  --navBtnSize: 44px;   /* desktop default */
+  /* frecce mese */
+  --navBtnSize: 44px;
 
   /* focus */
   --focus-ring: 0 0 0 2px rgba(74,170,240,.45);
@@ -63,38 +61,34 @@ body{
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
 body.no-scroll { overflow: hidden; }
-main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom)); padding:0 10px; }
 
-/* === TOPBAR uniforme con lo sfondo === */
+main{
+  max-width:760px;
+  margin:8px auto calc(90px + env(safe-area-inset-bottom));
+  padding:0 10px;
+}
+
+/* === TOPBAR identica alla tabbar === */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 20;
 
+  height: 46px;
+  padding: 8px 10px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  height: 46px;
-  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+  border-bottom: 1px solid rgba(255,255,255,.20);
 
-  /* Trasparenza totale */
-  background: transparent;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
 
-  /* Un minimo di vetro, ma quasi impercettibile */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  /* Linea sottilissima che non rompe la fusione */
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-
-  /* Ombra super leggera, giusto per distacco naturale */
-  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-
-  color: #fff;
+  color:#fff;
 }
-
-
 
 .brandmark{display:flex;align-items:center;justify-content:center;line-height:0}
 .brandmark svg{
@@ -114,16 +108,15 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
 .monthbar .title {
   text-align: center;
   font-family: var(--font-ui);
-  font-weight: 600;                 /* sotto a .weekhead(700) e .sigla/.num(800) */
+  font-weight: 600;
   font-size: clamp(18px, 2.8vw, 22px);
-  line-height: 1.15;                /* niente “effetto tappo” */
-  letter-spacing: 0.03em;           /* tracking coerente, non rigido in px */
+  line-height: 1.15;
+  letter-spacing: 0.03em;
   color: rgba(255,255,255,0.96);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.28); /* più fine del 1x3 */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.28);
 }
 
-
-/* Nav btn: bolla tonda trasparente stile iOS */
+/* Nav btn */
 .navbtn{
   appearance:none;
   border:1px solid rgba(255,255,255,.35);
@@ -148,7 +141,6 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
 }
 
-/* hover: lieve velatura bianca + lift */
 @media (hover:hover){
   .navbtn:hover{
     background: rgba(255,255,255,.12);
@@ -157,7 +149,6 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   }
 }
 
-/* click/tap: quasi piatto */
 .navbtn:active{
   background: rgba(255,255,255,.08);
   transform: translateY(var(--press));
@@ -174,18 +165,15 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   width:18px; height:18px; display:block; stroke-width:2.25;
 }
 
-
-/* Giorni settimana: allineati alla grid */
+/* DOW */
 .weekhead{
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:6px;               /* come .grid */
-  padding:3px;           /* come .grid */
-  margin:6px 0 4px;
+  gap:6px; padding:3px; margin:6px 0 4px;
 }
 .weekhead div{
-  background: transparent;                      /* come .cell */
-  border: 1px solid var(--cell-brd);            /* come .cell */
+  background: transparent;
+  border: 1px solid var(--cell-brd);
   color: color-mix(in oklch, #fff 96%, transparent);
   text-align:center;
   padding:10px 0;
@@ -193,8 +181,8 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   letter-spacing:.025em;
   text-transform:uppercase;
   font-size:.90rem;
-  border-radius:14px;                            /* come .cell desktop */
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14); /* come .cell */
+  border-radius:14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
 }
 
 .view{ display:none } .view.active{ display:block }
@@ -204,40 +192,41 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   display:grid;
   grid-template-columns:repeat(7,1fr);
   grid-auto-rows:minmax(62px,1fr);
-  gap:6px;
-  padding:3px;
-  position:relative;
+  gap:6px; padding:3px; position:relative;
 }
+
+/* animazioni */
 .grid.anim{ will-change: transform, opacity; }
 .slide-out-left{ animation: outLeft .22s ease forwards }
 .slide-in-right{ animation: inRight .22s ease forwards }
 .slide-out-right{ animation: outRight .22s ease forwards }
 .slide-in-left{ animation: inLeft .22s ease forwards }
+
 @keyframes outLeft{ from{transform:translateX(0); opacity:1} to{transform:translateX(-22px); opacity:0} }
 @keyframes inRight{ from{transform:translateX(22px); opacity:0} to{transform:translateX(0); opacity:1} }
 @keyframes outRight{ from{transform:translateX(0); opacity:1} to{transform:translateX(22px); opacity:0} }
 @keyframes inLeft{ from{transform:translateX(-22px); opacity:0} to{transform:translateX(0); opacity:1} }
 
-/* Celle trasparenti con bordo visibile */
+/* Celle */
 .cell{
   position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden;
   background: transparent !important;
   border: 1px solid var(--cell-brd) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
   color:#fff;
-  min-height:84px; border-radius:14px;
+  min-height:84px;
+  border-radius:14px;
   cursor:pointer;
   transition: transform .06s ease;
 }
 
-/* overlay hover/tap */
 .cell::before{
   content:""; position:absolute; inset:0; border-radius:inherit;
-  background:transparent; transition:background .14s ease, box-shadow .14s ease, transform .08s ease;
+  background:transparent;
+  transition:background .14s ease, box-shadow .14s ease, transform .08s ease;
   pointer-events:none;
 }
 
-/* micro pulse alla pressione */
 .cell::after{
   content:""; position:absolute; inset:-2px; border-radius:inherit;
   background: radial-gradient(120px 120px at 50% 50%, rgba(255,255,255,.12), transparent 60%);
@@ -246,7 +235,6 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   pointer-events:none;
 }
 
-/* hover desktop: velatura + lift + contorno più deciso */
 @media (hover:hover){
   .cell:hover{
     transform: translateY(var(--lift));
@@ -254,11 +242,9 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   .cell:hover::before{
     background: rgba(255,255,255,.10);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
-
   }
 }
 
-/* pressione: feedback immediato */
 .cell:active{
   transform: translateY(var(--press));
 }
@@ -270,16 +256,14 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   opacity:1; transform: scale(1);
 }
 
-/* Celle fuori mese */
 .cell.out-month{ opacity: var(--out-opacity, .55); }
 
-/* Focus per celle editabili */
 .cell:focus-within{
   outline: none;
   box-shadow: 0 0 0 1px rgba(255,255,255,.22), var(--focus-ring);
 }
 
-/* Numeri giorno */
+/* Numeri */
 .num{
   position:absolute; left:10px; top:8px; z-index:1;
   font-size:16px; font-weight:800; color:#fff;
@@ -287,17 +271,16 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   text-shadow: 0 1px 0 rgba(0,0,0,.35);
 }
 
-/* Domeniche: solo NUMERO rosso */
 .cell.sun .num{ color: var(--sunday) !important; }
 
-/* Oggi: bordo + bg */
+/* Today */
 .today{
   border-color: rgba(255,255,255,.65) !important;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), inset 0 1px 0 rgba(255,255,255,.12);
 }
 .today::before{ background: rgba(255,255,255,.08); }
 
-/* === SIGLE === */
+/* Sigla */
 .sigla{
   font-family:var(--font-ui);
   font-size:20px;
@@ -307,89 +290,151 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   text-shadow: 0 1px 0 rgba(0,0,0,.30);
 }
 
-/* Turni speciali */
 .T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
 
-/* === SETTINGS === */
+/* SETTINGS */
 .settingsCard{
   background: linear-gradient(180deg, rgba(12,24,48,.22), rgba(10,20,40,.16)) !important;
   border: 1px solid rgba(255,255,255,.20) !important;
   box-shadow: 0 8px 22px rgba(0,0,0,.20);
   border-radius: 14px; padding:14px; margin-top:10px;
 }
-.settingsRow{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center;margin:8px 0}
-.settingsRow label{font-weight:700;color:#eef4ff}
-.settingsRow input,.settingsRow select{
-  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
-  background: rgba(12,24,48,.20);color:#fff;height:var(--fieldH);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
-}
-.settingsRow input::placeholder, .orarioArea::placeholder{ color: rgba(255,255,255,.82); }
-.settingsRow select:focus, .settingsRow input:focus, .orarioArea:focus{
-  outline: none; box-shadow: var(--focus-ring); border-color: rgba(255,255,255,.42) !important;
+
+.settingsRow{
+  display:grid;grid-template-columns:160px 1fr;
+  gap:8px;align-items:center;margin:8px 0;
 }
 
-/* === FORMS === */
+.settingsRow label{font-weight:700;color:#eef4ff}
+
+.settingsRow input,.settingsRow select{
+  width:100%;padding:10px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.22);
+  background: rgba(12,24,48,.20);color:#fff;
+  height:var(--fieldH);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+.settingsRow input::placeholder,
+.orarioArea::placeholder{
+  color: rgba(255,255,255,.82);
+}
+
+.settingsRow select:focus,
+.settingsRow input:focus,
+.orarioArea:focus{
+  outline: none; box-shadow: var(--focus-ring);
+  border-color: rgba(255,255,255,.42) !important;
+}
+
+/* FORMS */
 .thin-sep{height:0;border-top:1px solid rgba(255,255,255,.20);margin:6px 0}
-.iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:10px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer}
+
+.iconbtn{
+  width:var(--fieldH);height:var(--fieldH);
+  border-radius:10px;padding:0;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+  border:0;cursor:pointer;
+}
 .iconbtn-primary{background:#1976d2;color:#fff}
 .iconbtn-primary:hover{ background: color-mix(in oklch, #1976d2 85%, white 15%); }
 .iconbtn-danger{background:#b42325;color:#fff}
 .iconbtn:active{transform:translateY(1px)}
-@media(max-width:560px){ .settingsRow{grid-template-columns:120px 1fr} }
 
-/* Hide topbar in settings quando richiesto */
+@media(max-width:560px){
+  .settingsRow{grid-template-columns:120px 1fr}
+}
+
+/* Nascondi topbar */
 .hide-topbar .topbar{ display: none !important; }
 .hide-topbar main{ margin-top: 8px; }
 
-/* === COLOR PICKER === */
+/* COLOR PICKER */
 .colorCell{ display:flex; align-items:center; justify-content:center; }
+
 .colorInput{
   -webkit-appearance:none; appearance:none;
   width:var(--fieldH); height:var(--fieldH);
-  border:1px solid rgba(255,255,255,.20); border-radius:10px; background:transparent;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:10px; background:transparent;
 }
+
 .colorInput::-webkit-color-swatch-wrapper{ padding:0; }
 .colorInput::-webkit-color-swatch{ border:none; border-radius:8px; }
 .colorInput::-moz-color-swatch{ border:none; border-radius:8px; }
-@media (max-width:560px){ :root{ --fieldH:40px; } }
 
-/* === GRID TURNI === */
-.turni-grid{ grid-template-columns: 1fr 64px 1.05fr 52px 44px !important; align-items:center; }
-.siglaInput{ width:100%; text-transform:uppercase; text-align:center; letter-spacing:.3px; font-family:var(--font-ui); font-weight:800; }
 @media (max-width:560px){
-  .turni-grid{ grid-template-columns: 1fr 60px 0.85fr 46px 44px !important; }
+  :root{ --fieldH:40px; }
 }
 
-/* === DATE FIELD === */
+/* GRID TURNI */
+.turni-grid{
+  grid-template-columns: 1fr 64px 1.05fr 52px 44px !important;
+  align-items:center;
+}
+
+.siglaInput{
+  width:100%; text-transform:uppercase;
+  text-align:center; letter-spacing:.3px;
+  font-family:var(--font-ui); font-weight:800;
+}
+
+@media (max-width:560px){
+  .turni-grid{
+    grid-template-columns: 1fr 60px 0.85fr 46px 44px !important;
+  }
+}
+
+/* DATE FIELD */
 .settingsRow input[type="date"]{
-  width:95%; min-width:0; font-size:1rem; height:38px; line-height:38px;
-  text-align:center; margin:0 auto; display:block; border-radius:10px;
-}
-@media (max-width:560px){
-  .settingsRow input[type="date"]{ width:92%; font-size:1.05rem; height:36px; line-height:36px; }
+  width:95%; min-width:0; font-size:1rem; height:38px;
+  line-height:38px; text-align:center; margin:0 auto;
+  display:block; border-radius:10px;
 }
 
-/* === MULTILINE SCHEDULE === */
+@media (max-width:560px){
+  .settingsRow input[type="date"]{
+    width:92%; font-size:1.05rem; height:36px;
+    line-height:36px;
+  }
+}
+
+/* MULTILINE */
 .orarioArea{
-  display:block; width:100%; height:calc(var(--fieldH) + 2px);
-  padding:6px 8px; resize:none; line-height:1.08; font-size:0.9rem;
-  border:1px solid rgba(255,255,255,.22); border-radius:10px; background: rgba(12,24,48,.20); color:#fff;
+  display:block; width:100%;
+  height:calc(var(--fieldH) + 2px);
+  padding:6px 8px; resize:none;
+  line-height:1.08; font-size:0.9rem;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:10px;
+  background: rgba(12,24,48,.20);
+  color:#fff;
   white-space:pre;
 }
-@media (max-width:560px){ .orarioArea{ font-size:0.86rem; height:calc(var(--fieldH)); } }
+
+@media (max-width:560px){
+  .orarioArea{
+    font-size:0.86rem;
+    height:calc(var(--fieldH));
+  }
+}
 
 /* === TABBAR === */
 .tabbar{
   position:fixed; bottom:0; left:0; right:0;
+
   background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06)) !important;
   border-top:1px solid rgba(255,255,255,.20);
+
   display:flex; justify-content:space-around; gap:10px;
+
   padding:8px 10px calc(8px + env(safe-area-inset-bottom));
   z-index:10;
+
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
+
 .tab{
   position: relative;
   display:flex;
@@ -400,42 +445,45 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   flex: 1;
   max-width: var(--tabMaxW);
   min-width: 0;
+
   height: var(--tabH);
   border-radius:12px;
+
   background:transparent;
   color: var(--tabColor);
   font-size:12px;
+
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition: color .2s ease, transform .06s ease, stroke-width .2s ease, filter .2s ease;
+
+  transition: color .2s ease, transform .06s ease,
+             stroke-width .2s ease, filter .2s ease;
 }
 
 .tab::after{ display:none !important; }
 
 .tab > *{ position: relative; z-index: 1; }
 
-/* hover: più bianco, lift e micro pop dell’icona */
 @media (hover:hover){
   .tab:hover{
     color: color-mix(in oklch, #fff 98%, transparent);
     transform: translateY(var(--lift));
     filter: brightness(var(--active-bright)) contrast(var(--active-contrast));
   }
-  .tab:hover svg{ stroke-width: 2.5; transform: scale(var(--icon-pop)); }
+  .tab:hover svg{
+    stroke-width: 2.5; transform: scale(var(--icon-pop));
+  }
 }
 
-/* pressione: accenno verso il basso */
 .tab:active{ transform: translateY(var(--press)); }
 .tab:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
 
-/* attivo: bianco pieno, leggero contrasto e più spessore */
 .tab.active{
   color:#ffffff;
   font-weight:800;
   filter: brightness(1.25) contrast(1.1);
 }
 
-/* SVG */
 .tab svg{
   width:var(--tabIcon);
   height:var(--tabIcon);
@@ -447,9 +495,10 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   stroke-linejoin:round;
   transition: stroke-width .2s ease, color .2s ease, transform .12s ease;
 }
+
 .tab.active svg{ stroke-width:2.7; }
 
-/* === Version badge === */
+/* Version badge */
 .version-label {
   position: fixed;
   bottom: 6px;
@@ -466,29 +515,31 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-/* === Reduce motion === */
+/* Reduce motion */
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ transition: none !important; animation: none !important; }
 }
 
-/* === MOBILE “super” (originali) === */
+/* MOBILE tweaks */
 @media (max-width:560px){
-  :root{ --navBtnSize: 36px; }  /* bolla frecce più compatta su mobile */
 
-  /* DOW coerenti con grid anche su mobile */
+  :root{ --navBtnSize: 36px; }
+
   .weekhead{
-    gap:2px;         /* come .grid mobile */
-    padding:2px;     /* come .grid mobile */
-    margin:4px 0 2px;
+    gap:2px; padding:2px; margin:4px 0 2px;
   }
+
   .weekhead div{
-    border-radius:10px;      /* come .cell mobile */
+    border-radius:10px;
     padding:8px 0;
     font-size:.86rem;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
   }
 
-  .grid{ grid-auto-rows:auto; gap:2px; padding:2px; }
+  .grid{
+    grid-auto-rows:auto;
+    gap:2px; padding:2px;
+  }
 
   .cell{
     aspect-ratio: 1 / 1;
@@ -505,18 +556,15 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
     top: 6px;
   }
 
-  /* Sigla centrata come in origine (niente bottom), con leggero offset verso il basso */
   .sigla{
     position: relative;
     top: 10px;
-    left: auto; right: auto; bottom: auto;
-    transform: none;
     font-size: 18px;
     letter-spacing: .25px;
   }
 }
 
-/* === Touch-first tweaks (quando non esiste hover, rendi la pressione più visibile) === */
+/* TOUCH tweaks */
 @media (hover:none){
   .tab:active{
     filter: brightness(1.22) contrast(1.08);
@@ -529,23 +577,21 @@ main{ max-width:760px; margin:8px auto calc(90px + env(safe-area-inset-bottom));
   }
 }
 
-/* === Desktop: celle alte finché c'è spazio === */
+/* DESKTOP: celle alte */
 @media (min-width: 561px) {
-  main {
-    padding-bottom: 110px; /* spazio sicuro sopra la tabbar, senza collisioni */
+
+  main{
+    padding-bottom: 110px;
   }
 
-.grid {
-  min-height: calc(100vh - 240px);
-  height: auto;
-  display: grid;
-  grid-auto-rows: minmax(100px, 1fr); /* celle più “adulte” */
-}
+  .grid{
+    min-height: calc(100vh - 240px);
+    height: auto;
+    grid-auto-rows: minmax(100px, 1fr);
+  }
 
-.cell {
-  height: 100%;
-  min-height: 100px; /* garantisce uniformità anche nei mesi a 6 righe */
+  .cell{
+    height: 100%;
+    min-height: 100px;
+  }
 }
-
-}
-
