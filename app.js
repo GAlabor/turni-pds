@@ -33,6 +33,10 @@ let view = new Date(Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), 
 
 const grid        = document.querySelector('.grid');
 const monthLabel  = document.getElementById('monthLabel');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+let isMonthAnimating = false;
 
 // Turni e settings (RAM)
 const SHIFT_DEFAULTS = [
@@ -89,7 +93,7 @@ function createCellElement({day, sun, sigla, isToday, startCol, outMonth, outOpa
 
   const num = document.createElement('span');
   num.className = 'num';
-  num.textContent = util_pad2(day);
+  num.textContent = day;
   cell.appendChild(num);
 
   // SEMPRE mostra la sigla, anche per out-month, con lo stesso stile (l’opacità la gestisce la cella)
@@ -176,19 +180,44 @@ if (remainder > 0) {
 
 // Animazioni tra mesi
 function animateAnd(fn, dir){
+  if (isMonthAnimating) return;      // se sta già animando, ignora
+  isMonthAnimating = true;
+
+  if (prevBtn) prevBtn.disabled = true;
+  if (nextBtn) nextBtn.disabled = true;
+
   const outClass = dir==='next' ? 'slide-out-left' : 'slide-out-right';
   const inClass  = dir==='next' ? 'slide-in-right' : 'slide-in-left';
+
   grid.classList.add('anim', outClass);
-  const once = () => {
-    grid.removeEventListener('animationend', once);
-    fn();
+
+  const handleOutEnd = (e) => {
+    // ci assicuriamo di reagire solo all'anim giusta
+    if (!e.animationName || !outClass.includes('out')) return;
+
+    grid.removeEventListener('animationend', handleOutEnd);
+
+    fn(); // cambia mese + render
+
     grid.classList.remove(outClass);
     grid.classList.add(inClass);
-    const once2 = () => { grid.removeEventListener('animationend', once2); grid.classList.remove('anim', inClass); };
-    grid.addEventListener('animationend', once2, { once:true });
   };
-  grid.addEventListener('animationend', once, { once:true });
+
+  const handleInEnd = (e) => {
+    if (!e.animationName || !inClass.includes('in')) return;
+
+    grid.removeEventListener('animationend', handleInEnd);
+    grid.classList.remove('anim', inClass);
+
+    isMonthAnimating = false;
+    if (prevBtn) prevBtn.disabled = false;
+    if (nextBtn) nextBtn.disabled = false;
+  };
+
+  grid.addEventListener('animationend', handleOutEnd);
+  grid.addEventListener('animationend', handleInEnd);
 }
+
 
 function nav_shift(delta){
   const dir = delta>0 ? 'next' : 'prev';

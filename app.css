@@ -32,8 +32,8 @@
   --fieldH:44px;
 
   /* Tabbar + icons (flex) */
-  --tabH: 28px; /*ALTEZZA TAPBAR*/
-  --tabIcon: 20px; /*ALTEZZA ICONE TABPAR*/
+  --tabH: 30px; /*ALTEZZA TAPBAR*/
+  --tabIcon: 26px; /*ALTEZZA ICONE TABPAR*/
   --tabMaxW: 90px; 
   --tabColor:#e2ebff;
   --tabColorActive:#ffffff;
@@ -536,3 +536,10 @@ main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom));
     height: 40px;   /* prima 32 / 44 → ora più grande SOLO su desktop */
     width: auto;
   }
+
+  @media (max-width: 560px){
+  html, body{
+    touch-action: manipulation;
+  }
+}
+
