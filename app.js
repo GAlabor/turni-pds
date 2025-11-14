@@ -121,22 +121,24 @@ function render_buildMonth(year,month) {
   const last =new Date(Date.UTC(year,month+1,0));
   const lead =util_jsWeekdayUTC(first); // 0=LUN ... 6=DOM
 
-  // 1) Giorni del mese precedente per coprire l'inizio riga
-  if (lead > 0) {
-    const prevY = (month===0) ? year-1 : year;
-    const prevM = (month===0) ? 11 : month-1;
-    const prevLast = util_daysInMonthUTC(prevY, prevM);
-    // sequence: prevLast-lead+1 ... prevLast
-    for (let i = prevLast - lead + 1, k=0; i <= prevLast; i++, k++) {
-      // opacità: da 0.35 (più lontano) a 0.85 (più vicino al mese corrente)
-      const denom = Math.max(1, lead-1);
-      const outOpacity = 0.16 + (k / denom) * 0.10;
-      const d = new Date(Date.UTC(prevY, prevM, i));
-      const isSun = util_jsWeekdayUTC(d)===6;
-      const sigla = shifts_codeForDate(d); // stessa logica turni anche sui filler
-      frag.appendChild(createCellElement({day:i,sun:isSun,sigla,isToday:false,outMonth:true,outOpacity}));
-    }
+// 1) Giorni del mese precedente per coprire l'inizio riga
+if (lead > 0) {
+  const prevY = (month===0) ? year-1 : year;
+  const prevM = (month===0) ? 11 : month-1;
+  const prevLast = util_daysInMonthUTC(prevY, prevM);
+  // sequence: prevLast-lead+1 ... prevLast
+  for (let i = prevLast - lead + 1, k=0; i <= prevLast; i++, k++) {
+    const denom = Math.max(1, lead-1);
+    // opacità: 0.45 → 0.60
+    const outOpacity = 0.45 + (k / denom) * 0.15;
+    const d = new Date(Date.UTC(prevY, prevM, i));
+    const isSun = util_jsWeekdayUTC(d)===6;
+    const sigla = shifts_codeForDate(d); // stessa logica turni anche sui filler
+    frag.appendChild(
+      createCellElement({day:i,sun:isSun,sigla,isToday:false,outMonth:true,outOpacity})
+    );
   }
+}
 
   // 2) Giorni del mese corrente
   for(let day=1; day<=last.getUTCDate(); day++){
@@ -150,22 +152,24 @@ function render_buildMonth(year,month) {
     frag.appendChild(createCellElement({day,sun:isSun,sigla,isToday:isT,startCol}));
   }
 
-  // 3) Giorni del mese successivo per chiudere la settimana
-  const cellsSoFar = lead + last.getUTCDate();
-  const remainder = (cellsSoFar % 7 === 0) ? 0 : 7 - (cellsSoFar % 7);
-  if (remainder > 0) {
-    const nextY = (month===11) ? year+1 : year;
-    const nextM = (month===11) ? 0 : month+1;
-    for (let i = 1; i <= remainder; i++) {
-      // opacità: da 0.85 (vicino alla fine del mese corrente) a 0.35 (più lontano)
-      const denom = Math.max(1, remainder-1);
-      const outOpacity = 0.26 - ((i-1) / denom) * 0.10;
-      const d = new Date(Date.UTC(nextY, nextM, i));
-      const isSun = util_jsWeekdayUTC(d)===6;
-      const sigla = shifts_codeForDate(d);
-      frag.appendChild(createCellElement({day:i,sun:isSun,sigla,isToday:false,outMonth:true,outOpacity}));
-    }
+// 3) Giorni del mese successivo per chiudere la settimana
+const cellsSoFar = lead + last.getUTCDate();
+const remainder = (cellsSoFar % 7 === 0) ? 0 : 7 - (cellsSoFar % 7);
+if (remainder > 0) {
+  const nextY = (month===11) ? year+1 : year;
+  const nextM = (month===11) ? 0 : month+1;
+  for (let i = 1; i <= remainder; i++) {
+    const denom = Math.max(1, remainder-1);
+    // opacità: 0.60 → 0.45
+    const outOpacity = 0.60 - ((i-1) / denom) * 0.15;
+    const d = new Date(Date.UTC(nextY, nextM, i));
+    const isSun = util_jsWeekdayUTC(d)===6;
+    const sigla = shifts_codeForDate(d);
+    frag.appendChild(
+      createCellElement({day:i,sun:isSun,sigla,isToday:false,outMonth:true,outOpacity})
+    );
   }
+}
 
   grid.replaceChildren(frag);
 }

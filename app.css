@@ -70,7 +70,7 @@ main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom));
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: center;
   padding:6px 10px; /*ALTEZZA TOPBAR */
-  height:30px;      /*ALTEZZA TOPBAR */
+  height:34px;      /*ALTEZZA TOPBAR */
   color:#fff;
   background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
   border: 1px solid rgba(255,255,255,.10);
@@ -254,7 +254,7 @@ main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom));
 
 /* Celle fuori mese */
 .cell.out-month{
-  opacity: var(--out-opacity, .20) !important;
+  opacity: var(--out-opacity, .45) !important;
 }
 
 /* Focus per celle editabili */
@@ -536,11 +536,3 @@ main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom));
     height: 40px;   /* prima 32 / 44 → ora più grande SOLO su desktop */
     width: auto;
   }
-
-  @media (max-width: 560px){
-  .topbar{
-    padding-top: calc(6px + env(safe-area-inset-top));
-    height: auto; /* lascia che l’altezza si adatti al padding */
-  }
-}
-

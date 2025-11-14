@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker (migliorato con navigationPreload)
 // ==============================
 
-const VERSION    = '2025-11-14 V1.5'; //VERSIONE APP CORRENTE
+const VERSION    = '2025-11-14 V1.1'; // VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -52,7 +52,11 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await Promise.all(
+      keys
+        .filter(k => k !== CACHE_NAME)
+        .map(k => caches.delete(k))
+    );
 
     // Abilita navigationPreload per velocizzare i navigate fetch
     if (self.registration.navigationPreload) {
@@ -71,8 +75,16 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
 
   if (req.method !== 'GET') return;
-  const sameOrigin = new URL(req.url).origin === self.location.origin;
+
+  const url = new URL(req.url);
+  const sameOrigin = url.origin === self.location.origin;
   if (!sameOrigin) return;
+
+  // ⬇⬇⬇ IMPORTANTE: NON intercettare il file del service worker
+  if (url.pathname === `${ROOT}/service-worker.js`) {
+    return; // lascia che il browser lo prenda sempre dal network
+  }
+  // ⬆⬆⬆
 
   const isHTML =
     req.mode === 'navigate' ||
@@ -99,7 +111,8 @@ self.addEventListener('fetch', (event) => {
       } catch {
         const cached = await caches.match(`${ROOT}/index.html`);
         return cached || new Response('<h1>Offline</h1><p>Nessuna cache disponibile.</p>', {
-          headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: 503
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+          status: 503
         });
       }
     })());
