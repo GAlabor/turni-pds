@@ -536,3 +536,11 @@ main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom));
     height: 40px;   /* prima 32 / 44 → ora più grande SOLO su desktop */
     width: auto;
   }
+
+  @media (max-width: 560px){
+  .topbar{
+    padding-top: calc(6px + env(safe-area-inset-top));
+    height: auto; /* lascia che l’altezza si adatti al padding */
+  }
+}
+
