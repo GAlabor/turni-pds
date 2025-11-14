@@ -1,545 +1,601 @@
-/* === TYPE (iOS-like ovunque) === */
-:root{
-  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-             "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
+:root {
+  /* tema chiaro di default */
+  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+  --bg-solid: #e7ecff;
+  --surface: rgba(255,255,255,0.88);
+  --surface-strong: rgba(255,255,255,0.96);
+  --border: rgba(120,130,170,0.18);
+  --text: #111827;
+  --subtext: #6b7280;
+  --accent: #0a84ff;
+  --radius-xl: 24px;
+  --radius: 16px;
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);
+  --shadow-light: 0 10px 26px rgba(15,23,42,0.12);
 
-  /* SFONDO MENO SATURO, PIÙ MODERNO (come prima versione che ti piaceva) */
-  --bg:
-    radial-gradient(1200px 800px at 80% -10%, rgba(130,170,255,.05) 0%, rgba(255,255,255,0) 70%),
-    linear-gradient(180deg, #14428f 0%, #184fa5 40%, #123b80 100%);
+  --dow-muted: #6b7280;
+  --weekend: #e25555;
+  --hover-bg: rgba(10,132,255,0.08);
+  --today-border: var(--accent);
+  --version-color: rgba(15,23,42,0.65);
 
-  /* superfici translucide */
-  --pill-bg: rgba(255,255,255,.12);
-  --pill-brd: rgba(255,255,255,.18);
+  /* frecce mese */
+  --nav-fg: #111827;
 
-  /* testi */
-  --text: #f8fbff;
-  --muted: #d2d8e6;
+  --tabbar-h: 70px;
 
-  /* calendario: riportato ai valori “soft” del tema precedente */
-  --sunday:#ff6a6a;
-  --cell-bg:  rgba(255,255,255,.05);
-  --cell-brd: rgba(255,255,255,.16);
-  --cell-hov: rgba(255,255,255,.09);
-  --today-brd: rgba(255,255,255,.85);
-  --today-bg:  rgba(255,255,255,.12);
+  /* tabbar palette */
+  --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
+  --tabbar-border: rgba(148,163,184,0.4);
 
-  /* turni speciali */
-  --T-GL:#3ccdd0;
-  --T-AP:#ff7dbf;
-
-  /* dimensioni */
-  --fieldH:44px;
-
-  /* Tabbar + icons (flex) */
-  --tabH: 30px; /*ALTEZZA TAPBAR*/
-  --tabIcon: 26px; /*ALTEZZA ICONE TABPAR*/
-  --tabMaxW: 90px; 
-  --tabColor:#e2ebff;
-  --tabColorActive:#ffffff;
-
-  /* frecce mese (bolla tonda) */
-  --navBtnSize: 32px;   /* desktop default */
-
-  /* focus */
-  --focus-ring: 0 0 0 2px rgba(74,170,240,.45);
-
-  /* feedback */
+  /* tabbar */
+  --tabH: 46px;
+  --tabIcon: 24px;
+  --tabMaxW: 120px;
+  --tabColor: #9ca3af;          /* icona inattiva */
+  --tabActiveColor: #0a84ff;    /* icona attiva */
+  --active-bright: 1.12;
+  --active-contrast: 1.03;
+  --icon-pop: 1.08;
   --lift: -1px;
   --press: 1px;
-  --icon-pop: 1.04;
-  --active-contrast: 1.1;
-  --active-bright: 1.25;
+  --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
 }
 
-/* === BASE === */
-*{box-sizing:border-box}
-html, body { height: 100%; }
-body{
-  margin:0;
-  background: var(--bg) fixed !important;
-  color:var(--text);
-  font-family:var(--font-ui);
-  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-}
-body.no-scroll { overflow: hidden; }
-main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom)); padding:0 10px; }
+/* Tema “system” scuro, se nessun data-theme è forzato */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+    --bg-solid: #020617;
+    --surface: rgba(15,23,42,0.94);
+    --surface-strong: rgba(15,23,42,0.98);
+    --border: rgba(148,163,184,0.26);
+    --text: #e5e7eb;
+    --subtext: #9ca3af;
+    --accent: #4b8dff;
+    --shadow-soft: 0 22px 60px rgba(0,0,0,0.7);
+    --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
 
-/* === TOPBAR uniforme con lo sfondo === */
-.topbar{
-  position: sticky; top: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: center;
-  padding:6px 10px; /*ALTEZZA TOPBAR */
-  height:34px;      /*ALTEZZA TOPBAR */
-  color:#fff;
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border: 1px solid rgba(255,255,255,.10);
-}
-.brandmark{display:flex;align-items:center;justify-content:center;line-height:0}
-.brandmark svg{
-  display:block; 
-  height:32px;  /*GRANDEZZA LOGO POLIZIA*/ 
-  width:auto;
-  shape-rendering:geometricPrecision; text-rendering:optimizeLegibility;
-}
+    --dow-muted: #9ca3af;
+    --weekend: #ff8f8f;
+    --hover-bg: rgba(75,141,255,0.18);
+    --today-border: var(--accent);
+    --version-color: rgba(226,232,240,0.8);
 
-/* === HEADER MESE + DOW === */
-.monthbar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 8px;
-  margin: 12px 0 10px;
-}
+    --nav-fg: #e5e7eb;
 
-.monthbar .title {
-  text-align: center;
-  font-family: var(--font-ui);
-  font-weight: 600;                 /* sotto a .weekhead(700) e .sigla/.num(800) */
-  font-size: clamp(18px, 2.8vw, 22px);
-  line-height: 1.15;                /* niente “effetto tappo” */
-  letter-spacing: 0.03em;           /* tracking coerente, non rigido in px */
-  color: rgba(255,255,255,0.96);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.28); /* più fine del 1x3 */
-}
+    --tabbar-bg: linear-gradient(180deg, rgba(15,23,42,0.3), rgba(15,23,42,0.92));
+    --tabbar-border: rgba(30,64,175,0.7);
 
-
-/* Nav btn: bolla tonda trasparente stile iOS */
-.navbtn{
-  appearance:none;
-  border:1px solid rgba(255,255,255,.35);
-  background:transparent;
-  color:#fff;
-
-  inline-size: var(--navBtnSize);
-  block-size: var(--navBtnSize);
-  border-radius:9999px;
-  padding:0;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:20px;
-  line-height:1;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-
-  transition: background .16s ease, transform .06s ease, box-shadow .16s ease, border-color .16s ease;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
-}
-
-/* hover: lieve velatura bianca + lift */
-@media (hover:hover){
-  .navbtn:hover{
-    background: rgba(255,255,255,.12);
-    transform: translateY(var(--lift));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 2px 8px rgba(0,0,0,.15);
+    --tabColor: #6b7280;
+    --tabActiveColor: #4b8dff;
   }
 }
 
-/* click/tap: quasi piatto */
-.navbtn:active{
-  background: rgba(255,255,255,.08);
-  transform: translateY(var(--press));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+/* Forzatura tema chiaro */
+:root[data-theme="light"] {
+  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+  --bg-solid: #e7ecff;
+  --surface: rgba(255,255,255,0.88);
+  --surface-strong: rgba(255,255,255,0.96);
+  --border: rgba(120,130,170,0.18);
+  --text: #111827;
+  --subtext: #6b7280;
+  --accent: #0a84ff;
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);
+  --shadow-light: 0 10px 26px rgba(15,23,42,0.12);
+
+  --dow-muted: #6b7280;
+  --weekend: #e25555;
+  --hover-bg: rgba(10,132,255,0.08);
+  --today-border: var(--accent);
+  --version-color: rgba(15,23,42,0.65);
+
+  --nav-fg: #111827;
+
+  --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
+  --tabbar-border: rgba(148,163,184,0.4);
+
+  --tabColor: #9ca3af;
+  --tabActiveColor: #0a84ff;
 }
 
-.navbtn:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.25), var(--focus-ring);
-  border-color: rgba(255,255,255,.45);
+/* Forzatura tema scuro */
+:root[data-theme="dark"] {
+  --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+  --bg-solid: #020617;
+  --surface: rgba(15,23,42,0.94);
+  --surface-strong: rgba(15,23,42,0.98);
+  --border: rgba(148,163,184,0.26);
+  --text: #e5e7eb;
+  --subtext: #9ca3af;
+  --accent: #4b8dff;
+  --shadow-soft: 0 22px 60px rgba(0,0,0,0.7);
+  --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
+
+  --dow-muted: #9ca3af;
+  --weekend: #ff8f8f;
+  --hover-bg: rgba(75,141,255,0.18);
+  --today-border: var(--accent);
+  --version-color: rgba(226,232,240,0.8);
+
+  --nav-fg: #e5e7eb;
+
+  --tabbar-bg: linear-gradient(180deg, rgba(15,23,42,0.3), rgba(15,23,42,0.92));
+  --tabbar-border: rgba(30,64,175,0.7);
+
+  --tabColor: #6b7280;
+  --tabActiveColor: #4b8dff;
 }
 
-.navbtn svg{
-  width:18px; height:18px; display:block; stroke-width:2.25;
+/* Reset / base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-
-/* Giorni settimana: allineati alla grid */
-.weekhead{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px;
-  padding:0;
-  margin:4px 0 2px;
+body {
+  margin: 0;
+  background: var(--bg);
+  background-attachment: fixed;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  padding: 4px 14px calc(18px + env(safe-area-inset-bottom) + var(--tabbar-h));
 }
 
-.weekhead div{
-  background: none;
+/* Shell & viste */
+
+.app-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.view {
+  display: none;
+}
+
+.view.is-active {
+  display: block;
+}
+
+/* Header stile iOS */
+
+.app-header {
+  padding: 4px 4px 10px 4px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.app-subtitle {
+  margin: 4px 0 0 2px;
+  font-size: 14px;
+  color: var(--subtext);
+}
+
+/* Header mese (vista calendario) */
+
+.monthbar {
+  margin: 6px 0 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.month-label {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.nav-btn {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: 40px;
+  height: 34px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+  color: var(--nav-fg);
+}
+
+.nav-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 8px 18px rgba(10,132,255,0.35);
+}
+
+/* Contenitore calendario */
+
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.calendar-container {
+  background: var(--surface);
+  padding: 18px 20px 20px;
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 1120px;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border);
+}
+
+/* Intestazioni giorni settimana */
+
+.dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dow {
+  padding: 6px 0;
+  text-align: center;
+  font-weight: 600;
+  color: var(--dow-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Griglia giorni */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+/* Celle giorno */
+
+.day {
+  background: var(--surface-strong);
+  padding: 12px 12px 14px;
+  text-align: right;
+  font-size: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  transition: 0.16s ease;
+  min-height: 64px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+.day::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at top, rgba(10,132,255,0.22), transparent 55%);
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.day.empty {
+  background: transparent;
   border: none;
   box-shadow: none;
-  text-align: center;
-  padding: 2px 0;
-  font-size: .70rem;  /* rimpiccioliti */
+  pointer-events: none;
+}
+
+.day:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.day:hover::before {
+  opacity: 1;
+}
+
+/* Weekend e oggi */
+
+.weekend {
+  color: var(--weekend);
+}
+
+.today {
+  border: 2px solid var(--today-border);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .02em;
-  color: rgba(255,255,255,0.75);
 }
 
+/* Vista impostazioni */
 
-.view{ display:none } .view.active{ display:block }
-
-/* === GRID === */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  grid-auto-rows:minmax(62px,1fr);
-  gap:6px;
-  padding:3px;
-  position:relative;
-}
-.grid.anim{ will-change: transform, opacity; }
-.slide-out-left{ animation: outLeft .22s ease forwards }
-.slide-in-right{ animation: inRight .22s ease forwards }
-.slide-out-right{ animation: outRight .22s ease forwards }
-.slide-in-left{ animation: inLeft .22s ease forwards }
-@keyframes outLeft{ from{transform:translateX(0); opacity:1} to{transform:translateX(-22px); opacity:0} }
-@keyframes inRight{ from{transform:translateX(22px); opacity:0} to{transform:translateX(0); opacity:1} }
-@keyframes outRight{ from{transform:translateX(0); opacity:1} to{transform:translateX(22px); opacity:0} }
-@keyframes inLeft{ from{transform:translateX(-22px); opacity:0} to{transform:translateX(0); opacity:1} }
-
-/* Celle trasparenti con bordo visibile */
-.cell{
-  position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden;
-  background: transparent !important;
-  border: 1px solid var(--cell-brd) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-  color:#fff;
-  min-height:84px; border-radius:14px;
-  cursor:pointer;
-  transition: transform .06s ease;
+.view-settings .settings-container {
+  background: var(--surface);
+  padding: 18px 18px 22px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-/* overlay hover/tap */
-.cell::before{
-  content:""; position:absolute; inset:0; border-radius:inherit;
-  background:transparent; transition:background .14s ease, box-shadow .14s ease, transform .08s ease;
-  pointer-events:none;
+.settings-title {
+  margin: 0 0 16px 0;
+  font-size: 22px;
 }
 
-/* micro pulse alla pressione */
-.cell::after{
-  content:""; position:absolute; inset:-2px; border-radius:inherit;
-  background: radial-gradient(120px 120px at 50% 50%, rgba(255,255,255,.12), transparent 60%);
-  opacity:0; transform: scale(.96);
-  transition: opacity .08s ease, transform .08s ease;
-  pointer-events:none;
+.settings-group {
+  margin-bottom: 18px;
 }
 
-/* hover desktop: velatura + lift + contorno più deciso */
-@media (hover:hover){
-  .cell:hover{
-    transform: translateY(var(--lift));
+.settings-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.settings-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.settings-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+:root[data-theme="dark"] .settings-option {
+  background: rgba(15,23,42,0.5);
+}
+
+.settings-option input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+.settings-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--subtext);
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  body {
+    padding: 14px 10px calc(12px + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
-  .cell:hover::before{
-    background: rgba(255,255,255,.10);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
 
+  .app-header {
+    padding: 2px 2px 8px 2px;
+  }
+
+  .app-title {
+    font-size: 26px;
+  }
+
+  .month-label {
+    font-size: 19px;
+  }
+
+  .calendar-container {
+    padding: 14px 12px 16px;
+    border-radius: 18px;
+  }
+
+  .day {
+    padding: 10px;
+    min-height: 54px;
+    font-size: 14px;
+  }
+
+  .dow {
+    font-size: 12px;
+  }
+
+  .view-settings .settings-container {
+    padding: 14px 12px 18px;
+    border-radius: 18px;
+  }
+
+  .tabbar {
+    padding-inline: 12px;
+  }
+
+  /* MOBILE: niente scritte sotto le icone */
+  .tab-label {
+    display: none;
   }
 }
 
-/* pressione: feedback immediato */
-.cell:active{
-  transform: translateY(var(--press));
-}
-.cell:active::before{
-  background: rgba(255,255,255,.10);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.26);
-}
-.cell:active::after{
-  opacity:1; transform: scale(1);
+/* DESKTOP: le scritte restano */
+@media (min-width: 901px) {
+  .tab-label {
+    display: block;
+  }
 }
 
-/* Celle fuori mese */
-.cell.out-month{
-  opacity: var(--out-opacity, .45) !important;
-}
+/* =========================
+   TABBAR IN BASSO
+   ========================= */
 
-/* Focus per celle editabili */
-.cell:focus-within{
-  outline: none;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.22), var(--focus-ring);
-}
-
-/* Numeri giorno */
-.num{
-  position:absolute; left:10px; top:8px; z-index:1;
-  font-size:16px; font-weight:800; color:#fff;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 0 rgba(0,0,0,.35);
-}
-
-/* Domeniche: solo NUMERO rosso */
-.cell.sun .num{ color: var(--sunday) !important; }
-
-/* Oggi: bordo + bg */
-.today{
-  border-color: var(--today-brd) !important;
-  box-shadow: inset 0 0 0 1px var(--today-brd), inset 0 1px 0 rgba(255,255,255,.12);
-}
-.today::before{ background: var(--today-bg); }
-
-/* === SIGLE === */
-.sigla{
-  font-family:var(--font-ui);
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:.3px;
-  position:relative; top:8px; z-index:1;
-  text-shadow: 0 1px 0 rgba(0,0,0,.30);
-}
-
-/* Turni speciali */
-.T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
-
-/* === SETTINGS === */
-.settingsCard{
-  background: linear-gradient(180deg, rgba(12,24,48,.22), rgba(10,20,40,.16)) !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
-  box-shadow: 0 8px 22px rgba(0,0,0,.20);
-  border-radius: 14px; padding:14px; margin-top:10px;
-}
-.settingsRow{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center;margin:8px 0}
-.settingsRow label{font-weight:700;color:#eef4ff}
-.settingsRow input,.settingsRow select{
-  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
-  background: rgba(12,24,48,.20);color:#fff;height:var(--fieldH);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
-}
-.settingsRow input::placeholder, .orarioArea::placeholder{ color: rgba(255,255,255,.82); }
-.settingsRow select:focus, .settingsRow input:focus, .orarioArea:focus{
-  outline: none; box-shadow: var(--focus-ring); border-color: rgba(255,255,255,.42) !important;
-}
-
-/* === FORMS === */
-.thin-sep{height:0;border-top:1px solid rgba(255,255,255,.20);margin:6px 0}
-.iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:10px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer}
-.iconbtn-primary{background:#1976d2;color:#fff}
-.iconbtn-primary:hover{ background: color-mix(in oklch, #1976d2 85%, white 15%); }
-.iconbtn-danger{background:#b42325;color:#fff}
-.iconbtn:active{transform:translateY(1px)}
-@media(max-width:560px){ .settingsRow{grid-template-columns:120px 1fr} }
-
-/* Hide topbar in settings quando richiesto */
-.hide-topbar .topbar{ display: none !important; }
-.hide-topbar main{ margin-top: 8px; }
-
-/* === COLOR PICKER === */
-.colorCell{ display:flex; align-items:center; justify-content:center; }
-.colorInput{
-  -webkit-appearance:none; appearance:none;
-  width:var(--fieldH); height:var(--fieldH);
-  border:1px solid rgba(255,255,255,.20); border-radius:10px; background:transparent;
-}
-.colorInput::-webkit-color-swatch-wrapper{ padding:0; }
-.colorInput::-webkit-color-swatch{ border:none; border-radius:8px; }
-.colorInput::-moz-color-swatch{ border:none; border-radius:8px; }
-@media (max-width:560px){ :root{ --fieldH:40px; } }
-
-/* === GRID TURNI === */
-.turni-grid{ grid-template-columns: 1fr 64px 1.05fr 52px 44px !important; align-items:center; }
-.siglaInput{ width:100%; text-transform:uppercase; text-align:center; letter-spacing:.3px; font-family:var(--font-ui); font-weight:800; }
-@media (max-width:560px){
-  .turni-grid{ grid-template-columns: 1fr 60px 0.85fr 46px 44px !important; }
-}
-
-/* === DATE FIELD === */
-.settingsRow input[type="date"]{
-  width:95%; min-width:0; font-size:1rem; height:38px; line-height:38px;
-  text-align:center; margin:0 auto; display:block; border-radius:10px;
-}
-@media (max-width:560px){
-  .settingsRow input[type="date"]{ width:92%; font-size:1.05rem; height:36px; line-height:36px; }
-}
-
-/* === MULTILINE SCHEDULE === */
-.orarioArea{
-  display:block; width:100%; height:calc(var(--fieldH) + 2px);
-  padding:6px 8px; resize:none; line-height:1.08; font-size:0.9rem;
-  border:1px solid rgba(255,255,255,.22); border-radius:10px; background: rgba(12,24,48,.20); color:#fff;
-  white-space:pre;
-}
-@media (max-width:560px){ .orarioArea{ font-size:0.86rem; height:calc(var(--fieldH)); } }
-
-/* === TABBAR === */
 .tabbar{
-  position:fixed; bottom:0; left:0; right:0;
-  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06)) !important;
-  border-top:1px solid rgba(255,255,255,.20);
-  display:flex; justify-content:space-around; gap:10px;
-  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background: var(--tabbar-bg);
+  border-top:1px solid var(--tabbar-border);
+  display:flex;
+  justify-content:space-around;
+  gap:18px;
+  padding:6px 18px calc(8px + env(safe-area-inset-bottom));
   z-index:10;
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
 }
+
 .tab{
   position: relative;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:4px;
+  gap:2px;
   flex: 1;
   max-width: var(--tabMaxW);
   min-width: 0;
   height: var(--tabH);
   border-radius:12px;
-  background:transparent;
+  background:transparent;           /* niente pillola selezionata */
   color: var(--tabColor);
-  font-size:12px;
+  font-size:11px;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition: color .2s ease, transform .06s ease, stroke-width .2s ease, filter .2s ease;
+  border: none;
+  padding: 0;
+  transition:
+    color .16s ease,
+    transform .06s ease,
+    filter .12s ease;
 }
 
 .tab::after{ display:none !important; }
 
 .tab > *{ position: relative; z-index: 1; }
 
-/* hover: più bianco, lift e micro pop dell’icona */
+.tab-label {
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* hover desktop */
 @media (hover:hover){
   .tab:hover{
-    color: color-mix(in oklch, #fff 98%, transparent);
     transform: translateY(var(--lift));
     filter: brightness(var(--active-bright)) contrast(var(--active-contrast));
   }
-  .tab:hover svg{ stroke-width: 2.5; transform: scale(var(--icon-pop)); }
 }
 
-/* pressione: accenno verso il basso */
-.tab:active{ transform: translateY(var(--press)); }
-.tab:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
+.tab:active{
+  transform: translateY(var(--press));
+}
 
-/* attivo: bianco pieno, leggero contrasto e più spessore */
+.tab:focus-visible{
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* STATO ATTIVO: solo colore icona/testo, nessun contorno */
 .tab.active{
-  color:#ffffff;
-  font-weight:800;
-  filter: brightness(1.25) contrast(1.1);
+  color: var(--tabActiveColor);
+  font-weight: 600;
+  filter: none;
 }
 
-/* SVG */
 .tab svg{
   width:var(--tabIcon);
   height:var(--tabIcon);
   display:block;
   fill:none;
   stroke:currentColor;
-  stroke-width:2.25;
+  stroke-width:2.2;
   stroke-linecap:round;
   stroke-linejoin:round;
-  transition: stroke-width .2s ease, color .2s ease, transform .12s ease;
+  transition:
+    stroke-width .16s ease,
+    transform .12s ease,
+    color .16s ease;
 }
-.tab.active svg{ stroke-width:2.7; }
 
-/* === Version badge === */
+.tab.active svg{
+  stroke-width:2.4;
+  transform: scale(var(--icon-pop));
+}
+
+/* touch */
+@media (hover:none){
+  .tab:active{
+    filter: brightness(1.08) contrast(1.02);
+  }
+}
+
+/* =========================
+   VERSION BADGE
+   ========================= */
+
 .version-label {
   position: fixed;
   bottom: 6px;
   left: 10px;
-  font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.03em;
-  color: rgba(255,255,255,0.82);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--version-color);
   opacity: 0.9;
   pointer-events: none;
   user-select: none;
   z-index: 9999;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 2px rgba(15,23,42,0.35);
 }
-
-/* === Reduce motion === */
-@media (prefers-reduced-motion: reduce){
-  *, *::before, *::after{ transition: none !important; animation: none !important; }
-}
-
-/* === MOBILE “super” (originali) === */
-@media (max-width:560px){
-  :root{ --navBtnSize: 36px; }  /* bolla frecce più compatta su mobile */
-
-  /* DOW coerenti con grid anche su mobile */
-  .weekhead{
-    gap:1px;
-    padding:0;
-    margin:2px 0 1px;
-  }
-  .weekhead div{
-    background:none;
-    border:none;
-    box-shadow:none;
-    padding:1px 0;
-    font-size:.58rem; /* più piccole su mobile */
-    color: rgba(255,255,255,0.75);
+@media (min-width: 901px) {
+  body {
+    padding-bottom: 20px; /* da 0 a 20px, scegli tu */
   }
 
-  .grid{ grid-auto-rows:auto; gap:2px; padding:2px; }
+  .calendar-container {
+    padding-bottom: 12px; /* era 20px → lo abbassi */
+  }
+}
 
-  .cell{
-    aspect-ratio: 1 / 1;
-    min-height: unset;
-    height: auto;
-    padding: 4px 0;
+@media (max-width: 900px) {
+  .day {
     border-radius: 10px;
+    min-height: 46px;
+    padding: 8px;
+    font-size: 13px;
+    box-shadow: none;
   }
 
-  .num{
-    font-size: 15px;
-    font-weight: 800;
-    left: 8px;
-    top: 6px;
-  }
-
-  /* Sigla centrata come in origine (niente bottom), con leggero offset verso il basso */
-  .sigla{
-    position: relative;
-    top: 10px;
-    left: auto; right: auto; bottom: auto;
-    transform: none;
-    font-size: 18px;
-    letter-spacing: .25px;
+  .day::before {
+    display: none; /* niente effetto hover */
   }
 }
 
-/* === Touch-first tweaks (quando non esiste hover, rendi la pressione più visibile) === */
-@media (hover:none){
-  .tab:active{
-    filter: brightness(1.22) contrast(1.08);
-  }
-  .navbtn:active{
-    filter: brightness(1.12);
-  }
-  .cell:active::after{
-    opacity:1; transform: scale(1.02);
-  }
-}
-
-/* === Desktop: celle alte finché c'è spazio === */
-@media (min-width: 561px) {
-  main {
-    padding-bottom: 110px; /* spazio sicuro sopra la tabbar, senza collisioni */
+@media (max-width: 900px) {
+  .app-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
-  .grid {
-    min-height: calc(100vh - 240px); /* topbar + monthbar + margini */
-    height: auto;                    /* niente forzature */
-    grid-auto-rows: 1fr;
+  .app-subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 2px;
   }
 
-  .cell {
-    height: 100%;
-    min-height: 80px; /* evita celle minuscole nei mesi “corti” */
-  }
-}
-  .brandmark svg{
-    height: 40px;   /* prima 32 / 44 → ora più grande SOLO su desktop */
-    width: auto;
-  }
-
-  @media (max-width: 560px){
-  html, body{
-    touch-action: manipulation;
+  .app-header {
+    padding-bottom: 4px;
   }
 }
 

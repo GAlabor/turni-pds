@@ -1,145 +1,104 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-
-  <!-- Canonicalizza l’URL su /turni-pds/ -->
-  <script>
-  (function(){
-    var p = location.pathname;
-    if (p === '/turni-pds' || p === '/turni-pds/index.html') {
-      location.replace('/turni-pds/');
-    }
-  })();
-  </script>
-
-  <!-- No-cache HTML -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-
-  <title>Turni Polizia di Stato</title>
-
-  <!-- Manifest + ICONS (base-aware) -->
-  <script>
-  (function () {
-    var BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
-
-    var m = document.createElement("link");
-    m.rel = "manifest";
-    m.href = BASE + "/manifest.webmanifest";
-    document.head.appendChild(m);
-
-    var links = [
-      { rel: "icon", type: "image/png", sizes: "16x16", href: BASE + "/ico/favicon-16x16.png" },
-      { rel: "icon", type: "image/png", sizes: "32x32", href: BASE + "/ico/favicon-32x32.png" },
-      { rel: "icon", type: "image/png", sizes: "48x48", href: BASE + "/ico/favicon-48x48.png" },
-      { rel: "icon", type: "image/x-icon",               href: BASE + "/favicon.ico"          },
-      { rel: "shortcut icon",                             href: BASE + "/favicon.ico"          },
-      { rel: "apple-touch-icon", sizes: "180x180", href: BASE + "/ico/apple-touch-icon-180x180-flat.png" },
-      { rel: "icon", type: "image/png", sizes: "192x192", href: BASE + "/ico/icon-192.png" },
-      { rel: "icon", type: "image/png", sizes: "512x512", href: BASE + "/ico/icon-512.png" }
-    ];
-    links.forEach(function (def) {
-      var el = document.createElement("link");
-      for (var k in def) el.setAttribute(k, def[k]);
-      document.head.appendChild(el);
-    });
-
-    if (location.hostname === "localhost") {
-      var f = document.createElement("link");
-      f.setAttribute("rel", "icon");
-      f.setAttribute("href", "/favicon.ico");
-      document.head.appendChild(f);
-    }
-  })();
-  </script>
-
-  <!-- Tema PWA -->
-  <meta name="theme-color" content="#0f3e95" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0a0f14" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#0a0f14">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico">
+  <title>Turni PDS</title>
   <link rel="stylesheet" href="app.css">
 </head>
+
 <body>
 
-  <!-- TOPBAR -->
-  <div class="topbar" aria-label="Intestazione Polizia">
-    <div class="brandmark" aria-label="Polizia" role="img">
-      <div id="logoContainer"></div>
-    </div>
-  </div>
+  <main class="app-shell">
+    <!-- VISTA CALENDARIO -->
+    <section class="view view-calendar is-active" data-view="calendar">
+      <header class="app-header">
+        <h1 class="app-title">Turni</h1>
+        <p class="app-subtitle">Calendario personale</p>
+      </header>
 
-  <!-- CALENDAR VIEW -->
-  <main>
-    <section class="view active" id="view-calendar">
-      <div class="monthbar">
-        <button class="navbtn" id="prev" aria-label="Mese precedente">&#x276E;</button>
-        <div class="title" id="monthLabel" aria-live="polite"></div>
-        <button class="navbtn" id="next" aria-label="Mese successivo">&#x276F;</button>
+      <!-- Selettore mese -->
+      <section class="monthbar">
+        <button class="nav-btn prev" aria-label="Mese precedente">&#10094;</button>
+        <div class="month-label"></div>
+        <button class="nav-btn next" aria-label="Mese successivo">&#10095;</button>
+      </section>
+
+      <!-- Contenitore calendario stile card iOS -->
+      <div class="calendar-wrapper">
+        <div class="calendar-container">
+          <div class="dow-row">
+            <div class="dow">Lun</div>
+            <div class="dow">Mar</div>
+            <div class="dow">Mer</div>
+            <div class="dow">Gio</div>
+            <div class="dow">Ven</div>
+            <div class="dow">Sab</div>
+            <div class="dow">Dom</div>
+          </div>
+          <div class="calendar-grid" id="calendar-grid">
+            <!-- Il JS inserirà le celle giorno -->
+          </div>
+        </div>
       </div>
-      <div class="weekhead" aria-hidden="true">
-        <div>LUN</div><div>MAR</div><div>MER</div><div>GIO</div><div>VEN</div><div>SAB</div><div>DOM</div>
-      </div>
-      <section class="grid anim" role="grid" aria-labelledby="monthLabel"></section>
     </section>
 
-    <!-- SETTINGS VIEW -->
-    <section class="view" id="view-settings">
-      <div class="settingsCard" id="set-turni">
-        <div class="settingsRow" style="grid-template-columns:120px 1fr">
-          <label for="startDate">Primo giorno</label>
-          <input type="date" id="startDate" />
+    <!-- VISTA IMPOSTAZIONI -->
+    <section class="view view-settings" data-view="settings">
+      <header class="app-header">
+        <h1 class="app-title">Impostazioni</h1>
+        <p class="app-subtitle">Aspetto e preferenze</p>
+      </header>
+
+      <div class="settings-container">
+        <div class="settings-group">
+          <div class="settings-label">Tema</div>
+          <div class="settings-options">
+            <label class="settings-option">
+              <input type="radio" name="theme" value="system" checked>
+              <span>Come sistema</span>
+            </label>
+            <label class="settings-option">
+              <input type="radio" name="theme" value="light">
+              <span>Chiaro</span>
+            </label>
+            <label class="settings-option">
+              <input type="radio" name="theme" value="dark">
+              <span>Scuro</span>
+            </label>
+          </div>
+          <p class="settings-hint">
+            Se scegli “Come sistema”, il tema seguirà automaticamente le impostazioni del dispositivo.
+          </p>
         </div>
-
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.20);margin:12px 0" />
-
-        <div class="settingsRow turni-grid turni-head">
-          <div style="font-weight:700;color:#eef4ff">Turno</div>
-          <div style="font-weight:700;color:#eef4ff">Sigla</div>
-          <div style="font-weight:700;color:#eef4ff">Orario</div>
-          <div style="font-weight:700;color:#eef4ff">Colore</div>
-          <div></div>
-        </div>
-        <div class="thin-sep"></div>
-
-        <div class="settingsRow turni-grid" style="align-items:center">
-          <div><input id="newNome" aria-label="Nome turno"></div>
-          <div><input id="newSigla" class="siglaInput" maxlength="4" aria-label="Sigla turno"></div>
-          <textarea id="newOrario" class="orarioArea" rows="2" placeholder="00:00&#10;00:00" aria-label="Orario turno su due righe"></textarea>
-          <div class="colorCell"><input id="newColor" class="colorInput" type="color" value="#8e88ff" title="Colore"></div>
-          <button id="btnAddTurno" type="button" class="iconbtn iconbtn-primary" title="Aggiungi">+</button>
-        </div>
-
-        <div id="turniList"></div>
       </div>
     </section>
   </main>
 
-  <!-- TABBAR -->
+  <!-- TABBAR IN BASSO -->
   <nav class="tabbar" aria-label="Barra schede">
-    <div class="tab active" data-tab="calendar" aria-label="Calendario">
+    <button class="tab active" data-tab="calendar" aria-label="Calendario">
       <svg id="icoCalendar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
            fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
-    </div>
+      <span class="tab-label">Calendario</span>
+    </button>
 
-    <div class="tab" data-tab="settings" aria-label="Impostazioni">
+    <button class="tab" data-tab="settings" aria-label="Impostazioni">
       <svg id="icoSettings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
            fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="3"></circle>
       </svg>
-    </div>
+      <span class="tab-label">Impostazioni</span>
+    </button>
   </nav>
 
   <!-- Etichetta versione -->
   <div id="versionLabel" class="version-label"></div>
 
-  <script src="app.js" defer></script>
+  <script src="app.js"></script>
 </body>
 </html>
