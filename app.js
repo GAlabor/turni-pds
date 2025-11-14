@@ -130,7 +130,7 @@ function render_buildMonth(year,month) {
     for (let i = prevLast - lead + 1, k=0; i <= prevLast; i++, k++) {
       // opacità: da 0.35 (più lontano) a 0.85 (più vicino al mese corrente)
       const denom = Math.max(1, lead-1);
-      const outOpacity = 0.35 + (k / denom) * 0.50;
+      const outOpacity = 0.16 + (k / denom) * 0.10;
       const d = new Date(Date.UTC(prevY, prevM, i));
       const isSun = util_jsWeekdayUTC(d)===6;
       const sigla = shifts_codeForDate(d); // stessa logica turni anche sui filler
@@ -159,7 +159,7 @@ function render_buildMonth(year,month) {
     for (let i = 1; i <= remainder; i++) {
       // opacità: da 0.85 (vicino alla fine del mese corrente) a 0.35 (più lontano)
       const denom = Math.max(1, remainder-1);
-      const outOpacity = 0.85 - ((i-1) / denom) * 0.50;
+      const outOpacity = 0.26 - ((i-1) / denom) * 0.10;
       const d = new Date(Date.UTC(nextY, nextM, i));
       const isSun = util_jsWeekdayUTC(d)===6;
       const sigla = shifts_codeForDate(d);

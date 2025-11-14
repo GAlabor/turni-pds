@@ -3,10 +3,10 @@
   --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
              "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, sans-serif;
 
-  /* Palette su blu istituzionale con sfondo fisso */
+  /* SFONDO MENO SATURO, PIÙ MODERNO (come prima versione che ti piaceva) */
   --bg:
-    radial-gradient(1400px 900px at 80% -10%, rgba(118,179,255,.07) 0%, rgba(255,255,255,0) 70%),
-    linear-gradient(180deg, #1547a7 0%, #1650b7 35%, #14449c 70%, #113a87 100%);
+    radial-gradient(1200px 800px at 80% -10%, rgba(130,170,255,.05) 0%, rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, #14428f 0%, #184fa5 40%, #123b80 100%);
 
   /* superfici translucide */
   --pill-bg: rgba(255,255,255,.12);
@@ -16,28 +16,30 @@
   --text: #f8fbff;
   --muted: #d2d8e6;
 
-  /* calendario */
+  /* calendario: riportato ai valori “soft” del tema precedente */
   --sunday:#ff6a6a;
-  --cell-brd: rgba(255,255,255,.18);
-  --cell-hov: rgba(255,255,255,.14);
-  --today-brd: rgba(255,255,255,.82);
-  --today-bg:  rgba(255,255,255,.10);
+  --cell-bg:  rgba(255,255,255,.05);
+  --cell-brd: rgba(255,255,255,.16);
+  --cell-hov: rgba(255,255,255,.09);
+  --today-brd: rgba(255,255,255,.85);
+  --today-bg:  rgba(255,255,255,.12);
 
   /* turni speciali */
-  --T-GL:#3ccdd0; --T-AP:#ff7dbf;
+  --T-GL:#3ccdd0;
+  --T-AP:#ff7dbf;
 
   /* dimensioni */
   --fieldH:44px;
 
   /* Tabbar + icons (flex) */
-  --tabH: 40px;
-  --tabIcon: 26px;
-  --tabMaxW: 90px;
+  --tabH: 28px; /*ALTEZZA TAPBAR*/
+  --tabIcon: 20px; /*ALTEZZA ICONE TABPAR*/
+  --tabMaxW: 90px; 
   --tabColor:#e2ebff;
   --tabColorActive:#ffffff;
 
-  /* frecce mese */
-  --navBtnSize: 44px;
+  /* frecce mese (bolla tonda) */
+  --navBtnSize: 32px;   /* desktop default */
 
   /* focus */
   --focus-ring: 0 0 0 2px rgba(74,170,240,.45);
@@ -61,38 +63,23 @@ body{
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
 }
 body.no-scroll { overflow: hidden; }
+main{ max-width:760px; margin:6px auto calc(80px + env(safe-area-inset-bottom)); padding:0 10px; }
 
-main{
-  max-width:760px;
-  margin:8px auto calc(90px + env(safe-area-inset-bottom));
-  padding:0 10px;
-}
-
-/* === TOPBAR identica alla tabbar === */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-
-  height: 46px;
-  padding: 8px 10px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
-  border-bottom: 1px solid rgba(255,255,255,.20);
-
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-
+/* === TOPBAR uniforme con lo sfondo === */
+.topbar{
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding:6px 10px; /*ALTEZZA TOPBAR */
+  height:30px;      /*ALTEZZA TOPBAR */
   color:#fff;
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border: 1px solid rgba(255,255,255,.10);
 }
-
 .brandmark{display:flex;align-items:center;justify-content:center;line-height:0}
 .brandmark svg{
-  display:block; height:44px; width:auto;
+  display:block; 
+  height:32px;  /*GRANDEZZA LOGO POLIZIA*/ 
+  width:auto;
   shape-rendering:geometricPrecision; text-rendering:optimizeLegibility;
 }
 
@@ -108,42 +95,41 @@ main{
 .monthbar .title {
   text-align: center;
   font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: clamp(18px, 2.7vw, 22px);
-  line-height: 1.15;
-  letter-spacing: 0.03em;
-  color: rgba(255,255,255,0.94);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.22);
+  font-weight: 600;                 /* sotto a .weekhead(700) e .sigla/.num(800) */
+  font-size: clamp(18px, 2.8vw, 22px);
+  line-height: 1.15;                /* niente “effetto tappo” */
+  letter-spacing: 0.03em;           /* tracking coerente, non rigido in px */
+  color: rgba(255,255,255,0.96);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.28); /* più fine del 1x3 */
 }
 
 
-/* Nav btn */
-.navbtn {
-  appearance: none;
-  border: 1px solid rgba(255,255,255,0.28);
-  background: rgba(255,255,255,0.06);
-  color: #fff;
+/* Nav btn: bolla tonda trasparente stile iOS */
+.navbtn{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.35);
+  background:transparent;
+  color:#fff;
 
   inline-size: var(--navBtnSize);
   block-size: var(--navBtnSize);
+  border-radius:9999px;
+  padding:0;
 
-  border-radius: 9999px;
-  padding: 0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-
-  transition: background 0.16s ease, transform 0.06s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+  transition: background .16s ease, transform .06s ease, box-shadow .16s ease, border-color .16s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
 }
 
-
+/* hover: lieve velatura bianca + lift */
 @media (hover:hover){
   .navbtn:hover{
     background: rgba(255,255,255,.12);
@@ -152,6 +138,7 @@ main{
   }
 }
 
+/* click/tap: quasi piatto */
 .navbtn:active{
   background: rgba(255,255,255,.08);
   transform: translateY(var(--press));
@@ -168,25 +155,29 @@ main{
   width:18px; height:18px; display:block; stroke-width:2.25;
 }
 
-/* DOW */
+
+/* Giorni settimana: allineati alla grid */
 .weekhead{
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:6px; padding:3px; margin:6px 0 4px;
+  gap:4px;
+  padding:0;
+  margin:4px 0 2px;
 }
+
 .weekhead div{
-  background: transparent;
-  border: 1px solid var(--cell-brd);
-  color: color-mix(in oklch, #fff 96%, transparent);
-  text-align:center;
-  padding:10px 0;
-  font-weight:700;
-  letter-spacing:.025em;
-  text-transform:uppercase;
-  font-size:.90rem;
-  border-radius:14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+  background: none;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+  padding: 2px 0;
+  font-size: .70rem;  /* rimpiccioliti */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  color: rgba(255,255,255,0.75);
 }
+
 
 .view{ display:none } .view.active{ display:block }
 
@@ -195,41 +186,40 @@ main{
   display:grid;
   grid-template-columns:repeat(7,1fr);
   grid-auto-rows:minmax(62px,1fr);
-  gap:6px; padding:3px; position:relative;
+  gap:6px;
+  padding:3px;
+  position:relative;
 }
-
-/* animazioni */
 .grid.anim{ will-change: transform, opacity; }
 .slide-out-left{ animation: outLeft .22s ease forwards }
 .slide-in-right{ animation: inRight .22s ease forwards }
 .slide-out-right{ animation: outRight .22s ease forwards }
 .slide-in-left{ animation: inLeft .22s ease forwards }
-
 @keyframes outLeft{ from{transform:translateX(0); opacity:1} to{transform:translateX(-22px); opacity:0} }
 @keyframes inRight{ from{transform:translateX(22px); opacity:0} to{transform:translateX(0); opacity:1} }
 @keyframes outRight{ from{transform:translateX(0); opacity:1} to{transform:translateX(22px); opacity:0} }
 @keyframes inLeft{ from{transform:translateX(-22px); opacity:0} to{transform:translateX(0); opacity:1} }
 
-/* Celle */
+/* Celle trasparenti con bordo visibile */
 .cell{
   position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden;
   background: transparent !important;
   border: 1px solid var(--cell-brd) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
   color:#fff;
-  min-height:84px;
-  border-radius:14px;
+  min-height:84px; border-radius:14px;
   cursor:pointer;
   transition: transform .06s ease;
 }
 
+/* overlay hover/tap */
 .cell::before{
   content:""; position:absolute; inset:0; border-radius:inherit;
-  background:transparent;
-  transition:background .14s ease, box-shadow .14s ease, transform .08s ease;
+  background:transparent; transition:background .14s ease, box-shadow .14s ease, transform .08s ease;
   pointer-events:none;
 }
 
+/* micro pulse alla pressione */
 .cell::after{
   content:""; position:absolute; inset:-2px; border-radius:inherit;
   background: radial-gradient(120px 120px at 50% 50%, rgba(255,255,255,.12), transparent 60%);
@@ -238,6 +228,7 @@ main{
   pointer-events:none;
 }
 
+/* hover desktop: velatura + lift + contorno più deciso */
 @media (hover:hover){
   .cell:hover{
     transform: translateY(var(--lift));
@@ -245,9 +236,11 @@ main{
   .cell:hover::before{
     background: rgba(255,255,255,.10);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+
   }
 }
 
+/* pressione: feedback immediato */
 .cell:active{
   transform: translateY(var(--press));
 }
@@ -259,14 +252,18 @@ main{
   opacity:1; transform: scale(1);
 }
 
-.cell.out-month{ opacity: var(--out-opacity, .55); }
+/* Celle fuori mese */
+.cell.out-month{
+  opacity: var(--out-opacity, .20) !important;
+}
 
+/* Focus per celle editabili */
 .cell:focus-within{
   outline: none;
   box-shadow: 0 0 0 1px rgba(255,255,255,.22), var(--focus-ring);
 }
 
-/* Numeri */
+/* Numeri giorno */
 .num{
   position:absolute; left:10px; top:8px; z-index:1;
   font-size:16px; font-weight:800; color:#fff;
@@ -274,16 +271,17 @@ main{
   text-shadow: 0 1px 0 rgba(0,0,0,.35);
 }
 
+/* Domeniche: solo NUMERO rosso */
 .cell.sun .num{ color: var(--sunday) !important; }
 
-/* Today */
+/* Oggi: bordo + bg */
 .today{
-  border-color: rgba(255,255,255,.65) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), inset 0 1px 0 rgba(255,255,255,.12);
+  border-color: var(--today-brd) !important;
+  box-shadow: inset 0 0 0 1px var(--today-brd), inset 0 1px 0 rgba(255,255,255,.12);
 }
-.today::before{ background: rgba(255,255,255,.08); }
+.today::before{ background: var(--today-bg); }
 
-/* Sigla */
+/* === SIGLE === */
 .sigla{
   font-family:var(--font-ui);
   font-size:20px;
@@ -293,151 +291,89 @@ main{
   text-shadow: 0 1px 0 rgba(0,0,0,.30);
 }
 
+/* Turni speciali */
 .T-GL{ color:var(--T-GL); } .T-AP{ color:var(--T-AP); }
 
-/* SETTINGS */
+/* === SETTINGS === */
 .settingsCard{
   background: linear-gradient(180deg, rgba(12,24,48,.22), rgba(10,20,40,.16)) !important;
   border: 1px solid rgba(255,255,255,.20) !important;
   box-shadow: 0 8px 22px rgba(0,0,0,.20);
   border-radius: 14px; padding:14px; margin-top:10px;
 }
-
-.settingsRow{
-  display:grid;grid-template-columns:160px 1fr;
-  gap:8px;align-items:center;margin:8px 0;
-}
-
+.settingsRow{display:grid;grid-template-columns:160px 1fr;gap:8px;align-items:center;margin:8px 0}
 .settingsRow label{font-weight:700;color:#eef4ff}
-
 .settingsRow input,.settingsRow select{
-  width:100%;padding:10px;border-radius:10px;
-  border:1px solid rgba(255,255,255,.22);
-  background: rgba(12,24,48,.20);color:#fff;
-  height:var(--fieldH);
+  width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
+  background: rgba(12,24,48,.20);color:#fff;height:var(--fieldH);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
 }
-
-.settingsRow input::placeholder,
-.orarioArea::placeholder{
-  color: rgba(255,255,255,.82);
+.settingsRow input::placeholder, .orarioArea::placeholder{ color: rgba(255,255,255,.82); }
+.settingsRow select:focus, .settingsRow input:focus, .orarioArea:focus{
+  outline: none; box-shadow: var(--focus-ring); border-color: rgba(255,255,255,.42) !important;
 }
 
-.settingsRow select:focus,
-.settingsRow input:focus,
-.orarioArea:focus{
-  outline: none; box-shadow: var(--focus-ring);
-  border-color: rgba(255,255,255,.42) !important;
-}
-
-/* FORMS */
+/* === FORMS === */
 .thin-sep{height:0;border-top:1px solid rgba(255,255,255,.20);margin:6px 0}
-
-.iconbtn{
-  width:var(--fieldH);height:var(--fieldH);
-  border-radius:10px;padding:0;font-size:20px;
-  display:flex;align-items:center;justify-content:center;
-  border:0;cursor:pointer;
-}
+.iconbtn{width:var(--fieldH);height:var(--fieldH);border-radius:10px;padding:0;font-size:20px;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer}
 .iconbtn-primary{background:#1976d2;color:#fff}
 .iconbtn-primary:hover{ background: color-mix(in oklch, #1976d2 85%, white 15%); }
 .iconbtn-danger{background:#b42325;color:#fff}
 .iconbtn:active{transform:translateY(1px)}
+@media(max-width:560px){ .settingsRow{grid-template-columns:120px 1fr} }
 
-@media(max-width:560px){
-  .settingsRow{grid-template-columns:120px 1fr}
-}
-
-/* Nascondi topbar */
+/* Hide topbar in settings quando richiesto */
 .hide-topbar .topbar{ display: none !important; }
 .hide-topbar main{ margin-top: 8px; }
 
-/* COLOR PICKER */
+/* === COLOR PICKER === */
 .colorCell{ display:flex; align-items:center; justify-content:center; }
-
 .colorInput{
   -webkit-appearance:none; appearance:none;
   width:var(--fieldH); height:var(--fieldH);
-  border:1px solid rgba(255,255,255,.20);
-  border-radius:10px; background:transparent;
+  border:1px solid rgba(255,255,255,.20); border-radius:10px; background:transparent;
 }
-
 .colorInput::-webkit-color-swatch-wrapper{ padding:0; }
 .colorInput::-webkit-color-swatch{ border:none; border-radius:8px; }
 .colorInput::-moz-color-swatch{ border:none; border-radius:8px; }
+@media (max-width:560px){ :root{ --fieldH:40px; } }
 
+/* === GRID TURNI === */
+.turni-grid{ grid-template-columns: 1fr 64px 1.05fr 52px 44px !important; align-items:center; }
+.siglaInput{ width:100%; text-transform:uppercase; text-align:center; letter-spacing:.3px; font-family:var(--font-ui); font-weight:800; }
 @media (max-width:560px){
-  :root{ --fieldH:40px; }
+  .turni-grid{ grid-template-columns: 1fr 60px 0.85fr 46px 44px !important; }
 }
 
-/* GRID TURNI */
-.turni-grid{
-  grid-template-columns: 1fr 64px 1.05fr 52px 44px !important;
-  align-items:center;
-}
-
-.siglaInput{
-  width:100%; text-transform:uppercase;
-  text-align:center; letter-spacing:.3px;
-  font-family:var(--font-ui); font-weight:800;
-}
-
-@media (max-width:560px){
-  .turni-grid{
-    grid-template-columns: 1fr 60px 0.85fr 46px 44px !important;
-  }
-}
-
-/* DATE FIELD */
+/* === DATE FIELD === */
 .settingsRow input[type="date"]{
-  width:95%; min-width:0; font-size:1rem; height:38px;
-  line-height:38px; text-align:center; margin:0 auto;
-  display:block; border-radius:10px;
+  width:95%; min-width:0; font-size:1rem; height:38px; line-height:38px;
+  text-align:center; margin:0 auto; display:block; border-radius:10px;
 }
-
 @media (max-width:560px){
-  .settingsRow input[type="date"]{
-    width:92%; font-size:1.05rem; height:36px;
-    line-height:36px;
-  }
+  .settingsRow input[type="date"]{ width:92%; font-size:1.05rem; height:36px; line-height:36px; }
 }
 
-/* MULTILINE */
+/* === MULTILINE SCHEDULE === */
 .orarioArea{
-  display:block; width:100%;
-  height:calc(var(--fieldH) + 2px);
-  padding:6px 8px; resize:none;
-  line-height:1.08; font-size:0.9rem;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:10px;
-  background: rgba(12,24,48,.20);
-  color:#fff;
+  display:block; width:100%; height:calc(var(--fieldH) + 2px);
+  padding:6px 8px; resize:none; line-height:1.08; font-size:0.9rem;
+  border:1px solid rgba(255,255,255,.22); border-radius:10px; background: rgba(12,24,48,.20); color:#fff;
   white-space:pre;
 }
-
-@media (max-width:560px){
-  .orarioArea{
-    font-size:0.86rem;
-    height:calc(var(--fieldH));
-  }
-}
+@media (max-width:560px){ .orarioArea{ font-size:0.86rem; height:calc(var(--fieldH)); } }
 
 /* === TABBAR === */
 .tabbar{
   position:fixed; bottom:0; left:0; right:0;
-
   background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06)) !important;
   border-top:1px solid rgba(255,255,255,.20);
-
   display:flex; justify-content:space-around; gap:10px;
-
-  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
   z-index:10;
-
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
-
 .tab{
   position: relative;
   display:flex;
@@ -448,45 +384,42 @@ main{
   flex: 1;
   max-width: var(--tabMaxW);
   min-width: 0;
-
   height: var(--tabH);
   border-radius:12px;
-
   background:transparent;
   color: var(--tabColor);
   font-size:12px;
-
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-
-  transition: color .2s ease, transform .06s ease,
-             stroke-width .2s ease, filter .2s ease;
+  transition: color .2s ease, transform .06s ease, stroke-width .2s ease, filter .2s ease;
 }
 
 .tab::after{ display:none !important; }
 
 .tab > *{ position: relative; z-index: 1; }
 
+/* hover: più bianco, lift e micro pop dell’icona */
 @media (hover:hover){
   .tab:hover{
     color: color-mix(in oklch, #fff 98%, transparent);
     transform: translateY(var(--lift));
     filter: brightness(var(--active-bright)) contrast(var(--active-contrast));
   }
-  .tab:hover svg{
-    stroke-width: 2.5; transform: scale(var(--icon-pop));
-  }
+  .tab:hover svg{ stroke-width: 2.5; transform: scale(var(--icon-pop)); }
 }
 
+/* pressione: accenno verso il basso */
 .tab:active{ transform: translateY(var(--press)); }
 .tab:focus-visible{ outline: none; box-shadow: var(--focus-ring); }
 
+/* attivo: bianco pieno, leggero contrasto e più spessore */
 .tab.active{
   color:#ffffff;
   font-weight:800;
   filter: brightness(1.25) contrast(1.1);
 }
 
+/* SVG */
 .tab svg{
   width:var(--tabIcon);
   height:var(--tabIcon);
@@ -498,10 +431,9 @@ main{
   stroke-linejoin:round;
   transition: stroke-width .2s ease, color .2s ease, transform .12s ease;
 }
-
 .tab.active svg{ stroke-width:2.7; }
 
-/* Version badge */
+/* === Version badge === */
 .version-label {
   position: fixed;
   bottom: 6px;
@@ -518,31 +450,31 @@ main{
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-/* Reduce motion */
+/* === Reduce motion === */
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ transition: none !important; animation: none !important; }
 }
 
-/* MOBILE tweaks */
+/* === MOBILE “super” (originali) === */
 @media (max-width:560px){
+  :root{ --navBtnSize: 36px; }  /* bolla frecce più compatta su mobile */
 
-  :root{ --navBtnSize: 36px; }
-
+  /* DOW coerenti con grid anche su mobile */
   .weekhead{
-    gap:2px; padding:2px; margin:4px 0 2px;
+    gap:1px;
+    padding:0;
+    margin:2px 0 1px;
   }
-
   .weekhead div{
-    border-radius:10px;
-    padding:8px 0;
-    font-size:.86rem;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    background:none;
+    border:none;
+    box-shadow:none;
+    padding:1px 0;
+    font-size:.58rem; /* più piccole su mobile */
+    color: rgba(255,255,255,0.75);
   }
 
-  .grid{
-    grid-auto-rows:auto;
-    gap:2px; padding:2px;
-  }
+  .grid{ grid-auto-rows:auto; gap:2px; padding:2px; }
 
   .cell{
     aspect-ratio: 1 / 1;
@@ -559,15 +491,18 @@ main{
     top: 6px;
   }
 
+  /* Sigla centrata come in origine (niente bottom), con leggero offset verso il basso */
   .sigla{
     position: relative;
     top: 10px;
+    left: auto; right: auto; bottom: auto;
+    transform: none;
     font-size: 18px;
     letter-spacing: .25px;
   }
 }
 
-/* TOUCH tweaks */
+/* === Touch-first tweaks (quando non esiste hover, rendi la pressione più visibile) === */
 @media (hover:none){
   .tab:active{
     filter: brightness(1.22) contrast(1.08);
@@ -580,21 +515,24 @@ main{
   }
 }
 
-/* DESKTOP: celle alte */
+/* === Desktop: celle alte finché c'è spazio === */
 @media (min-width: 561px) {
-
-  main{
-    padding-bottom: 110px;
+  main {
+    padding-bottom: 110px; /* spazio sicuro sopra la tabbar, senza collisioni */
   }
 
-  .grid{
-    min-height: calc(100vh - 240px);
-    height: auto;
-    grid-auto-rows: minmax(100px, 1fr);
+  .grid {
+    min-height: calc(100vh - 240px); /* topbar + monthbar + margini */
+    height: auto;                    /* niente forzature */
+    grid-auto-rows: 1fr;
   }
 
-  .cell{
+  .cell {
     height: 100%;
-    min-height: 100px;
+    min-height: 80px; /* evita celle minuscole nei mesi “corti” */
   }
 }
+  .brandmark svg{
+    height: 40px;   /* prima 32 / 44 → ora più grande SOLO su desktop */
+    width: auto;
+  }
