@@ -175,37 +175,70 @@ function app_base(){
   return '/' + seg;
 }
 
-async function loadTabbarIcons(){
+// Aggiorna mese e giorno dentro l'SVG del calendario
+function setCalendarIconDateInSvg() {
+  const host = document.getElementById('icoCalendar');
+  if (!host) return;
+
+  const now = new Date();
+  const months = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
+
+  const monthEl = host.querySelector('#calMonth');
+  const dayEl   = host.querySelector('#calDay');
+
+  if (monthEl) monthEl.textContent = months[now.getMonth()];
+  if (dayEl)   dayEl.textContent   = now.getDate();
+}
+
+
+// ========================
+// Caricamento icone tabbar
+// ========================
+async function loadTabbarIcons() {
   try {
+    // ----- ICONA CALENDARIO -----
     const cal = await fetch(`${app_base()}/svg/calendar.svg`, {
       cache: 'no-store',
       credentials: 'same-origin'
     });
+
     if (cal.ok) {
       const txt = await cal.text();
       const host = document.getElementById('icoCalendar');
-      if (host) host.innerHTML = txt;
+
+      if (host) {
+        host.innerHTML = txt;     // Inserisce l'SVG intero
+        setCalendarIconDateInSvg(); // Aggiorna Mese + Giorno dentro l'SVG
+      }
     }
 
+    // ----- ICONA SETTINGS -----
     const set = await fetch(`${app_base()}/svg/settings.svg`, {
       cache: 'no-store',
       credentials: 'same-origin'
     });
+
     if (set.ok) {
       const txt = await set.text();
       const host = document.getElementById('icoSettings');
+
       if (host) {
         const temp = document.createElement('div');
         temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
-        temp.querySelectorAll('svg > *').forEach(n => host.appendChild(n.cloneNode(true)));
+
+        temp.querySelectorAll('svg > *')
+            .forEach(n => host.appendChild(n.cloneNode(true)));
       }
     }
+
   } catch (err) {
     console.error('Errore icone tabbar:', err);
   }
 }
 
 loadTabbarIcons();
+
+
 
 
 // ============================
@@ -276,3 +309,5 @@ loadTabbarIcons();
     registerSW();
   }
 })();
+
+
