@@ -32,8 +32,8 @@
   --tabH: 46px;
   --tabIcon: 24px;
   --tabMaxW: 120px;
-  --tabColor: #9ca3af;          /* icona inattiva */
-  --tabActiveColor: #0a84ff;    /* icona attiva */
+  --tabColor: #9ca3af;
+  --tabActiveColor: #0a84ff;
   --active-bright: 1.12;
   --active-contrast: 1.03;
   --icon-pop: 1.08;
@@ -383,27 +383,27 @@ body {
 
 @media (max-width: 900px) {
   body {
-    padding: 12px 8px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
+    padding: 8px 6px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
 
   .app-header {
-    padding: 0 2px 4px 2px;
+    padding: 0 2px 2px 2px;
   }
 
   .app-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 500;
     letter-spacing: -0.01em;
   }
 
   .app-subtitle {
     font-size: 11px;
-    margin-top: 1px;
+    margin-top: 0;
     opacity: 0.7;
   }
 
   .monthbar {
-    margin: 2px 0 6px 0;
+    margin: 0 0 4px 0;
   }
 
   .month-label {
@@ -411,34 +411,35 @@ body {
   }
 
   .calendar-container {
-    padding: 8px 6px 10px;
+    padding: 6px 4px 8px;
     border-radius: 16px;
   }
 
   .dow-row {
-    gap: 4px;
-    margin-bottom: 4px;
+    gap: 2px;
+    margin-bottom: 3px;
   }
 
   .dow {
     font-size: 11px;
+    padding: 4px 0;
   }
 
   .calendar-grid {
-    gap: 4px;
+    gap: 2px;
   }
 
   .day {
     border-radius: 10px;
-    padding: 6px;
+    padding: 5px;
     min-height: auto;
-    aspect-ratio: 1;         /* quadrate */
+    aspect-ratio: 1;
     font-size: 12px;
     box-shadow: none;
   }
 
   .day::before {
-    display: none;           /* niente effetto hover/glow */
+    display: none;
   }
 
   .view-settings .settings-container {
