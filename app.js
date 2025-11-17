@@ -105,16 +105,45 @@ renderCalendar(currentYear, currentMonth);
 const tabs = document.querySelectorAll(".tab");
 const views = document.querySelectorAll(".view");
 
+const calendarTab = document.querySelector('.tab[data-tab="calendar"]');
+let calendarLongPress = false;
+let calendarLongPressTimer = null;
+
+
 tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
+  tab.addEventListener("click", (event) => {
     const target = tab.dataset.tab;
 
+    // TAB CALENDARIO: comportamento speciale
+    if (target === "calendar") {
+      // Se il long press ha già aperto il menu, ignoro il click di rimbalzo
+      if (calendarLongPress) {
+        calendarLongPress = false;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      const calendarView = document.querySelector(".view-calendar");
+      const isCalendarActive = calendarView && calendarView.classList.contains("is-active");
+
+      if (isCalendarActive) {
+        // Già sulla vista calendario → torna a oggi
+        currentYear = today.getFullYear();
+        currentMonth = today.getMonth();
+        renderCalendar(currentYear, currentMonth);
+        return;
+      }
+    }
+
+    // Comportamento standard delle tab
     tabs.forEach(t => t.classList.toggle("active", t === tab));
     views.forEach(v => {
       v.classList.toggle("is-active", v.dataset.view === target);
     });
   });
 });
+
 
 
 // ============================
@@ -162,7 +191,10 @@ function setupThemeControls() {
 document.addEventListener("DOMContentLoaded", () => {
   loadTheme();
   setupThemeControls();
+  setupCalendarTabInteractions();
+  setupDateJumpSheet();
 });
+
 
 
 // ============================
@@ -231,8 +263,27 @@ async function loadTabbarIcons() {
       }
     }
 
+        // ----- ICONA RIEPILOGO -----
+    const riepilogo = await fetch(`${app_base()}/svg/riepilogo.svg`, {
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
 
-    // ----- ICONA SETTINGS -----
+    if (riepilogo.ok) {
+      const txt = await riepilogo.text();
+      const host = document.getElementById('icoRiepilogo');
+
+      if (host) {
+        const temp = document.createElement('div');
+        temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
+
+        temp.querySelectorAll('svg > *')
+            .forEach(n => host.appendChild(n.cloneNode(true)));
+      }
+    }
+
+
+    // ----- ICONA IMPOSTAZIONI -----
     const set = await fetch(`${app_base()}/svg/settings.svg`, {
       cache: 'no-store',
       credentials: 'same-origin'
@@ -257,6 +308,98 @@ async function loadTabbarIcons() {
 }
 
 loadTabbarIcons();
+
+// BLOCCO COMPORTAMENTO ICONA CALENDARIO IN BASE AI TAP
+
+function openDateJumpSheet() {
+  const modal = document.getElementById("dateJumpModal");
+  const input = document.getElementById("dateJumpInput");
+  if (!modal || !input) return;
+
+  const base = new Date();
+  const defaultDate = new Date(currentYear, currentMonth, base.getDate());
+  input.valueAsDate = defaultDate;
+
+  modal.hidden = false;
+}
+
+function closeDateJumpSheet() {
+  const modal = document.getElementById("dateJumpModal");
+  if (!modal) return;
+  modal.hidden = true;
+}
+
+function setupDateJumpSheet() {
+  const modal = document.getElementById("dateJumpModal");
+  const input = document.getElementById("dateJumpInput");
+  const cancelBtn = document.getElementById("dateJumpCancel");
+  const confirmBtn = document.getElementById("dateJumpConfirm");
+
+  if (!modal || !input || !cancelBtn || !confirmBtn) return;
+
+  cancelBtn.addEventListener("click", () => {
+    closeDateJumpSheet();
+  });
+
+  // Chiudi toccando l'overlay scuro
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeDateJumpSheet();
+    }
+  });
+
+  confirmBtn.addEventListener("click", () => {
+    if (!input.value) {
+      closeDateJumpSheet();
+      return;
+    }
+
+    const targetDate = input.valueAsDate;
+    if (!targetDate || isNaN(targetDate.getTime())) {
+      closeDateJumpSheet();
+      return;
+    }
+
+    currentYear = targetDate.getFullYear();
+    currentMonth = targetDate.getMonth();
+    renderCalendar(currentYear, currentMonth);
+    closeDateJumpSheet();
+  });
+}
+
+
+function setupCalendarTabInteractions() {
+  if (!calendarTab) return;
+
+  const LONG_PRESS_MS = 550;
+
+  function startPress() {
+    calendarLongPress = false;
+    if (calendarLongPressTimer) {
+      clearTimeout(calendarLongPressTimer);
+    }
+    calendarLongPressTimer = setTimeout(() => {
+      calendarLongPress = true;
+      openDateJumpSheet();
+    }, LONG_PRESS_MS);
+  }
+
+  function cancelPress() {
+    if (calendarLongPressTimer) {
+      clearTimeout(calendarLongPressTimer);
+      calendarLongPressTimer = null;
+    }
+  }
+
+  calendarTab.addEventListener("mousedown", startPress);
+  calendarTab.addEventListener("touchstart", startPress, { passive: true });
+
+  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(ev => {
+    calendarTab.addEventListener(ev, cancelPress);
+  });
+}
+
+
 
 
 // ============================

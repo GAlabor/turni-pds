@@ -587,6 +587,108 @@ body {
   }
 }
 
+
+/* =========================
+   BOTTOM SHEET "VAI A DATA"
+   ========================= */
+
+.date-jump-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(15,23,42,0.45);
+  z-index: 50;
+}
+
+.date-jump-backdrop[hidden] {
+  display: none;
+}
+
+.date-jump-sheet {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface-strong);
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--shadow-soft);
+  padding: 14px 16px 18px;
+  border-top: 1px solid var(--border);
+}
+
+.date-jump-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148,163,184,0.8);
+  margin: 4px auto 10px;
+}
+
+.date-jump-title {
+  margin: 0 0 4px 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.date-jump-subtitle {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: var(--subtext);
+}
+
+#dateJumpInput {
+  width: 100%;
+  margin: 6px 0 14px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 15px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+#dateJumpInput:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.date-jump-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-secondary,
+.btn-primary {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+
 /* =========================
    VERSION BADGE
    ========================= */
