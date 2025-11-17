@@ -212,6 +212,26 @@ async function loadTabbarIcons() {
       }
     }
 
+        // ----- ICONA INSERIMENTI / PAGAMENTI -----
+    const inspag = await fetch(`${app_base()}/svg/inspag.svg`, {
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
+
+    if (inspag.ok) {
+      const txt = await inspag.text();
+      const host = document.getElementById('icoInspag');
+
+      if (host) {
+        const temp = document.createElement('div');
+        temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
+
+        temp.querySelectorAll('svg > *')
+            .forEach(n => host.appendChild(n.cloneNode(true)));
+      }
+    }
+
+
     // ----- ICONA SETTINGS -----
     const set = await fetch(`${app_base()}/svg/settings.svg`, {
       cache: 'no-store',
