@@ -612,7 +612,6 @@ body {
   display: none;
 }
 
-/* card rialzata sopra la tabbar */
 .date-jump-sheet {
   width: 100%;
   max-width: 520px;
@@ -621,8 +620,11 @@ body {
   box-shadow: var(--shadow-soft);
   padding: 14px 16px 18px;
   border-top: 1px solid var(--border);
-  margin-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 10px);
+
+  /* stacca il foglio dalla tabbar */
+  margin-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 6px);
 }
+
 
 .date-jump-handle {
   width: 40px;
@@ -632,113 +634,24 @@ body {
   margin: 4px auto 10px;
 }
 
-/* header con anno a sinistra, titolo al centro, X a destra */
-
 .date-jump-header {
-  position: relative;
-  margin-bottom: 8px;
-}
-
-.date-jump-header-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
 }
 
 .date-jump-title {
   margin: 0;
   font-size: 17px;
   font-weight: 600;
-  text-align: center;
 }
-
-/* pulsante anno */
-
-.date-jump-year-button {
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  padding: 4px 10px;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.date-jump-year-chevron {
-  font-size: 11px;
-  opacity: 0.7;
-}
-
-/* pulsante chiusura */
-
-.date-jump-close {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* dropdown anni, scrollabile */
-
-.date-jump-year-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 6px;
-  min-width: 120px;
-  max-height: 180px;
-  overflow-y: auto;
-  background: var(--surface-strong);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
-  padding: 4px;
-  display: none;
-  z-index: 2;
-}
-
-.date-jump-year-dropdown.is-open {
-  display: block;
-}
-
-.date-jump-year-item {
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.date-jump-year-item:hover {
-  background: var(--hover-bg);
-}
-
-.date-jump-year-item.is-selected {
-  background: var(--accent);
-  color: #fff;
-}
-
-/* nav mese / anno (sotto header) */
 
 .date-jump-nav {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 6px;
 }
 
 .date-jump-month {
@@ -763,8 +676,6 @@ body {
 .date-jump-nav-btn:hover {
   filter: brightness(1.05);
 }
-
-/* header giorni + griglia calendario */
 
 .date-jump-dow-row {
   display: grid;

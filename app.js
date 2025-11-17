@@ -21,10 +21,6 @@ let currentMonth = today.getMonth(); // 0–11
 let jumpYear = currentYear;
 let jumpMonth = currentMonth;
 
-// Range anni per il picker
-const JUMP_YEAR_START = currentYear - 5;
-const JUMP_YEAR_END   = currentYear + 5;
-
 function renderCalendar(year, month) {
   if (!grid) return;
 
@@ -321,19 +317,13 @@ loadTabbarIcons();
 // Bottom sheet "Vai a data"
 // ============================
 
-let isYearDropdownOpen = false;
-
 function renderDateJumpCalendar() {
-  const grid   = document.getElementById("dateJumpGrid");
-  const label  = document.getElementById("dateJumpMonthLabel");
-  const yearDisplay = document.getElementById("dateJumpYearDisplay");
-  if (!grid || !label || !yearDisplay) return;
-
-  // aggiorna label mese/anno e anno in alto
-  label.textContent = `${monthNames[jumpMonth]} ${jumpYear}`;
-  yearDisplay.textContent = jumpYear;
+  const grid = document.getElementById("dateJumpGrid");
+  const label = document.getElementById("dateJumpMonthLabel");
+  if (!grid || !label) return;
 
   grid.innerHTML = "";
+  label.textContent = `${monthNames[jumpMonth]} ${jumpYear}`;
 
   const firstDay = new Date(jumpYear, jumpMonth, 1);
   const startIndex = (firstDay.getDay() + 6) % 7; // lun=0 ... dom=6
@@ -363,7 +353,7 @@ function renderDateJumpCalendar() {
     }
 
     cell.addEventListener("click", () => {
-      // tap su un giorno → salta al mese/anno e chiudi
+      // appena clicchi un giorno, salta a quel mese e chiudi
       currentYear = jumpYear;
       currentMonth = jumpMonth;
       renderCalendar(currentYear, currentMonth);
@@ -374,63 +364,15 @@ function renderDateJumpCalendar() {
   }
 }
 
-function renderYearDropdown() {
-  const dropdown = document.getElementById("dateJumpYearDropdown");
-  if (!dropdown) return;
-
-  dropdown.innerHTML = "";
-
-  for (let y = JUMP_YEAR_START; y <= JUMP_YEAR_END; y++) {
-    const item = document.createElement("div");
-    item.className = "date-jump-year-item";
-    item.textContent = y;
-    item.dataset.year = y;
-
-    if (y === jumpYear) {
-      item.classList.add("is-selected");
-    }
-
-    item.addEventListener("click", () => {
-      jumpYear = y;
-      renderDateJumpCalendar();
-      closeYearDropdown();
-    });
-
-    dropdown.appendChild(item);
-  }
-
-  // cerca di centrare l'anno selezionato nella vista
-  const selected = dropdown.querySelector(".date-jump-year-item.is-selected");
-  if (selected) {
-    selected.scrollIntoView({ block: "center" });
-  }
-}
-
-function openYearDropdown() {
-  const dropdown = document.getElementById("dateJumpYearDropdown");
-  if (!dropdown) return;
-  renderYearDropdown();
-  dropdown.classList.add("is-open");
-  isYearDropdownOpen = true;
-}
-
-function closeYearDropdown() {
-  const dropdown = document.getElementById("dateJumpYearDropdown");
-  if (!dropdown) return;
-  dropdown.classList.remove("is-open");
-  isYearDropdownOpen = false;
-}
-
 function openDateJumpSheet() {
   const modal = document.getElementById("dateJumpModal");
   if (!modal) return;
 
-  // parti dal mese/anno attuali
+  // parti dal mese attuale mostrato nel calendario principale
   jumpYear = currentYear;
   jumpMonth = currentMonth;
-
-  closeYearDropdown();
   renderDateJumpCalendar();
+
   modal.hidden = false;
 }
 
@@ -439,7 +381,6 @@ function closeDateJumpSheet() {
   if (modal) {
     modal.hidden = true;
   }
-  closeYearDropdown();
   if (calendarTab) {
     calendarTab.classList.remove("long-press");
   }
@@ -451,10 +392,8 @@ function setupDateJumpSheet() {
 
   const prevBtn = modal.querySelector('.date-jump-nav-btn[data-dir="prev"]');
   const nextBtn = modal.querySelector('.date-jump-nav-btn[data-dir="next"]');
-  const closeBtn = document.getElementById("dateJumpClose");
-  const yearBtn  = document.getElementById("dateJumpYearButton");
 
-  if (!prevBtn || !nextBtn || !closeBtn || !yearBtn) return;
+  if (!prevBtn || !nextBtn) return;
 
   // chiudi toccando l'overlay scuro
   modal.addEventListener("click", (e) => {
@@ -463,22 +402,6 @@ function setupDateJumpSheet() {
     }
   });
 
-  // pulsante X
-  closeBtn.addEventListener("click", () => {
-    closeDateJumpSheet();
-  });
-
-  // toggle dropdown anni
-  yearBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (isYearDropdownOpen) {
-      closeYearDropdown();
-    } else {
-      openYearDropdown();
-    }
-  });
-
-  // cambio mese
   prevBtn.addEventListener("click", () => {
     jumpMonth--;
     if (jumpMonth < 0) {
@@ -495,15 +418,6 @@ function setupDateJumpSheet() {
       jumpYear++;
     }
     renderDateJumpCalendar();
-  });
-
-  // chiudi dropdown anni cliccando fuori dal header
-  document.addEventListener("click", (e) => {
-    const header = document.querySelector(".date-jump-header");
-    if (!header) return;
-    if (!header.contains(e.target)) {
-      closeYearDropdown();
-    }
   });
 }
 
@@ -537,10 +451,11 @@ function setupCalendarTabInteractions() {
   calendarTab.addEventListener("mousedown", startPress);
   calendarTab.addEventListener("touchstart", startPress, { passive: true });
 
-  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(ev => {
+  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((ev) => {
     calendarTab.addEventListener(ev, cancelPress);
   });
 }
+
 
 
 // ============================
