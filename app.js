@@ -239,8 +239,6 @@ async function loadTabbarIcons() {
 loadTabbarIcons();
 
 
-
-
 // ============================
 // Service worker + versione
 // ============================

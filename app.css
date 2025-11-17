@@ -30,7 +30,7 @@
 
   /* tabbar */
   --tabH: 46px;
-  --tabIcon: 26px;
+  --tabIcon: 32px; /*DIMENSIONE ICONE SVG BARRA POSTERIORE*/
   --tabMaxW: 120px;
   --tabColor: #9ca3af;
   --tabActiveColor: #0a84ff;
