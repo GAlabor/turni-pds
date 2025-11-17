@@ -548,6 +548,12 @@ body {
   transform: translateY(var(--press));
 }
 
+/* stato "long press" visivo sulla tab calendario */
+.tab.long-press {
+  transform: translateY(var(--press)) scale(0.97);
+  filter: brightness(1.1) contrast(1.05);
+}
+
 .tab:focus-visible{
   outline: none;
   box-shadow: var(--focus-ring);

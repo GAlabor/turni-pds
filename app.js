@@ -321,25 +321,35 @@ function openDateJumpSheet() {
   input.valueAsDate = defaultDate;
 
   modal.hidden = false;
+
+  // Prova a far aprire direttamente il picker nativo (iOS lo interpreta)
+  setTimeout(() => {
+    try {
+      input.focus({ preventScroll: true });
+    } catch {
+      // se il browser non gradisce, pazienza
+      input.focus();
+    }
+  }, 60);
 }
+
 
 function closeDateJumpSheet() {
   const modal = document.getElementById("dateJumpModal");
-  if (!modal) return;
-  modal.hidden = true;
+  if (modal) {
+    modal.hidden = true;
+  }
+  if (calendarTab) {
+    calendarTab.classList.remove('long-press');
+  }
 }
+
 
 function setupDateJumpSheet() {
   const modal = document.getElementById("dateJumpModal");
   const input = document.getElementById("dateJumpInput");
-  const cancelBtn = document.getElementById("dateJumpCancel");
-  const confirmBtn = document.getElementById("dateJumpConfirm");
 
-  if (!modal || !input || !cancelBtn || !confirmBtn) return;
-
-  cancelBtn.addEventListener("click", () => {
-    closeDateJumpSheet();
-  });
+  if (!modal || !input) return;
 
   // Chiudi toccando l'overlay scuro
   modal.addEventListener("click", (e) => {
@@ -348,7 +358,8 @@ function setupDateJumpSheet() {
     }
   });
 
-  confirmBtn.addEventListener("click", () => {
+  // Quando l'utente sceglie una data → vai subito a quel mese e chiudi
+  input.addEventListener("change", () => {
     if (!input.value) {
       closeDateJumpSheet();
       return;
@@ -368,6 +379,7 @@ function setupDateJumpSheet() {
 }
 
 
+
 function setupCalendarTabInteractions() {
   if (!calendarTab) return;
 
@@ -380,6 +392,7 @@ function setupCalendarTabInteractions() {
     }
     calendarLongPressTimer = setTimeout(() => {
       calendarLongPress = true;
+      calendarTab.classList.add('long-press');
       openDateJumpSheet();
     }, LONG_PRESS_MS);
   }
@@ -388,6 +401,12 @@ function setupCalendarTabInteractions() {
     if (calendarLongPressTimer) {
       clearTimeout(calendarLongPressTimer);
       calendarLongPressTimer = null;
+    }
+    if (!calendarLongPress) {
+      // se il long press non è scattato, niente stato speciale
+      if (calendarTab) {
+        calendarTab.classList.remove('long-press');
+      }
     }
   }
 
@@ -398,6 +417,7 @@ function setupCalendarTabInteractions() {
     calendarTab.addEventListener(ev, cancelPress);
   });
 }
+
 
 
 
