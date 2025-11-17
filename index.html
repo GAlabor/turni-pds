@@ -45,7 +45,7 @@
       </div>
     </section>
 
-        <!-- VISTA INSERIMENTI / PAGAMENTI -->
+    <!-- VISTA INSERIMENTI / PAGAMENTI -->
     <section class="view view-inspag" data-view="inspag">
       <header class="app-header">
         <h1 class="app-title">Inserimenti e Pagamenti</h1>
@@ -61,19 +61,17 @@
 
     <!-- VISTA RIEPILOGO -->
     <section class="view view-riepilogo" data-view="riepilogo">
-  <header class="app-header">
-    <h1 class="app-title">Riepilogo</h1>
-    <p class="app-subtitle">Ricerca e riepilogo mensile</p>
-  </header>
+      <header class="app-header">
+        <h1 class="app-title">Riepilogo</h1>
+        <p class="app-subtitle">Ricerca e riepilogo mensile</p>
+      </header>
 
-  <div class="settings-container">
-    <p class="settings-hint">
-      In questa sezione potrai vedere i riepiloghi per mese o anno.
-    </p>
-  </div>
-</section>
-
-
+      <div class="settings-container">
+        <p class="settings-hint">
+          In questa sezione potrai vedere i riepiloghi per mese o anno.
+        </p>
+      </div>
+    </section>
 
     <!-- VISTA IMPOSTAZIONI -->
     <section class="view view-settings" data-view="settings">
@@ -116,19 +114,19 @@
       <span class="tab-label">Calendario</span>
     </button>
 
-       <button class="tab" data-tab="inspag" aria-label="Inserimenti e pagamenti">
-  <svg id="icoInspag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-       fill="none" stroke="currentColor" stroke-width="1.4"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
-  <span class="tab-label">Ins/Pag</span>
-</button>
+    <button class="tab" data-tab="inspag" aria-label="Inserimenti e pagamenti">
+      <svg id="icoInspag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="1.4"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+      <span class="tab-label">Ins/Pag</span>
+    </button>
 
-  <button class="tab" data-tab="riepilogo" aria-label="Riepilogo">
-  <svg id="icoRiepilogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-       fill="none" stroke="currentColor" stroke-width="1.4"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
-  <span class="tab-label">Riepilogo</span>
-</button>
+    <button class="tab" data-tab="riepilogo" aria-label="Riepilogo">
+      <svg id="icoRiepilogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="1.4"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+      <span class="tab-label">Riepilogo</span>
+    </button>
 
     <button class="tab" data-tab="settings" aria-label="Impostazioni">
       <svg id="icoSettings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -147,14 +145,33 @@
   <div class="date-jump-backdrop" id="dateJumpModal" hidden>
     <div class="date-jump-sheet" role="dialog" aria-modal="true" aria-labelledby="dateJumpTitle">
       <div class="date-jump-handle" aria-hidden="true"></div>
-      <h2 class="date-jump-title" id="dateJumpTitle">Vai a data</h2>
 
-      <input type="date" id="dateJumpInput">
+      <div class="date-jump-header">
+        <h2 class="date-jump-title" id="dateJumpTitle">Vai a data</h2>
+        <div class="date-jump-nav">
+          <button type="button" class="date-jump-nav-btn" data-dir="prev">&#10094;</button>
+          <div class="date-jump-month" id="dateJumpMonthLabel"></div>
+          <button type="button" class="date-jump-nav-btn" data-dir="next">&#10095;</button>
+        </div>
+      </div>
+
+      <div class="date-jump-dow-row">
+        <div>L</div>
+        <div>M</div>
+        <div>M</div>
+        <div>G</div>
+        <div>V</div>
+        <div>S</div>
+        <div>D</div>
+      </div>
+
+      <div class="date-jump-grid" id="dateJumpGrid">
+        <!-- Celle giorno per il jump verranno inserite via JS -->
+      </div>
     </div>
   </div>
 
   <script src="app.js"></script>
 
-  
 </body>
 </html>

@@ -17,6 +17,10 @@ let today = new Date();
 let currentYear = today.getFullYear();
 let currentMonth = today.getMonth(); // 0–11
 
+// Stato per il mini calendario "vai a data"
+let jumpYear = currentYear;
+let jumpMonth = currentMonth;
+
 function renderCalendar(year, month) {
   if (!grid) return;
 
@@ -244,7 +248,7 @@ async function loadTabbarIcons() {
       }
     }
 
-        // ----- ICONA INSERIMENTI / PAGAMENTI -----
+    // ----- ICONA INSERIMENTI / PAGAMENTI -----
     const inspag = await fetch(`${app_base()}/svg/inspag.svg`, {
       cache: 'no-store',
       credentials: 'same-origin'
@@ -263,7 +267,7 @@ async function loadTabbarIcons() {
       }
     }
 
-        // ----- ICONA RIEPILOGO -----
+    // ----- ICONA RIEPILOGO -----
     const riepilogo = await fetch(`${app_base()}/svg/riepilogo.svg`, {
       cache: 'no-store',
       credentials: 'same-origin'
@@ -281,7 +285,6 @@ async function loadTabbarIcons() {
             .forEach(n => host.appendChild(n.cloneNode(true)));
       }
     }
-
 
     // ----- ICONA IMPOSTAZIONI -----
     const set = await fetch(`${app_base()}/svg/settings.svg`, {
@@ -309,30 +312,69 @@ async function loadTabbarIcons() {
 
 loadTabbarIcons();
 
-// BLOCCO COMPORTAMENTO ICONA CALENDARIO IN BASE AI TAP
+
+// ============================
+// Bottom sheet "Vai a data"
+// ============================
+
+function renderDateJumpCalendar() {
+  const grid = document.getElementById("dateJumpGrid");
+  const label = document.getElementById("dateJumpMonthLabel");
+  if (!grid || !label) return;
+
+  grid.innerHTML = "";
+  label.textContent = `${monthNames[jumpMonth]} ${jumpYear}`;
+
+  const firstDay = new Date(jumpYear, jumpMonth, 1);
+  const startIndex = (firstDay.getDay() + 6) % 7; // lun=0 ... dom=6
+  const daysInMonth = new Date(jumpYear, jumpMonth + 1, 0).getDate();
+
+  const todayDate = new Date();
+  const isThisMonth =
+    jumpYear === todayDate.getFullYear() &&
+    jumpMonth === todayDate.getMonth();
+
+  // celle vuote prima del giorno 1
+  for (let i = 0; i < startIndex; i++) {
+    const empty = document.createElement("div");
+    empty.className = "date-jump-day empty";
+    grid.appendChild(empty);
+  }
+
+  // giorni del mese
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement("div");
+    cell.className = "date-jump-day";
+    cell.textContent = d;
+    cell.dataset.day = d;
+
+    if (isThisMonth && d === todayDate.getDate()) {
+      cell.classList.add("date-jump-day-today");
+    }
+
+    cell.addEventListener("click", () => {
+      // appena clicchi un giorno, salta a quel mese e chiudi
+      currentYear = jumpYear;
+      currentMonth = jumpMonth;
+      renderCalendar(currentYear, currentMonth);
+      closeDateJumpSheet();
+    });
+
+    grid.appendChild(cell);
+  }
+}
 
 function openDateJumpSheet() {
   const modal = document.getElementById("dateJumpModal");
-  const input = document.getElementById("dateJumpInput");
-  if (!modal || !input) return;
+  if (!modal) return;
 
-  const base = new Date();
-  const defaultDate = new Date(currentYear, currentMonth, base.getDate());
-  input.valueAsDate = defaultDate;
+  // parti dal mese attuale mostrato nel calendario principale
+  jumpYear = currentYear;
+  jumpMonth = currentMonth;
+  renderDateJumpCalendar();
 
   modal.hidden = false;
-
-  // Prova a far aprire direttamente il picker nativo (iOS lo interpreta)
-  setTimeout(() => {
-    try {
-      input.focus({ preventScroll: true });
-    } catch {
-      // se il browser non gradisce, pazienza
-      input.focus();
-    }
-  }, 60);
 }
-
 
 function closeDateJumpSheet() {
   const modal = document.getElementById("dateJumpModal");
@@ -340,45 +382,44 @@ function closeDateJumpSheet() {
     modal.hidden = true;
   }
   if (calendarTab) {
-    calendarTab.classList.remove('long-press');
+    calendarTab.classList.remove("long-press");
   }
 }
 
-
 function setupDateJumpSheet() {
   const modal = document.getElementById("dateJumpModal");
-  const input = document.getElementById("dateJumpInput");
+  if (!modal) return;
 
-  if (!modal || !input) return;
+  const prevBtn = modal.querySelector('.date-jump-nav-btn[data-dir="prev"]');
+  const nextBtn = modal.querySelector('.date-jump-nav-btn[data-dir="next"]');
 
-  // Chiudi toccando l'overlay scuro
+  if (!prevBtn || !nextBtn) return;
+
+  // chiudi toccando l'overlay scuro
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       closeDateJumpSheet();
     }
   });
 
-  // Quando l'utente sceglie una data → vai subito a quel mese e chiudi
-  input.addEventListener("change", () => {
-    if (!input.value) {
-      closeDateJumpSheet();
-      return;
+  prevBtn.addEventListener("click", () => {
+    jumpMonth--;
+    if (jumpMonth < 0) {
+      jumpMonth = 11;
+      jumpYear--;
     }
+    renderDateJumpCalendar();
+  });
 
-    const targetDate = input.valueAsDate;
-    if (!targetDate || isNaN(targetDate.getTime())) {
-      closeDateJumpSheet();
-      return;
+  nextBtn.addEventListener("click", () => {
+    jumpMonth++;
+    if (jumpMonth > 11) {
+      jumpMonth = 0;
+      jumpYear++;
     }
-
-    currentYear = targetDate.getFullYear();
-    currentMonth = targetDate.getMonth();
-    renderCalendar(currentYear, currentMonth);
-    closeDateJumpSheet();
+    renderDateJumpCalendar();
   });
 }
-
-
 
 function setupCalendarTabInteractions() {
   if (!calendarTab) return;
@@ -392,7 +433,7 @@ function setupCalendarTabInteractions() {
     }
     calendarLongPressTimer = setTimeout(() => {
       calendarLongPress = true;
-      calendarTab.classList.add('long-press');
+      calendarTab.classList.add("long-press");
       openDateJumpSheet();
     }, LONG_PRESS_MS);
   }
@@ -402,23 +443,18 @@ function setupCalendarTabInteractions() {
       clearTimeout(calendarLongPressTimer);
       calendarLongPressTimer = null;
     }
-    if (!calendarLongPress) {
-      // se il long press non è scattato, niente stato speciale
-      if (calendarTab) {
-        calendarTab.classList.remove('long-press');
-      }
+    if (!calendarLongPress && calendarTab) {
+      calendarTab.classList.remove("long-press");
     }
   }
 
   calendarTab.addEventListener("mousedown", startPress);
   calendarTab.addEventListener("touchstart", startPress, { passive: true });
 
-  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(ev => {
+  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((ev) => {
     calendarTab.addEventListener(ev, cancelPress);
   });
 }
-
-
 
 
 
@@ -490,5 +526,3 @@ function setupCalendarTabInteractions() {
     registerSW();
   }
 })();
-
-
