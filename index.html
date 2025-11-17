@@ -147,14 +147,34 @@
       <div class="date-jump-handle" aria-hidden="true"></div>
 
       <div class="date-jump-header">
-        <h2 class="date-jump-title" id="dateJumpTitle">Vai a data</h2>
-        <div class="date-jump-nav">
-          <button type="button" class="date-jump-nav-btn" data-dir="prev">&#10094;</button>
-          <div class="date-jump-month" id="dateJumpMonthLabel"></div>
-          <button type="button" class="date-jump-nav-btn" data-dir="next">&#10095;</button>
+        <div class="date-jump-header-row">
+          <!-- Anno in alto a sinistra -->
+          <button type="button" class="date-jump-year-button" id="dateJumpYearButton">
+            <span id="dateJumpYearDisplay">2025</span>
+            <span class="date-jump-year-chevron">▾</span>
+          </button>
+
+          <!-- Titolo al centro -->
+          <h2 class="date-jump-title" id="dateJumpTitle">Vai a data</h2>
+
+          <!-- Pulsante chiusura a destra -->
+          <button type="button" class="date-jump-close" id="dateJumpClose" aria-label="Chiudi">✕</button>
+        </div>
+
+        <!-- Dropdown anni (scroll) -->
+        <div class="date-jump-year-dropdown" id="dateJumpYearDropdown">
+          <!-- anni via JS -->
         </div>
       </div>
 
+      <!-- Mese / anno + frecce -->
+      <div class="date-jump-nav">
+        <button type="button" class="date-jump-nav-btn" data-dir="prev">&#10094;</button>
+        <div class="date-jump-month" id="dateJumpMonthLabel"></div>
+        <button type="button" class="date-jump-nav-btn" data-dir="next">&#10095;</button>
+      </div>
+
+      <!-- intestazione giorni -->
       <div class="date-jump-dow-row">
         <div>L</div>
         <div>M</div>
@@ -165,8 +185,9 @@
         <div>D</div>
       </div>
 
+      <!-- mini calendario -->
       <div class="date-jump-grid" id="dateJumpGrid">
-        <!-- Celle giorno per il jump verranno inserite via JS -->
+        <!-- Celle giorno inserite via JS -->
       </div>
     </div>
   </div>
