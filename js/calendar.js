@@ -82,7 +82,8 @@
 
     popup.innerHTML = "";
 
-    const range = 5; // 5 anni prima e 5 dopo
+    // più anni prima/dopo per "allargare gli orizzonti"
+    const range = 15; // 15 anni prima e 15 dopo → 31 anni visibili
     const start = jumpYear - range;
     const end = jumpYear + range;
 
@@ -111,9 +112,13 @@
       popup.appendChild(btn);
     }
 
-    // prova a centrare circa l'anno selezionato
+    // centra l'anno attivo nella lista
     requestAnimationFrame(() => {
-      popup.scrollTop = popup.scrollHeight / 2 - popup.clientHeight / 2;
+      const active = popup.querySelector(".date-jump-year-item.is-active");
+      if (active) {
+        popup.scrollTop =
+          active.offsetTop - popup.clientHeight / 2 + active.offsetHeight / 2;
+      }
     });
   }
 
