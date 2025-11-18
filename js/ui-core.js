@@ -114,8 +114,6 @@
           clearTimeout(calendarLongPressTimer);
         }
 
-        // niente preventDefault sui touch, così il tap normale continua a generare click
-        // sul mouse non tocchiamo niente: la selezione l'abbiamo già tolta da CSS
         calendarLongPressTimer = setTimeout(() => {
           calendarLongPress = true;
           calendarTab.classList.add("long-press");
@@ -142,17 +140,6 @@
       });
     }
   }
-
-  // Blocco MENU tasto destro / long press SU TUTTA LA TABBAR (e sul foglio "Vai a data")
-  // Lo mettiamo a livello documento, in capture, per fregare anche DevTools "mobile".
-  document.addEventListener("contextmenu", (ev) => {
-    const inTabbar = ev.target.closest(".tabbar");
-    const inDateSheet = ev.target.closest(".date-jump-sheet");
-    if (inTabbar || inDateSheet) {
-      ev.preventDefault();
-      ev.stopPropagation();
-    }
-  }, { capture: true });
 
   // ----------------------------
   // Icone SVG tabbar
