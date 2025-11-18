@@ -136,6 +136,13 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+
 body {
   margin: 0;
   background: var(--bg);
