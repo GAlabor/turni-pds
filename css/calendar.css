@@ -1,0 +1,327 @@
+/* Header mese (vista calendario) */
+
+.monthbar {
+  margin: 6px 0 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.month-label {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.nav-btn {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  width: 40px;
+  height: 34px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+  color: var(--nav-fg);
+}
+
+.nav-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 8px 18px rgba(10,132,255,0.35);
+}
+
+/* Contenitore calendario */
+
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.calendar-container {
+  background: var(--surface);
+  padding: 18px 20px 20px;
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 1120px;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border);
+}
+
+/* Intestazioni giorni settimana */
+
+.dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dow {
+  padding: 6px 0;
+  text-align: center;
+  font-weight: 600;
+  color: var(--dow-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Griglia giorni */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+/* Celle giorno */
+
+.day {
+  background: var(--surface-strong);
+  padding: 12px 12px 14px;
+  text-align: right;
+  font-size: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  transition: 0.16s ease;
+  min-height: 64px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+.day::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at top, rgba(10,132,255,0.22), transparent 55%);
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.day.empty {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.day:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.day:hover::before {
+  opacity: 1;
+}
+
+/* Weekend e oggi */
+
+.weekend {
+  color: var(--weekend);
+}
+
+.today {
+  border: 2px solid var(--today-border);
+  font-weight: 700;
+}
+
+/* =========================
+   RESPONSIVE CALENDARIO
+   ========================= */
+
+@media (max-width: 900px) {
+  /* frecce un po' più lontane dal titolo */
+  .monthbar {
+    margin: 4px 0 10px 0;
+  }
+
+  /* frecce più piccole, circolari, con più aria */
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 16px;
+  }
+
+  .month-label {
+    font-size: 17px;
+  }
+
+  .calendar-container {
+    padding: 6px 4px 6px;
+    border-radius: 16px;
+  }
+
+  .dow-row {
+    gap: 2px;
+    margin-bottom: 3px;
+  }
+
+  .dow {
+    font-size: 11px;
+    padding: 4px 0;
+  }
+
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  .day {
+    border-radius: 10px;
+    padding: 5px;
+    min-height: auto;
+    aspect-ratio: 1;
+    font-size: 12px;
+    box-shadow: none;
+  }
+
+  .day::before {
+    display: none;
+  }
+}
+
+@media (min-width: 901px) {
+  .calendar-container {
+    padding-bottom: 12px;
+  }
+}
+
+/* =========================
+   BOTTOM SHEET "VAI A DATA"
+   ========================= */
+
+.date-jump-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(15,23,42,0.45);
+  z-index: 50;
+}
+
+.date-jump-backdrop[hidden] {
+  display: none;
+}
+
+.date-jump-sheet {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface-strong);
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--shadow-soft);
+  padding: 14px 16px 18px;
+  border-top: 1px solid var(--border);
+
+  /* stacca il foglio dalla tabbar */
+  margin-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 6px);
+}
+
+.date-jump-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148,163,184,0.8);
+  margin: 4px auto 10px;
+}
+
+.date-jump-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.date-jump-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.date-jump-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.date-jump-month {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.date-jump-nav-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.date-jump-nav-btn:hover {
+  filter: brightness(1.05);
+}
+
+.date-jump-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--subtext);
+  margin-bottom: 6px;
+}
+
+.date-jump-dow-row > div {
+  text-align: center;
+}
+
+.date-jump-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.date-jump-day {
+  position: relative;
+  text-align: center;
+  font-size: 13px;
+  padding: 6px 0;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.date-jump-day.empty {
+  cursor: default;
+}
+
+.date-jump-day:not(.empty):hover {
+  background: var(--hover-bg);
+}
+
+.date-jump-day-today {
+  border: 1px solid var(--accent);
+  font-weight: 600;
+}
+
+.date-jump-day-selected {
+  background: var(--accent);
+  color: #fff;
+}

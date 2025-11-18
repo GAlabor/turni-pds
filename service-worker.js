@@ -1,8 +1,8 @@
 // ==============================
-// Turni PDS — Service Worker (migliorato con navigationPreload)
+// Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-14 V3.3'; // VERSIONE APP CORRENTE
+const VERSION    = '2025-11-17 V3.5'; // VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -14,8 +14,15 @@ const PRECACHE_URLS = [
   `${ROOT}/`,
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
-  `${ROOT}/app.css`,
-  `${ROOT}/app.js`,
+
+  // nuovi CSS/JS
+  `${ROOT}/css/base.css`,
+  `${ROOT}/css/calendar.css`,
+  `${ROOT}/css/ui.css`,
+  `${ROOT}/js/calendar.js`,
+  `${ROOT}/js/ui-core.js`,
+  `${ROOT}/js/sw-register.js`,
+
   `${ROOT}/favicon.ico`,
   `${ROOT}/ico/icon-192.png`,
   `${ROOT}/ico/icon-512.png`,
@@ -81,11 +88,10 @@ self.addEventListener('fetch', (event) => {
   const sameOrigin = url.origin === self.location.origin;
   if (!sameOrigin) return;
 
-  // ⬇⬇⬇ IMPORTANTE: NON intercettare il file del service worker
+  // NON intercettare il file del service worker
   if (url.pathname === `${ROOT}/service-worker.js`) {
-    return; // lascia che il browser lo prenda sempre dal network
+    return;
   }
-  // ⬆⬆⬆
 
   const isHTML =
     req.mode === 'navigate' ||
@@ -97,10 +103,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);
 
-      // prova preloadResponse se disponibile
       const preload = event.preloadResponse ? await event.preloadResponse : null;
       if (preload) {
-        // aggiorna cache e ritorna preload
         try { cache.put(`${ROOT}/index.html`, preload.clone()); } catch {}
         return preload;
       }

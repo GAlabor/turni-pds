@@ -1,0 +1,211 @@
+:root {
+  /* tema chiaro di default */
+  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+  --bg-solid: #e7ecff;
+  --surface: rgba(255,255,255,0.88);
+  --surface-strong: rgba(255,255,255,0.96);
+  --border: rgba(120,130,170,0.18);
+  --text: #111827;
+  --subtext: #6b7280;
+  --accent: #0a84ff;
+  --radius-xl: 24px;
+  --radius: 16px;
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);
+  --shadow-light: 0 10px 26px rgba(15,23,42,0.12);
+
+  --dow-muted: #6b7280;
+  --weekend: #e25555;
+  --hover-bg: rgba(10,132,255,0.08);
+  --today-border: var(--accent);
+  --version-color: rgba(15,23,42,0.65);
+
+  /* frecce mese */
+  --nav-fg: #111827;
+
+  --tabbar-h: 70px;
+
+  /* tabbar palette */
+  --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
+  --tabbar-border: rgba(148,163,184,0.4);
+
+  /* tabbar */
+  --tabH: 46px;
+  --tabIcon: 32px;
+  --tabMaxW: 120px;
+  --tabColor: #9ca3af;
+  --tabActiveColor: #0a84ff;
+  --active-bright: 1.12;
+  --active-contrast: 1.03;
+  --icon-pop: 1.08;
+  --lift: -1px;
+  --press: 1px;
+  --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
+}
+
+/* Tema “system” scuro, se nessun data-theme è forzato */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+    --bg-solid: #020617;
+    --surface: rgba(15,23,42,0.94);
+    --surface-strong: rgba(15,23,42,0.98);
+    --border: rgba(148,163,184,0.26);
+    --text: #e5e7eb;
+    --subtext: #9ca3af;
+    --accent: #4b8dff;
+    --shadow-soft: 0 22px 60px rgba(0,0,0,0.7);
+    --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
+
+    --dow-muted: #9ca3af;
+    --weekend: #ff8f8f;
+    --hover-bg: rgba(75,141,255,0.18);
+    --today-border: var(--accent);
+    --version-color: rgba(226,232,240,0.8);
+
+    --nav-fg: #e5e7eb;
+
+    --tabbar-bg: linear-gradient(180deg, rgba(15,23,42,0.3), rgba(15,23,42,0.92));
+    --tabbar-border: rgba(30,64,175,0.7);
+
+    --tabColor: #6b7280;
+    --tabActiveColor: #4b8dff;
+  }
+}
+
+/* Forzatura tema chiaro */
+:root[data-theme="light"] {
+  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+  --bg-solid: #e7ecff;
+  --surface: rgba(255,255,255,0.88);
+  --surface-strong: rgba(255,255,255,0.96);
+  --border: rgba(120,130,170,0.18);
+  --text: #111827;
+  --subtext: #6b7280;
+  --accent: #0a84ff;
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);
+  --shadow-light: 0 10px 26px rgba(15,23,42,0.12);
+
+  --dow-muted: #6b7280;
+  --weekend: #e25555;
+  --hover-bg: rgba(10,132,255,0.08);
+  --today-border: var(--accent);
+  --version-color: rgba(15,23,42,0.65);
+
+  --nav-fg: #111827;
+
+  --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
+  --tabbar-border: rgba(148,163,184,0.4);
+
+  --tabColor: #9ca3af;
+  --tabActiveColor: #0a84ff;
+}
+
+/* Forzatura tema scuro */
+:root[data-theme="dark"] {
+  --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+  --bg-solid: #020617;
+  --surface: rgba(15,23,42,0.94);
+  --surface-strong: rgba(15,23,42,0.98);
+  --border: rgba(148,163,184,0.26);
+  --text: #e5e7eb;
+  --subtext: #9ca3af;
+  --accent: #4b8dff;
+  --shadow-soft: 0 22px 60px rgba(0,0,0,0.7);
+  --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
+
+  --dow-muted: #9ca3af;
+  --weekend: #ff8f8f;
+  --hover-bg: rgba(75,141,255,0.18);
+  --today-border: var(--accent);
+  --version-color: rgba(226,232,240,0.8);
+
+  --nav-fg: #e5e7eb;
+
+  --tabbar-bg: linear-gradient(180deg, rgba(15,23,42,0.3), rgba(15,23,42,0.92));
+  --tabbar-border: rgba(30,64,175,0.7);
+
+  --tabColor: #6b7280;
+  --tabActiveColor: #4b8dff;
+}
+
+/* Reset / base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-attachment: fixed;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  padding: 18px 14px calc(18px + env(safe-area-inset-bottom) + var(--tabbar-h));
+}
+
+/* Shell & viste */
+
+.app-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.view {
+  display: none;
+}
+
+.view.is-active {
+  display: block;
+}
+
+/* Header stile iOS */
+
+.app-header {
+  padding: 4px 4px 10px 4px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.app-subtitle {
+  margin: 4px 0 0 2px;
+  font-size: 14px;
+  color: var(--subtext);
+}
+
+/* RESPONSIVE GLOBAL */
+
+@media (max-width: 900px) {
+  body {
+    padding: 8px 6px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
+  }
+
+  .app-header {
+    padding: 0 2px 2px 2px;
+  }
+
+  .app-title {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .app-subtitle {
+    font-size: 11px;
+    margin-top: 0;
+    opacity: 0.7;
+  }
+}
+
+@media (min-width: 901px) {
+  body {
+    padding-bottom: 20px;
+  }
+}

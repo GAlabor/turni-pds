@@ -1,0 +1,221 @@
+/* Vista impostazioni */
+
+.view-settings .settings-container {
+  background: var(--surface);
+  padding: 18px 18px 22px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.settings-title {
+  margin: 0 0 16px 0;
+  font-size: 22px;
+}
+
+.settings-group {
+  margin-bottom: 18px;
+}
+
+.settings-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.settings-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.settings-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+:root[data-theme="dark"] .settings-option {
+  background: rgba(15,23,42,0.5);
+}
+
+.settings-option input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+.settings-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--subtext);
+}
+
+/* =========================
+   TABBAR IN BASSO
+   ========================= */
+
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tabbar-bg);
+  border-top: 1px solid var(--tabbar-border);
+  display: flex;
+  justify-content: space-around;
+  gap: 18px;
+  padding: 6px 18px calc(8px + env(safe-area-inset-bottom));
+  z-index: 10;
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  max-width: var(--tabMaxW);
+  min-width: 0;
+  height: var(--tabH);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--tabColor);
+  font-size: 11px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  padding: 0;
+  transition:
+    color .16s ease,
+    transform .06s ease,
+    filter .12s ease;
+}
+
+.tab::after {
+  display: none !important;
+}
+
+.tab > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tab-label {
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* hover desktop */
+@media (hover:hover) {
+  .tab:hover {
+    transform: translateY(var(--lift));
+    filter: brightness(var(--active-bright)) contrast(var(--active-contrast));
+  }
+}
+
+.tab:active {
+  transform: translateY(var(--press));
+}
+
+/* stato "long press" visivo sulla tab calendario */
+.tab.long-press {
+  transform: translateY(var(--press)) scale(0.97);
+  filter: brightness(1.1) contrast(1.05);
+}
+
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* STATO ATTIVO: solo colore icona/testo, nessun contorno */
+.tab.active {
+  color: var(--tabActiveColor);
+  font-weight: 600;
+  filter: none;
+}
+
+.tab svg {
+  width: var(--tabIcon);
+  height: var(--tabIcon);
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    stroke-width .16s ease,
+    transform .12s ease,
+    color .16s ease;
+}
+
+.tab.active svg {
+  stroke-width: 1.6;
+  transform: scale(var(--icon-pop));
+}
+
+/* touch */
+@media (hover:none) {
+  .tab:active {
+    filter: brightness(1.08) contrast(1.02);
+  }
+}
+
+/* =========================
+   VERSION BADGE
+   ========================= */
+
+.version-label {
+  position: fixed;
+  bottom: 6px;
+  left: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--version-color);
+  opacity: 0.9;
+  pointer-events: none;
+  user-select: none;
+  z-index: 9999;
+  text-shadow: 0 1px 2px rgba(15,23,42,0.35);
+}
+
+/* =========================
+   RESPONSIVE UI
+   ========================= */
+
+@media (max-width: 900px) {
+  .view-settings .settings-container {
+    padding: 12px 10px 16px;
+    border-radius: 16px;
+  }
+
+  .tabbar {
+    padding-inline: 10px;
+  }
+
+  /* MOBILE: niente scritte sotto le icone */
+  .tab-label {
+    display: none;
+  }
+}
+
+@media (min-width: 901px) {
+  .tab-label {
+    display: block;
+  }
+}
