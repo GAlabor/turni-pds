@@ -64,6 +64,7 @@
 
     if (!tabs.length || !views.length) return;
 
+    // Click tab: switch vista + logica speciale calendario
     tabs.forEach(tab => {
       tab.addEventListener("click", (event) => {
         const target = tab.dataset.tab;
@@ -79,9 +80,13 @@
           }
 
           const calendarView = document.querySelector(".view-calendar");
-          const isCalendarActive = calendarView && calendarView.classList.contains("is-active");
+          const isCalendarActive =
+            calendarView && calendarView.classList.contains("is-active");
 
-          if (isCalendarActive && window.Calendar && typeof Calendar.resetToToday === "function") {
+          // già sulla vista calendario → torna a oggi
+          if (isCalendarActive &&
+              window.Calendar &&
+              typeof Calendar.resetToToday === "function") {
             Calendar.resetToToday();
             return;
           }
@@ -95,49 +100,59 @@
       });
     });
 
-// Long press sulla tab calendario per aprire "Vai a data"
-if (calendarTab && window.Calendar && typeof Calendar.openDateJumpSheet === "function") {
-  const LONG_PRESS_MS = 550;
+    // Long press sulla tab calendario per aprire "Vai a data"
+    if (calendarTab &&
+        window.Calendar &&
+        typeof Calendar.openDateJumpSheet === "function") {
 
-  function startPress(ev) {
-    calendarLongPress = false;
+      const LONG_PRESS_MS = 550;
 
-    if (calendarLongPressTimer) {
-      clearTimeout(calendarLongPressTimer);
+      function startPress(ev) {
+        calendarLongPress = false;
+
+        if (calendarLongPressTimer) {
+          clearTimeout(calendarLongPressTimer);
+        }
+
+        // niente preventDefault sui touch, così il tap normale continua a generare click
+        // sul mouse non tocchiamo niente: la selezione l'abbiamo già tolta da CSS
+        calendarLongPressTimer = setTimeout(() => {
+          calendarLongPress = true;
+          calendarTab.classList.add("long-press");
+          Calendar.openDateJumpSheet();
+        }, LONG_PRESS_MS);
+      }
+
+      function cancelPress() {
+        if (calendarLongPressTimer) {
+          clearTimeout(calendarLongPressTimer);
+          calendarLongPressTimer = null;
+        }
+        if (!calendarLongPress) {
+          calendarTab.classList.remove("long-press");
+        }
+      }
+
+      // Mouse / touch per il long-press
+      calendarTab.addEventListener("mousedown", startPress);
+      calendarTab.addEventListener("touchstart", startPress, { passive: true });
+
+      ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((evName) => {
+        calendarTab.addEventListener(evName, cancelPress);
+      });
     }
+  }
 
-    // Solo su mouse evitiamo selezione / focus,
-    // sui touch NON facciamo preventDefault così il click continua a funzionare.
-    if (ev && ev.type === "mousedown" && typeof ev.preventDefault === "function") {
+  // Blocco MENU tasto destro / long press SU TUTTA LA TABBAR (e sul foglio "Vai a data")
+  // Lo mettiamo a livello documento, in capture, per fregare anche DevTools "mobile".
+  document.addEventListener("contextmenu", (ev) => {
+    const inTabbar = ev.target.closest(".tabbar");
+    const inDateSheet = ev.target.closest(".date-jump-sheet");
+    if (inTabbar || inDateSheet) {
       ev.preventDefault();
+      ev.stopPropagation();
     }
-
-    calendarLongPressTimer = setTimeout(() => {
-      calendarLongPress = true;
-      calendarTab.classList.add("long-press");
-      Calendar.openDateJumpSheet();
-    }, LONG_PRESS_MS);
-  }
-
-  function cancelPress() {
-    if (calendarLongPressTimer) {
-      clearTimeout(calendarLongPressTimer);
-      calendarLongPressTimer = null;
-    }
-    if (!calendarLongPress) {
-      calendarTab.classList.remove("long-press");
-    }
-  }
-
-  calendarTab.addEventListener("mousedown", startPress);
-  calendarTab.addEventListener("touchstart", startPress, { passive: true });
-
-  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((evName) => {
-    calendarTab.addEventListener(evName, cancelPress);
-  });
-}
-
-  }
+  }, { capture: true });
 
   // ----------------------------
   // Icone SVG tabbar
