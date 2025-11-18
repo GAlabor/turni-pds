@@ -182,7 +182,7 @@
   left: 10px;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--version-color);
   opacity: 0.9;
