@@ -20,15 +20,16 @@
     YEARS: "years"
   };
 
-  const YEARS_PAGE_SIZE = 10; // blocchi da 10 anni (es. 2020–2029)
+  // 12 anni per pagina, centrati: 5 prima, 6 dopo
+  const YEARS_PAGE_SIZE = 12;
 
   let today = new Date();
   let currentYear = today.getFullYear();
   let currentMonth = today.getMonth(); // 0–11
   let currentMode = MODES.DAYS;
 
-  // range anni visibile in modalità anni
-  let yearRangeStart = Math.floor(currentYear / YEARS_PAGE_SIZE) * YEARS_PAGE_SIZE;
+  // range anni visibile in modalità anni: Y-5 ... Y+6
+  let yearRangeStart = currentYear - 5;
 
   // Riferimenti DOM
   let gridDays = null;
@@ -205,7 +206,8 @@
     currentMode = mode;
 
     if (currentMode === MODES.YEARS) {
-      yearRangeStart = Math.floor(currentYear / YEARS_PAGE_SIZE) * YEARS_PAGE_SIZE;
+      // centra la finestra: 5 anni prima, 6 dopo
+      yearRangeStart = currentYear - 5;
     }
 
     updateContainerModeClass();
