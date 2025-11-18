@@ -1,5 +1,6 @@
 // ============================
-// Calendario + "Vai a data"
+// Calendario con viste:
+// giorni / mesi / anni
 // ============================
 
 (function () {
@@ -8,41 +9,97 @@
     "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
   ];
 
+  const monthShort = [
+    "gen", "feb", "mar", "apr", "mag", "giu",
+    "lug", "ago", "set", "ott", "nov", "dic"
+  ];
+
+  const MODES = {
+    DAYS: "days",
+    MONTHS: "months",
+    YEARS: "years"
+  };
+
+  const YEARS_PAGE_SIZE = 10; // blocchi da 10 anni (es. 2020–2029)
+
   let today = new Date();
   let currentYear = today.getFullYear();
   let currentMonth = today.getMonth(); // 0–11
+  let currentMode = MODES.DAYS;
 
-  // Stato per il mini calendario "vai a data"
-  let jumpYear = currentYear;
-  let jumpMonth = currentMonth;
+  // range anni visibile in modalità anni
+  let yearRangeStart = Math.floor(currentYear / YEARS_PAGE_SIZE) * YEARS_PAGE_SIZE;
 
-  // Riferimenti DOM (inizializzati in init)
-  let grid = null;
+  // Riferimenti DOM
+  let gridDays = null;
+  let gridMonths = null;
+  let gridYears = null;
   let monthLabel = null;
   let prevBtn = null;
   let nextBtn = null;
+  let calendarContainer = null;
 
-  function renderCalendar(year, month) {
-    if (!grid) return;
+  // ============================
+  // Render header
+  // ============================
 
-    grid.innerHTML = "";
+  function updateHeader() {
+    if (!monthLabel) return;
 
-    const firstDay = new Date(year, month, 1);
+    if (currentMode === MODES.DAYS) {
+      monthLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      return;
+    }
+
+    if (currentMode === MODES.MONTHS) {
+      monthLabel.textContent = String(currentYear);
+      return;
+    }
+
+    if (currentMode === MODES.YEARS) {
+      const end = yearRangeStart + YEARS_PAGE_SIZE - 1;
+      monthLabel.textContent = `${yearRangeStart} - ${end}`;
+    }
+  }
+
+  function updateContainerModeClass() {
+    if (!calendarContainer) return;
+    calendarContainer.classList.remove("mode-days", "mode-months", "mode-years");
+    if (currentMode === MODES.DAYS) {
+      calendarContainer.classList.add("mode-days");
+    } else if (currentMode === MODES.MONTHS) {
+      calendarContainer.classList.add("mode-months");
+    } else if (currentMode === MODES.YEARS) {
+      calendarContainer.classList.add("mode-years");
+    }
+  }
+
+  // ============================
+  // Render giorni
+  // ============================
+
+  function renderDays() {
+    if (!gridDays) return;
+
+    gridDays.innerHTML = "";
+
+    const firstDay = new Date(currentYear, currentMonth, 1);
 
     // JS: 0 = Domenica ... 6 = Sabato
     // Noi vogliamo: 0 = Lunedì ... 6 = Domenica
     const startIndex = (firstDay.getDay() + 6) % 7;
 
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
     const isCurrentMonth =
-      year === today.getFullYear() && month === today.getMonth();
+      currentYear === today.getFullYear() &&
+      currentMonth === today.getMonth();
 
     // Celle vuote prima del giorno 1
     for (let i = 0; i < startIndex; i++) {
       const empty = document.createElement("div");
       empty.className = "day empty";
-      grid.appendChild(empty);
+      gridDays.appendChild(empty);
     }
 
     // Tutti i giorni del mese
@@ -64,213 +121,175 @@
         cell.classList.add("today");
       }
 
-      grid.appendChild(cell);
+      gridDays.appendChild(cell);
     }
 
-    if (monthLabel) {
-      monthLabel.textContent = `${monthNames[month]} ${year}`;
-    }
+    updateHeader();
   }
 
   // ============================
-  // Bottom sheet "Vai a data"
+  // Render mesi
   // ============================
 
-  function renderYearSelector() {
-    const popup = document.getElementById("dateJumpYearPopup");
-    if (!popup) return;
+  function renderMonths() {
+    if (!gridMonths) return;
 
-    popup.innerHTML = "";
+    gridMonths.innerHTML = "";
 
-    // più anni prima/dopo per "allargare gli orizzonti"
-    const range = 15; // 15 anni prima e 15 dopo → 31 anni visibili
-    const start = jumpYear - range;
-    const end = jumpYear + range;
+    for (let m = 0; m < 12; m++) {
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "month-cell";
+      cell.textContent = monthShort[m];
 
-    for (let y = start; y <= end; y++) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "date-jump-year-item" + (y === jumpYear ? " is-active" : "");
-      btn.textContent = y;
-      btn.dataset.year = y;
-
-      btn.addEventListener("click", () => {
-        jumpYear = y;
-        renderDateJumpCalendar();
-
-        const popupEl = document.getElementById("dateJumpYearPopup");
-        const yearBtnEl = document.getElementById("dateJumpYearBtn");
-        if (popupEl) {
-          popupEl.classList.remove("is-open");
-          popupEl.setAttribute("aria-hidden", "true");
-        }
-        if (yearBtnEl) {
-          yearBtnEl.setAttribute("aria-expanded", "false");
-        }
-      });
-
-      popup.appendChild(btn);
-    }
-
-    // centra l'anno attivo nella lista
-    requestAnimationFrame(() => {
-      const active = popup.querySelector(".date-jump-year-item.is-active");
-      if (active) {
-        popup.scrollTop =
-          active.offsetTop - popup.clientHeight / 2 + active.offsetHeight / 2;
-      }
-    });
-  }
-
-  function renderDateJumpCalendar() {
-    const gridJump = document.getElementById("dateJumpGrid");
-    const label = document.getElementById("dateJumpMonthLabel");
-    const yearBtn = document.getElementById("dateJumpYearBtn");
-    if (!gridJump || !label) return;
-
-    gridJump.innerHTML = "";
-    label.textContent = `${monthNames[jumpMonth]} ${jumpYear}`;
-
-    if (yearBtn) {
-      yearBtn.textContent = jumpYear;
-    }
-
-    // aggiorna lista anni
-    renderYearSelector();
-
-    const firstDay = new Date(jumpYear, jumpMonth, 1);
-    const startIndex = (firstDay.getDay() + 6) % 7; // lun=0 ... dom=6
-    const daysInMonth = new Date(jumpYear, jumpMonth + 1, 0).getDate();
-
-    const todayDate = new Date();
-    const isThisMonth =
-      jumpYear === todayDate.getFullYear() &&
-      jumpMonth === todayDate.getMonth();
-
-    // celle vuote prima del giorno 1
-    for (let i = 0; i < startIndex; i++) {
-      const empty = document.createElement("div");
-      empty.className = "date-jump-day empty";
-      gridJump.appendChild(empty);
-    }
-
-    // giorni del mese
-    for (let d = 1; d <= daysInMonth; d++) {
-      const cell = document.createElement("div");
-      cell.className = "date-jump-day";
-      cell.textContent = d;
-      cell.dataset.day = d;
-
-      if (isThisMonth && d === todayDate.getDate()) {
-        cell.classList.add("date-jump-day-today");
+      if (m === currentMonth) {
+        cell.classList.add("is-current");
       }
 
       cell.addEventListener("click", () => {
-        currentYear = jumpYear;
-        currentMonth = jumpMonth;
-        renderCalendar(currentYear, currentMonth);
-        closeDateJumpSheet();
+        currentMonth = m;
+        currentMode = MODES.DAYS;
+        updateContainerModeClass();
+        renderDays();
       });
 
-      gridJump.appendChild(cell);
+      gridMonths.appendChild(cell);
     }
+
+    updateHeader();
   }
 
-  function openDateJumpSheet() {
-    const modal = document.getElementById("dateJumpModal");
-    if (!modal) return;
+  // ============================
+  // Render anni
+  // ============================
 
-    // parti dal mese attuale mostrato nel calendario principale
-    jumpYear = currentYear;
-    jumpMonth = currentMonth;
-    renderDateJumpCalendar();
+  function renderYears() {
+    if (!gridYears) return;
 
-    const popup = document.getElementById("dateJumpYearPopup");
-    const yearBtn = document.getElementById("dateJumpYearBtn");
-    if (popup) {
-      popup.classList.remove("is-open");
-      popup.setAttribute("aria-hidden", "true");
-    }
-    if (yearBtn) {
-      yearBtn.setAttribute("aria-expanded", "false");
-    }
+    gridYears.innerHTML = "";
 
-    modal.classList.add("is-open");
-  }
+    const end = yearRangeStart + YEARS_PAGE_SIZE - 1;
 
-  function closeDateJumpSheet() {
-    const modal = document.getElementById("dateJumpModal");
-    if (modal) {
-      modal.classList.remove("is-open");
-    }
+    for (let y = yearRangeStart; y <= end; y++) {
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "year-cell";
+      cell.textContent = y;
 
-    const popup = document.getElementById("dateJumpYearPopup");
-    const yearBtn = document.getElementById("dateJumpYearBtn");
-    if (popup) {
-      popup.classList.remove("is-open");
-      popup.setAttribute("aria-hidden", "true");
-    }
-    if (yearBtn) {
-      yearBtn.setAttribute("aria-expanded", "false");
-    }
-
-    // ripulisce la tab calendario da eventuale stato "long-press"
-    const calendarTab = document.querySelector('.tab[data-tab="calendar"]');
-    if (calendarTab) {
-      calendarTab.classList.remove("long-press");
-    }
-  }
-
-  function setupDateJumpSheet() {
-    const modal = document.getElementById("dateJumpModal");
-    if (!modal) return;
-
-    const prevBtn = modal.querySelector('.date-jump-nav-btn[data-dir="prev"]');
-    const nextBtn = modal.querySelector('.date-jump-nav-btn[data-dir="next"]');
-
-    if (!prevBtn || !nextBtn) return;
-
-    // chiudi toccando l'overlay scuro
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeDateJumpSheet();
+      if (y === currentYear) {
+        cell.classList.add("is-current");
       }
-    });
 
-    prevBtn.addEventListener("click", () => {
-      jumpMonth--;
-      if (jumpMonth < 0) {
-        jumpMonth = 11;
-        jumpYear--;
-      }
-      renderDateJumpCalendar();
-    });
-
-    nextBtn.addEventListener("click", () => {
-      jumpMonth++;
-      if (jumpMonth > 11) {
-        jumpMonth = 0;
-        jumpYear++;
-      }
-      renderDateJumpCalendar();
-    });
-
-    const yearBtn = document.getElementById("dateJumpYearBtn");
-    const yearPopup = document.getElementById("dateJumpYearPopup");
-
-    if (yearBtn && yearPopup) {
-      yearBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-
-        const isOpen = yearPopup.classList.toggle("is-open");
-        yearPopup.setAttribute("aria-hidden", isOpen ? "false" : "true");
-        yearBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-
-        if (isOpen) {
-          renderYearSelector();
-        }
+      cell.addEventListener("click", () => {
+        currentYear = y;
+        currentMode = MODES.MONTHS;
+        updateContainerModeClass();
+        renderMonths();
       });
+
+      gridYears.appendChild(cell);
     }
+
+    updateHeader();
+  }
+
+  // ============================
+  // Switch modalità
+  // ============================
+
+  function setMode(mode) {
+    if (mode === currentMode && mode !== MODES.YEARS) {
+      return;
+    }
+
+    currentMode = mode;
+
+    if (currentMode === MODES.YEARS) {
+      yearRangeStart = Math.floor(currentYear / YEARS_PAGE_SIZE) * YEARS_PAGE_SIZE;
+    }
+
+    updateContainerModeClass();
+
+    if (currentMode === MODES.DAYS) {
+      renderDays();
+    } else if (currentMode === MODES.MONTHS) {
+      renderMonths();
+    } else if (currentMode === MODES.YEARS) {
+      renderYears();
+    }
+  }
+
+  // ============================
+  // Navigazione frecce
+  // ============================
+
+  function goPrev() {
+    if (currentMode === MODES.DAYS) {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderDays();
+      return;
+    }
+
+    if (currentMode === MODES.MONTHS) {
+      currentYear--;
+      renderMonths();
+      return;
+    }
+
+    if (currentMode === MODES.YEARS) {
+      yearRangeStart -= YEARS_PAGE_SIZE;
+      renderYears();
+    }
+  }
+
+  function goNext() {
+    if (currentMode === MODES.DAYS) {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderDays();
+      return;
+    }
+
+    if (currentMode === MODES.MONTHS) {
+      currentYear++;
+      renderMonths();
+      return;
+    }
+
+    if (currentMode === MODES.YEARS) {
+      yearRangeStart += YEARS_PAGE_SIZE;
+      renderYears();
+    }
+  }
+
+  // ============================
+  // Click fuori dal calendario
+  // ============================
+
+  function setupOutsideClickHandler() {
+    document.addEventListener("click", (ev) => {
+      if (!calendarContainer) return;
+      if (currentMode === MODES.DAYS) return;
+
+      const target = ev.target;
+
+      // se clicchi dentro il contenitore o sul titolo mese/anno → NON resettare
+      if (calendarContainer.contains(target) || (monthLabel && monthLabel.contains(target))) {
+        return;
+      }
+
+      // Torna alla vista giorni mantenendo year/month correnti
+      currentMode = MODES.DAYS;
+      updateContainerModeClass();
+      renderDays();
+    });
   }
 
   // ============================
@@ -281,61 +300,66 @@
     today = new Date();
     currentYear = today.getFullYear();
     currentMonth = today.getMonth();
-    renderCalendar(currentYear, currentMonth);
+    currentMode = MODES.DAYS;
+    updateContainerModeClass();
+    renderDays();
   }
 
   function getState() {
     return {
       year: currentYear,
-      month: currentMonth
+      month: currentMonth,
+      mode: currentMode
     };
   }
 
   function setState(year, month) {
     currentYear = year;
     currentMonth = month;
-    renderCalendar(currentYear, currentMonth);
+    currentMode = MODES.DAYS;
+    updateContainerModeClass();
+    renderDays();
   }
 
   function init() {
-    grid = document.getElementById("calendar-grid");
+    gridDays = document.getElementById("calendar-grid");
+    gridMonths = document.getElementById("month-grid");
+    gridYears = document.getElementById("year-grid");
     monthLabel = document.querySelector(".month-label");
     prevBtn = document.querySelector(".prev");
     nextBtn = document.querySelector(".next");
+    calendarContainer = document.getElementById("calendarContainer");
 
-    if (!grid || !monthLabel) return;
+    if (!gridDays || !monthLabel || !calendarContainer) return;
+
+    updateContainerModeClass();
 
     if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear--;
-        }
-        renderCalendar(currentYear, currentMonth);
-      });
+      prevBtn.addEventListener("click", goPrev);
     }
 
     if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear++;
-        }
-        renderCalendar(currentYear, currentMonth);
-      });
+      nextBtn.addEventListener("click", goNext);
     }
 
-    renderCalendar(currentYear, currentMonth);
-    setupDateJumpSheet();
+    // Click sul titolo: Giorni → Mesi → Anni
+    monthLabel.addEventListener("click", () => {
+      if (currentMode === MODES.DAYS) {
+        setMode(MODES.MONTHS);
+      } else if (currentMode === MODES.MONTHS) {
+        setMode(MODES.YEARS);
+      }
+      // in modalità anni il click sul titolo non fa nulla
+    });
+
+    setupOutsideClickHandler();
+    renderDays();
   }
 
   window.Calendar = {
     init,
     resetToToday,
     getState,
-    setState,
-    openDateJumpSheet
+    setState
   };
 })();

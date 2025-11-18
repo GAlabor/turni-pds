@@ -51,39 +51,25 @@
   }
 
   // ----------------------------
-  // Tabbar: switch viste + long press calendario
+  // Tabbar: switch viste
   // ----------------------------
-
-  let calendarLongPress = false;
-  let calendarLongPressTimer = null;
 
   function initTabs() {
     const tabs = document.querySelectorAll(".tab");
     const views = document.querySelectorAll(".view");
-    const calendarTab = document.querySelector('.tab[data-tab="calendar"]');
 
     if (!tabs.length || !views.length) return;
 
-    // Click tab: switch vista + logica speciale calendario
     tabs.forEach(tab => {
-      tab.addEventListener("click", (event) => {
+      tab.addEventListener("click", () => {
         const target = tab.dataset.tab;
 
-        // TAB CALENDARIO: comportamento speciale
+        // TAB CALENDARIO: se è già attiva → torna a oggi
         if (target === "calendar") {
-          // se il long press ha già aperto il menu, ignoro il click di rimbalzo
-          if (calendarLongPress) {
-            calendarLongPress = false;
-            event.preventDefault();
-            event.stopPropagation();
-            return;
-          }
-
           const calendarView = document.querySelector(".view-calendar");
           const isCalendarActive =
             calendarView && calendarView.classList.contains("is-active");
 
-          // già sulla vista calendario → torna a oggi
           if (isCalendarActive &&
               window.Calendar &&
               typeof Calendar.resetToToday === "function") {
@@ -99,73 +85,6 @@
         });
       });
     });
-
-    // Long press sulla tab calendario per aprire "Vai a data"
-if (calendarTab &&
-    window.Calendar &&
-    typeof Calendar.openDateJumpSheet === "function") {
-
-  const LONG_PRESS_MS = 550;
-
-  function startPress(ev) {
-    calendarLongPress = false;
-
-    if (calendarLongPressTimer) {
-      clearTimeout(calendarLongPressTimer);
-    }
-
-    // blocca menu tasto destro in devtools desktop
-    if (ev.pointerType === "mouse") {
-      ev.preventDefault();
-    }
-
-    calendarLongPressTimer = setTimeout(() => {
-      calendarLongPress = true;
-      calendarTab.classList.add("long-press");
-
-      // vibrazione nativa se disponibile
-      if (navigator.vibrate) {
-        navigator.vibrate(15);
-      }
-
-      Calendar.openDateJumpSheet();
-    }, LONG_PRESS_MS);
-  }
-
-  function cancelPress() {
-    if (calendarLongPressTimer) {
-      clearTimeout(calendarLongPressTimer);
-      calendarLongPressTimer = null;
-    }
-    if (!calendarLongPress) {
-      calendarTab.classList.remove("long-press");
-    }
-  }
-
-  // Pointer events (unifica mouse + touch)
-  calendarTab.addEventListener("pointerdown", startPress);
-  calendarTab.addEventListener("pointerup", cancelPress);
-  calendarTab.addEventListener("pointerleave", cancelPress);
-  calendarTab.addEventListener("pointercancel", cancelPress);
-
-  // blocco menu destro sulla tab calendario
-  calendarTab.addEventListener("contextmenu", (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    if (!calendarLongPress) {
-      calendarLongPress = true;
-      calendarTab.classList.add("long-press");
-
-      if (navigator.vibrate) {
-        navigator.vibrate(15);
-      }
-
-      Calendar.openDateJumpSheet();
-    }
-  });
-}
-
   }
 
   // ----------------------------

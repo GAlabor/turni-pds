@@ -7,7 +7,7 @@
   <link rel="icon" href="favicon.ico">
   <title>Turni PDS</title>
 
-  <!-- Nuovi CSS -->
+  <!-- CSS -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/calendar.css">
   <link rel="stylesheet" href="css/ui.css">
@@ -32,8 +32,8 @@
 
       <!-- Contenitore calendario -->
       <div class="calendar-wrapper">
-        <div class="calendar-container">
-          <div class="dow-row">
+        <div class="calendar-container mode-days" id="calendarContainer">
+          <div class="dow-row" id="dowRow">
             <div class="dow">Lun</div>
             <div class="dow">Mar</div>
             <div class="dow">Mer</div>
@@ -42,8 +42,20 @@
             <div class="dow">Sab</div>
             <div class="dow">Dom</div>
           </div>
+
+          <!-- Griglia giorni -->
           <div class="calendar-grid" id="calendar-grid">
             <!-- Il JS inserirà le celle giorno -->
+          </div>
+
+          <!-- Griglia mesi -->
+          <div class="month-grid" id="month-grid">
+            <!-- Mesi inseriti via JS -->
+          </div>
+
+          <!-- Griglia anni -->
+          <div class="year-grid" id="year-grid">
+            <!-- Anni inseriti via JS -->
           </div>
         </div>
       </div>
@@ -145,53 +157,7 @@
   <!-- Etichetta versione -->
   <div id="versionLabel" class="version-label"></div>
 
-  <!-- Sheet "Vai a data" (titolo rimosso, l'intestazione è l'anno) -->
-  <div class="date-jump-backdrop" id="dateJumpModal">
-    <div class="date-jump-sheet" role="dialog" aria-modal="true" aria-labelledby="dateJumpYearBtn">
-      <div class="date-jump-handle" aria-hidden="true"></div>
-
-      <div class="date-jump-header">
-        <div class="date-jump-top">
-          <div class="date-jump-year-wrapper">
-            <button
-              type="button"
-              class="date-jump-year-btn"
-              id="dateJumpYearBtn"
-              aria-label="Seleziona anno"
-              aria-expanded="false"
-            >
-              <!-- anno impostato via JS -->
-            </button>
-            <div class="date-jump-year-popup" id="dateJumpYearPopup" aria-hidden="true">
-              <!-- anni inseriti via JS -->
-            </div>
-          </div>
-        </div>
-
-        <div class="date-jump-nav">
-          <button type="button" class="date-jump-nav-btn" data-dir="prev">&#10094;</button>
-          <div class="date-jump-month" id="dateJumpMonthLabel"></div>
-          <button type="button" class="date-jump-nav-btn" data-dir="next">&#10095;</button>
-        </div>
-      </div>
-
-      <div class="date-jump-dow-row">
-        <div>L</div>
-        <div>M</div>
-        <div>M</div>
-        <div>G</div>
-        <div>V</div>
-        <div>S</div>
-        <div>D</div>
-      </div>
-
-      <div class="date-jump-grid" id="dateJumpGrid">
-        <!-- Celle giorno per il jump verranno inserite via JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Nuovi JS -->
+  <!-- JS -->
   <script src="js/calendar.js" defer></script>
   <script src="js/ui-core.js" defer></script>
   <script src="js/sw-register.js" defer></script>
