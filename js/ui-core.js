@@ -95,7 +95,7 @@
       });
     });
 
-    // Long press sulla tab calendario per aprire "Vai a data"
+// Long press sulla tab calendario per aprire "Vai a data"
 if (calendarTab && window.Calendar && typeof Calendar.openDateJumpSheet === "function") {
   const LONG_PRESS_MS = 550;
 
@@ -106,8 +106,9 @@ if (calendarTab && window.Calendar && typeof Calendar.openDateJumpSheet === "fun
       clearTimeout(calendarLongPressTimer);
     }
 
-    // evita selezione / focus strani durante il long press
-    if (ev && typeof ev.preventDefault === "function") {
+    // Solo su mouse evitiamo selezione / focus,
+    // sui touch NON facciamo preventDefault così il click continua a funzionare.
+    if (ev && ev.type === "mousedown" && typeof ev.preventDefault === "function") {
       ev.preventDefault();
     }
 
@@ -129,12 +130,13 @@ if (calendarTab && window.Calendar && typeof Calendar.openDateJumpSheet === "fun
   }
 
   calendarTab.addEventListener("mousedown", startPress);
-  calendarTab.addEventListener("touchstart", startPress, { passive: false });
+  calendarTab.addEventListener("touchstart", startPress, { passive: true });
 
-  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((ev) => {
-    calendarTab.addEventListener(ev, cancelPress);
+  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((evName) => {
+    calendarTab.addEventListener(evName, cancelPress);
   });
 }
+
   }
 
   // ----------------------------
