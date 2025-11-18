@@ -96,38 +96,45 @@
     });
 
     // Long press sulla tab calendario per aprire "Vai a data"
-    if (calendarTab && window.Calendar && typeof Calendar.openDateJumpSheet === "function") {
-      const LONG_PRESS_MS = 550;
+if (calendarTab && window.Calendar && typeof Calendar.openDateJumpSheet === "function") {
+  const LONG_PRESS_MS = 550;
 
-      function startPress() {
-        calendarLongPress = false;
-        if (calendarLongPressTimer) {
-          clearTimeout(calendarLongPressTimer);
-        }
-        calendarLongPressTimer = setTimeout(() => {
-          calendarLongPress = true;
-          calendarTab.classList.add("long-press");
-          Calendar.openDateJumpSheet();
-        }, LONG_PRESS_MS);
-      }
+  function startPress(ev) {
+    calendarLongPress = false;
 
-      function cancelPress() {
-        if (calendarLongPressTimer) {
-          clearTimeout(calendarLongPressTimer);
-          calendarLongPressTimer = null;
-        }
-        if (!calendarLongPress) {
-          calendarTab.classList.remove("long-press");
-        }
-      }
-
-      calendarTab.addEventListener("mousedown", startPress);
-      calendarTab.addEventListener("touchstart", startPress, { passive: true });
-
-      ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((ev) => {
-        calendarTab.addEventListener(ev, cancelPress);
-      });
+    if (calendarLongPressTimer) {
+      clearTimeout(calendarLongPressTimer);
     }
+
+    // evita selezione / focus strani durante il long press
+    if (ev && typeof ev.preventDefault === "function") {
+      ev.preventDefault();
+    }
+
+    calendarLongPressTimer = setTimeout(() => {
+      calendarLongPress = true;
+      calendarTab.classList.add("long-press");
+      Calendar.openDateJumpSheet();
+    }, LONG_PRESS_MS);
+  }
+
+  function cancelPress() {
+    if (calendarLongPressTimer) {
+      clearTimeout(calendarLongPressTimer);
+      calendarLongPressTimer = null;
+    }
+    if (!calendarLongPress) {
+      calendarTab.classList.remove("long-press");
+    }
+  }
+
+  calendarTab.addEventListener("mousedown", startPress);
+  calendarTab.addEventListener("touchstart", startPress, { passive: false });
+
+  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach((ev) => {
+    calendarTab.addEventListener(ev, cancelPress);
+  });
+}
   }
 
   // ----------------------------
