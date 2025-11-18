@@ -263,6 +263,91 @@
   margin-bottom: 10px;
 }
 
+.date-jump-top {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 4px;
+}
+
+.date-jump-year-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.date-jump-year-btn {
+  min-width: 72px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-jump-year-btn::after {
+  content: "▾";
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.date-jump-year-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* Popup anni */
+
+.date-jump-year-popup {
+  position: absolute;
+  top: 120%;
+  left: 0;
+  min-width: 90px;
+  max-height: 180px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition:
+    opacity 0.16s ease-out,
+    transform 0.16s ease-out;
+  z-index: 70;
+}
+
+.date-jump-year-popup.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.date-jump-year-item {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.date-jump-year-item:hover {
+  background: var(--hover-bg);
+}
+
+.date-jump-year-item.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
 .date-jump-title {
   margin: 0;
   font-size: 17px;
@@ -346,4 +431,3 @@
   background: var(--accent);
   color: #fff;
 }
-

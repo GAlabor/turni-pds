@@ -151,7 +151,25 @@
       <div class="date-jump-handle" aria-hidden="true"></div>
 
       <div class="date-jump-header">
+        <div class="date-jump-top">
+          <div class="date-jump-year-wrapper">
+            <button
+              type="button"
+              class="date-jump-year-btn"
+              id="dateJumpYearBtn"
+              aria-label="Seleziona anno"
+              aria-expanded="false"
+            >
+              <!-- anno impostato via JS -->
+            </button>
+            <div class="date-jump-year-popup" id="dateJumpYearPopup" aria-hidden="true">
+              <!-- anni inseriti via JS -->
+            </div>
+          </div>
+        </div>
+
         <h2 class="date-jump-title" id="dateJumpTitle">Vai a data</h2>
+
         <div class="date-jump-nav">
           <button type="button" class="date-jump-nav-btn" data-dir="prev">&#10094;</button>
           <div class="date-jump-month" id="dateJumpMonthLabel"></div>

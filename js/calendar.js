@@ -76,13 +76,62 @@
   // Bottom sheet "Vai a data"
   // ============================
 
+  function renderYearSelector() {
+    const popup = document.getElementById("dateJumpYearPopup");
+    if (!popup) return;
+
+    popup.innerHTML = "";
+
+    const range = 5; // 5 anni prima e 5 dopo
+    const start = jumpYear - range;
+    const end = jumpYear + range;
+
+    for (let y = start; y <= end; y++) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "date-jump-year-item" + (y === jumpYear ? " is-active" : "");
+      btn.textContent = y;
+      btn.dataset.year = y;
+
+      btn.addEventListener("click", () => {
+        jumpYear = y;
+        renderDateJumpCalendar();
+
+        const popupEl = document.getElementById("dateJumpYearPopup");
+        const yearBtnEl = document.getElementById("dateJumpYearBtn");
+        if (popupEl) {
+          popupEl.classList.remove("is-open");
+          popupEl.setAttribute("aria-hidden", "true");
+        }
+        if (yearBtnEl) {
+          yearBtnEl.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      popup.appendChild(btn);
+    }
+
+    // prova a centrare circa l'anno selezionato
+    requestAnimationFrame(() => {
+      popup.scrollTop = popup.scrollHeight / 2 - popup.clientHeight / 2;
+    });
+  }
+
   function renderDateJumpCalendar() {
     const gridJump = document.getElementById("dateJumpGrid");
     const label = document.getElementById("dateJumpMonthLabel");
+    const yearBtn = document.getElementById("dateJumpYearBtn");
     if (!gridJump || !label) return;
 
     gridJump.innerHTML = "";
     label.textContent = `${monthNames[jumpMonth]} ${jumpYear}`;
+
+    if (yearBtn) {
+      yearBtn.textContent = jumpYear;
+    }
+
+    // aggiorna lista anni
+    renderYearSelector();
 
     const firstDay = new Date(jumpYear, jumpMonth, 1);
     const startIndex = (firstDay.getDay() + 6) % 7; // lun=0 ... dom=6
@@ -122,31 +171,50 @@
     }
   }
 
-function openDateJumpSheet() {
-  const modal = document.getElementById("dateJumpModal");
-  if (!modal) return;
+  function openDateJumpSheet() {
+    const modal = document.getElementById("dateJumpModal");
+    if (!modal) return;
 
-  // parti dal mese attuale mostrato nel calendario principale
-  jumpYear = currentYear;
-  jumpMonth = currentMonth;
-  renderDateJumpCalendar();
+    // parti dal mese attuale mostrato nel calendario principale
+    jumpYear = currentYear;
+    jumpMonth = currentMonth;
+    renderDateJumpCalendar();
 
-  modal.classList.add("is-open");
-}
+    const popup = document.getElementById("dateJumpYearPopup");
+    const yearBtn = document.getElementById("dateJumpYearBtn");
+    if (popup) {
+      popup.classList.remove("is-open");
+      popup.setAttribute("aria-hidden", "true");
+    }
+    if (yearBtn) {
+      yearBtn.setAttribute("aria-expanded", "false");
+    }
 
-function closeDateJumpSheet() {
-  const modal = document.getElementById("dateJumpModal");
-  if (modal) {
-    modal.classList.remove("is-open");
+    modal.classList.add("is-open");
   }
 
-  // ripulisce la tab calendario da eventuale stato "long-press"
-  const calendarTab = document.querySelector('.tab[data-tab="calendar"]');
-  if (calendarTab) {
-    calendarTab.classList.remove("long-press");
-  }
-}
+  function closeDateJumpSheet() {
+    const modal = document.getElementById("dateJumpModal");
+    if (modal) {
+      modal.classList.remove("is-open");
+    }
 
+    const popup = document.getElementById("dateJumpYearPopup");
+    const yearBtn = document.getElementById("dateJumpYearBtn");
+    if (popup) {
+      popup.classList.remove("is-open");
+      popup.setAttribute("aria-hidden", "true");
+    }
+    if (yearBtn) {
+      yearBtn.setAttribute("aria-expanded", "false");
+    }
+
+    // ripulisce la tab calendario da eventuale stato "long-press"
+    const calendarTab = document.querySelector('.tab[data-tab="calendar"]');
+    if (calendarTab) {
+      calendarTab.classList.remove("long-press");
+    }
+  }
 
   function setupDateJumpSheet() {
     const modal = document.getElementById("dateJumpModal");
@@ -181,6 +249,23 @@ function closeDateJumpSheet() {
       }
       renderDateJumpCalendar();
     });
+
+    const yearBtn = document.getElementById("dateJumpYearBtn");
+    const yearPopup = document.getElementById("dateJumpYearPopup");
+
+    if (yearBtn && yearPopup) {
+      yearBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        const isOpen = yearPopup.classList.toggle("is-open");
+        yearPopup.setAttribute("aria-hidden", isOpen ? "false" : "true");
+        yearBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+
+        if (isOpen) {
+          renderYearSelector();
+        }
+      });
+    }
   }
 
   // ============================
