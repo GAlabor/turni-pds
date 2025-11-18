@@ -137,13 +137,17 @@
 
     gridMonths.innerHTML = "";
 
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth();
+
     for (let m = 0; m < 12; m++) {
       const cell = document.createElement("button");
       cell.type = "button";
       cell.className = "month-cell";
       cell.textContent = monthShort[m];
 
-      if (m === currentMonth) {
+      // evidenzia SOLO se è il mese reale di oggi nello stesso anno
+      if (currentYear === todayYear && m === todayMonth) {
         cell.classList.add("is-current");
       }
 
@@ -170,6 +174,7 @@
     gridYears.innerHTML = "";
 
     const end = yearRangeStart + YEARS_PAGE_SIZE - 1;
+    const todayYear = today.getFullYear();
 
     for (let y = yearRangeStart; y <= end; y++) {
       const cell = document.createElement("button");
@@ -177,7 +182,8 @@
       cell.className = "year-cell";
       cell.textContent = y;
 
-      if (y === currentYear) {
+      // evidenzia SOLO l'anno reale di oggi
+      if (y === todayYear) {
         cell.classList.add("is-current");
       }
 
@@ -282,8 +288,14 @@
 
       const target = ev.target;
 
-      // se clicchi dentro il contenitore o sul titolo mese/anno → NON resettare
-      if (calendarContainer.contains(target) || (monthLabel && monthLabel.contains(target))) {
+      // se clicchi dentro il contenitore,
+      // sul titolo, o sulle frecce → NON resettare
+      if (
+        calendarContainer.contains(target) ||
+        (monthLabel && monthLabel.contains(target)) ||
+        (prevBtn && prevBtn.contains(target)) ||
+        (nextBtn && nextBtn.contains(target))
+      ) {
         return;
       }
 
