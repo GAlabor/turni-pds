@@ -122,24 +122,31 @@
     }
   }
 
-  function openDateJumpSheet() {
-    const modal = document.getElementById("dateJumpModal");
-    if (!modal) return;
+function openDateJumpSheet() {
+  const modal = document.getElementById("dateJumpModal");
+  if (!modal) return;
 
-    // parti dal mese attuale mostrato nel calendario principale
-    jumpYear = currentYear;
-    jumpMonth = currentMonth;
-    renderDateJumpCalendar();
+  // parti dal mese attuale mostrato nel calendario principale
+  jumpYear = currentYear;
+  jumpMonth = currentMonth;
+  renderDateJumpCalendar();
 
-    modal.hidden = false;
+  modal.classList.add("is-open");
+}
+
+function closeDateJumpSheet() {
+  const modal = document.getElementById("dateJumpModal");
+  if (modal) {
+    modal.classList.remove("is-open");
   }
 
-  function closeDateJumpSheet() {
-    const modal = document.getElementById("dateJumpModal");
-    if (modal) {
-      modal.hidden = true;
-    }
+  // ripulisce la tab calendario da eventuale stato "long-press"
+  const calendarTab = document.querySelector('.tab[data-tab="calendar"]');
+  if (calendarTab) {
+    calendarTab.classList.remove("long-press");
   }
+}
+
 
   function setupDateJumpSheet() {
     const modal = document.getElementById("dateJumpModal");

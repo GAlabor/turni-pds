@@ -206,25 +206,46 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(15,23,42,0.45);
   z-index: 50;
+
+  /* stato chiuso */
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(15,23,42,0);
+  transition:
+    opacity 0.22s ease-out,
+    background 0.22s ease-out;
 }
 
-.date-jump-backdrop[hidden] {
-  display: none;
+.date-jump-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(15,23,42,0.45);
 }
 
 .date-jump-sheet {
   width: 100%;
   max-width: 520px;
   background: var(--surface-strong);
-  border-radius: 20px 20px 0 0;
+  border-radius: 22px; /* arrotondato su tutti gli spigoli */
   box-shadow: var(--shadow-soft);
   padding: 14px 16px 18px;
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
 
-  /* stacca il foglio dalla tabbar */
-  margin-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 6px);
+  /* separato lateralmente e dal basso */
+  margin: 0 14px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);
+
+  /* animazione ingresso */
+  transform: translateY(24px) scale(0.98);
+  opacity: 0;
+  transition:
+    transform 0.26s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+    opacity 0.2s ease-out;
+}
+
+.date-jump-backdrop.is-open .date-jump-sheet {
+  transform: translateY(0) scale(1);
+  opacity: 1;
 }
 
 .date-jump-handle {
@@ -325,3 +346,4 @@
   background: var(--accent);
   color: #fff;
 }
+
