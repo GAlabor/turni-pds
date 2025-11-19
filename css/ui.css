@@ -215,25 +215,40 @@
   stroke: var(--accent);
   fill: none;
   transform-origin: center;
-  stroke-dasharray: 300;
-  stroke-dashoffset: 150;
+  /* di base: cerchio pieno */
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 0;
+  transition:
+    opacity 0.16s ease,
+    stroke-dasharray 0.16s ease,
+    stroke-dashoffset 0.16s ease;
 }
 
-/* Stati */
-
+/* NULLO: cerchio intero opaco */
 .status-idle #loginCircle {
   opacity: 0.4;
+  animation: none;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 0;
 }
 
+/* IN SALVATAGGIO: solo pacche che girano */
 .status-saving #loginCircle {
   opacity: 1;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 150;
   animation: statusSpin 0.9s linear infinite;
 }
 
+/* SALVATO: cerchio intero acceso */
 .status-ok #loginCircle {
   opacity: 1;
   animation: none;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 0;
 }
+
+
 
 @keyframes statusSpin {
   from { transform: rotate(0deg); }
