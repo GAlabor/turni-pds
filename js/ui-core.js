@@ -78,32 +78,38 @@
     if (!settingsView) return;
 
     const main = settingsView.querySelector(".settings-main");
-    const themePanel = settingsView.querySelector(".settings-theme");
-    const themeRow = settingsView.querySelector('[data-settings-page="theme"]');
-    const backBtn = settingsView.querySelector("[data-settings-back]");
+    const panels = settingsView.querySelectorAll(".settings-panel[data-settings-id]");
+    const rows = settingsView.querySelectorAll(".settings-row[data-settings-page]");
+    const backBtns = settingsView.querySelectorAll("[data-settings-back]");
 
-    if (!main || !themePanel) return;
+    if (!main) return;
 
     const showMain = () => {
       main.classList.add("is-active");
-      themePanel.classList.remove("is-active");
+      panels.forEach(p => p.classList.remove("is-active"));
     };
 
-    const showTheme = () => {
+    const showPanel = (id) => {
+      if (!id) return;
       main.classList.remove("is-active");
-      themePanel.classList.add("is-active");
+      panels.forEach(p => {
+        p.classList.toggle("is-active", p.dataset.settingsId === id);
+      });
     };
 
     // stato iniziale
     showMain();
 
-    if (themeRow) {
-      themeRow.addEventListener("click", showTheme);
-    }
+    rows.forEach(row => {
+      row.addEventListener("click", () => {
+        const id = row.dataset.settingsPage;
+        showPanel(id);
+      });
+    });
 
-    if (backBtn) {
-      backBtn.addEventListener("click", showMain);
-    }
+    backBtns.forEach(btn => {
+      btn.addEventListener("click", showMain);
+    });
   }
 
   // ----------------------------
