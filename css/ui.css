@@ -248,7 +248,7 @@
 
 .status-saving #icoStatus #loginCircle {
   opacity: 1;
-  animation: statusSpin 1s linear infinite;
+  animation: statusSpin 0.3s linear infinite; /*tempo cerchio giro*/
 }
 
 /* OK → cerchio pieno più acceso, nessun segmento */

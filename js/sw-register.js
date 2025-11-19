@@ -28,6 +28,7 @@
       const swVersion = await getSWVersion();
       setVersionLabel(swVersion);
       const SW_URL = `${BASE}/service-worker.js?v=${encodeURIComponent(swVersion)}`;
+      
       const reg = await navigator.serviceWorker.register(SW_URL, { scope: SCOPE });
       if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
 
