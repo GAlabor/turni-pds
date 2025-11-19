@@ -183,6 +183,64 @@
 }
 
 /* =========================
+   ICONA STATO / SALVATAGGIO
+   ========================= */
+
+.app-status {
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 9999;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#icoStatus svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+/* Omino: colore sottotitoli */
+#icoStatus #loginUser {
+  fill: var(--subtext);
+}
+
+/* Cerchio animabile */
+#icoStatus #loginCircle {
+  stroke: var(--accent);
+  fill: none;
+  transform-origin: center;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 150;
+}
+
+/* Stati */
+
+.status-idle #loginCircle {
+  opacity: 0.4;
+}
+
+.status-saving #loginCircle {
+  opacity: 1;
+  animation: statusSpin 0.9s linear infinite;
+}
+
+.status-ok #loginCircle {
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes statusSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* =========================
    TABBAR IN BASSO
    ========================= */
 

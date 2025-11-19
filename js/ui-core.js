@@ -1,5 +1,5 @@
 // ============================
-// UI core: tabs, tema, icone SVG
+// UI core: tabs, tema, icone SVG + stato
 // ============================
 
 (function () {
@@ -57,9 +57,20 @@
         const value = btn.dataset.theme;
         if (!value) return;
 
+        // "Salvataggio" delle preferenze tema
         localStorage.setItem(THEME_KEY, value);
         applyTheme(value);
         syncThemeUI(value);
+
+        // Trigger stato salvataggio
+        if (window.Status && typeof Status.setSaving === "function") {
+          Status.setSaving();
+          setTimeout(() => {
+            if (window.Status && typeof Status.setOk === "function") {
+              Status.setOk();
+            }
+          }, 800);
+        }
       });
     });
   }
@@ -259,6 +270,75 @@
   }
 
   // ----------------------------
+  // Icona stato / login.svg
+  // ----------------------------
+
+  async function loadStatusIcon() {
+    try {
+      const res = await fetch(`${app_base()}/svg/login.svg`, {
+        cache: "no-store",
+        credentials: "same-origin"
+      });
+      if (!res.ok) return;
+
+      const txt = await res.text();
+      const host = document.getElementById("icoStatus");
+      if (!host) return;
+
+      const temp = document.createElement("div");
+      temp.innerHTML = txt.trim();
+      const svg = temp.querySelector("svg");
+      if (svg) {
+        host.innerHTML = "";
+        host.appendChild(svg);
+      }
+    } catch (err) {
+      console.error("Errore icona stato:", err);
+    }
+  }
+
+  const Status = {
+    el: null,
+    timer: null,
+
+    init() {
+      this.el = document.getElementById("statusIcon");
+      if (!this.el) return;
+      this.setIdle();
+    },
+
+    setIdle() {
+      if (!this.el) return;
+      this.el.classList.remove("status-saving", "status-ok");
+      this.el.classList.add("status-idle");
+    },
+
+    setSaving() {
+      if (!this.el) return;
+      this.el.classList.remove("status-idle", "status-ok");
+      this.el.classList.add("status-saving");
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+    },
+
+    setOk() {
+      if (!this.el) return;
+      this.el.classList.remove("status-idle", "status-saving");
+      this.el.classList.add("status-ok");
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      this.timer = setTimeout(() => {
+        this.setIdle();
+      }, 1500);
+    }
+  };
+
+  window.Status = Status;
+
+  // ----------------------------
   // Bootstrap UI core
   // ----------------------------
 
@@ -270,5 +350,7 @@
     initTabs();
     initIcons();
     initSettingsNavigation();
+    loadStatusIcon();
+    Status.init();
   });
 })();
