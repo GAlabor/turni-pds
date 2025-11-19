@@ -9,31 +9,6 @@
 
   const THEME_KEY = "turnipds-theme";
 
-  function setThemeColor(theme) {
-    // Colori coerenti con --bg-solid light/dark
-    const LIGHT = "#e7ecff";
-    const DARK  = "#020617";
-
-    let color = LIGHT;
-
-    if (theme === "light") {
-      color = LIGHT;
-    } else if (theme === "dark") {
-      color = DARK;
-    } else {
-      // "system": segui prefers-color-scheme
-      const prefersDark =
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-      color = prefersDark ? DARK : LIGHT;
-    }
-
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-      meta.setAttribute("content", color);
-    }
-  }
-
   function applyTheme(theme) {
     const root = document.documentElement;
 
@@ -43,8 +18,6 @@
       // "system": nessun attributo, lascia lavorare prefers-color-scheme
       root.removeAttribute("data-theme");
     }
-
-    setThemeColor(theme);
   }
 
   function syncThemeUI(theme) {
@@ -73,25 +46,6 @@
 
     applyTheme(saved);
     syncThemeUI(saved);
-  }
-
-  function setupSystemThemeListener() {
-    if (!window.matchMedia) return;
-
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      const saved = localStorage.getItem(THEME_KEY) || "system";
-      if (saved === "system") {
-        setThemeColor("system");
-      }
-    };
-
-    if (typeof mq.addEventListener === "function") {
-      mq.addEventListener("change", handler);
-    } else if (typeof mq.addListener === "function") {
-      // vecchi Safari
-      mq.addListener(handler);
-    }
   }
 
   function setupThemeControls() {
@@ -124,7 +78,6 @@
   function initTheme() {
     loadTheme();
     setupThemeControls();
-    setupSystemThemeListener();
   }
 
   // ----------------------------

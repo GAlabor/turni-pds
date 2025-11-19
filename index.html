@@ -3,14 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-
-  <!-- Colore barra di stato / browser: segue il tema -->
-  <meta name="theme-color" id="themeColor" content="#e7ecff">
-
-  <!-- PWA iOS: status bar che si fonde col contenuto -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
   <title>Turni PDS</title>
@@ -22,6 +14,9 @@
 </head>
 
 <body>
+
+  <div class="fake-statusbar"></div>
+
 
   <!-- ICONA STATO / SALVATAGGIO -->
   <div id="statusIcon" class="app-status status-idle">

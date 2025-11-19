@@ -187,6 +187,20 @@ body {
   color: var(--subtext);
 }
 
+
+.fake-statusbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top);
+  background: var(--bg);
+  background-attachment: fixed;
+  z-index: 999999999;
+  pointer-events: none;
+}
+
+
 /* RESPONSIVE GLOBAL */
 
 @media (max-width: 900px) {
