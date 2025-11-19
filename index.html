@@ -97,25 +97,40 @@
       </header>
 
       <div class="settings-container">
-        <div class="settings-group">
-          <div class="settings-label">Tema</div>
-          <div class="settings-options">
-            <label class="settings-option">
-              <input type="radio" name="theme" value="system" checked>
-              <span>Come sistema</span>
-            </label>
-            <label class="settings-option">
-              <input type="radio" name="theme" value="light">
-              <span>Chiaro</span>
-            </label>
-            <label class="settings-option">
-              <input type="radio" name="theme" value="dark">
-              <span>Scuro</span>
-            </label>
+        <!-- Schermata principale impostazioni -->
+        <div class="settings-main is-active">
+          <button class="settings-row" type="button" data-settings-page="theme">
+            <div class="settings-row-left">
+              <span class="settings-row-label">Tema</span>
+            </div>
+            <div class="settings-row-right">
+              <span class="settings-row-summary" id="themeSummary"></span>
+              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+            </div>
+          </button>
+          <hr class="settings-separator">
+        </div>
+
+        <!-- Schermata scelta tema -->
+        <div class="settings-panel settings-theme">
+          <div class="settings-panel-header">
+            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
+              &#10094;
+            </button>
+            <span class="settings-panel-title">Tema</span>
           </div>
-          <p class="settings-hint">
-            Se scegli “Come sistema”, il tema seguirà automaticamente le impostazioni del dispositivo.
-          </p>
+
+          <div class="settings-group">
+            <button class="settings-choice" type="button" data-theme="system">
+              <span class="settings-choice-label">Tema corrente</span>
+            </button>
+            <button class="settings-choice" type="button" data-theme="dark">
+              <span class="settings-choice-label">Tema scuro</span>
+            </button>
+            <button class="settings-choice" type="button" data-theme="light">
+              <span class="settings-choice-label">Tema chiaro</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>

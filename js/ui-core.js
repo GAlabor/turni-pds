@@ -20,6 +20,24 @@
     }
   }
 
+  function syncThemeUI(theme) {
+    const choices = document.querySelectorAll(".settings-choice");
+    choices.forEach(btn => {
+      const value = btn.dataset.theme;
+      btn.classList.toggle("is-active", value === theme);
+    });
+
+    const summary = document.getElementById("themeSummary");
+    if (summary) {
+      const labels = {
+        system: "Tema corrente",
+        light: "Tema chiaro",
+        dark: "Tema scuro"
+      };
+      summary.textContent = labels[theme] || "";
+    }
+  }
+
   function loadTheme() {
     let saved = localStorage.getItem(THEME_KEY);
     if (!saved) {
@@ -27,20 +45,21 @@
     }
 
     applyTheme(saved);
-
-    const input = document.querySelector(`input[name="theme"][value="${saved}"]`);
-    if (input) {
-      input.checked = true;
-    }
+    syncThemeUI(saved);
   }
 
   function setupThemeControls() {
-    const radios = document.querySelectorAll('input[name="theme"]');
-    radios.forEach(r => {
-      r.addEventListener("change", () => {
-        const value = r.value;
+    const choices = document.querySelectorAll(".settings-choice");
+    if (!choices.length) return;
+
+    choices.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.theme;
+        if (!value) return;
+
         localStorage.setItem(THEME_KEY, value);
         applyTheme(value);
+        syncThemeUI(value);
       });
     });
   }
@@ -48,6 +67,43 @@
   function initTheme() {
     loadTheme();
     setupThemeControls();
+  }
+
+  // ----------------------------
+  // Navigazione schermate impostazioni
+  // ----------------------------
+
+  function initSettingsNavigation() {
+    const settingsView = document.querySelector(".view-settings");
+    if (!settingsView) return;
+
+    const main = settingsView.querySelector(".settings-main");
+    const themePanel = settingsView.querySelector(".settings-theme");
+    const themeRow = settingsView.querySelector('[data-settings-page="theme"]');
+    const backBtn = settingsView.querySelector("[data-settings-back]");
+
+    if (!main || !themePanel) return;
+
+    const showMain = () => {
+      main.classList.add("is-active");
+      themePanel.classList.remove("is-active");
+    };
+
+    const showTheme = () => {
+      main.classList.remove("is-active");
+      themePanel.classList.add("is-active");
+    };
+
+    // stato iniziale
+    showMain();
+
+    if (themeRow) {
+      themeRow.addEventListener("click", showTheme);
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener("click", showMain);
+    }
   }
 
   // ----------------------------
@@ -207,5 +263,6 @@
     initTheme();
     initTabs();
     initIcons();
+    initSettingsNavigation();
   });
 })();
