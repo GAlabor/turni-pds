@@ -150,7 +150,6 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  /* padding-top include anche la safe-area-top per allineare il contenuto sotto la status bar */
   padding: calc(env(safe-area-inset-top) + 18px) 14px calc(18px + env(safe-area-inset-bottom) + var(--tabbar-h));
 }
 
@@ -188,15 +187,14 @@ body {
   color: var(--subtext);
 }
 
-/* Finta status bar che non rompe il gradiente */
+/* Finta status bar che usa un colore coerente col tema */
 .fake-statusbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: env(safe-area-inset-top);
-  /* lasciamo vedere il background del body dietro la status bar di sistema */
-  background: transparent;
+  background: var(--bg-solid); /* PRIMA ERA transparent */
   z-index: 999999999;
   pointer-events: none;
 }
