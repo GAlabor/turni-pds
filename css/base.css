@@ -150,7 +150,6 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  padding: calc(env(safe-area-inset-top) + 18px) 14px calc(18px + env(safe-area-inset-bottom) + var(--tabbar-h));
 }
 
 /* Shell & viste */
@@ -185,18 +184,6 @@ body {
   margin: 4px 0 0 2px;
   font-size: 14px;
   color: var(--subtext);
-}
-
-/* Finta status bar che usa un colore coerente col tema */
-.fake-statusbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: env(safe-area-inset-top);
-  background: var(--bg-solid); /* PRIMA ERA transparent */
-  z-index: 999999999;
-  pointer-events: none;
 }
 
 /* RESPONSIVE GLOBAL */
