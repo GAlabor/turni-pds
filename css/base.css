@@ -140,8 +140,8 @@ html,
 body {
   overscroll-behavior: none;
   touch-action: manipulation;
+  height: 100%;
 }
-
 
 body {
   margin: 0;
@@ -150,7 +150,8 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  padding: 18px 14px calc(18px + env(safe-area-inset-bottom) + var(--tabbar-h));
+  /* padding-top include anche la safe-area-top per allineare il contenuto sotto la status bar */
+  padding: calc(env(safe-area-inset-top) + 18px) 14px calc(18px + env(safe-area-inset-bottom) + var(--tabbar-h));
 }
 
 /* Shell & viste */
@@ -187,25 +188,24 @@ body {
   color: var(--subtext);
 }
 
-
+/* Finta status bar che non rompe il gradiente */
 .fake-statusbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: env(safe-area-inset-top);
-  background: var(--bg);
-  background-attachment: fixed;
+  /* lasciamo vedere il background del body dietro la status bar di sistema */
+  background: transparent;
   z-index: 999999999;
   pointer-events: none;
 }
-
 
 /* RESPONSIVE GLOBAL */
 
 @media (max-width: 900px) {
   body {
-    padding: 12px 6px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
+    padding: calc(env(safe-area-inset-top) + 12px) 6px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
 
   .app-header {

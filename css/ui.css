@@ -210,45 +210,44 @@
   fill: var(--subtext);
 }
 
-/* Cerchio animabile */
+/* Cerchio animabile: solo stile base, niente dash di default */
 #icoStatus #loginCircle {
   stroke: var(--accent);
   fill: none;
   transform-origin: center;
-  /* di base: cerchio pieno */
-  stroke-dasharray: 1200;
-  stroke-dashoffset: 0;
   transition:
     opacity 0.16s ease,
     stroke-dasharray 0.16s ease,
     stroke-dashoffset 0.16s ease;
 }
 
-/* NULLO: cerchio intero opaco */
-.status-idle #loginCircle {
-  opacity: 0.4;
-  animation: none;
-  stroke-dasharray: 1200;
+/* =========================================
+   STATI
+   ========================================= */
+
+/* IDLE → cerchio intero opaco */
+.status-idle #icoStatus #loginCircle {
+  opacity: 0.35;
+  stroke-dasharray: 1200;   /* cerchio pieno */
   stroke-dashoffset: 0;
+  animation: none;
 }
 
-/* IN SALVATAGGIO: solo pacche che girano */
-.status-saving #loginCircle {
+/* SAVING → pacche accese che girano */
+.status-saving #icoStatus #loginCircle {
   opacity: 1;
-  stroke-dasharray: 300;
+  stroke-dasharray: 300;    /* pacche */
   stroke-dashoffset: 150;
   animation: statusSpin 0.9s linear infinite;
 }
 
-/* SALVATO: cerchio intero acceso */
-.status-ok #loginCircle {
+/* OK → cerchio pieno acceso */
+.status-ok #icoStatus #loginCircle {
   opacity: 1;
-  animation: none;
-  stroke-dasharray: 1200;
+  stroke-dasharray: 1200;   /* cerchio pieno */
   stroke-dashoffset: 0;
+  animation: none;
 }
-
-
 
 @keyframes statusSpin {
   from { transform: rotate(0deg); }
