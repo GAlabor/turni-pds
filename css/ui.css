@@ -210,49 +210,62 @@
   fill: var(--subtext);
 }
 
-/* Cerchio animabile: solo stile base, niente dash di default */
+/* Cerchio base: sempre pieno, mai animato */
+#icoStatus #loginCircleBase {
+  stroke: var(--accent);
+  fill: none;
+  transform-origin: center;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+
+/* Cerchio spinning: solo il segmento, già dashed da SVG */
 #icoStatus #loginCircle {
   stroke: var(--accent);
   fill: none;
   transform-origin: center;
+  transform: rotate(0deg);
+  opacity: 0;
   transition:
-    opacity 0.16s ease,
-    stroke-dasharray 0.16s ease,
-    stroke-dashoffset 0.16s ease;
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
-/* =========================================
-   STATI
-   ========================================= */
-
-/* IDLE → cerchio intero opaco */
-.status-idle #icoStatus #loginCircle {
+/* IDLE → cerchio pieno tenue, nessun segmento */
+.status-idle #icoStatus #loginCircleBase {
   opacity: 0.35;
-  stroke-dasharray: 1200;   /* cerchio pieno */
-  stroke-dashoffset: 0;
+}
+
+.status-idle #icoStatus #loginCircle {
+  opacity: 0;
   animation: none;
 }
 
-/* SAVING → pacche accese che girano */
-.status-saving #icoStatus #loginCircle {
-  opacity: 1;
-  stroke-dasharray: 300;    /* pacche */
-  stroke-dashoffset: 150;
-  animation: statusSpin 0.9s linear infinite;
+/* SAVING → cerchio pieno leggero + segmento acceso che gira */
+.status-saving #icoStatus #loginCircleBase {
+  opacity: 0.35;
 }
 
-/* OK → cerchio pieno acceso */
-.status-ok #icoStatus #loginCircle {
+.status-saving #icoStatus #loginCircle {
   opacity: 1;
-  stroke-dasharray: 1200;   /* cerchio pieno */
-  stroke-dashoffset: 0;
+  animation: statusSpin 1s linear infinite;
+}
+
+/* OK → cerchio pieno più acceso, nessun segmento */
+.status-ok #icoStatus #loginCircleBase {
+  opacity: 1;
+}
+
+.status-ok #icoStatus #loginCircle {
+  opacity: 0;
   animation: none;
 }
 
 @keyframes statusSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
+
 
 /* =========================
    TABBAR IN BASSO

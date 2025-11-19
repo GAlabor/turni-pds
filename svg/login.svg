@@ -2,13 +2,23 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 512 512">
 
-  <!-- Cerchio esterno animabile -->
-  <circle id="loginCircle"
-          cx="256" cy="256" r="190"
+  <!-- Cerchio esterno: base (sempre pieno) -->
+  <circle id="loginCircleBase"
+          cx="256" cy="256" r="210"
           fill="none"
           stroke="currentColor"
           stroke-width="20"
           stroke-linecap="round"/>
+
+  <!-- Cerchio esterno: segmento che può girare -->
+  <circle id="loginCircle"
+          cx="256" cy="256" r="210"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="20"
+          stroke-linecap="round"
+          stroke-dasharray="300 900"
+          stroke-dashoffset="0"/>
 
   <!-- Omino sempre centrato -->
   <g id="loginUser"
