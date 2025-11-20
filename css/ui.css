@@ -183,6 +183,309 @@
 }
 
 /* =========================
+   PANNELLO TURNI
+   ========================= */
+
+.settings-row-left-column {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.settings-row-subhint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+/* Toggle switch turnazione */
+
+.toggle-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+:root[data-theme="dark"] .toggle-switch {
+  background: rgba(15,23,42,0.7);
+}
+
+.toggle-knob {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.35);
+  transform: translateX(0);
+  transition: transform 0.18s ease;
+}
+
+.toggle-switch.is-on {
+  background: rgba(10,132,255,0.18);
+  border-color: var(--accent);
+}
+
+.toggle-switch.is-on .toggle-knob {
+  transform: translateX(18px);
+}
+
+/* Card turni */
+
+.turni-section {
+  margin-top: 4px;
+  background: var(--surface-strong);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-light);
+  padding: 4px 8px; /* più compatta quando è chiusa */
+}
+
+.turni-row {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.turni-row-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.turni-add-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--nav-fg); /* stesso colore delle frecce cambia mese */
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease;
+}
+
+.turni-add-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+
+/* quando il pannello è aperto (aria-expanded="true") */
+.turni-row[aria-expanded="true"] .turni-add-btn {
+  border-color: var(--accent);
+  box-shadow: 0 4px 10px rgba(10,132,255,0.25);
+}
+
+/* hover desktop: piccolo highlight sul cerchio */
+@media (hover:hover) {
+  .turni-row:hover .turni-add-btn {
+    border-color: var(--accent);
+    box-shadow: 0 4px 10px rgba(10,132,255,0.25);
+  }
+}
+
+/* pressione */
+.turni-row:active .turni-add-btn {
+  transform: translateY(1px);
+}
+
+
+.turni-form {
+  margin-top: 6px;
+  display: block;
+}
+
+.turni-form[hidden] {
+  display: none;
+}
+
+.turni-field-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.turni-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.turni-actions {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.turni-submit-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(10,132,255,0.35);
+}
+
+.turni-submit-btn:active {
+  transform: translateY(1px);
+}
+
+/* Lista turni salvati */
+
+.turni-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.turno-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+
+:root[data-theme="dark"] .turno-item {
+  background: rgba(15,23,42,0.6);
+}
+
+.turno-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.turno-sigla {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+.turno-orario {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+}
+
+
+.turni-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.turni-input {
+  width: 100%;
+  height: 30px; /* più bassa */
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.turni-row-time-color {
+  align-items: flex-end;
+}
+
+.turni-field-color {
+  max-width: 100px;
+}
+
+.turni-color-dot {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+:root[data-theme="dark"] .turni-input {
+  background: rgba(15,23,42,0.7);
+}
+
+.turni-input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
+}
+
+/* Colore turno */
+
+.turni-color-row {
+  margin-bottom: 4px;
+}
+
+.turni-color-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.turni-color-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px rgba(15,23,42,0.25);
+  background: var(--accent);
+}
+
+/* input colore invisibile, usato solo per aprire la tavolozza */
+.turni-color-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+/* =========================
    ICONA STATO / SALVATAGGIO
    ========================= */
 
@@ -419,6 +722,7 @@
   .tab-label {
     display: none;
   }
+
 }
 
 @media (min-width: 901px) {
