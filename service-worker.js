@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-17 V5.0'; // VERSIONE APP CORRENTE
+const VERSION    = '2025-11-20 V6.8'; // VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -15,13 +15,23 @@ const PRECACHE_URLS = [
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
 
-  // nuovi CSS/JS
+  // CSS/JS
   `${ROOT}/css/base.css`,
   `${ROOT}/css/calendar.css`,
-  `${ROOT}/css/ui.css`,
+  `${ROOT}/css/settings.css`,
+  `${ROOT}/css/components.css`,
+  `${ROOT}/css/tabbar.css`,
+  `${ROOT}/css/turni.css`,
   `${ROOT}/js/calendar.js`,
-  `${ROOT}/js/ui-core.js`,
+  `${ROOT}/js/theme.js`,
+  `${ROOT}/js/status.js`,
+  `${ROOT}/js/icons.js`,
+  `${ROOT}/js/settings.js`,
+  `${ROOT}/js/turni.js`,
+  `${ROOT}/js/app.js`,
   `${ROOT}/js/sw-register.js`,
+
+  // Icone / SVG / favicon
   `${ROOT}/favicon.ico`,
   `${ROOT}/ico/icon-192.png`,
   `${ROOT}/ico/icon-512.png`,

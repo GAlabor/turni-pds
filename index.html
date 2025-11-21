@@ -20,7 +20,10 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/calendar.css">
-  <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/settings.css">
+  <link rel="stylesheet" href="css/turni.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/tabbar.css">
 </head>
 
 <body>
@@ -235,73 +238,69 @@
             <hr class="settings-separator">
           </div>
 
-  <!-- Sezione turni personalizzati -->
-<div class="turni-section">
+          <!-- Sezione turni personalizzati -->
+          <div class="turni-section">
+            <!-- Riga cliccabile: Aggiungi turno + cerchietto con + -->
+            <button class="turni-row" type="button" data-turni-open>
+              <span class="turni-row-label">Aggiungi turno</span>
+              <span class="turni-add-btn">
+                <span class="turni-add-icon" aria-hidden="true">+</span>
+              </span>
+            </button>
 
-  <!-- Riga cliccabile: Aggiungi turno + cerchietto con + -->
-  <button class="turni-row" type="button" data-turni-open>
-    <span class="turni-row-label">Aggiungi turno</span>
-    <span class="turni-add-btn">
-      <span class="turni-add-icon" aria-hidden="true">+</span>
-    </span>
-  </button>
+            <!-- Form inserimento turno (inizialmente nascosto) -->
+            <div class="turni-form" data-turni-form hidden>
+              <!-- Rigo 1: Turno + Sigla -->
+              <div class="turni-field-row">
+                <div class="turni-field">
+                  <label class="turni-label" for="turnoNome">Turno</label>
+                  <input class="turni-input" id="turnoNome" type="text" maxlength="15" autocomplete="off">
+                </div>
+                <div class="turni-field">
+                  <label class="turni-label" for="turnoSigla">Sigla</label>
+                  <input class="turni-input" id="turnoSigla" type="text" maxlength="4" autocomplete="off">
+                </div>
+              </div>
 
-  <!-- Form inserimento turno (inizialmente nascosto) -->
-  <div class="turni-form" data-turni-form hidden>
+              <!-- Rigo 2: Inizio / Fine / Colore -->
+              <div class="turni-field-row turni-row-time-color">
+                <div class="turni-field">
+                  <label class="turni-label" for="turnoOraInizio">Inizio</label>
+                  <input class="turni-input" id="turnoOraInizio" type="time" inputmode="numeric">
+                </div>
 
-    <!-- Rigo 1: Turno + Sigla -->
-    <div class="turni-field-row">
-      <div class="turni-field">
-        <label class="turni-label" for="turnoNome">Turno</label>
-        <input class="turni-input" id="turnoNome" type="text" maxlength="15" autocomplete="off">
-      </div>
-      <div class="turni-field">
-        <label class="turni-label" for="turnoSigla">Sigla</label>
-        <input class="turni-input" id="turnoSigla" type="text" maxlength="4" autocomplete="off">
-      </div>
-    </div>
+                <div class="turni-field">
+                  <label class="turni-label" for="turnoOraFine">Fine</label>
+                  <input class="turni-input" id="turnoOraFine" type="time" inputmode="numeric">
+                </div>
 
-    <!-- Rigo 2: Inizio / Fine / Colore -->
-    <div class="turni-field-row turni-row-time-color">
-      <div class="turni-field">
-        <label class="turni-label" for="turnoOraInizio">Inizio</label>
-        <input class="turni-input" id="turnoOraInizio" type="time" inputmode="numeric">
-      </div>
+                <div class="turni-field turni-field-color">
+                  <label class="turni-label" for="turnoColore">Colore</label>
+                  <button class="turni-color-dot" type="button" data-turni-color-trigger aria-label="Scegli colore turno">
+                    <span class="turni-color-preview" data-turni-color-preview></span>
+                  </button>
+                  <input
+                    class="turni-color-input"
+                    id="turnoColore"
+                    type="color"
+                    value="#0a84ff"
+                    data-turni-color>
+                </div>
+              </div>
 
-      <div class="turni-field">
-        <label class="turni-label" for="turnoOraFine">Fine</label>
-        <input class="turni-input" id="turnoOraFine" type="time" inputmode="numeric">
-      </div>
+              <!-- Pulsante Aggiungi -->
+              <div class="turni-actions">
+                <button class="turni-submit-btn" type="button" data-turni-submit>
+                  Aggiungi
+                </button>
+              </div>
+            </div>
 
-      <div class="turni-field turni-field-color">
-        <label class="turni-label" for="turnoColore">Colore</label>
-        <button class="turni-color-dot" type="button" data-turni-color-trigger aria-label="Scegli colore turno">
-          <span class="turni-color-preview" data-turni-color-preview></span>
-        </button>
-        <input
-          class="turni-color-input"
-          id="turnoColore"
-          type="color"
-          value="#0a84ff"
-          data-turni-color>
-      </div>
-    </div>
+            <!-- Lista turni salvati -->
+            <div class="turni-list" data-turni-list></div>
+          </div>
 
-    <!-- Pulsante Aggiungi -->
-    <div class="turni-actions">
-      <button class="turni-submit-btn" type="button" data-turni-submit>
-        Aggiungi
-      </button>
-    </div>
-
-  </div>
-
-  <!-- Lista turni salvati -->
-  <div class="turni-list" data-turni-list></div>
-
-</div>
-
-
+        </div>
 
         <!-- Pannello Indennità -->
         <div class="settings-panel settings-indennita" data-settings-id="indennita">
@@ -396,7 +395,12 @@
 
   <!-- JS -->
   <script src="js/calendar.js" defer></script>
-  <script src="js/ui-core.js" defer></script>
+  <script src="js/theme.js" defer></script>
+  <script src="js/status.js" defer></script>
+  <script src="js/icons.js" defer></script>
+  <script src="js/settings.js" defer></script>
+  <script src="js/turni.js" defer></script>
+  <script src="js/app.js" defer></script>
   <script src="js/sw-register.js" defer></script>
 
 </body>

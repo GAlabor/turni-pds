@@ -1,0 +1,82 @@
+// ============================
+// Tema: system / light / dark
+// ============================
+
+(function () {
+  const THEME_KEY = "turnipds-theme";
+
+  function applyTheme(theme) {
+    const root = document.documentElement;
+
+    if (theme === "light" || theme === "dark") {
+      root.setAttribute("data-theme", theme);
+    } else {
+      // "system": nessun attributo, lascia lavorare prefers-color-scheme
+      root.removeAttribute("data-theme");
+    }
+  }
+
+  function syncThemeUI(theme) {
+    const choices = document.querySelectorAll(".settings-choice");
+    choices.forEach(btn => {
+      const value = btn.dataset.theme;
+      btn.classList.toggle("is-active", value === theme);
+    });
+
+    const summary = document.getElementById("themeSummary");
+    if (summary) {
+      const labels = {
+        system: "Tema corrente",
+        light: "Tema chiaro",
+        dark: "Tema scuro"
+      };
+      summary.textContent = labels[theme] || "";
+    }
+  }
+
+  function loadTheme() {
+    let saved = localStorage.getItem(THEME_KEY);
+    if (!saved) {
+      saved = "system";
+    }
+
+    applyTheme(saved);
+    syncThemeUI(saved);
+  }
+
+  function setupThemeControls() {
+    const choices = document.querySelectorAll(".settings-choice");
+    if (!choices.length) return;
+
+    choices.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.theme;
+        if (!value) return;
+
+        // "Salvataggio" delle preferenze tema
+        localStorage.setItem(THEME_KEY, value);
+        applyTheme(value);
+        syncThemeUI(value);
+
+        // Trigger stato salvataggio
+        if (window.Status && typeof Status.setSaving === "function") {
+          Status.setSaving();
+          setTimeout(() => {
+            if (window.Status && typeof Status.setOk === "function") {
+              Status.setOk();
+            }
+          }, 800);
+        }
+      });
+    });
+  }
+
+  function initTheme() {
+    loadTheme();
+    setupThemeControls();
+  }
+
+  window.Theme = {
+    init: initTheme
+  };
+})();

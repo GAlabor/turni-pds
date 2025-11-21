@@ -1,35 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <!-- Cornice calendario -->
-  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+  <g transform="translate(0,-1.4)">
+    <!-- Cornice calendario -->
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
 
-  <!-- Anelli -->
-  <line x1="16" y1="2" x2="16" y2="4"></line>
-  <line x1="8"  y1="2" x2="8"  y2="4"></line>
+    <!-- Anelli -->
+    <line x1="16" y1="2" x2="16" y2="4"></line>
+    <line x1="8"  y1="2" x2="8"  y2="4"></line>
 
-  <!-- Linea di separazione -->
-  <line x1="3" y1="11" x2="21" y2="11"></line>
+    <!-- Linea di separazione -->
+    <line x1="3" y1="11" x2="21" y2="11"></line>
 
-  <!-- Mese (testo in alto) -->
-  <text id="calMonth"
-        x="12" y="9.5"
-        text-anchor="middle"
-        font-size="5.5"
-        font-family="system-ui, -apple-system, sans-serif"
-        font-weight="600"
-        fill="currentColor"
-        stroke="none">
-    FEB
-  </text>
+    <!-- Mese (testo in alto) -->
+    <text id="calMonth"
+          x="12" y="9.5"
+          text-anchor="middle"
+          font-size="5.5"
+          font-family="system-ui, -apple-system, sans-serif"
+          font-weight="600"
+          fill="currentColor"
+          stroke="none">
+      FEB
+    </text>
 
-  <!-- Giorno (testo in basso) -->
-  <text id="calDay"
-        x="12" y="19.5" 
-        text-anchor="middle"
-        font-size="9.5"
-        font-family="system-ui, -apple-system, sans-serif"
-        font-weight="700"
-        fill="currentColor"
-        stroke="none">
-    14
-  </text>
+    <!-- Giorno (testo in basso) -->
+    <text id="calDay"
+          x="12" y="19.5" 
+          text-anchor="middle"
+          font-size="9.5"
+          font-family="system-ui, -apple-system, sans-serif"
+          font-weight="700"
+          fill="currentColor"
+          stroke="none">
+      14
+    </text>
+  </g>
 </svg>
