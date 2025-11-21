@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V6.8'; // VERSIONE APP CORRENTE
+const VERSION    = '2025-11-20 V7.5'; // VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -36,6 +36,7 @@ const PRECACHE_URLS = [
   `${ROOT}/ico/icon-192.png`,
   `${ROOT}/ico/icon-512.png`,
   `${ROOT}/ico/icon-1024.png`,
+  `${ROOT}/svg/arrow-back.svg`,
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,

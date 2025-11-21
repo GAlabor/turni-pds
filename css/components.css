@@ -23,6 +23,29 @@
 }
 
 /* =========================
+   INPUT PILL (utility generica, NON usata dai turni per ora)
+   ========================= */
+
+.input-pill {
+  width: 100%;
+  height: 30px; /* altezza base */
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input-pill:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
+}
+
+/* =========================
    PULSANTI / BOTTONI ICONA
    ========================= */
 
