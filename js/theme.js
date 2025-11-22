@@ -11,7 +11,6 @@
     if (theme === "light" || theme === "dark") {
       root.setAttribute("data-theme", theme);
     } else {
-      // "system": nessun attributo, lascia lavorare prefers-color-scheme
       root.removeAttribute("data-theme");
     }
   }
@@ -36,10 +35,7 @@
 
   function loadTheme() {
     let saved = localStorage.getItem(THEME_KEY);
-    if (!saved) {
-      saved = "system";
-    }
-
+    if (!saved) saved = "system";
     applyTheme(saved);
     syncThemeUI(saved);
   }
@@ -53,20 +49,12 @@
         const value = btn.dataset.theme;
         if (!value) return;
 
-        // "Salvataggio" delle preferenze tema
         localStorage.setItem(THEME_KEY, value);
         applyTheme(value);
         syncThemeUI(value);
 
-        // Trigger stato salvataggio
-        if (window.Status && typeof Status.setSaving === "function") {
-          Status.setSaving();
-          setTimeout(() => {
-            if (window.Status && typeof Status.setOk === "function") {
-              Status.setOk();
-            }
-          }, 800);
-        }
+        // ✔ unify saving animation
+        if (window.Status) Status.markSaved();
       });
     });
   }

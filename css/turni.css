@@ -79,22 +79,22 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Pulsante tondo per + / <
+/* Pulsante tondo per freccia open/close
    - eredita base comune da components.css */
 .turni-add-btn {
   width: 28px;
   height: 28px;
-  color: var(--accent);      /* colore frecce mese */
+  color: var(--accent);
   flex-shrink: 0;
 }
 
-/* Icona interna (+ o <), stessa dimensione della freccia del menu */
-.turni-add-icon {
-  font-size: 20px;   /* un filo più piccolo, sta meglio nel cerchio */
-  line-height: 1;
-  display: inline-block;
-  position: relative;
-  top: -0.5px;       /* spostata leggermente in alto → visivamente centrata */
+/* Rotazione freccia quando il pannello è aperto */
+.turni-add-btn svg {
+  transition: transform 0.16s ease;
+}
+
+.turni-row[aria-expanded="true"] .turni-add-btn svg {
+  transform: rotate(180deg);
 }
 
 /* quando il pannello è aperto (aria-expanded="true") */

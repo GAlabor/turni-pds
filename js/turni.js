@@ -22,7 +22,6 @@
     // Riga "Aggiungi turno" → apre/chiude il form
     const openBtn = panel.querySelector("[data-turni-open]");
     const form = panel.querySelector("[data-turni-form]");
-    const iconAdd = openBtn ? openBtn.querySelector(".turni-add-icon") : null;
 
     if (openBtn && form) {
       openBtn.addEventListener("click", () => {
@@ -30,11 +29,9 @@
 
         if (isHidden) {
           form.removeAttribute("hidden");
-          if (iconAdd) iconAdd.textContent = "‹";
           openBtn.setAttribute("aria-expanded", "true");
         } else {
           form.setAttribute("hidden", "");
-          if (iconAdd) iconAdd.textContent = "+";
           openBtn.setAttribute("aria-expanded", "false");
         }
       });

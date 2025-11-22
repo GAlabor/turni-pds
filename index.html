@@ -43,9 +43,17 @@
 
       <!-- Selettore mese -->
       <section class="monthbar">
-        <button class="nav-btn prev" aria-label="Mese precedente">&#10094;</button>
+        <button class="nav-btn prev" type="button" aria-label="Mese precedente">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M14 6 L8 12 L14 18" />
+          </svg>
+        </button>
         <div class="month-label"></div>
-        <button class="nav-btn next" aria-label="Mese successivo">&#10095;</button>
+        <button class="nav-btn next" type="button" aria-label="Mese successivo">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M10 6 L16 12 L10 18" />
+          </svg>
+        </button>
       </section>
 
       <!-- Contenitore calendario -->
@@ -124,7 +132,11 @@
             </div>
             <div class="settings-row-right">
               <span class="settings-row-summary" id="themeSummary"></span>
-              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+              <span class="settings-row-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M10 6 L16 12 L10 18" />
+                </svg>
+              </span>
             </div>
           </button>
           <hr class="settings-separator">
@@ -135,7 +147,11 @@
               <span class="settings-row-label">Turni</span>
             </div>
             <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+              <span class="settings-row-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M10 6 L16 12 L10 18" />
+                </svg>
+              </span>
             </div>
           </button>
           <hr class="settings-separator">
@@ -146,7 +162,11 @@
               <span class="settings-row-label">Indennità</span>
             </div>
             <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+              <span class="settings-row-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M10 6 L16 12 L10 18" />
+                </svg>
+              </span>
             </div>
           </button>
           <hr class="settings-separator">
@@ -157,7 +177,11 @@
               <span class="settings-row-label">Festività</span>
             </div>
             <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+              <span class="settings-row-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M10 6 L16 12 L10 18" />
+                </svg>
+              </span>
             </div>
           </button>
           <hr class="settings-separator">
@@ -168,7 +192,11 @@
               <span class="settings-row-label">Informazioni</span>
             </div>
             <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+              <span class="settings-row-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M10 6 L16 12 L10 18" />
+                </svg>
+              </span>
             </div>
           </button>
           <hr class="settings-separator">
@@ -179,7 +207,11 @@
               <span class="settings-row-label">Aggiornamenti</span>
             </div>
             <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">&rsaquo;</span>
+              <span class="settings-row-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M10 6 L16 12 L10 18" />
+                </svg>
+              </span>
             </div>
           </button>
         </div>
@@ -188,7 +220,9 @@
         <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              &#10094;
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 6 L8 12 L14 18" />
+              </svg>
             </button>
             <span class="settings-panel-title">Tema</span>
           </div>
@@ -210,7 +244,9 @@
         <div class="settings-panel settings-turni" data-settings-id="turni">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              &#10094;
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 6 L8 12 L14 18" />
+              </svg>
             </button>
             <span class="settings-panel-title">Turni</span>
           </div>
@@ -240,11 +276,13 @@
 
           <!-- Sezione turni personalizzati -->
           <div class="turni-section">
-            <!-- Riga cliccabile: Aggiungi turno + cerchietto con + -->
-            <button class="turni-row" type="button" data-turni-open>
+            <!-- Riga cliccabile: Aggiungi turno + cerchietto con freccia -->
+            <button class="turni-row" type="button" data-turni-open aria-expanded="false">
               <span class="turni-row-label">Aggiungi turno</span>
-              <span class="turni-add-btn">
-                <span class="turni-add-icon" aria-hidden="true">+</span>
+              <span class="turni-add-btn" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M6 10 L12 16 L18 10" />
+                </svg>
               </span>
             </button>
 
@@ -306,7 +344,9 @@
         <div class="settings-panel settings-indennita" data-settings-id="indennita">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              &#10094;
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 6 L8 12 L14 18" />
+              </svg>
             </button>
             <span class="settings-panel-title">Indennità</span>
           </div>
@@ -319,7 +359,9 @@
         <div class="settings-panel settings-festivita" data-settings-id="festivita">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              &#10094;
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 6 L8 12 L14 18" />
+              </svg>
             </button>
             <span class="settings-panel-title">Festività</span>
           </div>
@@ -332,7 +374,9 @@
         <div class="settings-panel settings-info" data-settings-id="info">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              &#10094;
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 6 L8 12 L14 18" />
+              </svg>
             </button>
             <span class="settings-panel-title">Informazioni</span>
           </div>
@@ -345,7 +389,9 @@
         <div class="settings-panel settings-updates" data-settings-id="updates">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              &#10094;
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 6 L8 12 L14 18" />
+              </svg>
             </button>
             <span class="settings-panel-title">Aggiornamenti</span>
           </div>
@@ -383,9 +429,7 @@
     <button class="tab" data-tab="settings" aria-label="Impostazioni">
       <svg id="icoSettings" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
            fill="none" stroke="currentColor" stroke-width="1.4"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="3"></circle>
-      </svg>
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
       <span class="tab-label">Impostazioni</span>
     </button>
   </nav>

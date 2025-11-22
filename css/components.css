@@ -61,23 +61,65 @@
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease-out;
 }
 
 /* Pulsanti frecce mese (calendario) */
 .nav-btn {
   width: 40px;
-  height: 34px;
-  font-size: 18px;
-  transition: 0.18s;
+  height: 40px;
   box-shadow: 0 4px 10px rgba(15,23,42,0.08);
   color: var(--nav-fg);
 }
 
-.nav-btn:hover {
+/* SVG interni dei bottoni icona tondi */
+.nav-btn svg,
+.settings-back svg,
+.turni-add-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Hover desktop: cerchio blu pieno, come nel test */
+@media (hover:hover) {
+  .nav-btn:hover,
+  .settings-back:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 10px rgba(10,132,255,0.25);
+  }
+}
+
+/* Pressione: scalatura */
+.nav-btn:active,
+.settings-back:active {
+  transform: scale(0.9);
   background: var(--accent);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--accent);
-  box-shadow: 0 8px 18px rgba(10,132,255,0.35);
+  box-shadow: 0 2px 6px rgba(10,132,255,0.35);
+}
+
+/* Focus tastiera */
+.nav-btn:focus-visible,
+.settings-back:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(10,132,255,0.45),
+    0 4px 10px rgba(15,23,42,0.25);
 }
 
 @media (max-width: 900px) {
@@ -85,7 +127,6 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    font-size: 16px;
   }
 }
 

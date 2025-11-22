@@ -98,11 +98,38 @@
   color: var(--subtext); /* come sottotitoli */
 }
 
+/* Chevron riga impostazioni → icona piccola */
 .settings-row-chevron {
-  font-size: 22px; /* un po' più grande */
-  line-height: 1;
-  color: var(--text); /* colore dei titoli */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0.6;
+}
+
+.settings-row-chevron svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: none;
+  stroke: var(--subtext);
+  stroke-width: 2.0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    opacity 0.16s ease,
+    transform 0.12s ease;
+}
+
+/* Solo feed di pressione/hover, niente riempimento blu del rigo */
+@media (hover:hover) {
+  .settings-row:hover .settings-row-chevron svg {
+    opacity: 0.9;
+    transform: translateX(1px);
+  }
+}
+
+.settings-row:active .settings-row-chevron svg {
+  transform: translateX(1px);
 }
 
 .settings-separator {
@@ -124,7 +151,6 @@
 .settings-back {
   width: 32px;
   height: 32px;
-  font-size: 16px;
   color: var(--text); /* stessa tinta del titolo */
   display: flex;
 }

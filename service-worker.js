@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V7.5'; // VERSIONE APP CORRENTE
+const VERSION    = '2025-11-20 V9.4'; // VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -32,16 +32,35 @@ const PRECACHE_URLS = [
   `${ROOT}/js/sw-register.js`,
 
   // Icone / SVG / favicon
-  `${ROOT}/favicon.ico`,
-  `${ROOT}/ico/icon-192.png`,
-  `${ROOT}/ico/icon-512.png`,
-  `${ROOT}/ico/icon-1024.png`,
-  `${ROOT}/svg/arrow-back.svg`,
-  `${ROOT}/svg/calendar.svg`,
-  `${ROOT}/svg/inspag.svg`,
-  `${ROOT}/svg/riepilogo.svg`,
-  `${ROOT}/svg/settings.svg`,
-  `${ROOT}/svg/login.svg`,
+`${ROOT}/favicon.ico`,
+
+// Cartella ICO completa
+`${ROOT}/ico/apple-touch-icon-120x120.png`,
+`${ROOT}/ico/apple-touch-icon-152x152.png`,
+`${ROOT}/ico/apple-touch-icon-167x167.png`,
+`${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
+`${ROOT}/ico/apple-touch-icon-180x180.png`,
+`${ROOT}/ico/favicon-16x16.png`,
+`${ROOT}/ico/favicon-32x32.png`,
+`${ROOT}/ico/favicon-48x48.png`,
+`${ROOT}/ico/icon-1024.png`,
+`${ROOT}/ico/icon-192.png`,
+`${ROOT}/ico/icon-512.png`,
+`${ROOT}/ico/mstile-150x150.png`,
+
+// SVG UI
+`${ROOT}/svg/add.svg`,
+`${ROOT}/svg/arrow-back.svg`,
+`${ROOT}/svg/arrow-right.svg`,
+`${ROOT}/svg/arrow-down.svg`,
+`${ROOT}/svg/arrow-up.svg`,
+`${ROOT}/svg/cancel.svg`,
+`${ROOT}/svg/calendar.svg`,
+`${ROOT}/svg/inspag.svg`,
+`${ROOT}/svg/riepilogo.svg`,
+`${ROOT}/svg/settings.svg`,
+`${ROOT}/svg/login.svg`,
+
 ];
 
 // Normalizza richieste HTML verso index
@@ -108,6 +127,7 @@ self.addEventListener('fetch', (event) => {
     req.mode === 'navigate' ||
     (req.headers.get('accept') || '').includes('text/html');
 
+  // HTML → app shell
   if (isHTML) {
     const htmlReq = normalizeHTMLRequest(req);
 
@@ -135,7 +155,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Asset statici → cache-first con refresh in background
+  // =========================
+  // SVG icone → NETWORK-FIRST
+  // =========================
+  if (url.pathname.startsWith(`${ROOT}/svg/`)) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_NAME);
+      try {
+        // Prima rete, niente HTTP cache
+        const fresh = await fetch(req, { cache: 'no-store' });
+        try { cache.put(req, fresh.clone()); } catch {}
+        return fresh;
+      } catch {
+        // Se rete KO → fallback alla cache
+        const cached = await cache.match(req);
+        if (cached) return cached;
+        return new Response('', { status: 504 });
+      }
+    })());
+    return;
+  }
+
+  // =========================
+  // Asset statici → CACHE-FIRST con refresh in background
+  // =========================
   event.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) {

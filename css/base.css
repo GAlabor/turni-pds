@@ -42,9 +42,9 @@
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
 }
 
-/* Tema “system” scuro, se nessun data-theme è forzato */
+/* Tema “system” scuro, solo se NON è forzato un tema via data-theme */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
     --bg-solid: #020617;
     --surface: rgba(15,23,42,0.94);
@@ -70,34 +70,6 @@
     --tabColor: #6b7280;
     --tabActiveColor: #4b8dff;
   }
-}
-
-/* Forzatura tema chiaro */
-:root[data-theme="light"] {
-  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
-  --bg-solid: #e7ecff;
-  --surface: rgba(255,255,255,0.88);
-  --surface-strong: rgba(255,255,255,0.96);
-  --border: rgba(120,130,170,0.18);
-  --text: #111827;
-  --subtext: #6b7280;
-  --accent: #0a84ff;
-  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);
-  --shadow-light: 0 10px 26px rgba(15,23,42,0.12);
-
-  --dow-muted: #6b7280;
-  --weekend: #e25555;
-  --hover-bg: rgba(10,132,255,0.08);
-  --today-border: var(--accent);
-  --version-color: rgba(15,23,42,0.65);
-
-  --nav-fg: #111827;
-
-  --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
-  --tabbar-border: rgba(148,163,184,0.4);
-
-  --tabColor: #9ca3af;
-  --tabActiveColor: #0a84ff;
 }
 
 /* Forzatura tema scuro */

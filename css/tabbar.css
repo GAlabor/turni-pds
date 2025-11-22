@@ -98,7 +98,11 @@
     stroke-width .16s ease,
     transform .12s ease,
     color .16s ease;
+  /* inizialmente nascoste, verranno rese visibili quando le icone sono caricate */
+  visibility: hidden;
 }
+
+
 
 .tab.active svg {
   stroke-width: 1.6;
@@ -151,4 +155,9 @@
   .tab-label {
     display: block;
   }
+}
+
+/* Quando le icone SVG sono state caricate da icons.js */
+.tabbar.tabbar-icons-ready .tab svg {
+  visibility: visible;
 }

@@ -24,109 +24,49 @@
     if (dayEl)   dayEl.textContent   = now.getDate();
   }
 
-  async function loadTabbarIcons() {
+  // Caricamento uniforme SVG → innerHTML diretto
+  async function loadSVGInto(id, file) {
+    const host = document.getElementById(id);
+    if (!host) return;
+
     try {
-      // ----- ICONA CALENDARIO -----
-      const cal = await fetch(`${app_base()}/svg/calendar.svg`, {
-        cache: "no-store",
-        credentials: "same-origin"
-      });
-
-      if (cal.ok) {
-        const txt = await cal.text();
-        const host = document.getElementById("icoCalendar");
-
-        if (host) {
-          host.innerHTML = txt;
-          setCalendarIconDateInSvg();
-        }
-      }
-
-      // ----- ICONA INSERIMENTI / PAGAMENTI -----
-      const inspag = await fetch(`${app_base()}/svg/inspag.svg`, {
-        cache: "no-store",
-        credentials: "same-origin"
-      });
-
-      if (inspag.ok) {
-        const txt = await inspag.text();
-        const host = document.getElementById("icoInspag");
-
-        if (host) {
-          const temp = document.createElement("div");
-          temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
-
-          temp.querySelectorAll("svg > *")
-            .forEach(n => host.appendChild(n.cloneNode(true)));
-        }
-      }
-
-      // ----- ICONA RIEPILOGO -----
-      const riepilogo = await fetch(`${app_base()}/svg/riepilogo.svg`, {
-        cache: "no-store",
-        credentials: "same-origin"
-      });
-
-      if (riepilogo.ok) {
-        const txt = await riepilogo.text();
-        const host = document.getElementById("icoRiepilogo");
-
-        if (host) {
-          const temp = document.createElement("div");
-          temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
-
-          temp.querySelectorAll("svg > *")
-            .forEach(n => host.appendChild(n.cloneNode(true)));
-        }
-      }
-
-      // ----- ICONA IMPOSTAZIONI -----
-      const set = await fetch(`${app_base()}/svg/settings.svg`, {
-        cache: "no-store",
-        credentials: "same-origin"
-      });
-
-      if (set.ok) {
-        const txt = await set.text();
-        const host = document.getElementById("icoSettings");
-
-        if (host) {
-          const temp = document.createElement("div");
-          temp.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${txt}</svg>`;
-
-          temp.querySelectorAll("svg > *")
-            .forEach(n => host.appendChild(n.cloneNode(true)));
-        }
-      }
-
-    } catch (err) {
-      console.error("Errore icone tabbar:", err);
-    }
-  }
-
-  // Icona stato / login.svg
-  async function loadStatusIcon() {
-    try {
-      const res = await fetch(`${app_base()}/svg/login.svg`, {
+      const res = await fetch(`${app_base()}/svg/${file}`, {
         cache: "no-store",
         credentials: "same-origin"
       });
       if (!res.ok) return;
 
       const txt = await res.text();
-      const host = document.getElementById("icoStatus");
-      if (!host) return;
-
-      const temp = document.createElement("div");
-      temp.innerHTML = txt.trim();
-      const svg = temp.querySelector("svg");
-      if (svg) {
-        host.innerHTML = "";
-        host.appendChild(svg);
-      }
+      host.innerHTML = txt.trim(); // preserva <svg> intero o gruppo interno
     } catch (err) {
-      console.error("Errore icona stato:", err);
+      console.error("Errore icona:", file, err);
     }
+  }
+
+  async function loadTabbarIcons() {
+    // CALENDARIO
+    await loadSVGInto("icoCalendar", "calendar.svg");
+    setCalendarIconDateInSvg();
+
+    // INSERIMENTI/PAGAMENTI
+    await loadSVGInto("icoInspag", "inspag.svg");
+
+    // RIEPILOGO
+    await loadSVGInto("icoRiepilogo", "riepilogo.svg");
+
+    // IMPOSTAZIONI
+    await loadSVGInto("icoSettings", "settings.svg");
+
+    // quando tutte le icone sono state iniettate, rendile visibili
+    const tabbar = document.querySelector(".tabbar");
+    if (tabbar) {
+      tabbar.classList.add("tabbar-icons-ready");
+    }
+  }
+
+  // Icona stato / login.svg
+  async function loadStatusIcon() {
+    await loadSVGInto("icoStatus", "login.svg");
   }
 
   window.Icons = {
