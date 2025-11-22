@@ -6,13 +6,25 @@
     <!-- Cornice calendario -->
     <rect x="2" y="2" width="20" height="20" rx="2.6" ry="2.6"></rect>
 
+    <!-- Giorno (testo in alto) -->
+<text id="calDay"
+      x="12" y="11.3"
+      text-anchor="middle"
+      font-size="10"
+      font-family="system-ui, -apple-system, sans-serif"
+      font-weight="760"
+      fill="currentColor"
+      stroke="none">
+  14
+</text>
+
     <!-- Mese (testo in basso) -->
 <text id="calMonth"
       x="12" y="19.3"
       text-anchor="middle"
-      font-size="6.5"
+      font-size="7.0"
       font-family="system-ui, -apple-system, sans-serif"
-      font-weight="600"
+      font-weight="650"
       fill="currentColor"
       stroke="none">
   Feb
@@ -23,19 +35,6 @@
       stroke="currentColor"
       stroke-width="0.5"
       stroke-linecap="round" />
-
-
-<!-- Giorno (testo in alto) -->
-<text id="calDay"
-      x="12" y="11.3"
-      text-anchor="middle"
-      font-size="10"
-      font-family="system-ui, -apple-system, sans-serif"
-      font-weight="700"
-      fill="currentColor"
-      stroke="none">
-  14
-</text>
 
   </g>
 </svg>

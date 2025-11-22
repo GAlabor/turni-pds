@@ -102,8 +102,6 @@
   visibility: hidden;
 }
 
-
-
 .tab.active svg {
   stroke-width: 1.6;
   transform: scale(var(--icon-pop));

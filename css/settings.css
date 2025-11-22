@@ -1,6 +1,7 @@
 /* Vista impostazioni */
 
 .view-settings .settings-container {
+  margin-top: var(--settings-top-gap);
   padding: 18px 18px 22px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
