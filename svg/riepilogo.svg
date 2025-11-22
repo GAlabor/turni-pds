@@ -3,13 +3,13 @@
    stroke-linecap="round"
    stroke-linejoin="round">
 
-  <!-- Contenitore leggermente più grande, come il calendario -->
-  <rect x="2" y="2" width="20" height="20" rx="4" stroke-width="2"/>
+  <!-- Contenitore allineato al calendario -->
+  <rect x="2" y="2" width="20" height="20" rx="2.6" stroke-width="1" />
 
-  <!-- Linee interne, ri-centrate sul nuovo box -->
-  <g stroke-width="1.6">
-    <line x1="6"  y1="8"  x2="18" y2="8"  />
-    <line x1="6"  y1="12" x2="18" y2="12" />
-    <line x1="6"  y1="16" x2="18" y2="16" />
+  <!-- Linee interne più leggere e rientrate -->
+  <g stroke-width="1">
+    <line x1="7" y1="8"  x2="17" y2="8"  />
+    <line x1="7" y1="12" x2="17" y2="12" />
+    <line x1="7" y1="16" x2="17" y2="16" />
   </g>
 </g>

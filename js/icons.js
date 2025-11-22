@@ -15,7 +15,7 @@
     if (!host) return;
 
     const now = new Date();
-    const months = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
+    const months = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
 
     const monthEl = host.querySelector("#calMonth");
     const dayEl   = host.querySelector("#calDay");
