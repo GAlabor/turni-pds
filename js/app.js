@@ -38,6 +38,11 @@
   }
 
   window.addEventListener("DOMContentLoaded", () => {
+    // Stato prima di tutto: gli altri possono usarlo tranquillamente
+    if (window.Status && typeof Status.init === "function") {
+      Status.init();
+    }
+
     if (window.Calendar && typeof Calendar.init === "function") {
       Calendar.init();
     }
@@ -61,10 +66,6 @@
 
     if (window.Turni && typeof Turni.init === "function") {
       Turni.init();
-    }
-
-    if (window.Status && typeof Status.init === "function") {
-      Status.init();
     }
   });
 })();
