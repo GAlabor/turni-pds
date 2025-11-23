@@ -1,177 +1,131 @@
-/* Vista impostazioni */
+/* =========================
+   CONTAINER PRINCIPALE
+   ========================= */
 
-.view-settings .settings-container {
-  margin-top: var(--settings-top-gap);
-  padding: 18px 18px 22px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.settings-title {
-  margin: 0 0 16px 0;
-  font-size: 22px;
-}
-
-.settings-group {
-  margin-bottom: 18px;
-}
-
-.settings-label {
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 15px;
-}
-
-.settings-hint {
-  margin: 0;
-  font-size: 13px;
-  color: var(--subtext);
+.settings-container {
+  margin-top: 18px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 /* =========================
-   SETTINGS: LISTA + PANNELLI
+   TESTI / LABEL
    ========================= */
 
-.settings-main,
-.settings-panel {
-  display: none;
+.settings-hint {
+  color: var(--subtext);
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
 }
 
-.settings-main.is-active,
-.settings-panel.is-active {
-  display: block;
-}
-
+/* Riga cliccabile nelle impostazioni */
 .settings-row {
   width: 100%;
-  padding: 10px 4px;
-  border: none;
   background: transparent;
+  border: none;
+  padding: 12px 0;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.settings-row-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.settings-row-right {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px; /* più aria tra testo e freccia */
+.settings-row-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .settings-row-summary {
   font-size: 13px;
-  color: var(--subtext); /* come sottotitoli */
-}
-
-/* Chevron riga impostazioni → icona piccola */
-.settings-row-chevron {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.6;
+  color: var(--subtext);
 }
 
 .settings-row-chevron svg {
-  width: 16px;
-  height: 16px;
-  display: block;
-  fill: none;
-  stroke: var(--subtext);
-  stroke-width: 2.0;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition:
-    opacity 0.16s ease,
-    transform 0.12s ease;
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  opacity: 0.7;
 }
 
-/* Solo feed di pressione/hover, niente riempimento blu del rigo */
-@media (hover:hover) {
-  .settings-row:hover .settings-row-chevron svg {
-    opacity: 0.9;
-    transform: translateX(1px);
-  }
-}
-
-.settings-row:active .settings-row-chevron svg {
-  transform: translateX(1px);
-}
-
+/* Separatore */
 .settings-separator {
-  margin: 4px 0 0 0;
-  border: 0;
-  border-bottom: 1px solid rgba(148,163,184,0.35);
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 0;
 }
 
-/* Pannello tema */
+/* =========================
+   NAVIGAZIONE PANNELLI
+   ========================= */
+
+.settings-panel {
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 20px;
+}
+
+.settings-panel.is-active {
+  display: flex;
+}
 
 .settings-panel-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 10px;
 }
 
-/* usa la base comune dei bottoni icona da components.css */
 .settings-back {
-  width: 32px;
-  height: 32px;
-  color: var(--text); /* stessa tinta del titolo */
-  display: flex;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.settings-back svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
 }
 
 .settings-panel-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
-  color: var(--text); /* coerenza con il resto dei titoli */
+  color: var(--text);
+}
+
+/* =========================
+   GRUPPI E SCELTE
+   ========================= */
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .settings-choice {
   width: 100%;
-  text-align: left;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgba(255,255,255,0.03);
+  background: var(--surface);
+  text-align: left;
   cursor: pointer;
-  font-size: 14px;
-  margin-bottom: 8px;
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    transform 0.06s ease;
-  color: var(--text); /* voci tema coerenti con testo principale */
-}
-
-:root[data-theme="dark"] .settings-choice {
-  background: rgba(15,23,42,0.5);
-}
-
-.settings-choice-label {
-  display: inline-block;
 }
 
 .settings-choice.is-active {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(10,132,255,0.45);
+  background: rgba(10,132,255,0.12);
 }
 
-/* =========================
-   RESPONSIVE UI (settings)
-   ========================= */
-
-@media (max-width: 900px) {
-  .view-settings .settings-container {
-    padding: 12px 10px 16px;
-  }
+.settings-choice-label {
+  color: var(--text);
+  font-size: 14px;
 }
