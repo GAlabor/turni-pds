@@ -184,6 +184,16 @@
   background: rgba(15,23,42,0.6);
 }
 
+/* nuovo: pallino colore nella lista */
+.turno-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  flex-shrink: 0;
+}
+
 .turno-name {
   font-size: 13px;
   font-weight: 500;
@@ -203,6 +213,7 @@
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
 }
+
 
 .turni-label {
   display: block;
@@ -255,16 +266,6 @@
 }
 
 /* Colore turno */
-
-.turni-color-row {
-  margin-bottom: 4px;
-}
-
-.turni-color-picker {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
 
 .turni-color-preview {
   width: 20px;

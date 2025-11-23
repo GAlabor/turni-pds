@@ -82,14 +82,10 @@
     function saveTurni(turni) {
       try {
         localStorage.setItem(TURNI_KEY, JSON.stringify(turni));
-        // Stato salvataggio
-        if (window.Status && typeof Status.setSaving === "function") {
-          Status.setSaving();
-          setTimeout(() => {
-            if (window.Status && typeof Status.setOk === "function") {
-              Status.setOk();
-            }
-          }, 400);
+
+        // Feedback salvataggio unificato con Theme
+        if (window.Status && typeof Status.markSaved === "function") {
+          Status.markSaved();
         }
       } catch (e) {
         console.warn("Salvataggio turni fallito:", e);
@@ -105,6 +101,15 @@
         const row = document.createElement("div");
         row.className = "turno-item";
 
+        // Pallino colore, se presente
+        const colorEl = document.createElement("span");
+        colorEl.className = "turno-color";
+        if (t.colore) {
+          colorEl.style.backgroundColor = t.colore;
+          // bordo del chip nel colore del turno
+          row.style.borderColor = t.colore;
+        }
+
         const nameEl = document.createElement("span");
         nameEl.className = "turno-name";
         nameEl.textContent = t.nome || "";
@@ -119,6 +124,7 @@
           orarioEl.textContent = `${t.inizio} - ${t.fine}`;
         }
 
+        row.appendChild(colorEl);
         row.appendChild(nameEl);
         row.appendChild(siglaEl);
         row.appendChild(orarioEl);
@@ -139,7 +145,7 @@
         const fine   = inputFine.value;
         const colore = colorInput.value || "#0a84ff";
 
-        // Niente UX complicata: se manca qualcosa, non salviamo
+        // Se manca qualcosa, non salviamo
         if (!nome || !sigla || !inizio || !fine) {
           return;
         }
