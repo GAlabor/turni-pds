@@ -3,10 +3,16 @@
 // ============================
 
 (function () {
+  if (!window.AppConfig) {
+    throw new Error("CONFIG.MISSING: AppConfig non disponibile (status.js)");
+  }
+  const { STATUS } = window.AppConfig;
+
   const Status = {
     el: null,
     timer: null,
-    SAVED_DELAY: 1200, // durata animazione OK prima di tornare idle
+    SAVED_DELAY: STATUS.savedDelay,
+    SPINNER_MS: STATUS.spinnerVisibleMs,
 
     init() {
       this.el = document.getElementById("statusIcon");
@@ -36,21 +42,21 @@
       this.el.classList.remove("status-idle", "status-saving");
       this.el.classList.add("status-ok");
 
-      if (this.timer) clearTimeout(this.timer);
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
 
       this.timer = setTimeout(() => {
         this.setIdle();
       }, this.SAVED_DELAY);
     },
 
-    // ----------------------------
-    // Nuova API pubblica
-    // ----------------------------
+    // API pubblica
     markSaved() {
       this.setSaving();
       setTimeout(() => {
         this.setOk();
-      }, 800); // piccola pausa per vedere l’anello girare
+      }, this.SPINNER_MS);
     }
   };
 

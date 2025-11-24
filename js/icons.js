@@ -3,11 +3,11 @@
 // ============================
 
 (function () {
-  function app_base() {
-    if (location.hostname === "localhost") return "";
-    const seg = location.pathname.split("/").filter(Boolean)[0] || "turni-pds";
-    return "/" + seg;
+  if (!window.AppConfig) {
+    throw new Error("CONFIG.MISSING: AppConfig non disponibile (icons.js)");
   }
+  const { PATHS } = window.AppConfig;
+  const SVG_BASE = PATHS.svgBase;
 
   // Aggiorna mese e giorno dentro l'SVG del calendario
   function setCalendarIconDateInSvg() {
@@ -30,14 +30,14 @@
     if (!host) return;
 
     try {
-      const res = await fetch(`${app_base()}/svg/${file}`, {
+      const res = await fetch(`${SVG_BASE}/${file}`, {
         cache: "no-store",
         credentials: "same-origin"
       });
       if (!res.ok) return;
 
       const txt = await res.text();
-      host.innerHTML = txt.trim(); // preserva <svg> intero o gruppo interno
+      host.innerHTML = txt.trim();
     } catch (err) {
       console.error("Errore icona:", file, err);
     }

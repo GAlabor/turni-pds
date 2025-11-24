@@ -3,8 +3,12 @@
 // ============================
 
 (function () {
-  const TURNI_KEY     = "turnipds-turni";
-  const TURNI_VIS_KEY = "turnipds-turni-visualizza";
+  if (!window.AppConfig) {
+    throw new Error("CONFIG.MISSING: AppConfig non disponibile (turni.js)");
+  }
+  const { STORAGE_KEYS } = window.AppConfig;
+  const TURNI_KEY     = STORAGE_KEYS.turni;
+  const TURNI_VIS_KEY = STORAGE_KEYS.turniVisualizza;
 
   // ----------------------------
   // Storage: turni
@@ -71,6 +75,7 @@
       const row = document.createElement("div");
       row.className = "turno-item";
 
+      // pallino colore
       const colorEl = document.createElement("span");
       colorEl.className = "turno-color";
       if (t.colore) {
@@ -173,7 +178,7 @@
     const turniIniziali = loadTurni();
     renderTurni(listEl, turniIniziali);
 
-    // Click sul bottone "Aggiungi" dentro il form
+    // Click sul bottone "Aggiungi"
     if (submitBtn && inputNome && inputSigla && inputInizio && inputFine && colorInput) {
       submitBtn.addEventListener("click", () => {
         const nome   = inputNome.value.trim();
@@ -191,6 +196,7 @@
         saveTurni(turni);
         renderTurni(listEl, turni);
 
+        // reset campi base
         inputNome.value   = "";
         inputSigla.value  = "";
         inputInizio.value = "";

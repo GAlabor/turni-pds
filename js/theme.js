@@ -3,7 +3,12 @@
 // ============================
 
 (function () {
-  const THEME_KEY = "turnipds-theme";
+  if (!window.AppConfig) {
+    throw new Error("CONFIG.MISSING: AppConfig non disponibile (theme.js)");
+  }
+  const { STORAGE_KEYS, UI } = window.AppConfig;
+  const THEME_KEY    = STORAGE_KEYS.theme;
+  const THEME_LABELS = UI.themeLabels || {};
 
   function applyTheme(theme) {
     const root = document.documentElement;
@@ -24,12 +29,7 @@
 
     const summary = document.getElementById("themeSummary");
     if (summary) {
-      const labels = {
-        system: "Tema corrente",
-        light: "Tema chiaro",
-        dark: "Tema scuro"
-      };
-      summary.textContent = labels[theme] || "";
+      summary.textContent = THEME_LABELS[theme] || "";
     }
   }
 
@@ -53,8 +53,9 @@
         applyTheme(value);
         syncThemeUI(value);
 
-        // ✔ unify saving animation
-        if (window.Status) Status.markSaved();
+        if (window.Status && typeof Status.markSaved === "function") {
+          Status.markSaved();
+        }
       });
     });
   }
