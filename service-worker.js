@@ -1,36 +1,68 @@
 // ==============================
-// Turni PDS — Service Worker V2.5
-// Ultra Fast / Stable / Clean
+// Turni PDS — Service Worker V2.6
+// Ultra Fast / Stable / Complete
 // ==============================
 
-const VERSION    = '2025-11-20 V2.5';
+const VERSION    = '2025-11-20 V2.8';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
 const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
 
 // ==============================
-// PRECACHE MINIMO ESSENZIALE
+// PRECACHE COMPLETO (APP READY)
 // ==============================
-// Solo il necessario per un primo avvio immediato.
-// Il resto viene cache-ato su richiesta.
+// Tutto ciò che serve per avere l’app pienamente
+// funzionante offline già dal primo avvio.
 const PRECACHE_URLS = [
+  // Shell base
   `${ROOT}/`,
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
 
-  // Core CSS
+  // CSS
   `${ROOT}/css/base.css`,
+  `${ROOT}/css/calendar.css`,
+  `${ROOT}/css/settings.css`,
   `${ROOT}/css/components.css`,
   `${ROOT}/css/tabbar.css`,
+  `${ROOT}/css/turni.css`,
 
-  // Core JS
+  // JS core + moduli UI
   `${ROOT}/js/config.js`,
   `${ROOT}/js/app.js`,
   `${ROOT}/js/sw-register.js`,
+  `${ROOT}/js/calendar.js`,
+  `${ROOT}/js/theme.js`,
+  `${ROOT}/js/status.js`,
+  `${ROOT}/js/icons.js`,
+  `${ROOT}/js/settings.js`,
+  `${ROOT}/js/turni.js`,
 
-  // Icone critiche
+  // Icone / favicon
   `${ROOT}/favicon.ico`,
+
+  // Cartella ICO completa
+  `${ROOT}/ico/apple-touch-icon-120x120.png`,
+  `${ROOT}/ico/apple-touch-icon-152x152.png`,
+  `${ROOT}/ico/apple-touch-icon-167x167.png`,
+  `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
+  `${ROOT}/ico/apple-touch-icon-180x180.png`,
+  `${ROOT}/ico/favicon-16x16.png`,
+  `${ROOT}/ico/favicon-32x32.png`,
+  `${ROOT}/ico/favicon-48x48.png`,
+  `${ROOT}/ico/icon-1024.png`,
+  `${ROOT}/ico/icon-192.png`,
+  `${ROOT}/ico/icon-512.png`,
+  `${ROOT}/ico/mstile-150x150.png`,
+
+  // SVG UI (tabbar + status + frecce)
+  `${ROOT}/svg/add.svg`,
+  `${ROOT}/svg/arrow-back.svg`,
+  `${ROOT}/svg/arrow-right.svg`,
+  `${ROOT}/svg/arrow-down.svg`,
+  `${ROOT}/svg/arrow-up.svg`,
+  `${ROOT}/svg/cancel.svg`,
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
@@ -84,7 +116,7 @@ async function handleHtmlFetch(event, req) {
     return preload;
   }
 
-  // rete → cache → risposta
+  // rete → cache → fallback
   try {
     const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
     try {
