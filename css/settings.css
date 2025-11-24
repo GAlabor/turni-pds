@@ -1,4 +1,89 @@
-/* settings.css */
+/* 
+===========================================
+ Turni PDS — Mappa file settings.css
+===========================================
+
+RUOLO DEL FILE
+---------------
+Gestisce la parte visiva della vista Impostazioni:
+  <section class="view view-settings" data-view="settings">
+
+Controlla:
+  • Card impostazioni (.settings-container) SOLO per quanto riguarda
+    margini/padding nella vista settings (lo stile base card è in components.css).
+  • Lista delle righe impostazioni (.settings-row, .settings-row-label, ecc.).
+  • Pannelli secondari (.settings-panel) per:
+      - Tema
+      - Turni
+      - Indennità
+      - Festività
+      - Informazioni
+      - Aggiornamenti
+  • Header dei pannelli (indietro + titolo).
+  • Scelte di tema (.settings-choice).
+  • Layout e spacing dei blocchi (.settings-group).
+
+CONTENUTO PRINCIPALE
+--------------------
+1) .settings-container
+   • Margine superiore controllato da --settings-top-gap.
+   • Padding di base per tutte le sezioni settings/inspag/riepilogo.
+   • Nella vista settings la variante:
+       .view-settings .settings-container
+     aggiunge blur + padding dedicato.
+
+2) Gruppi e label
+   • .settings-title
+   • .settings-group
+   • .settings-label
+   • .settings-hint
+   Stili testuali e spacing per intestazioni e descrizioni.
+
+3) Lista impostazioni principali
+   • .settings-main        → contenitore lista voci
+   • .settings-panel       → pannelli secondari (nascosti di default)
+   • .settings-row         → riga cliccabile con label + chevron
+   • .settings-row-left / .settings-row-right
+   • .settings-row-summary → testo riassuntivo (es. tema corrente)
+   • .settings-row-chevron → icona freccia laterale
+
+   La logica di switch tra main/pannelli è in:
+     • settings.js (data-settings-page / data-settings-id)
+
+4) Separatore
+   • .settings-separator
+   Border bottom che separa le righe.
+
+5) Header pannelli
+   • .settings-panel-header
+   • .settings-back      → bottone tondo back (base in components.css)
+   • .settings-panel-title
+
+6) Scelte tema
+   • .settings-choice
+   • .settings-choice.is-active
+   Stile dei pulsanti di selezione tema.
+   Stato aggiornato da theme.js.
+
+RESPONSIVE
+-----------
+@media (max-width: 900px)
+   • Riduce padding della .settings-container
+     sia per vista impostazioni che per altre viste che la usano.
+
+REGOLE PROGETTUALI
+-------------------
+• Questo file riguarda SOLO:
+    - la vista Impostazioni
+    - le variazioni di .settings-container quando è usata lì.
+• Le card base, i bottoni tondi, ecc. sono definiti in components.css.
+• Qualsiasi nuovo pannello impostazioni deve usare:
+    - .settings-row + data-settings-page nella lista principale
+    - .settings-panel + data-settings-id per il pannello
+  in modo che settings.js lo gestisca automaticamente.
+
+===========================================
+*/
 
 /* Vista impostazioni */
 

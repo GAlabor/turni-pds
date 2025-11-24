@@ -1,5 +1,98 @@
 <!-- index.html -->
 
+<!--
+===========================================
+ Turni PDS — Mappa struttura index.html
+===========================================
+
+STRUTTURA PRINCIPALE
+--------------------
+<main class="app-shell">
+  • Contiene tutte le viste principali dell’app.
+  • Ogni vista segue la regola:
+      <section class="view view-XXXX" data-view="xxxx">
+
+VISTE
+------
+1) view-calendar
+   • Calendario con switch giorni / mesi / anni.
+   • Header + monthbar (frecce mese e label).
+   • Griglie:
+       #calendar-grid
+       #month-grid
+       #year-grid
+   • Gestito da:
+       - calendar.js
+       - icons.js (per l’icona tabbar)
+
+2) view-inspag
+   • Placeholder per Inserimenti e Pagamenti.
+   • Usa solo settings-container.
+   • Gestito da:
+       - nessun modulo dedicato (futuro)
+
+3) view-riepilogo
+   • Placeholder per Riepilogo mensile/annuale.
+   • Gestito da:
+       - nessun modulo dedicato (futuro)
+
+4) view-settings
+   • Contiene:
+       - settings-main
+       - settings-panel (pannelli dinamici)
+   • Moduli coinvolti:
+       - settings.js
+       - theme.js
+       - turni.js
+
+COMPONENTI SHARED
+-----------------
+• app-header
+   Titolo + sottotitolo della vista.
+
+• settings-container
+   Card con padding controllato da settings.css.
+
+• statusIcon / icoStatus
+   Icona stato → gestita da status.js e icons.js
+
+• tabbar
+   Quattro tab:
+     - Calendario     (icoCalendar)
+     - Ins/Pag        (icoInspag)
+     - Riepilogo      (icoRiepilogo)
+     - Impostazioni   (icoSettings)
+   Gestita da:
+     - app.js (switch viste)
+     - icons.js (iniezione SVG)
+
+• versionLabel
+   Etichetta versione in basso a sinistra.
+   Gestita da sw-register.js
+
+JS CARICATI
+-----------
+Ordine di esecuzione:
+ 1. config.js      → AppConfig
+ 2. calendar.js    → logica calendario
+ 3. theme.js       → gestione tema
+ 4. status.js      → icona stato
+ 5. icons.js       → load SVG
+ 6. settings.js    → pannelli impostazioni
+ 7. turni.js       → gestione turni
+ 8. app.js         → bootstrap generale
+ 9. sw-register.js → service worker
+
+NOTA
+----
+Qualsiasi nuova vista:
+  - va inserita qui con class="view ..."
+  - va agganciata ad una tab nella tabbar (se serve)
+  - va gestita tramite app.js (initTabs)
+===========================================
+-->
+
+
 <!DOCTYPE html>
 <html lang="it">
 <head>

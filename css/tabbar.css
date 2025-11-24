@@ -1,4 +1,75 @@
-/* tabbar.css */
+/* 
+===========================================
+ Turni PDS — Mappa file tabbar.css
+===========================================
+
+RUOLO DEL FILE
+---------------
+Gestisce ESCLUSIVAMENTE:
+  • La barra in basso (.tabbar)
+  • Le tab (.tab) con icona + label
+  • L’etichetta versione (.version-label)
+  • Responsive della tabbar (mobile vs desktop)
+
+Qui dentro vive il "navigation footer" dell’app, niente altro.
+
+CONTENUTO PRINCIPALE
+--------------------
+1) .tabbar
+   • Contenitore fisso in basso (position: fixed).
+   • Sfondo blur + gradient controllato da variabili:
+       - --tabbar-bg
+       - --tabbar-border
+   • Padding calcolato con safe-area-inset-bottom.
+
+2) .tab
+   • Ogni tab è un bottone:
+       - icona SVG
+       - label facoltativa
+   • Stati gestiti:
+       - default
+       - :hover (desktop)
+       - :active
+       - :focus-visible
+       - .active (tab corrente)
+   • Usa variabili globali:
+       - --tabH, --tabIcon, --tabMaxW
+       - --tabColor, --tabActiveColor
+       - --active-bright, --active-contrast
+       - --icon-pop, --lift, --press
+       - --focus-ring
+
+3) .tab svg
+   • Icone della tabbar:
+       - stroke: currentColor
+       - stroke-width di base 1.4 (1.6 attivo)
+       - visibilità controllata da:
+           .tabbar.tabbar-icons-ready .tab svg { visibility: visible; }
+
+4) .version-label
+   • Etichetta versione in basso a sinistra.
+   • Testo aggiornato da sw-register.js
+   • Non interagibile (pointer-events: none).
+
+RESPONSIVE
+-----------
+@media (max-width: 900px)
+   • Riduce padding tabbar.
+   • Nasconde le label testuali (.tab-label → display:none).
+   • Solo icone su mobile.
+
+@media (min-width: 901px)
+   • Mostra le label (.tab-label → display:block).
+
+REGOLE PROGETTUALI
+-------------------
+• SOLO elementi legati alla tabbar devono stare qui.
+• Nessuna logica specifica delle viste (calendar, settings, ecc.).
+• Icone SVG vengono iniettate da icons.js
+  → qui si gestisce solo lo stile, non il contenuto.
+
+===========================================
+*/
 
 /* =========================
    TABBAR IN BASSO

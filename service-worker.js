@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V2.0'; // VERSIONE APP CORRENTE
+const VERSION    = '2025-11-20 V2.1'; // VERSIONE APP CORRENTE
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 // Scope e root dinamici
@@ -33,35 +33,34 @@ const PRECACHE_URLS = [
   `${ROOT}/js/sw-register.js`,
 
   // Icone / SVG / favicon
-`${ROOT}/favicon.ico`,
+  `${ROOT}/favicon.ico`,
 
-// Cartella ICO completa
-`${ROOT}/ico/apple-touch-icon-120x120.png`,
-`${ROOT}/ico/apple-touch-icon-152x152.png`,
-`${ROOT}/ico/apple-touch-icon-167x167.png`,
-`${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
-`${ROOT}/ico/apple-touch-icon-180x180.png`,
-`${ROOT}/ico/favicon-16x16.png`,
-`${ROOT}/ico/favicon-32x32.png`,
-`${ROOT}/ico/favicon-48x48.png`,
-`${ROOT}/ico/icon-1024.png`,
-`${ROOT}/ico/icon-192.png`,
-`${ROOT}/ico/icon-512.png`,
-`${ROOT}/ico/mstile-150x150.png`,
+  // Cartella ICO completa
+  `${ROOT}/ico/apple-touch-icon-120x120.png`,
+  `${ROOT}/ico/apple-touch-icon-152x152.png`,
+  `${ROOT}/ico/apple-touch-icon-167x167.png`,
+  `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
+  `${ROOT}/ico/apple-touch-icon-180x180.png`,
+  `${ROOT}/ico/favicon-16x16.png`,
+  `${ROOT}/ico/favicon-32x32.png`,
+  `${ROOT}/ico/favicon-48x48.png`,
+  `${ROOT}/ico/icon-1024.png`,
+  `${ROOT}/ico/icon-192.png`,
+  `${ROOT}/ico/icon-512.png`,
+  `${ROOT}/ico/mstile-150x150.png`,
 
-// SVG UI
-`${ROOT}/svg/add.svg`,
-`${ROOT}/svg/arrow-back.svg`,
-`${ROOT}/svg/arrow-right.svg`,
-`${ROOT}/svg/arrow-down.svg`,
-`${ROOT}/svg/arrow-up.svg`,
-`${ROOT}/svg/cancel.svg`,
-`${ROOT}/svg/calendar.svg`,
-`${ROOT}/svg/inspag.svg`,
-`${ROOT}/svg/riepilogo.svg`,
-`${ROOT}/svg/settings.svg`,
-`${ROOT}/svg/login.svg`,
-
+  // SVG UI
+  `${ROOT}/svg/add.svg`,
+  `${ROOT}/svg/arrow-back.svg`,
+  `${ROOT}/svg/arrow-right.svg`,
+  `${ROOT}/svg/arrow-down.svg`,
+  `${ROOT}/svg/arrow-up.svg`,
+  `${ROOT}/svg/cancel.svg`,
+  `${ROOT}/svg/calendar.svg`,
+  `${ROOT}/svg/inspag.svg`,
+  `${ROOT}/svg/riepilogo.svg`,
+  `${ROOT}/svg/settings.svg`,
+  `${ROOT}/svg/login.svg`,
 ];
 
 // Normalizza richieste HTML verso index
@@ -128,14 +127,25 @@ self.addEventListener('fetch', (event) => {
     req.mode === 'navigate' ||
     (req.headers.get('accept') || '').includes('text/html');
 
+  // =========================
   // HTML → app shell
+  // =========================
   if (isHTML) {
     const htmlReq = normalizeHTMLRequest(req);
 
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);
 
-      const preload = event.preloadResponse ? await event.preloadResponse : null;
+      // ⚠ navigationPreload può FALLIRE in offline → va gestito
+      let preload = null;
+      if (event.preloadResponse) {
+        try {
+          preload = await event.preloadResponse;
+        } catch (e) {
+          preload = null; // niente drama, si va di fetch/cache
+        }
+      }
+
       if (preload) {
         try { cache.put(`${ROOT}/index.html`, preload.clone()); } catch {}
         return preload;
