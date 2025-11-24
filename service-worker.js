@@ -1,85 +1,163 @@
 // ==============================
-// Turni PDS — Service Worker
+// Turni PDS — Service Worker V2.5
+// Ultra Fast / Stable / Clean
 // ==============================
 
-const VERSION    = '2025-11-20 V2.4'; // VERSIONE APP CORRENTE
+const VERSION    = '2025-11-20 V2.5';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
-// Scope e root dinamici
 const SCOPE_URL = new URL(self.registration.scope);
 const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
 
-// Precache minimo per offline affidabile
+// ==============================
+// PRECACHE MINIMO ESSENZIALE
+// ==============================
+// Solo il necessario per un primo avvio immediato.
+// Il resto viene cache-ato su richiesta.
 const PRECACHE_URLS = [
   `${ROOT}/`,
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
 
-  // CSS/JS
+  // Core CSS
   `${ROOT}/css/base.css`,
-  `${ROOT}/css/calendar.css`,
-  `${ROOT}/css/settings.css`,
   `${ROOT}/css/components.css`,
   `${ROOT}/css/tabbar.css`,
-  `${ROOT}/css/turni.css`,
-  `${ROOT}/js/calendar.js`,
+
+  // Core JS
   `${ROOT}/js/config.js`,
-  `${ROOT}/js/theme.js`,
-  `${ROOT}/js/status.js`,
-  `${ROOT}/js/icons.js`,
-  `${ROOT}/js/settings.js`,
-  `${ROOT}/js/turni.js`,
   `${ROOT}/js/app.js`,
   `${ROOT}/js/sw-register.js`,
 
-  // Icone / SVG / favicon
+  // Icone critiche
   `${ROOT}/favicon.ico`,
-
-  // Cartella ICO completa
-  `${ROOT}/ico/apple-touch-icon-120x120.png`,
-  `${ROOT}/ico/apple-touch-icon-152x152.png`,
-  `${ROOT}/ico/apple-touch-icon-167x167.png`,
-  `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
-  `${ROOT}/ico/apple-touch-icon-180x180.png`,
-  `${ROOT}/ico/favicon-16x16.png`,
-  `${ROOT}/ico/favicon-32x32.png`,
-  `${ROOT}/ico/favicon-48x48.png`,
-  `${ROOT}/ico/icon-1024.png`,
-  `${ROOT}/ico/icon-192.png`,
-  `${ROOT}/ico/icon-512.png`,
-  `${ROOT}/ico/mstile-150x150.png`,
-
-  // SVG UI
-  `${ROOT}/svg/add.svg`,
-  `${ROOT}/svg/arrow-back.svg`,
-  `${ROOT}/svg/arrow-right.svg`,
-  `${ROOT}/svg/arrow-down.svg`,
-  `${ROOT}/svg/arrow-up.svg`,
-  `${ROOT}/svg/cancel.svg`,
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
   `${ROOT}/svg/settings.svg`,
-  `${ROOT}/svg/login.svg`,
+  `${ROOT}/svg/login.svg`
 ];
 
-// Normalizza richieste HTML verso index
+// ==============================
+// NORMALIZZAZIONE HTML
+// ==============================
 function normalizeHTMLRequest(req) {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return req;
-  if (!(url.pathname === ROOT || url.pathname.startsWith(ROOT + '/'))) return req;
 
   const wantsHTML =
     req.mode === 'navigate' ||
     (req.headers.get('accept') || '').includes('text/html');
 
-  if (wantsHTML && (url.pathname === ROOT || url.pathname === ROOT + '/')) {
+  if (!wantsHTML) return req;
+
+  if (url.pathname === ROOT || url.pathname === ROOT + '/') {
     return new Request(`${ROOT}/index.html`, { credentials: 'same-origin' });
   }
+
   return req;
 }
 
-self.addEventListener('install', (event) => {
+// ==============================
+// HANDLER HTML
+// ==============================
+async function handleHtmlFetch(event, req) {
+  const htmlReq = normalizeHTMLRequest(req);
+  const cache = await caches.open(CACHE_NAME);
+
+  // navigationPreload se disponibile
+  let preload = null;
+  if (event.preloadResponse) {
+    try {
+      preload = await event.preloadResponse;
+    } catch (e) {
+      preload = null;
+    }
+  }
+
+  if (preload) {
+    try {
+      await cache.put(`${ROOT}/index.html`, preload.clone());
+    } catch (e) {
+      // ignorato
+    }
+    return preload;
+  }
+
+  // rete → cache → risposta
+  try {
+    const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
+    try {
+      await cache.put(`${ROOT}/index.html`, fresh.clone());
+    } catch (e) {
+      // ignorato
+    }
+    return fresh;
+  } catch (e) {
+    const cached = await cache.match(`${ROOT}/index.html`);
+    if (cached) return cached;
+
+    return new Response('<h1>Offline</h1><p>Nessuna cache disponibile.</p>', {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      status: 503
+    });
+  }
+}
+
+// ==============================
+// HANDLER SVG (network-first)
+// ==============================
+async function handleSvgFetch(req) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const fresh = await fetch(req, { cache: 'no-store' });
+    try {
+      await cache.put(req, fresh.clone());
+    } catch (e) {
+      // ignorato
+    }
+    return fresh;
+  } catch (e) {
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    return new Response('', { status: 504 });
+  }
+}
+
+// ==============================
+// HANDLER STATICI (SWR reale)
+// ==============================
+async function handleStaticFetch(event, req) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(req);
+
+  if (cached) {
+    // Aggiornamento in background
+    event.waitUntil((async () => {
+      try {
+        const fresh = await fetch(req, { cache: 'no-store' });
+        await cache.put(req, fresh.clone());
+      } catch (e) {
+        // ignorato
+      }
+    })());
+    return cached;
+  }
+
+  // non in cache → rete diretta
+  try {
+    const fresh = await fetch(req);
+    await cache.put(req, fresh.clone());
+    return fresh;
+  } catch (e) {
+    return new Response('', { status: 504 });
+  }
+}
+
+// ==============================
+// INSTALL
+// ==============================
+self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
     await cache.addAll(PRECACHE_URLS);
@@ -87,39 +165,54 @@ self.addEventListener('install', (event) => {
   })());
 });
 
-self.addEventListener('activate', (event) => {
+// ==============================
+// ACTIVATE
+// ==============================
+self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys
-        .filter(k => k !== CACHE_NAME)
-        .map(k => caches.delete(k))
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
     );
 
-    // Abilita navigationPreload per velocizzare i navigate fetch
     if (self.registration.navigationPreload) {
-      try { await self.registration.navigationPreload.enable(); } catch {}
+      try {
+        await self.registration.navigationPreload.enable();
+      } catch (e) {
+        // ignorato
+      }
     }
 
     await self.clients.claim();
   })());
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+// ==============================
+// MESSAGGI (SKIP WAITING)
+// ==============================
+self.addEventListener('message', ev => {
+  if (ev.data && ev.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
-self.addEventListener('fetch', (event) => {
+// ==============================
+// FETCH
+// ==============================
+self.addEventListener('fetch', event => {
   const req = event.request;
 
-  if (req.method !== 'GET') return;
+  if (req.method !== 'GET') {
+    return;
+  }
 
   const url = new URL(req.url);
-  const sameOrigin = url.origin === self.location.origin;
-  if (!sameOrigin) return;
+  if (url.origin !== self.location.origin) {
+    return;
+  }
 
-  // NON intercettare il file del service worker
-  if (url.pathname === `${ROOT}/service-worker.js`) {
+  // Non catturare il file del service worker
+  if (url.pathname.endsWith('/service-worker.js')) {
     return;
   }
 
@@ -127,92 +220,18 @@ self.addEventListener('fetch', (event) => {
     req.mode === 'navigate' ||
     (req.headers.get('accept') || '').includes('text/html');
 
-  // =========================
-  // HTML → app shell
-  // =========================
+  // 1) HTML → app shell veloce
   if (isHTML) {
-    const htmlReq = normalizeHTMLRequest(req);
-
-    event.respondWith((async () => {
-      const cache = await caches.open(CACHE_NAME);
-
-      // ⚠ navigationPreload può FALLIRE in offline → va gestito
-      let preload = null;
-      if (event.preloadResponse) {
-        try {
-          preload = await event.preloadResponse;
-        } catch (e) {
-          preload = null; // niente drama, si va di fetch/cache
-        }
-      }
-
-      if (preload) {
-        try { cache.put(`${ROOT}/index.html`, preload.clone()); } catch {}
-        return preload;
-      }
-
-      try {
-        const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
-        try { cache.put(`${ROOT}/index.html`, fresh.clone()); } catch {}
-        return fresh;
-      } catch {
-        const cached = await caches.match(`${ROOT}/index.html`);
-        return cached || new Response('<h1>Offline</h1><p>Nessuna cache disponibile.</p>', {
-          headers: { 'Content-Type': 'text/html; charset=utf-8' },
-          status: 503
-        });
-      }
-    })());
+    event.respondWith(handleHtmlFetch(event, req));
     return;
   }
 
-  // =========================
-  // SVG icone → NETWORK-FIRST
-  // =========================
+  // 2) SVG → network-first
   if (url.pathname.startsWith(`${ROOT}/svg/`)) {
-    event.respondWith((async () => {
-      const cache = await caches.open(CACHE_NAME);
-      try {
-        // Prima rete, niente HTTP cache
-        const fresh = await fetch(req, { cache: 'no-store' });
-        try { cache.put(req, fresh.clone()); } catch {}
-        return fresh;
-      } catch {
-        // Se rete KO → fallback alla cache
-        const cached = await cache.match(req);
-        if (cached) return cached;
-        return new Response('', { status: 504 });
-      }
-    })());
+    event.respondWith(handleSvgFetch(req));
     return;
   }
 
-  // =========================
-  // Asset statici → CACHE-FIRST con refresh in background
-  // =========================
-  event.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) {
-      event.waitUntil((async () => {
-        try {
-          const fresh = await fetch(req, { cache: 'no-store' });
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(req, fresh.clone());
-        } catch {}
-      })());
-      return cached;
-    }
-    try {
-      const resp = await fetch(req);
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(req, resp.clone());
-      return resp;
-    } catch {
-      if (req.mode === 'navigate') {
-        const home = await caches.match(`${ROOT}/index.html`);
-        if (home) return home;
-      }
-      return new Response('', { status: 504 });
-    }
-  })());
+  // 3) Statici → stale-while-revalidate
+  event.respondWith(handleStaticFetch(event, req));
 });
