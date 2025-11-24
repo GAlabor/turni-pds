@@ -9,7 +9,7 @@
 }
 
 .month-label {
-  font-size: 22px;
+  font-size: var(--fs-section-title);
   font-weight: 600;
   cursor: pointer;
 }
@@ -43,7 +43,7 @@
   text-align: center;
   font-weight: 600;
   color: var(--dow-muted);
-  font-size: 13px;
+  font-size: var(--fs-row-subtext);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -170,8 +170,8 @@
   border: 1px solid var(--border);
   padding: 16px 10px;
   text-align: center;
-  font-size: 17px; /* 15 → 17 */
-  font-weight: 600; /* 500 → 600 */
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
   min-height: 72px;
   display: flex;
@@ -209,10 +209,10 @@
   background: var(--surface-strong);
   border-radius: 18px;
   border: 1px solid var(--border);
-  padding: 14px 10px; /* 12→14 e 8→10 */
+  padding: 14px 10px;
   text-align: center;
-  font-size: 16px; /* 14 → 16 */
-  font-weight: 600; /* 500 → 600 */
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   min-height: 64px;
   display: flex;
@@ -243,7 +243,6 @@
    ========================= */
 
 @media (max-width: 900px) {
-  /* frecce un po' più lontane dal titolo */
   .monthbar {
     margin: 4px 0 10px 0;
   }
@@ -262,7 +261,7 @@
   }
 
   .dow {
-    font-size: 11px;
+    font-size: var(--fs-tab-label); /* 11px */
     padding: 4px 0;
   }
 

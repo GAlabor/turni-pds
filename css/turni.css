@@ -10,7 +10,7 @@
 
 .settings-row-subhint {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--fs-meta);
   color: var(--subtext);
 }
 
@@ -148,7 +148,7 @@
   border: none;
   border-radius: 999px;
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--fs-row-subtext);
   font-weight: 500;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -184,7 +184,7 @@
   background: rgba(15,23,42,0.6);
 }
 
-/* nuovo: pallino colore nella lista */
+/* pallino colore nella lista */
 .turno-color {
   width: 12px;
   height: 12px;
@@ -195,13 +195,13 @@
 }
 
 .turno-name {
-  font-size: 13px;
+  font-size: var(--fs-row-subtext);
   font-weight: 500;
   color: var(--text);
 }
 
 .turno-sigla {
-  font-size: 12px;
+  font-size: var(--fs-meta);
   font-weight: 600;
   color: var(--text);
   opacity: 0.9;
@@ -209,15 +209,14 @@
 
 .turno-orario {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--fs-meta);
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
 }
 
-
 .turni-label {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-row-subtext);
   font-weight: 500;
   color: var(--text);
   margin-bottom: 4px;
@@ -225,12 +224,12 @@
 
 .turni-input {
   width: 100%;
-  height: 30px; /* più bassa */
+  height: 30px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.06);
   padding: 0 8px;
-  font-size: 12px;
+  font-size: var(--fs-input);
   color: var(--text);
   outline: none;
   -webkit-appearance: none;

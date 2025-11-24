@@ -17,8 +17,8 @@
 /* Titoli delle righe (impostazioni, turni, ecc.) */
 .settings-row-label,
 .turni-row-label {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: var(--fs-row-label);
+  font-weight: var(--fw-row-label);
   color: var(--text);
 }
 
@@ -69,7 +69,7 @@
   stroke-linejoin: round;
 }
 
-/* Hover desktop: cerchio blu pieno, come nel test */
+/* Hover desktop: cerchio blu pieno */
 @media (hover:hover) {
   .nav-btn:hover,
   .settings-back:hover {
@@ -173,7 +173,7 @@
 
 .status-saving #icoStatus #loginCircle {
   opacity: 1;
-  animation: statusSpin 0.3s linear infinite; /*tempo cerchio giro*/
+  animation: statusSpin 0.3s linear infinite;
 }
 
 /* OK → cerchio pieno più acceso, nessun segmento */

@@ -15,7 +15,7 @@
 
 .settings-title {
   margin: 0 0 16px 0;
-  font-size: 22px;
+  font-size: var(--fs-section-title);
 }
 
 .settings-group {
@@ -23,9 +23,9 @@
 }
 
 .settings-label {
-  font-weight: 600;
+  font-weight: var(--fw-row-label);
   margin-bottom: 8px;
-  font-size: 15px;
+  font-size: var(--fs-row-label);
 }
 
 .settings-options {
@@ -44,7 +44,7 @@
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.03);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--fs-row-subtext);
 }
 
 :root[data-theme="dark"] .settings-option {
@@ -57,7 +57,7 @@
 
 .settings-hint {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-row-subtext);
   color: var(--subtext);
 }
 
@@ -101,8 +101,8 @@
 }
 
 .settings-row-summary {
-  font-size: 13px;
-  color: var(--subtext); /* come sottotitoli */
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
 }
 
 /* Chevron riga impostazioni → icona piccola */
@@ -158,14 +158,14 @@
 .settings-back {
   width: 32px;
   height: 32px;
-  color: var(--text); /* stessa tinta del titolo */
+  color: var(--text);
   display: flex;
 }
 
 .settings-panel-title {
   font-size: 17px;
   font-weight: 600;
-  color: var(--text); /* coerenza con il resto dei titoli */
+  color: var(--text);
 }
 
 .settings-choice {
@@ -176,14 +176,14 @@
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.03);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--fs-row-subtext);
   margin-bottom: 8px;
   -webkit-tap-highlight-color: transparent;
   transition:
     border-color 0.16s ease,
     box-shadow 0.16s ease,
     transform 0.06s ease;
-  color: var(--text); /* voci tema coerenti con testo principale */
+  color: var(--text);
 }
 
 :root[data-theme="dark"] .settings-choice {
