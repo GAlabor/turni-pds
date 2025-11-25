@@ -286,7 +286,7 @@ Gestisce TUTTA la parte visiva del calendario nella vista:
   .day {
     border-radius: 14px;
     padding: 6px 6px 10px;
-    min-height: 52px;
+    min-height: 58px;
     font-size: 14px;     /* numeri invariati come deciso */
     box-shadow: none;
   }

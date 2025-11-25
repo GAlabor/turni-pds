@@ -261,7 +261,7 @@ body {
   }
 
   .app-header {
-    padding: 10px 4px 14px 4px;
+    padding: 10px 4px 8px 4px; /* il 3 valore cambia lo spazio tra turni e frecce */
   }
 
   .app-title {
