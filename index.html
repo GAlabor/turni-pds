@@ -216,119 +216,102 @@ Qualsiasi nuova vista:
       <div class="settings-container">
         <!-- Schermata principale impostazioni -->
         <div class="settings-main is-active">
-          <!-- Tema -->
-          <button class="settings-row" type="button" data-settings-page="theme">
-            <div class="settings-row-left">
-              <span class="settings-row-label">Tema</span>
-            </div>
-            <div class="settings-row-right">
-              <span class="settings-row-summary" id="themeSummary"></span>
-              <span class="settings-row-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M10 6 L16 12 L10 18" />
-                </svg>
-              </span>
-            </div>
-          </button>
-          <hr class="settings-separator">
 
-          <!-- Turni -->
-          <button class="settings-row" type="button" data-settings-page="turni">
-            <div class="settings-row-left">
-              <span class="settings-row-label">Turni</span>
-            </div>
-            <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M10 6 L16 12 L10 18" />
-                </svg>
-              </span>
-            </div>
-          </button>
-          <hr class="settings-separator">
-
-          <!-- Indennità -->
-          <button class="settings-row" type="button" data-settings-page="indennita">
-            <div class="settings-row-left">
-              <span class="settings-row-label">Indennità</span>
-            </div>
-            <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M10 6 L16 12 L10 18" />
-                </svg>
-              </span>
-            </div>
-          </button>
-          <hr class="settings-separator">
-
-          <!-- Festività -->
-          <button class="settings-row" type="button" data-settings-page="festivita">
-            <div class="settings-row-left">
-              <span class="settings-row-label">Festività</span>
-            </div>
-            <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M10 6 L16 12 L10 18" />
-                </svg>
-              </span>
-            </div>
-          </button>
-          <hr class="settings-separator">
-
-          <!-- Informazioni -->
-          <button class="settings-row" type="button" data-settings-page="info">
-            <div class="settings-row-left">
-              <span class="settings-row-label">Informazioni</span>
-            </div>
-            <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M10 6 L16 12 L10 18" />
-                </svg>
-              </span>
-            </div>
-          </button>
-          <hr class="settings-separator">
-
-          <!-- Aggiornamenti -->
-          <button class="settings-row" type="button" data-settings-page="updates">
-            <div class="settings-row-left">
-              <span class="settings-row-label">Aggiornamenti</span>
-            </div>
-            <div class="settings-row-right">
-              <span class="settings-row-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M10 6 L16 12 L10 18" />
-                </svg>
-              </span>
-            </div>
-          </button>
-        </div>
-
-        <!-- Schermata scelta tema -->
-        <div class="settings-panel settings-theme" data-settings-id="theme">
-          <div class="settings-panel-header">
-            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M14 6 L8 12 L14 18" />
-              </svg>
+          <!-- CONTENITORE 1 -->
+          <div class="settings-group-card">
+            <!-- Turni -->
+            <button class="settings-row" type="button" data-settings-page="turni">
+              <div class="settings-row-left">
+                <span class="settings-row-label">Turni</span>
+              </div>
+              <div class="settings-row-right">
+                <span class="settings-row-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6 L16 12 L10 18" />
+                  </svg>
+                </span>
+              </div>
             </button>
-            <span class="settings-panel-title">Tema</span>
-          </div>
+            <hr class="settings-separator">
 
-          <div class="settings-group">
-            <button class="settings-choice" type="button" data-theme="system">
-              <span class="settings-choice-label">Tema corrente</span>
+            <!-- Indennità -->
+            <button class="settings-row" type="button" data-settings-page="indennita">
+              <div class="settings-row-left">
+                <span class="settings-row-label">Indennità</span>
+              </div>
+              <div class="settings-row-right">
+                <span class="settings-row-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6 L16 12 L10 18" />
+                  </svg>
+                </span>
+              </div>
             </button>
-            <button class="settings-choice" type="button" data-theme="dark">
-              <span class="settings-choice-label">Tema scuro</span>
-            </button>
-            <button class="settings-choice" type="button" data-theme="light">
-              <span class="settings-choice-label">Tema chiaro</span>
+            <hr class="settings-separator">
+
+            <!-- Festività -->
+            <button class="settings-row" type="button" data-settings-page="festivita">
+              <div class="settings-row-left">
+                <span class="settings-row-label">Festività</span>
+              </div>
+              <div class="settings-row-right">
+                <span class="settings-row-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6 L16 12 L10 18" />
+                  </svg>
+                </span>
+              </div>
             </button>
           </div>
+
+          <!-- CONTENITORE 2 -->
+          <div class="settings-group-card">
+            <!-- Tema -->
+            <button class="settings-row" type="button" data-settings-page="theme">
+              <div class="settings-row-left">
+                <span class="settings-row-label">Tema</span>
+              </div>
+              <div class="settings-row-right">
+                <span class="settings-row-summary" id="themeSummary"></span>
+                <span class="settings-row-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6 L16 12 L10 18" />
+                  </svg>
+                </span>
+              </div>
+            </button>
+            <hr class="settings-separator">
+
+            <!-- Aggiornamenti -->
+            <button class="settings-row" type="button" data-settings-page="updates">
+              <div class="settings-row-left">
+                <span class="settings-row-label">Aggiornamenti</span>
+              </div>
+              <div class="settings-row-right">
+                <span class="settings-row-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6 L16 12 L10 18" />
+                  </svg>
+                </span>
+              </div>
+            </button>
+            <hr class="settings-separator">
+
+            <!-- Informazioni -->
+            <button class="settings-row" type="button" data-settings-page="info">
+              <div class="settings-row-left">
+                <span class="settings-row-label">Informazioni</span>
+              </div>
+              <div class="settings-row-right">
+                <span class="settings-row-chevron" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M10 6 L16 12 L10 18" />
+                  </svg>
+                </span>
+              </div>
+            </button>
+          </div>
+
         </div>
 
         <!-- Pannello Turni -->
@@ -503,18 +486,18 @@ Qualsiasi nuova vista:
       <span class="tab-label">Calendario</span>
     </button>
 
+      <button class="tab" data-tab="riepilogo" aria-label="Riepilogo">
+      <svg id="icoRiepilogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+      <span class="tab-label">Riepilogo</span>
+    </button>
+
     <button class="tab" data-tab="inspag" aria-label="Inserimenti e pagamenti">
       <svg id="icoInspag" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
            fill="none" stroke="currentColor"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
       <span class="tab-label">Ins/Pag</span>
-    </button>
-
-    <button class="tab" data-tab="riepilogo" aria-label="Riepilogo">
-      <svg id="icoRiepilogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
-      <span class="tab-label">Riepilogo</span>
     </button>
 
     <button class="tab" data-tab="settings" aria-label="Impostazioni">

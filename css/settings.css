@@ -93,12 +93,18 @@ REGOLE PROGETTUALI
   padding: 22px 22px 26px;
 }
 
-/* Vista impostazioni: padding più generoso + blur */
+
+/* Vista impostazioni: contenitore SOLO di layout.
+   Le card vere sono .settings-group-card */
 .view-settings .settings-container {
   padding: 30px 26px 36px;
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
+
 
 .settings-title {
   margin: 0 0 18px 0;
@@ -152,6 +158,19 @@ REGOLE PROGETTUALI
 /* =========================
    SETTINGS: LISTA + PANNELLI
    ========================= */
+
+/* settings.css */
+.settings-group-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  padding: 10px 14px 4px;
+  margin-bottom: 26px;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
 
 .settings-main,
 .settings-panel {
