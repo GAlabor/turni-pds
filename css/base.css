@@ -76,7 +76,6 @@ NON inserire:
 
   /* distanza standard sopra ai contenitori settings */ 
   --settings-top-gap: 8px;
-  --settings-bottom-gap: 8px;
 
   /* frecce mese */
   --nav-fg: #111827;
@@ -257,12 +256,9 @@ body {
 
 @media (max-width: 900px) {
   body {
-    padding:
-      calc(env(safe-area-inset-top) + 26px)
-      4px
-      calc(env(safe-area-inset-bottom) + var(--tabbar-h));
+    /* meno padding laterale per dare più larghezza al calendario */
+    padding: calc(env(safe-area-inset-top) + 26px) 4px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
-
 
   .app-header {
     padding: 10px 4px 8px 4px; /* il 3 valore cambia lo spazio tra turni e frecce */
