@@ -90,8 +90,10 @@ REGOLE PROGETTUALI
 /* Base per tutti i contenitori settings (Impostazioni, Inspag, Riepilogo, ecc.) */
 .settings-container {
   margin-top: var(--settings-top-gap);
+  margin-bottom: var(--settings-bottom-gap);
   padding: 22px 22px 26px;
 }
+
 
 
 /* Vista impostazioni: contenitore SOLO di layout.

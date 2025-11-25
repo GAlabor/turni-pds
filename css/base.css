@@ -76,6 +76,7 @@ NON inserire:
 
   /* distanza standard sopra ai contenitori settings */ 
   --settings-top-gap: 8px;
+  --settings-bottom-gap: 8px;
 
   /* frecce mese */
   --nav-fg: #111827;
