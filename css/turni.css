@@ -285,3 +285,73 @@
   width: 0;
   height: 0;
 }
+
+
+/* =========================
+   NUOVO HEADER CARD TURNI
+   ========================= */
+
+.turni-card {
+  margin-top: 8px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  padding: 18px 16px 16px;
+}
+
+.turni-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turni-card-title {
+  margin: 0;
+  font-size: var(--fs-section-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.turni-card-title-small {
+  margin: 0;
+  font-size: var(--fs-section-subtitle); /* nuova variabile */
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+
+.turni-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Mobile: titolo un filo più piccolo e pulsanti più stretti */
+
+@media (max-width: 900px) {
+  .turni-card {
+    padding: 14px 12px 12px;
+  }
+
+  .turni-card-title {
+    font-size: 20px;
+  }
+
+  .turni-card-actions {
+    gap: 6px;
+  }
+
+  .pill-btn {
+    height: 30px;               /* come il cerchio versione mobile */
+    padding: 0 10px;
+    font-size: var(--fs-row-subtext);
+  }
+
+  .icon-circle-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
+

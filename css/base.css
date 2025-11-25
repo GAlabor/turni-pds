@@ -130,6 +130,9 @@ NON inserire:
 
   /* Input / pillole */
   --fs-input: 12px;
+
+  /* Voci Sottomenù - Turni -> */
+  --fs-section-subtitle: 17px; 
 }
 
 /* Tema “system” scuro, solo se NON è forzato un tema via data-theme */

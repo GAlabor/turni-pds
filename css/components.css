@@ -118,7 +118,8 @@ un badge, un mini-card):
 /* Base comune per bottoni tondi con icona */
 .nav-btn,
 .settings-back,
-.turni-add-btn {
+.turni-add-btn,
+.icon-circle-btn {
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface-strong);
@@ -147,7 +148,8 @@ un badge, un mini-card):
 /* SVG interni dei bottoni icona tondi */
 .nav-btn svg,
 .settings-back svg,
-.turni-add-btn svg {
+.turni-add-btn svg,
+.icon-circle-btn svg {
   width: 22px;
   height: 22px;
   display: block;
@@ -161,7 +163,8 @@ un badge, un mini-card):
 /* Hover desktop: cerchio blu pieno */
 @media (hover:hover) {
   .nav-btn:hover,
-  .settings-back:hover {
+  .settings-back:hover,
+  .icon-circle-btn:hover {
     background: var(--accent);
     color: #ffffff;
     border-color: var(--accent);
@@ -171,7 +174,8 @@ un badge, un mini-card):
 
 /* Pressione: scalatura */
 .nav-btn:active,
-.settings-back:active {
+.settings-back:active,
+.icon-circle-btn:active {
   transform: scale(0.9);
   background: var(--accent);
   color: #ffffff;
@@ -181,7 +185,8 @@ un badge, un mini-card):
 
 /* Focus tastiera */
 .nav-btn:focus-visible,
-.settings-back:focus-visible {
+.settings-back:focus-visible,
+.icon-circle-btn:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 2px rgba(10,132,255,0.45),
@@ -195,6 +200,72 @@ un badge, un mini-card):
     border-radius: 50%;
   }
 }
+
+/* =========================
+   PULSANTE "PILLOLA" GENERICO
+   ========================= */
+
+.pill-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* altezza allineata al cerchio */
+  height: 32px;
+  padding: 0 14px;
+  font-size: var(--fs-row-label);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease-out;
+}
+
+
+@media (hover:hover) {
+  .pill-btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 10px rgba(10,132,255,0.25);
+  }
+}
+
+.pill-btn:active {
+  transform: scale(0.96);
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 2px 6px rgba(10,132,255,0.35);
+}
+
+/* =========================
+   BOTTONE ICONA TONDO COMPATTO
+   ========================= */
+
+.icon-circle-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--accent);
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+}
+
 
 /* =========================
    ICONA STATO / SALVATAGGIO

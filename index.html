@@ -314,105 +314,67 @@ Qualsiasi nuova vista:
 
         </div>
 
-        <!-- Pannello Turni -->
-        <div class="settings-panel settings-turni" data-settings-id="turni">
+        <!-- Pannello Tema -->
+        <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-panel-header">
             <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M14 6 L8 12 L14 18" />
               </svg>
             </button>
-            <span class="settings-panel-title">Turni</span>
+            <span class="settings-panel-title">Tema</span>
           </div>
 
-          <!-- Toggle visualizzazione turnazione su calendario -->
           <div class="settings-group">
-            <div class="settings-row settings-row-toggle">
-              <div class="settings-row-left settings-row-left-column">
-                <span class="settings-row-label">Visualizza turnazione su calendario</span>
-                <p class="settings-row-subhint">
-                  Mostra le lettere della turnazione sul calendario.
-                </p>
-              </div>
-              <div class="settings-row-right">
-                <button
-                  class="toggle-switch"
-                  type="button"
-                  data-turni-visual-toggle
-                  aria-pressed="false"
-                  aria-label="Attiva o disattiva la visualizzazione turni su calendario">
-                  <span class="toggle-knob" aria-hidden="true"></span>
-                </button>
-              </div>
-            </div>
-            <hr class="settings-separator">
+            <p class="settings-hint">
+              Scegli come visualizzare Turni PDS.
+            </p>
           </div>
 
-          <!-- Sezione turni personalizzati -->
-          <div class="turni-section">
-            <!-- Riga cliccabile: Aggiungi turno + cerchietto con freccia -->
-            <button class="turni-row" type="button" data-turni-open aria-expanded="false">
-              <span class="turni-row-label">Aggiungi turno</span>
-              <span class="turni-add-btn" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M6 10 L12 16 L18 10" />
-                </svg>
-              </span>
-            </button>
+          <button class="settings-choice" data-theme="system">
+            <span class="settings-choice-label" data-theme-label="system"></span>
+          </button>
 
-            <!-- Form inserimento turno (inizialmente nascosto) -->
-            <div class="turni-form" data-turni-form hidden>
-              <!-- Rigo 1: Turno + Sigla -->
-              <div class="turni-field-row">
-                <div class="turni-field">
-                  <label class="turni-label" for="turnoNome">Turno</label>
-                  <input class="turni-input" id="turnoNome" type="text" maxlength="15" autocomplete="off">
-                </div>
-                <div class="turni-field">
-                  <label class="turni-label" for="turnoSigla">Sigla</label>
-                  <input class="turni-input" id="turnoSigla" type="text" maxlength="4" autocomplete="off">
-                </div>
-              </div>
+          <button class="settings-choice" data-theme="light">
+            <span class="settings-choice-label" data-theme-label="light"></span>
+          </button>
 
-              <!-- Rigo 2: Inizio / Fine / Colore -->
-              <div class="turni-field-row turni-row-time-color">
-                <div class="turni-field">
-                  <label class="turni-label" for="turnoOraInizio">Inizio</label>
-                  <input class="turni-input" id="turnoOraInizio" type="time" inputmode="numeric">
-                </div>
-
-                <div class="turni-field">
-                  <label class="turni-label" for="turnoOraFine">Fine</label>
-                  <input class="turni-input" id="turnoOraFine" type="time" inputmode="numeric">
-                </div>
-
-                <div class="turni-field turni-field-color">
-                  <label class="turni-label" for="turnoColore">Colore</label>
-                  <button class="turni-color-dot" type="button" data-turni-color-trigger aria-label="Scegli colore turno">
-                    <span class="turni-color-preview" data-turni-color-preview></span>
-                  </button>
-                  <input
-                    class="turni-color-input"
-                    id="turnoColore"
-                    type="color"
-                    value="#0a84ff"
-                    data-turni-color>
-                </div>
-              </div>
-
-              <!-- Pulsante Aggiungi -->
-              <div class="turni-actions">
-                <button class="turni-submit-btn" type="button" data-turni-submit>
-                  Aggiungi
-                </button>
-              </div>
-            </div>
-
-            <!-- Lista turni salvati -->
-            <div class="turni-list" data-turni-list></div>
-          </div>
-
+          <button class="settings-choice" data-theme="dark">
+            <span class="settings-choice-label" data-theme-label="dark"></span>
+          </button>
         </div>
+
+<!-- Pannello Turni -->
+<div class="settings-panel settings-turni" data-settings-id="turni">
+  <div class="settings-panel-header">
+    <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M14 6 L8 12 L14 18" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="turni-card">
+    <div class="turni-card-header">
+      <h2 class="turni-card-title-small">Turni</h2>
+      <div class="turni-card-actions">
+        <button class="pill-btn" type="button" data-turni-edit>
+          Modifica
+        </button>
+        <button class="icon-circle-btn" type="button" data-turni-add aria-label="Aggiungi turno">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 5 L12 19" />
+            <path d="M5 12 L19 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Qui sotto in futuro metteremo lista turni / editor -->
+  </div>
+</div>
+
+
 
         <!-- Pannello Indennità -->
         <div class="settings-panel settings-indennita" data-settings-id="indennita">
@@ -486,7 +448,7 @@ Qualsiasi nuova vista:
       <span class="tab-label">Calendario</span>
     </button>
 
-      <button class="tab" data-tab="riepilogo" aria-label="Riepilogo">
+    <button class="tab" data-tab="riepilogo" aria-label="Riepilogo">
       <svg id="icoRiepilogo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
            fill="none" stroke="currentColor"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
