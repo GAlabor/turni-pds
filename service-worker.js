@@ -1,9 +1,8 @@
 // ==============================
-// Turni PDS — Service Worker V2.6
-// Ultra Fast / Stable / Complete
+// Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V2.8';
+const VERSION    = '2025-11-20 V3.2';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);

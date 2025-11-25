@@ -7,82 +7,13 @@ RUOLO DEL FILE
 ---------------
 Gestisce TUTTA la parte visiva del calendario nella vista:
   <section class="view view-calendar" data-view="calendar">
-
-Controlla:
-  • Barra mese (monthbar) con frecce + label
-  • Griglia dei giorni (calendar-grid)
-  • Griglia mesi (month-grid)
-  • Griglia anni (year-grid)
-  • Stili per giorni, weekend, oggi, ecc.
-
-Logica e stato (giorni/mesi/anni) sono in:
-  • calendar.js
-Questo file si occupa SOLO dell’aspetto.
-
-CONTENUTO PRINCIPALE
---------------------
-1) .monthbar
-   • Barra superiore con:
-       - .nav-btn.prev
-       - .month-label
-       - .nav-btn.next
-   • Usa .nav-btn definito in components.css
-     per i bottoni freccia.
-
-2) .calendar-wrapper / .calendar-container
-   • Contenitore card del calendario.
-   • .calendar-container riceve classi modalità:
-       - .mode-days
-       - .mode-months
-       - .mode-years
-     impostate da calendar.js
-
-3) .dow-row / .dow
-   • Riga intestazioni giorni della settimana:
-       Lun, Mar, ..., Dom.
-   • Colori/tono gestiti via variabili globali.
-
-4) .calendar-grid .day
-   • Celle giorni del mese:
-       - .day                → giorno normale
-       - .day.empty          → slot vuoto prima del giorno 1
-       - .day.weekend        → sabato/domenica (colore weekend)
-       - .day.today          → giorno corrente (bordo/cerchio speciale)
-
-5) .month-grid .month-cell
-   • Bottoni mese (Gen, Feb, ...).
-   • .is-current evidenzia il mese “oggi” nell’anno selezionato.
-
-6) .year-grid .year-cell
-   • Bottoni anno.
-   • .is-current evidenzia l’anno corrente.
-
-MODALITÀ VISIVE
-----------------
-calendar.js gestisce le classi:
-  • .mode-days   → mostra solo griglia giorni
-  • .mode-months → mostra solo mesi
-  • .mode-years  → mostra solo anni
-
-calendar.css deve prendersi cura di:
-  • mostrare/nascondere le griglie giuste
-  • transizioni eventuali (se presenti)
-  • allineamento e spacing.
-
-REGOLE PROGETTUALI
--------------------
-• Qui NON vanno componenti riutilizzabili generali
-  (quelli vivono in components.css).
-• Tutto ciò che riguarda SOLO la vista calendario sta qui.
-• Nessun riferimento a pannelli impostazioni o tabbar.
-
 ===========================================
 */
 
 /* Header mese (vista calendario) */
 
 .monthbar {
-  margin: 6px 0 16px 0;
+  margin: 14px 0 20px 0; /* distacco dal titolo e dal calendario */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -103,9 +34,10 @@ REGOLE PROGETTUALI
 }
 
 .calendar-container {
-  padding: 18px 20px 20px;
+  margin-top: 6px; /* contenitore giorni più giù */
+  padding: 22px 18px 26px; /* meno padding laterale → più larghezza utile */
   width: 100%;
-  max-width: 1120px;
+  max-width: 1280px;       /* più largo su desktop */
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
@@ -116,7 +48,7 @@ REGOLE PROGETTUALI
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .dow {
@@ -134,20 +66,20 @@ REGOLE PROGETTUALI
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 10px; /* tiene un po’ respiro ma lascia più spazio alle celle */
 }
 
 /* Celle giorno */
 
 .day {
   background: var(--surface-strong);
-  padding: 12px 12px 14px;
+  padding: 12px 12px 16px;
   text-align: right;
-  font-size: 16px;
+  font-size: 18px;
   border-radius: 18px;
   border: 1px solid var(--border);
   transition: 0.16s ease;
-  min-height: 64px;
+  min-height: 86px; /* altezza maggiore */
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-light);
@@ -278,7 +210,7 @@ REGOLE PROGETTUALI
   font-weight: 700;
 }
 
-/* Griglia anni: blocchi da 10 */
+/* Griglia anni */
 
 .year-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -325,20 +257,21 @@ REGOLE PROGETTUALI
 
 @media (max-width: 900px) {
   .monthbar {
-    margin: 4px 0 10px 0;
+    margin: 10px 0 16px 0;
   }
 
   .month-label {
-    font-size: 17px;
+    font-size: 20px;
   }
 
   .calendar-container {
-    padding: 6px 4px 6px;
+    margin-top: 8px;
+    padding: 10px 2px 10px; /* quasi a filo per dare più larghezza alle celle */
   }
 
   .dow-row {
     gap: 2px;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
   }
 
   .dow {
@@ -347,15 +280,14 @@ REGOLE PROGETTUALI
   }
 
   .calendar-grid {
-    gap: 2px;
+    gap: 2px; /* meno gap = celle più larghe */
   }
 
   .day {
-    border-radius: 10px;
-    padding: 5px;
-    min-height: auto;
-    aspect-ratio: 1;
-    font-size: 12px;
+    border-radius: 14px;
+    padding: 6px 6px 10px;
+    min-height: 52px;
+    font-size: 14px;     /* numeri invariati come deciso */
     box-shadow: none;
   }
 
@@ -389,6 +321,6 @@ REGOLE PROGETTUALI
 
 @media (min-width: 901px) {
   .calendar-container {
-    padding-bottom: 12px;
+    padding-bottom: 16px;
   }
 }
