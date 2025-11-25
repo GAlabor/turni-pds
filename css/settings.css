@@ -90,28 +90,28 @@ REGOLE PROGETTUALI
 /* Base per tutti i contenitori settings (Impostazioni, Inspag, Riepilogo, ecc.) */
 .settings-container {
   margin-top: var(--settings-top-gap);
-  padding: 14px 16px 18px;
+  padding: 18px 20px 22px; /* più aria, card più “piena” */
 }
 
 /* Vista impostazioni: padding un po' più generoso + blur */
 .view-settings .settings-container {
-  padding: 18px 18px 22px;
+  padding: 22px 22px 26px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 .settings-title {
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
   font-size: var(--fs-section-title);
 }
 
 .settings-group {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .settings-label {
   font-weight: var(--fw-row-label);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: var(--fs-row-label);
 }
 
@@ -126,7 +126,7 @@ REGOLE PROGETTUALI
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 11px;
+  padding: 7px 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.03);
@@ -164,7 +164,7 @@ REGOLE PROGETTUALI
 
 .settings-row {
   width: 100%;
-  padding: 10px 4px;
+  padding: 12px 4px; /* riga più alta, più tappabile */
   border: none;
   background: transparent;
   display: flex;
@@ -177,14 +177,14 @@ REGOLE PROGETTUALI
 .settings-row-left {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
 }
 
 .settings-row-right {
   display: inline-flex;
   align-items: center;
-  gap: 10px; /* più aria tra testo e freccia */
+  gap: 12px; /* un filo più aria tra testo e freccia */
 }
 
 .settings-row-summary {
@@ -227,7 +227,7 @@ REGOLE PROGETTUALI
 }
 
 .settings-separator {
-  margin: 4px 0 0 0;
+  margin: 2px 0 0 0;
   border: 0;
   border-bottom: 1px solid rgba(148,163,184,0.35);
 }
@@ -237,20 +237,20 @@ REGOLE PROGETTUALI
 .settings-panel-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 /* usa la base comune dei bottoni icona da components.css */
 .settings-back {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   color: var(--text);
   display: flex;
 }
 
 .settings-panel-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text);
 }
@@ -258,13 +258,13 @@ REGOLE PROGETTUALI
 .settings-choice {
   width: 100%;
   text-align: left;
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.03);
   cursor: pointer;
   font-size: var(--fs-row-subtext);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   -webkit-tap-highlight-color: transparent;
   transition:
     border-color 0.16s ease,
@@ -292,10 +292,18 @@ REGOLE PROGETTUALI
 
 @media (max-width: 900px) {
   .settings-container {
-    padding: 12px 10px 16px;
+    padding: 16px 10px 20px;  /* più piena anche su mobile */
   }
 
   .view-settings .settings-container {
-    padding: 14px 12px 18px;
+    padding: 18px 12px 22px;
+  }
+
+  .settings-row {
+    padding: 12px 2px;
+  }
+
+  .settings-panel-title {
+    font-size: 17px;
   }
 }
