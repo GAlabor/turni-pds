@@ -91,7 +91,6 @@ Qualsiasi nuova vista:
   - va gestita tramite app.js (initTabs)
 ===========================================
 -->
-<!-- index.html -->
 
 <!DOCTYPE html>
 <html lang="it">
@@ -210,7 +209,20 @@ Qualsiasi nuova vista:
     <!-- VISTA IMPOSTAZIONI -->
     <section class="view view-settings" data-view="settings">
       <header class="app-header">
-        <h1 class="app-title">Impostazioni</h1>
+        <!-- Freccia BACK principale, visibile solo dentro i pannelli -->
+        <button
+          class="settings-back"
+          type="button"
+          data-settings-back-main
+          aria-label="Torna alle impostazioni"
+          hidden>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M14 6 L8 12 L14 18" />
+          </svg>
+        </button>
+
+        <!-- Titolo principale dinamico: "Impostazioni" / "Impostazioni - Turni" / ecc. -->
+        <h1 class="app-title" id="settingsTitle">Impostazioni</h1>
       </header>
 
       <div class="settings-container">
@@ -314,17 +326,8 @@ Qualsiasi nuova vista:
 
         </div>
 
-        <!-- Pannello Tema -->
+        <!-- PANNELLO TEMA -->
         <div class="settings-panel settings-theme" data-settings-id="theme">
-          <div class="settings-panel-header">
-            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M14 6 L8 12 L14 18" />
-              </svg>
-            </button>
-            <span class="settings-panel-title">Tema</span>
-          </div>
-
           <div class="settings-group">
             <p class="settings-hint">
               Scegli come visualizzare Turni PDS.
@@ -344,96 +347,45 @@ Qualsiasi nuova vista:
           </button>
         </div>
 
-<!-- Pannello Turni -->
-<div class="settings-panel settings-turni" data-settings-id="turni">
-  <div class="settings-panel-header">
-    <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M14 6 L8 12 L14 18" />
-      </svg>
-    </button>
-  </div>
+        <!-- PANNELLO TURNI -->
+        <div class="settings-panel settings-turni" data-settings-id="turni">
+          <div class="turni-card">
+            <div class="turni-card-header">
+              <h2 class="turni-panel-title">Turni</h2>
+              <div class="turni-card-actions">
+                <button class="pill-btn" type="button" data-turni-edit>
+                  Modifica
+                </button>
+                <button class="icon-circle-btn" type="button" data-turni-add aria-label="Aggiungi turno">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 5 L12 19" />
+                    <path d="M5 12 L19 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <!-- In futuro: lista turni / editor -->
+          </div>
+        </div>
 
-  <div class="turni-card">
-    <div class="turni-card-header">
-      <h2 class="turni-card-title-small">Turni</h2>
-      <div class="turni-card-actions">
-        <button class="pill-btn" type="button" data-turni-edit>
-          Modifica
-        </button>
-        <button class="icon-circle-btn" type="button" data-turni-add aria-label="Aggiungi turno">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 5 L12 19" />
-            <path d="M5 12 L19 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Qui sotto in futuro metteremo lista turni / editor -->
-  </div>
-</div>
-
-
-
-        <!-- Pannello Indennità -->
+        <!-- PANNELLO INDENNITÀ -->
         <div class="settings-panel settings-indennita" data-settings-id="indennita">
-          <div class="settings-panel-header">
-            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M14 6 L8 12 L14 18" />
-              </svg>
-            </button>
-            <span class="settings-panel-title">Indennità</span>
-          </div>
-          <p class="settings-hint">
-            Sezione indennità in lavorazione.
-          </p>
+          <!-- volutamente vuoto per ora -->
         </div>
 
-        <!-- Pannello Festività -->
+        <!-- PANNELLO FESTIVITÀ -->
         <div class="settings-panel settings-festivita" data-settings-id="festivita">
-          <div class="settings-panel-header">
-            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M14 6 L8 12 L14 18" />
-              </svg>
-            </button>
-            <span class="settings-panel-title">Festività</span>
-          </div>
-          <p class="settings-hint">
-            Sezione festività in lavorazione.
-          </p>
+          <!-- volutamente vuoto per ora -->
         </div>
 
-        <!-- Pannello Informazioni -->
+        <!-- PANNELLO INFORMAZIONI -->
         <div class="settings-panel settings-info" data-settings-id="info">
-          <div class="settings-panel-header">
-            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M14 6 L8 12 L14 18" />
-              </svg>
-            </button>
-            <span class="settings-panel-title">Informazioni</span>
-          </div>
-          <p class="settings-hint">
-            Sezione informazioni in lavorazione.
-          </p>
+          <!-- volutamente vuoto per ora -->
         </div>
 
-        <!-- Pannello Aggiornamenti -->
+        <!-- PANNELLO AGGIORNAMENTI -->
         <div class="settings-panel settings-updates" data-settings-id="updates">
-          <div class="settings-panel-header">
-            <button class="settings-back" type="button" data-settings-back aria-label="Torna alle impostazioni">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M14 6 L8 12 L14 18" />
-              </svg>
-            </button>
-            <span class="settings-panel-title">Aggiornamenti</span>
-          </div>
-          <p class="settings-hint">
-            Sezione aggiornamenti in lavorazione.
-          </p>
+          <!-- volutamente vuoto per ora -->
         </div>
       </div>
     </section>

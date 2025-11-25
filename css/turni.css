@@ -58,7 +58,7 @@
   transform: translateX(18px);
 }
 
-/* Card turni */
+/* Card turni (vecchia sezione, ancora usabile in futuro se serve) */
 
 .turni-section {
   margin-top: 4px;
@@ -286,7 +286,6 @@
   height: 0;
 }
 
-
 /* =========================
    NUOVO HEADER CARD TURNI
    ========================= */
@@ -307,36 +306,97 @@
   gap: 12px;
 }
 
-.turni-card-title {
+/* Titolo interno del pannello Turni (più piccolo del titolo pagina) */
+.turni-panel-title {
   margin: 0;
-  font-size: var(--fs-section-title);
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
-.turni-card-title-small {
-  margin: 0;
-  font-size: var(--fs-section-subtitle); /* nuova variabile */
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-
+/* Contenitore dei controlli a destra (Modifica + +) */
 .turni-card-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Mobile: titolo un filo più piccolo e pulsanti più stretti */
+/* Pill "Modifica" – stessa altezza del cerchio */
+.pill-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  height: 32px;
+  padding: 0 12px;
+  background: var(--surface-strong);
+  font-size: var(--fs-row-subtext);
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cerchio con icona + */
+.icon-circle-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-strong);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.icon-circle-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Nel pannello Turni, Modifica e + usano il colore delle frecce mese */
+.settings-panel.settings-turni .pill-btn,
+.settings-panel.settings-turni .icon-circle-btn {
+  color: var(--nav-fg);
+}
+
+/* Hover desktop: leggero highlight */
+@media (hover:hover) {
+  .pill-btn:hover,
+  .icon-circle-btn:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 10px rgba(10,132,255,0.18);
+  }
+}
+
+/* Pressione */
+.pill-btn:active,
+.icon-circle-btn:active {
+  transform: translateY(1px);
+}
+
+/* =========================
+   RESPONSIVE (Turni)
+   ========================= */
 
 @media (max-width: 900px) {
   .turni-card {
     padding: 14px 12px 12px;
   }
 
-  .turni-card-title {
-    font-size: 20px;
+  .turni-panel-title {
+    font-size: 17px;
   }
 
   .turni-card-actions {
@@ -344,9 +404,8 @@
   }
 
   .pill-btn {
-    height: 30px;               /* come il cerchio versione mobile */
+    height: 30px;
     padding: 0 10px;
-    font-size: var(--fs-row-subtext);
   }
 
   .icon-circle-btn {
@@ -354,4 +413,3 @@
     height: 30px;
   }
 }
-
