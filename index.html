@@ -380,22 +380,20 @@ Qualsiasi nuova vista:
           class="settings-panel settings-turni-add"
           data-settings-id="turni-add"
           data-settings-title="Aggiungi turno">
-          
-          <!-- Toolbar Salva (la freccia è quella dell'header Impostazioni) -->
+
+          <!-- Toolbar Salva + messaggio errore -->
           <div class="turni-add-toolbar">
             <button class="pill-btn turni-save-btn" type="button" data-turni-save>
               Salva
             </button>
+            <p class="turni-error" data-turni-error hidden>
+              Compila tutti i campi
+            </p>
           </div>
-
-          <!-- Messaggio errore -->
-          <p class="turni-error" data-turni-error hidden>
-            Compila tutti i campi
-          </p>
 
           <!-- Form Aggiungi turno -->
           <div class="turni-form" data-turni-add-form>
-            <!-- Rigo 1: Turno + Sigla -->
+            <!-- Turno -->
             <div class="turni-field-row">
               <div class="turni-field">
                 <label class="turni-label" for="addTurnoNome">Turno</label>
@@ -406,7 +404,10 @@ Qualsiasi nuova vista:
                   maxlength="15"
                   autocomplete="off">
               </div>
+            </div>
 
+            <!-- Sigla -->
+            <div class="turni-field-row">
               <div class="turni-field">
                 <label class="turni-label" for="addTurnoSigla">Sigla</label>
                 <input
@@ -418,45 +419,49 @@ Qualsiasi nuova vista:
               </div>
             </div>
 
-            <!-- Rigo 2: Inizio / Fine / Colore sigla -->
-            <div class="turni-field-row turni-row-time-color">
+            <!-- Colore sigla -->
+            <div class="turni-field-row">
+              <div class="turni-field turni-field-color-row">
+                <label class="turni-label" for="addTurnoColore">Colore sigla</label>
+                <div class="turni-color-wrapper">
+                  <button
+                    class="turni-color-dot"
+                    type="button"
+                    data-turni-color-trigger
+                    aria-label="Scegli colore sigla">
+                    <span class="turni-color-preview" data-turni-color-preview></span>
+                  </button>
+                  <input
+                    class="turni-color-input"
+                    id="addTurnoColore"
+                    type="color"
+                    value="#0a84ff"
+                    data-turni-color>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ora inizio -->
+            <div class="turni-field-row">
               <div class="turni-field">
                 <label class="turni-label" for="addTurnoOraInizio">Ora inizio</label>
                 <input
                   class="turni-input"
                   id="addTurnoOraInizio"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="5"
-                  placeholder="00:00">
+                  type="time"
+                  inputmode="numeric">
               </div>
+            </div>
 
+            <!-- Ora fine -->
+            <div class="turni-field-row">
               <div class="turni-field">
                 <label class="turni-label" for="addTurnoOraFine">Ora fine</label>
                 <input
                   class="turni-input"
                   id="addTurnoOraFine"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="5"
-                  placeholder="00:00">
-              </div>
-
-              <div class="turni-field turni-field-color">
-                <label class="turni-label" for="addTurnoColore">Colore sigla</label>
-                <button
-                  class="turni-color-dot"
-                  type="button"
-                  data-turni-color-trigger
-                  aria-label="Scegli colore sigla">
-                  <span class="turni-color-preview" data-turni-color-preview></span>
-                </button>
-                <input
-                  class="turni-color-input"
-                  id="addTurnoColore"
-                  type="color"
-                  value="#0a84ff"
-                  data-turni-color>
+                  type="time"
+                  inputmode="numeric">
               </div>
             </div>
           </div>

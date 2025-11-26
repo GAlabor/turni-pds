@@ -40,8 +40,7 @@
 
   // ----------------------------
   // Storage: toggle visualizzazione turnazione
-  // (non ancora usato in UI con il nuovo layout,
-  //  ma tenuto per futura integrazione col calendario)
+  // (non ancora agganciato al calendario nel layout attuale)
   // ----------------------------
 
   function loadVisualToggle() {
@@ -129,6 +128,8 @@
   // ----------------------------
   // Util: parsing / validazione orario
   // Accetta 00:00 .. 23:59 e 24:00
+  // (se usi <input type="time"> il browser non ti farà inserire 24:00,
+  // ma la funzione resta compatibile)
   // ----------------------------
 
   function isValidTime(str) {
@@ -180,7 +181,12 @@
     const saveBtn      = panelAdd.querySelector("[data-turni-save]");
     const errorEl      = panelAdd.querySelector("[data-turni-error]");
 
-    if (!listEl || !btnAdd || !formEl || !inputNome || !inputSigla || !inputInizio || !inputFine || !colorInput || !colorPreview || !colorTrigger || !saveBtn || !errorEl) {
+    if (
+      !listEl || !btnAdd || !formEl ||
+      !inputNome || !inputSigla || !inputInizio || !inputFine ||
+      !colorInput || !colorPreview || !colorTrigger ||
+      !saveBtn || !errorEl
+    ) {
       return;
     }
 
@@ -309,8 +315,7 @@
       }
     });
 
-    // (eventuale toggle visualizza turnazione:
-    //  UI non presente ora, ma lasciamo pronte le API se serviranno)
+    // (eventuale toggle visualizza turnazione in futuro)
     // const visualOn = loadVisualToggle();
     // ...
   }
