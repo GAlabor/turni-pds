@@ -40,6 +40,8 @@
 
   // ----------------------------
   // Storage: toggle visualizzazione turnazione
+  // (non ancora usato in UI con il nuovo layout,
+  //  ma tenuto per futura integrazione col calendario)
   // ----------------------------
 
   function loadVisualToggle() {
@@ -68,30 +70,47 @@
   // Render lista turni
   // ----------------------------
 
-  function renderTurni(listEl, turni) {
+  function renderTurni(listEl, turni, emptyHintEl, editBtn) {
     if (!listEl) return;
     listEl.innerHTML = "";
-    if (!turni.length) return;
+
+    if (!Array.isArray(turni) || !turni.length) {
+      if (emptyHintEl) {
+        emptyHintEl.hidden = false;
+      }
+      if (editBtn) {
+        editBtn.disabled = true;
+      }
+      return;
+    }
+
+    if (emptyHintEl) {
+      emptyHintEl.hidden = true;
+    }
+    if (editBtn) {
+      editBtn.disabled = false;
+    }
 
     turni.forEach(t => {
       const row = document.createElement("div");
       row.className = "turno-item";
 
-      // pallino colore
-      const colorEl = document.createElement("span");
-      colorEl.className = "turno-color";
-      if (t.colore) {
-        colorEl.style.backgroundColor = t.colore;
-        row.style.borderColor = t.colore;
-      }
-
-      const nameEl = document.createElement("span");
-      nameEl.className = "turno-name";
-      nameEl.textContent = t.nome || "";
+      // [SIGLA] → pill quadrata, testo con colore scelto
+      const siglaPill = document.createElement("span");
+      siglaPill.className = "turno-sigla-pill";
 
       const siglaEl = document.createElement("span");
       siglaEl.className = "turno-sigla";
       siglaEl.textContent = t.sigla || "";
+      if (t.colore) {
+        siglaEl.style.color = t.colore;
+      }
+
+      siglaPill.appendChild(siglaEl);
+
+      const nameEl = document.createElement("span");
+      nameEl.className = "turno-name";
+      nameEl.textContent = t.nome || "";
 
       const orarioEl = document.createElement("span");
       orarioEl.className = "turno-orario";
@@ -99,12 +118,33 @@
         orarioEl.textContent = `${t.inizio} - ${t.fine}`;
       }
 
-      row.appendChild(colorEl);
+      row.appendChild(siglaPill);
       row.appendChild(nameEl);
-      row.appendChild(siglaEl);
       row.appendChild(orarioEl);
+
       listEl.appendChild(row);
     });
+  }
+
+  // ----------------------------
+  // Util: parsing / validazione orario
+  // Accetta 00:00 .. 23:59 e 24:00
+  // ----------------------------
+
+  function isValidTime(str) {
+    if (typeof str !== "string") return false;
+    const s = str.trim();
+    const m = /^(\d{1,2}):(\d{2})$/.exec(s);
+    if (!m) return false;
+
+    const h = parseInt(m[1], 10);
+    const min = parseInt(m[2], 10);
+    if (Number.isNaN(h) || Number.isNaN(min)) return false;
+    if (min < 0 || min > 59) return false;
+    if (h < 0 || h > 24) return false;
+    if (h === 24 && min !== 0) return false;
+
+    return true;
   }
 
   // ----------------------------
@@ -112,99 +152,167 @@
   // ----------------------------
 
   function initTurniPanel() {
-    const panel = document.querySelector(".settings-panel.settings-turni");
-    if (!panel) return;
+    const settingsView = document.querySelector(".view-settings");
+    if (!settingsView) return;
 
-    // Toggle "Visualizza turnazione su calendario"
-    const toggle = panel.querySelector("[data-turni-visual-toggle]");
-    if (toggle) {
-      const initial = loadVisualToggle();
-      toggle.classList.toggle("is-on", initial);
-      toggle.setAttribute("aria-pressed", initial ? "true" : "false");
+    // Pannello principale turni (lista)
+    const panelTurni = settingsView.querySelector('.settings-panel.settings-turni[data-settings-id="turni"]');
+    // Pannello aggiungi turno
+    const panelAdd   = settingsView.querySelector('.settings-panel.settings-turni-add[data-settings-id="turni-add"]');
 
-      toggle.addEventListener("click", () => {
-        const isOn = !toggle.classList.contains("is-on");
-        toggle.classList.toggle("is-on", isOn);
-        toggle.setAttribute("aria-pressed", isOn ? "true" : "false");
-        saveVisualToggle(isOn);
-      });
+    if (!panelTurni || !panelAdd) return;
+
+    // --- elementi pannello lista ---
+    const listEl     = panelTurni.querySelector("[data-turni-list]");
+    const emptyHint  = panelTurni.querySelector("[data-turni-empty-hint]");
+    const btnAdd     = panelTurni.querySelector("[data-turni-add]");
+    const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
+
+    // --- elementi pannello Aggiungi turno ---
+    const formEl       = panelAdd.querySelector("[data-turni-add-form]");
+    const inputNome    = panelAdd.querySelector("#addTurnoNome");
+    const inputSigla   = panelAdd.querySelector("#addTurnoSigla");
+    const inputInizio  = panelAdd.querySelector("#addTurnoOraInizio");
+    const inputFine    = panelAdd.querySelector("#addTurnoOraFine");
+    const colorInput   = panelAdd.querySelector("[data-turni-color]");
+    const colorPreview = panelAdd.querySelector("[data-turni-color-preview]");
+    const colorTrigger = panelAdd.querySelector("[data-turni-color-trigger]");
+    const saveBtn      = panelAdd.querySelector("[data-turni-save]");
+    const errorEl      = panelAdd.querySelector("[data-turni-error]");
+
+    if (!listEl || !btnAdd || !formEl || !inputNome || !inputSigla || !inputInizio || !inputFine || !colorInput || !colorPreview || !colorTrigger || !saveBtn || !errorEl) {
+      return;
     }
-
-    // Riga "Aggiungi turno" → apre/chiude il form
-    const openBtn = panel.querySelector("[data-turni-open]");
-    const form = panel.querySelector("[data-turni-form]");
-
-    if (openBtn && form) {
-      openBtn.addEventListener("click", () => {
-        const isHidden = form.hasAttribute("hidden");
-
-        if (isHidden) {
-          form.removeAttribute("hidden");
-          openBtn.setAttribute("aria-expanded", "true");
-        } else {
-          form.setAttribute("hidden", "");
-          openBtn.setAttribute("aria-expanded", "false");
-        }
-      });
-    }
-
-    // Colore: sync preview con input color
-    const colorInput   = panel.querySelector("[data-turni-color]");
-    const colorPreview = panel.querySelector("[data-turni-color-preview]");
-    if (colorInput && colorPreview) {
-      const applyColor = () => {
-        colorPreview.style.backgroundColor = colorInput.value || "#0a84ff";
-      };
-      applyColor();
-      colorInput.addEventListener("input", applyColor);
-      colorInput.addEventListener("change", applyColor);
-    }
-
-    const colorTrigger = panel.querySelector("[data-turni-color-trigger]");
-    if (colorTrigger && colorInput) {
-      colorTrigger.addEventListener("click", () => {
-        colorInput.click();
-      });
-    }
-
-    // Gestione lista turni
-    const listEl    = panel.querySelector("[data-turni-list]");
-    const submitBtn = panel.querySelector("[data-turni-submit]");
-
-    const inputNome   = panel.querySelector("#turnoNome");
-    const inputSigla  = panel.querySelector("#turnoSigla");
-    const inputInizio = panel.querySelector("#turnoOraInizio");
-    const inputFine   = panel.querySelector("#turnoOraFine");
 
     // Render iniziale da localStorage
     const turniIniziali = loadTurni();
-    renderTurni(listEl, turniIniziali);
+    renderTurni(listEl, turniIniziali, emptyHint, btnEdit);
 
-    // Click sul bottone "Aggiungi"
-    if (submitBtn && inputNome && inputSigla && inputInizio && inputFine && colorInput) {
-      submitBtn.addEventListener("click", () => {
-        const nome   = inputNome.value.trim();
-        const sigla  = inputSigla.value.trim();
-        const inizio = inputInizio.value;
-        const fine   = inputFine.value;
-        const colore = colorInput.value || "#0a84ff";
+    // ----------------------------
+    // Gestione colore sigla
+    // ----------------------------
 
-        if (!nome || !sigla || !inizio || !fine) {
-          return;
-        }
+    function applyColorPreview() {
+      const v = colorInput.value || "#0a84ff";
+      colorPreview.style.backgroundColor = v;
+    }
 
-        const turni = loadTurni();
-        turni.push({ nome, sigla, inizio, fine, colore });
-        saveTurni(turni);
-        renderTurni(listEl, turni);
+    applyColorPreview();
+    colorInput.addEventListener("input", applyColorPreview);
+    colorInput.addEventListener("change", applyColorPreview);
 
-        // reset campi base
-        inputNome.value   = "";
-        inputSigla.value  = "";
-        inputInizio.value = "";
-        inputFine.value   = "";
+    colorTrigger.addEventListener("click", () => {
+      colorInput.click();
+    });
+
+    // ----------------------------
+    // Form Aggiungi turno
+    // ----------------------------
+
+    let errorTimer = null;
+
+    function clearError() {
+      if (errorTimer) {
+        clearTimeout(errorTimer);
+        errorTimer = null;
+      }
+      errorEl.hidden = true;
+
+      // rimuove stato errore dai campi
+      [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => {
+        inp.classList.remove("is-invalid");
       });
     }
+
+    function showError() {
+      clearError();
+      errorEl.hidden = false;
+      errorTimer = setTimeout(() => {
+        errorEl.hidden = true;
+        [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => {
+          inp.classList.remove("is-invalid");
+        });
+      }, 2000);
+    }
+
+    // appena l'utente digita, togliamo il bordo rosso
+    [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => {
+      inp.addEventListener("input", () => {
+        inp.classList.remove("is-invalid");
+      });
+    });
+
+    function resetAddForm() {
+      clearError();
+      inputNome.value   = "";
+      inputSigla.value  = "";
+      inputInizio.value = "";
+      inputFine.value   = "";
+      colorInput.value  = "#0a84ff";
+      applyColorPreview();
+    }
+
+    // Apertura pannello "Aggiungi turno" dal pulsante +
+    btnAdd.addEventListener("click", () => {
+      resetAddForm();
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni-add");
+      }
+    });
+
+    // Salvataggio nuovo turno
+    saveBtn.addEventListener("click", () => {
+      clearError();
+
+      const nome   = (inputNome.value || "").trim();
+      const sigla  = (inputSigla.value || "").trim();
+      const inizio = (inputInizio.value || "").trim();
+      const fine   = (inputFine.value || "").trim();
+      const colore = colorInput.value || "#0a84ff";
+
+      let hasError = false;
+
+      if (!nome) {
+        inputNome.classList.add("is-invalid");
+        hasError = true;
+      }
+      if (!sigla) {
+        inputSigla.classList.add("is-invalid");
+        hasError = true;
+      }
+      if (!inizio || !isValidTime(inizio)) {
+        inputInizio.classList.add("is-invalid");
+        hasError = true;
+      }
+      if (!fine || !isValidTime(fine)) {
+        inputFine.classList.add("is-invalid");
+        hasError = true;
+      }
+
+      if (hasError) {
+        showError();
+        return;
+      }
+
+      // Salva turno
+      const turni = loadTurni();
+      turni.push({ nome, sigla, inizio, fine, colore });
+      saveTurni(turni);
+      renderTurni(listEl, turni, emptyHint, btnEdit);
+
+      // pulizia form per la prossima volta
+      resetAddForm();
+
+      // ritorna alla schermata Turni
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni");
+      }
+    });
+
+    // (eventuale toggle visualizza turnazione:
+    //  UI non presente ora, ma lasciamo pronte le API se serviranno)
+    // const visualOn = loadVisualToggle();
+    // ...
   }
 
   // ----------------------------

@@ -145,9 +145,9 @@
     UI: {
       // Label usate dal modulo theme.js per il riepilogo
       themeLabels: {
-        system: "Tema sistema",
-        light: "Tema chiaro",
-        dark: "Tema scuro"
+        system: "Sistema",
+        light: "Chiaro",
+        dark: "Scuro"
       }
       // In futuro puoi aggiungere qui altre label condivise usate dallo script
     },

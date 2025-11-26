@@ -16,7 +16,7 @@
   color: var(--subtext);
 }
 
-/* Toggle switch turnazione */
+/* Toggle switch turnazione (al momento non usata in UI ma lasciata pronta) */
 
 .toggle-switch {
   width: 44px;
@@ -58,7 +58,11 @@
   transform: translateX(18px);
 }
 
-/* Card turni (vecchia sezione, ancora usabile in futuro se serve) */
+/* =========================
+   VECCHIA CARD TURNI (sezione collapsabile)
+   Ancora usabile in futuro se serve,
+   ma non più referenziata dall'HTML attuale.
+   ========================= */
 
 .turni-section {
   margin-top: 4px;
@@ -163,7 +167,9 @@
   transform: translateY(1px);
 }
 
-/* Lista turni salvati */
+/* =========================
+   LISTA TURNI SALVATI
+   ========================= */
 
 .turni-list {
   margin-top: 10px;
@@ -172,10 +178,19 @@
   gap: 6px;
 }
 
+.turni-empty-hint {
+  margin: 8px 2px 0 2px;
+  font-size: var(--fs-meta);
+  color: var(--subtext);
+}
+
+/* Singola riga turno:
+   [SIGLA]  Nome turno   06:55 - 13:08
+*/
 .turno-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 6px 8px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -186,14 +201,25 @@
   background: rgba(15,23,42,0.6);
 }
 
-/* pallino colore nella lista */
-.turno-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
+/* pill quadrata per la sigla:
+   stessa idea dei giorni calendario, ma aspect ratio 1 */
+.turno-sigla-pill {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface-strong);
   border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: 0 1px 2px rgba(15,23,42,0.35);
   flex-shrink: 0;
+}
+
+.turno-sigla {
+  font-size: var(--fs-row-subtext);
+  font-weight: 600;
+  color: var(--text); /* verrà sovrascritto in inline-style col colore sigla */
 }
 
 .turno-name {
@@ -202,19 +228,14 @@
   color: var(--text);
 }
 
-.turno-sigla {
-  font-size: var(--fs-meta);
-  font-weight: 600;
-  color: var(--text);
-  opacity: 0.9;
-}
-
 .turno-orario {
   margin-left: auto;
   font-size: var(--fs-meta);
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
 }
+
+/* Etichette + input */
 
 .turni-label {
   display: block;
@@ -238,12 +259,29 @@
   appearance: none;
 }
 
+:root[data-theme="dark"] .turni-input {
+  background: rgba(15,23,42,0.7);
+}
+
+.turni-input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
+}
+
+/* stato errore validazione */
+.turni-input.is-invalid {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 1px rgba(220,38,38,0.6);
+}
+
+/* Layout tempo/colore */
+
 .turni-row-time-color {
   align-items: flex-end;
 }
 
 .turni-field-color {
-  max-width: 100px;
+  max-width: 110px;
 }
 
 .turni-color-dot {
@@ -255,15 +293,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-:root[data-theme="dark"] .turni-input {
-  background: rgba(15,23,42,0.7);
-}
-
-.turni-input:focus-visible {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
 }
 
 /* Colore turno */
@@ -384,6 +413,43 @@
 .pill-btn:active,
 .icon-circle-btn:active {
   transform: translateY(1px);
+}
+
+/* =========================
+   TOOLBAR "AGGIUNGI TURNO"
+   ========================= */
+
+.turni-add-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* bottone Salva evidenziato */
+.turni-save-btn {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 10px rgba(10,132,255,0.35);
+}
+
+.turni-save-btn:active {
+  transform: translateY(1px);
+}
+
+/* Messaggio errore "Compila tutti i campi" */
+
+.turni-error {
+  margin: 2px 4px 8px;
+  font-size: var(--fs-meta);
+  color: #dc2626;
+}
+
+.turni-error[hidden] {
+  display: none;
 }
 
 /* =========================

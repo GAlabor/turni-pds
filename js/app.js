@@ -22,10 +22,30 @@
           const isCalendarActive =
             calendarView && calendarView.classList.contains("is-active");
 
-          if (isCalendarActive &&
-              window.Calendar &&
-              typeof Calendar.resetToToday === "function") {
+          if (
+            isCalendarActive &&
+            window.Calendar &&
+            typeof Calendar.resetToToday === "function"
+          ) {
             Calendar.resetToToday();
+            return;
+          }
+        }
+
+        // TAB IMPOSTAZIONI:
+        // se la vista settings è già attiva → torna al menu principale Impostazioni
+        if (target === "settings") {
+          const settingsView = document.querySelector(".view-settings");
+          const isSettingsActive =
+            settingsView && settingsView.classList.contains("is-active");
+
+          if (
+            isSettingsActive &&
+            window.SettingsUI &&
+            typeof SettingsUI.showMain === "function"
+          ) {
+            SettingsUI.showMain();
+            // niente toggle viste: siamo già su settings, abbiamo solo resettato il pannello
             return;
           }
         }
