@@ -17,7 +17,7 @@
 /* Hint mostrato quando non ci sono turni salvati */
 .turni-empty-hint {
   margin: 8px 2px 0 2px;
-  font-size: var(--fs-meta);
+  font-size: var(--fs-turni-form-hint); /* FONT 14 hint */
   color: var(--subtext);
 }
 
@@ -51,20 +51,20 @@
 }
 
 .turno-sigla {
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-sigla); /* FONT 11 */
   font-weight: 600;
   color: var(--text); /* sovrascritto inline con il colore scelto */
 }
 
 .turno-name {
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-nome); /* FONT 12 */
   font-weight: 500;
   color: var(--text);
 }
 
 .turno-orario {
   margin-left: auto;
-  font-size: var(--fs-meta);
+  font-size: var(--fs-turni-orario); /* FONT 13 */
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
 }
@@ -88,7 +88,7 @@
 
 .turni-label {
   display: block;
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-form-label); /* FONT 14 */
   font-weight: 500;
   color: var(--text);
   margin-bottom: 4px;
@@ -101,7 +101,7 @@
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
   padding: 0 12px;
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-form-input); /* FONT 14 */
   color: var(--text);
   outline: none;
   -webkit-appearance: none;
@@ -154,8 +154,8 @@
 
 /* Colore turno */
 .turni-color-preview {
-  width: 20px;
-  height: 20px;
+  width: var(--color-dot-size);
+  height: var(--color-dot-size);
   border-radius: 999px;
   border: 1px solid var(--border);
   box-shadow: 0 2px 4px rgba(15,23,42,0.25);
@@ -192,12 +192,12 @@
   gap: 12px;
 }
 
-/* Titolo interno del pannello Turni (più piccolo del titolo pagina) */
+/* Titolo interno del pannello Turni (FONT 9, più piccolo del titolo pagina) */
 .turni-panel-title {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--fs-turni-panel-title-desktop);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ls-turni-panel-title);
 }
 
 /* Contenitore dei controlli a destra (Modifica + "+") */
@@ -249,7 +249,7 @@
    subito sotto il pulsante Salva */
 .turni-error {
   margin: 0 2px 4px;
-  font-size: var(--fs-meta);
+  font-size: var(--fs-turni-form-hint);
   color: #dc2626;
 }
 
@@ -267,7 +267,7 @@
   }
 
   .turni-panel-title {
-    font-size: 17px;
+    font-size: var(--fs-turni-panel-title-mobile);
   }
 
   .turni-card-actions {

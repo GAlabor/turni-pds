@@ -1,6 +1,6 @@
-/* components.css
+/* 
 ===========================================
- Turni PDS
+ Turni PDS — components.css
  Componenti UI condivisi (card, bottoni, stato)
 ===========================================
 */
@@ -67,15 +67,37 @@
 
 /* Pulsanti frecce mese (calendario) */
 .nav-btn {
-  width: 48px;
-  height: 48px;
+  width: var(--icon-circle-lg);
+  height: var(--icon-circle-lg);
   box-shadow: 0 4px 10px rgba(15,23,42,0.08);
-  color: var(--nav-fg);
+  color: var(--color-arrow-month);
 }
 
-/* SVG interni dei bottoni icona tondi */
-.nav-btn svg,
-.settings-back svg,
+/* SVG frecce mese calendario */
+.nav-btn svg {
+  width: var(--icon-arrow-size);
+  height: var(--icon-arrow-size);
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-arrow-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* SVG icona BACK impostazioni */
+.settings-back svg {
+  width: var(--icon-back-size);
+  height: var(--icon-back-size);
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-arrow-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* SVG interni dei bottoni icona tondi generici (es. "+") */
 .icon-circle-btn svg {
   width: 22px;
   height: 22px;
@@ -122,8 +144,8 @@
 
 @media (max-width: 900px) {
   .nav-btn {
-    width: 44px;
-    height: 44px;
+    width: var(--icon-circle-lg-mobile);
+    height: var(--icon-circle-lg-mobile);
     border-radius: 50%;
   }
 }
@@ -146,7 +168,7 @@
   /* altezza allineata al cerchio */
   height: 32px;
   padding: 0 14px;
-  font-size: var(--fs-row-label);
+  font-size: var(--fs-pill-btn);
   font-weight: 600;
   color: var(--text);
   cursor: pointer;
@@ -188,8 +210,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--icon-circle-sm);
+  height: var(--icon-circle-sm);
   padding: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -209,8 +231,8 @@
   top: 20px;   /* più giù */
   right: 16px;
   z-index: 9999;
-  width: 34px;
-  height: 34px;
+  width: var(--icon-circle-md);
+  height: var(--icon-circle-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,8 +241,8 @@
 
 /* SVG login.svg iniettato in #icoStatus da Icons.loadStatusIcon() */
 #icoStatus svg {
-  width: 48px;   /* icona più grande */
-  height: 48px;
+  width: var(--status-icon-size);   /* icona più grande */
+  height: var(--status-icon-size);
   display: block;
 }
 

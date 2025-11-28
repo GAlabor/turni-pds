@@ -69,7 +69,35 @@
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
 
   /* =========================
-     TIPO / TESTI GLOBALI
+     ICON / CONTROL SIZES
+     (cerchi, frecce, status, pallini colore)
+     ========================= */
+
+  /* Cerchi bottoni icona:
+     - FONT 15/16 come dimensione contenitore frecce/back
+       (icone vere gestite sotto) */
+  --icon-circle-lg: 48px;  /* frecce mese calendario (.nav-btn, desktop) */
+  --icon-circle-lg-mobile: 44px; /* frecce mese calendario (.nav-btn, mobile) */
+  --icon-circle-md: 34px;  /* back impostazioni (.settings-back), slot icona stato (.app-status) */
+  --icon-circle-sm: 32px;  /* "+" Turni (.icon-circle-btn) */
+
+  /* Pallino colore sigla Turni */
+  --color-dot-size: 20px;  /* .turni-color-preview */
+
+  /* Icona omino stato (SVG interno) */
+  --status-icon-size: 48px; /* #icoStatus svg */
+
+  /* Frecce mese calendario (icone SVG) */
+  --icon-arrow-size: 22px;     /* FONT 15 — dimensione SVG dentro .nav-btn */
+  --icon-arrow-stroke: 2.4;
+  --color-arrow-month: var(--nav-fg); /* colore frecce mese */
+
+  /* Freccia BACK impostazioni (icone SVG) */
+  --icon-back-size: 22px;      /* FONT 16 — dimensione SVG dentro .settings-back */
+  --color-back-icon: var(--text); /* colore freccia back */
+
+  /* =========================
+     TIPO / TESTI GLOBALI (SCALA BASE)
      ========================= */
 
   /* Font UI principale (usato da body) */
@@ -83,7 +111,7 @@
   --fs-page-subtitle: 14px;
 
   /* Titoli secondari / barre (es: label impostazioni, intestazioni pannelli come "Turni") */
-  --fs-section-title: 24px;
+  --fs-section-title: 24px; /* alias per header calendario di default */
 
   /* Label di riga (impostazioni, righe elenco, ecc.) */
   --fs-row-label: 15px;
@@ -92,11 +120,110 @@
   /* Testi secondari / summary / hint (es. .settings-hint, descrizioni brevi) */
   --fs-row-subtext: 13px;
 
+  /* Riepilogo a destra nelle righe impostazioni
+   (es. "Sistema" nella riga Tema) */
+  --fs-settings-summary: 15px;  
+  --fw-settings-summary: 400;
+  --col-settings-summary: var(--subtext);
+  --ls-settings-summary: -0.00em;
+  
+
   /* Testi meta / micro (sigle, orari, badge piccoli) */
   --fs-meta: 12px;
 
   /* Label tabbar desktop (testo sotto le icone) */
   --fs-tab-label: 11px;
+
+  /* =========================
+     TIPO / TOKENS SPECIFICI (MAPPATI AI "FONT N")
+     ========================= */
+
+  /* FONT 1 — Titolo grande pagina:
+     - .app-title (Turni, Riepilogo, Inserimenti e Pagamenti, Impostazioni)
+     - header Impostazioni (id="settingsTitle" anche quando mostra sottovoci)
+  */
+  --fs-title-lg: 34px;
+  --ls-title-lg: -0.035em;        /* desktop */
+  --ls-title-lg-mobile: -0.025em; /* mobile */
+
+  /* FONT 2 — Intestazione calendario:
+     - .month-label ("Novembre 2025", "2025", "2020 - 2031")
+  */
+  --fs-cal-header: 24px;
+
+  /* FONT 3 — Giorni settimana calendario:
+     - .dow (Lun, Mar, ... Dom)
+  */
+  --fs-cal-dow-desktop: 13px;
+  --fs-cal-dow-mobile: 11px;
+
+  /* Numero giorno nelle celle calendario (grid) */
+  --fs-cal-day-desktop: 18px;
+  --fs-cal-day-mobile: 14px;
+
+  /* FONT 4 — Celle selezione mesi / anni:
+     - .month-cell (Gen, Feb, ...)
+     - .year-cell  (2024, 2025, ...)
+  */
+  --fs-cal-month-cell: 17px;
+  --fs-cal-year-cell: 16px;
+
+  /* FONT 5 / 6 — Icona calendario (gestiti in SVG, qui solo token):
+     - #calDay   → giorno (es. "24")
+     - #calMonth → mese corto (es. "NOV")
+  */
+  --fs-cal-icon-day: 10px;
+  --fs-cal-icon-month: 7px;
+
+  /* FONT 7 — Voci menu principali Impostazioni:
+     - .settings-row-label in .view-settings
+       (Turni, Indennità, Festività, Tema, Versione, Info)
+  */
+  --fs-settings-menu-desktop: 18px;
+  --fs-settings-menu-mobile: 17px;
+  --ls-settings-menu: -0.015em; /* letter-spacing per le voci menu impostazioni */
+
+  /* FONT 8 — Voci secondarie menu:
+     - testo interno .settings-choice (Sistema, Chiaro, Scuro)
+  */
+  --fs-settings-choice: 13px;
+
+  /* FONT 9 — Titolo pannello Turni:
+     - .turni-panel-title ("Turni" nella card Turni)
+  */
+  --fs-turni-panel-title-desktop: 18px;
+  --fs-turni-panel-title-mobile: 17px;
+  --ls-turni-panel-title: -0.02em;
+
+  /* FONT 10 — Bottoni pillola:
+     - .pill-btn (es. "Modifica" nel pannello Turni)
+  */
+  --fs-pill-btn: 15px;
+
+  /* FONT 11 — Sigla turno nel quadrato:
+     - .turno-sigla
+  */
+  --fs-turni-sigla: 13px;
+
+  /* FONT 12 — Nome turno:
+     - .turno-name
+  */
+  --fs-turni-nome: 13px;
+
+  /* FONT 13 — Orario turno (grigio):
+     - .turno-orario
+  */
+  --fs-turni-orario: 12px;
+
+  /* FONT 14 — Form "Aggiungi turno":
+     - .turni-label (etichette)
+     - .turni-input (campi testo/ora)
+  */
+  --fs-turni-form-label: 13px;
+  --fs-turni-form-input: 13px;
+  --fs-turni-form-hint: 12px;
+
+  /* (FONT 15/16 sono già coperti nelle variabili ICON / CONTROL SIZES in alto) */
 }
 
 /* Tema “system” scuro, solo se NON è forzato un tema via data-theme */
@@ -124,6 +251,9 @@
 
     --tabColor: #6b7280;
     --tabActiveColor: #4b8dff;
+
+    --color-arrow-month: var(--nav-fg);
+    --color-back-icon: var(--text);
   }
 }
 
@@ -151,6 +281,9 @@
 
   --tabColor: #6b7280;
   --tabActiveColor: #4b8dff;
+
+  --color-arrow-month: var(--nav-fg);
+  --color-back-icon: var(--text);
 }
 
 /* =========================
@@ -207,9 +340,9 @@ body {
 /* Titolo principale di pagina */
 .app-title {
   margin: 0;
-  font-size: var(--fs-page-title);
+  font-size: var(--fs-title-lg);
   font-weight: var(--fw-page-title);
-  letter-spacing: -0.035em;
+  letter-spacing: var(--ls-title-lg);
 }
 
 /* =========================
@@ -228,9 +361,9 @@ body {
   }
 
   .app-title {
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.025em;
+    font-size: 24px;                /* valore storico mobile */
+    font-weight: 600;               /* più leggero rispetto al 700 desktop */
+    letter-spacing: var(--ls-title-lg-mobile);
   }
 }
 

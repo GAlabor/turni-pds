@@ -146,6 +146,30 @@
 }
 
 /* =========================
+   ICONA CALENDARIO (tabbar)
+   Testi interni:
+   - FONT 5 → giorno (#calDay)
+   - FONT 6 → mese (#calMonth)
+   ========================= */
+
+#icoCalendar #calDay {
+  font-family: var(--font-ui);
+  font-size: var(--fs-cal-icon-day);   /* FONT 5 */
+  font-weight: 760;
+  fill: currentColor;
+  stroke: none;
+}
+
+#icoCalendar #calMonth {
+  font-family: var(--font-ui);
+  font-size: var(--fs-cal-icon-month); /* FONT 6 */
+  font-weight: 650;
+  fill: currentColor;
+  stroke: none;
+}
+
+
+/* =========================
    VERSION LABEL (in basso a sinistra)
    ========================= */
 

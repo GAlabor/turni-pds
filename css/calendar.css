@@ -1,6 +1,6 @@
-/* calendar.css
+/* 
 ===========================================
- Turni PDS
+ Turni PDS — calendar.css
  Vista calendario: giorni / mesi / anni
  calendar.css
 ===========================================
@@ -27,7 +27,7 @@
    - giorni → mesi → anni (gestito da calendar.js)
 */
 .month-label {
-  font-size: var(--fs-section-title);
+  font-size: var(--fs-cal-header); /* FONT 2 */
   font-weight: 600;
   cursor: pointer;
 }
@@ -76,7 +76,7 @@
   text-align: center;
   font-weight: 600;
   color: var(--dow-muted);
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-cal-dow-desktop); /* FONT 3 */
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -102,7 +102,7 @@
   background: var(--surface-strong);
   padding: 12px 12px 16px;
   text-align: right;
-  font-size: 18px;
+  font-size: var(--fs-cal-day-desktop); /* numero giorno, FONT dedicato */
   border-radius: 18px;
   border: 1px solid var(--border);
   transition: 0.16s ease;
@@ -231,7 +231,7 @@
   border: 1px solid var(--border);
   padding: 16px 10px;
   text-align: center;
-  font-size: 17px;
+  font-size: var(--fs-cal-month-cell); /* FONT 4 */
   font-weight: 600;
   cursor: pointer;
   min-height: 72px;
@@ -279,7 +279,7 @@
   border: 1px solid var(--border);
   padding: 14px 10px;
   text-align: center;
-  font-size: 16px;
+  font-size: var(--fs-cal-year-cell); /* FONT 4 */
   font-weight: 600;
   cursor: pointer;
   min-height: 64px;
@@ -316,7 +316,7 @@
   }
 
   .month-label {
-    font-size: 20px;
+    font-size: 20px; /* manteniamo il valore storico mobile */
   }
 
   .calendar-container {
@@ -330,7 +330,7 @@
   }
 
   .dow {
-    font-size: var(--fs-tab-label); /* 11px */
+    font-size: var(--fs-cal-dow-mobile); /* FONT 3 mobile */
     padding: 4px 0;
   }
 
@@ -342,7 +342,7 @@
     border-radius: 14px;
     padding: 6px 6px 10px;
     min-height: 58px; /* altezza celle giorni */
-    font-size: 14px;
+    font-size: var(--fs-cal-day-mobile); /* numero giorno mobile */
     box-shadow: none;
   }
 

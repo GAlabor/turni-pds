@@ -1,6 +1,6 @@
-/* settings.css
+/* 
 ===========================================
- Turni PDS
+ Turni PDS — settings.css
  Layout vista Impostazioni + contenitori
 ===========================================
 */
@@ -101,24 +101,28 @@
   min-width: 0;
 }
 
-/* Lato destro riga (summary + chevron) */
+/* Lato destro riga (summary + chevron > a destra) */
 .settings-row-right {
   display: inline-flex;
   align-items: center;
   gap: 12px;
 }
 
-/* Label riga Impostazioni (re-uses .settings-row-label da components.css) */
+/* Label riga Impostazioni (FONT 7)
+   usa token dedicati per dimensione + letter-spacing */
 .view-settings .settings-row-label {
-  font-size: 18px;
-  letter-spacing: -0.015em;
+  font-size: var(--fs-settings-menu-desktop);
+  letter-spacing: var(--ls-settings-menu);
 }
 
 /* Testo riassuntivo a destra (es. "Sistema", "Chiaro", "Scuro") */
 .settings-row-summary {
-  font-size: 15px;
-  color: var(--subtext);
+  font-size: var(--fs-settings-summary);
+  font-weight: var(--fw-settings-summary);
+  color: var(--col-settings-summary);
+  letter-spacing: var(--ls-settings-summary);
 }
+
 
 /* Chevron riga impostazioni → icona laterale */
 .settings-row-chevron {
@@ -168,9 +172,9 @@
 /* usa la base comune dei bottoni icona da components.css
    (classe .settings-back usata nell’header principale Impostazioni) */
 .settings-back {
-  width: 34px;
-  height: 34px;
-  color: var(--text);
+  width: var(--icon-circle-md);
+  height: var(--icon-circle-md);
+  color: var(--color-back-icon);
   display: flex;
 }
 
@@ -190,7 +194,7 @@
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.04);
   cursor: pointer;
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-settings-choice); /* FONT 8 */
   margin-bottom: 10px;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -233,11 +237,7 @@
   }
 
   .view-settings .settings-row-label {
-    font-size: 17px;
-  }
-
-  .settings-row-summary {
-    font-size: 14px;
+    font-size: var(--fs-settings-menu-mobile);
   }
 
   .settings-choice {
