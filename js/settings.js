@@ -1,11 +1,14 @@
-// settings.js
-
 // ============================
-// Navigazione schermate impostazioni
+// Navigazione schermate Impostazioni
+// Gestisce:
+// - lista principale (.settings-main)
+// - pannelli secondari (.settings-panel[data-settings-id])
+// - header dinamico + pulsante back
+// - API globale SettingsUI usata da app.js e turni.js
 // ============================
 
 (function () {
-  // piccolo contenitore interno per l'API
+  // contenitore interno per esporre le funzioni reali
   const settingsApi = {
     showMainFn: null,
     showPanelFn: null
@@ -27,6 +30,9 @@
 
     let activePanelId = null;
 
+    // ----------------------------
+    // Util: gestione pulsante back
+    // ----------------------------
     function hideBackBtn() {
       backBtn.hidden = true;
       backBtn.style.display = "none";
@@ -34,19 +40,27 @@
 
     function showBackBtn() {
       backBtn.hidden = false;
-      // inline-flex per allinearsi bene con il titolo
+      // inline-flex per allinearsi bene col titolo
       backBtn.style.display = "inline-flex";
     }
 
+    // ----------------------------
+    // Header: titolo per main e pannelli
+    // ----------------------------
+
+    // Titolo quando siamo sulla lista principale Impostazioni
     function setHeaderForMain() {
       titleEl.textContent = "Impostazioni";
       hideBackBtn();
     }
 
+    // Titolo quando siamo su un pannello secondario:
+    // - se il pannello ha data-settings-title → usa quello
+    // - altrimenti "Impostazioni - <label riga corrispondente>"
     function setHeaderForPanel(id) {
       let label = id;
 
-      // 1) Se il pannello dichiara un titolo specifico → usiamo quello (es: "Aggiungi turno")
+      // 1) Pannello con titolo custom (es: "Aggiungi turno")
       const panel = settingsView.querySelector(`.settings-panel[data-settings-id="${id}"]`);
       if (panel && panel.dataset.settingsTitle) {
         titleEl.textContent = panel.dataset.settingsTitle;
@@ -54,7 +68,7 @@
         return;
       }
 
-      // 2) Altrimenti, recupera l'etichetta dal bottone corrispondente
+      // 2) Recupera testo dalla riga principale di impostazioni
       const row = settingsView.querySelector(`.settings-row[data-settings-page="${id}"]`);
       if (row) {
         const lblEl = row.querySelector(".settings-row-label");
@@ -66,6 +80,10 @@
       titleEl.textContent = `Impostazioni - ${label}`;
       showBackBtn();
     }
+
+    // ----------------------------
+    // Switch vista: main / pannelli
+    // ----------------------------
 
     function showMain() {
       activePanelId = null;
@@ -84,14 +102,18 @@
       setHeaderForPanel(id);
     }
 
-    // espone le funzioni reali all'API globale
+    // esponi le funzioni interne all’API globale
     settingsApi.showMainFn  = showMain;
     settingsApi.showPanelFn = showPanel;
 
-    // stato iniziale → schermata principale SENZA freccia
+    // stato iniziale → schermata principale senza freccia
     showMain();
 
-    // click sulle righe della lista principale
+    // ----------------------------
+    // Eventi UI
+    // ----------------------------
+
+    // click sulle righe della lista principale (aprono il pannello corrispondente)
     rows.forEach(row => {
       row.addEventListener("click", () => {
         const id = row.dataset.settingsPage;
@@ -102,7 +124,7 @@
     // click sulla freccia in alto a sinistra
     backBtn.addEventListener("click", () => {
       // Caso speciale: se siamo nel pannello "Aggiungi turno",
-      // il back riporta al pannello "Turni", non alla main list.
+      // il back riporta al pannello "Turni", NON alla main list.
       if (activePanelId === "turni-add") {
         showPanel("turni");
         return;
@@ -112,7 +134,11 @@
     });
   }
 
+  // ============================
+  // API globale SettingsUI
+  // ============================
   window.SettingsUI = {
+    // inizializzazione chiamata da app.js
     init: initSettingsNavigation,
 
     // usato da app.js quando tocchi la tab Impostazioni

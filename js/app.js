@@ -1,13 +1,15 @@
-// app.js
-
 // ============================
 // Bootstrap UI core
+// - Inizializza moduli principali
+// - Gestisce il comportamento della tabbar
 // ============================
 
 (function () {
-  // Tabbar: switch viste
+  // ============================
+  // Tabbar: switch viste principali
+  // ============================
   function initTabs() {
-    const tabs = document.querySelectorAll(".tab");
+    const tabs  = document.querySelectorAll(".tab");
     const views = document.querySelectorAll(".view");
 
     if (!tabs.length || !views.length) return;
@@ -16,7 +18,8 @@
       tab.addEventListener("click", () => {
         const target = tab.dataset.tab;
 
-        // TAB CALENDARIO: se è già attiva → torna a oggi
+        // TAB CALENDARIO:
+        // se è già attiva → torna al mese/giorno corrente (resetToToday)
         if (target === "calendar") {
           const calendarView = document.querySelector(".view-calendar");
           const isCalendarActive =
@@ -44,13 +47,15 @@
             window.SettingsUI &&
             typeof SettingsUI.showMain === "function"
           ) {
+            // siamo già su settings → resetta solo il pannello
             SettingsUI.showMain();
-            // niente toggle viste: siamo già su settings, abbiamo solo resettato il pannello
             return;
           }
         }
 
-        // Comportamento standard delle tab
+        // Comportamento standard delle tab:
+        // - aggiorna stato .active sui bottoni
+        // - mostra/nasconde le viste con .is-active
         tabs.forEach(t => t.classList.toggle("active", t === tab));
         views.forEach(v => {
           v.classList.toggle("is-active", v.dataset.view === target);
@@ -59,33 +64,43 @@
     });
   }
 
+  // ============================
+  // Bootstrap all’avvio
+  // ============================
   window.addEventListener("DOMContentLoaded", () => {
-    // Stato prima di tutto: gli altri possono usarlo tranquillamente
+    // Stato prima di tutto: gli altri possono usarlo subito
     if (window.Status && typeof Status.init === "function") {
       Status.init();
     }
 
+    // Calendario (vista principale)
     if (window.Calendar && typeof Calendar.init === "function") {
       Calendar.init();
     }
 
+    // Tema (applica data-theme + sincronizza UI tema)
     if (window.Theme && typeof Theme.init === "function") {
       Theme.init();
     }
 
+    // Tabbar (switch tra le viste principali)
     initTabs();
 
+    // Icone SVG (tabbar + icona stato)
     if (window.Icons && typeof Icons.initTabbar === "function") {
       Icons.initTabbar();
+
       if (typeof Icons.loadStatusIcon === "function") {
         Icons.loadStatusIcon();
       }
     }
 
+    // Navigazione Impostazioni (lista principale + pannelli)
     if (window.SettingsUI && typeof SettingsUI.init === "function") {
       SettingsUI.init();
     }
 
+    // Pannello Turni (lista + form "Aggiungi turno")
     if (window.Turni && typeof Turni.init === "function") {
       Turni.init();
     }

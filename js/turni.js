@@ -1,20 +1,23 @@
-// turni.js
-
 // ============================
-// Pannello Turni
+// Pannello Turni (Impostazioni → Turni)
+// - Gestione storage turni (localStorage)
+// - Render lista turni salvati
+// - Form "Aggiungi turno"
+// - Toggle "visualizza turnazione" (solo storage, non agganciato alla UI)
 // ============================
 
 (function () {
   if (!window.AppConfig) {
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (turni.js)");
   }
+
   const { STORAGE_KEYS } = window.AppConfig;
   const TURNI_KEY     = STORAGE_KEYS.turni;
   const TURNI_VIS_KEY = STORAGE_KEYS.turniVisualizza;
 
-  // ----------------------------
-  // Storage: turni
-  // ----------------------------
+  // ============================
+  // Storage: turni personalizzati
+  // ============================
 
   function loadTurni() {
     try {
@@ -30,6 +33,7 @@
   function saveTurni(turni) {
     try {
       localStorage.setItem(TURNI_KEY, JSON.stringify(turni));
+
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();
       }
@@ -38,10 +42,10 @@
     }
   }
 
-  // ----------------------------
+  // ============================
   // Storage: toggle visualizzazione turnazione
-  // (non ancora agganciato al calendario nel layout attuale)
-  // ----------------------------
+  // (solo storage; non ancora collegato al calendario nella UI attuale)
+  // ============================
 
   function loadVisualToggle() {
     try {
@@ -57,6 +61,7 @@
   function saveVisualToggle(isOn) {
     try {
       localStorage.setItem(TURNI_VIS_KEY, isOn ? "true" : "false");
+
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();
       }
@@ -65,9 +70,10 @@
     }
   }
 
-  // ----------------------------
+  // ============================
   // Render lista turni
-  // ----------------------------
+  // Usata nel pannello Impostazioni → Turni
+  // ============================
 
   function renderTurni(listEl, turni, emptyHintEl, editBtn) {
     if (!listEl) return;
@@ -125,12 +131,12 @@
     });
   }
 
-  // ----------------------------
+  // ============================
   // Util: parsing / validazione orario
   // Accetta 00:00 .. 23:59 e 24:00
   // (se usi <input type="time"> il browser non ti farà inserire 24:00,
   // ma la funzione resta compatibile)
-  // ----------------------------
+  // ============================
 
   function isValidTime(str) {
     if (typeof str !== "string") return false;
@@ -138,8 +144,9 @@
     const m = /^(\d{1,2}):(\d{2})$/.exec(s);
     if (!m) return false;
 
-    const h = parseInt(m[1], 10);
+    const h   = parseInt(m[1], 10);
     const min = parseInt(m[2], 10);
+
     if (Number.isNaN(h) || Number.isNaN(min)) return false;
     if (min < 0 || min > 59) return false;
     if (h < 0 || h > 24) return false;
@@ -148,9 +155,10 @@
     return true;
   }
 
-  // ----------------------------
-  // Init pannello UI
-  // ----------------------------
+  // ============================
+  // Init pannello UI Turni
+  // (lista + pannello "Aggiungi turno")
+  // ============================
 
   function initTurniPanel() {
     const settingsView = document.querySelector(".view-settings");
@@ -158,7 +166,7 @@
 
     // Pannello principale turni (lista)
     const panelTurni = settingsView.querySelector('.settings-panel.settings-turni[data-settings-id="turni"]');
-    // Pannello aggiungi turno
+    // Pannello "Aggiungi turno"
     const panelAdd   = settingsView.querySelector('.settings-panel.settings-turni-add[data-settings-id="turni-add"]');
 
     if (!panelTurni || !panelAdd) return;
@@ -169,7 +177,7 @@
     const btnAdd     = panelTurni.querySelector("[data-turni-add]");
     const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
 
-    // --- elementi pannello Aggiungi turno ---
+    // --- elementi pannello "Aggiungi turno" ---
     const formEl       = panelAdd.querySelector("[data-turni-add-form]");
     const inputNome    = panelAdd.querySelector("#addTurnoNome");
     const inputSigla   = panelAdd.querySelector("#addTurnoSigla");
@@ -204,6 +212,7 @@
     }
 
     applyColorPreview();
+
     colorInput.addEventListener("input", applyColorPreview);
     colorInput.addEventListener("change", applyColorPreview);
 
@@ -212,7 +221,7 @@
     });
 
     // ----------------------------
-    // Form Aggiungi turno
+    // Gestione errori form "Aggiungi turno"
     // ----------------------------
 
     let errorTimer = null;
@@ -222,6 +231,7 @@
         clearTimeout(errorTimer);
         errorTimer = null;
       }
+
       errorEl.hidden = true;
 
       // rimuove stato errore dai campi
@@ -233,6 +243,7 @@
     function showError() {
       clearError();
       errorEl.hidden = false;
+
       errorTimer = setTimeout(() => {
         errorEl.hidden = true;
         [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => {
@@ -248,6 +259,10 @@
       });
     });
 
+    // ----------------------------
+    // Reset form Aggiungi turno
+    // ----------------------------
+
     function resetAddForm() {
       clearError();
       inputNome.value   = "";
@@ -258,15 +273,22 @@
       applyColorPreview();
     }
 
-    // Apertura pannello "Aggiungi turno" dal pulsante +
+    // ----------------------------
+    // Apertura pannello "Aggiungi turno"
+    // ----------------------------
+
     btnAdd.addEventListener("click", () => {
       resetAddForm();
+
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
         SettingsUI.openPanel("turni-add");
       }
     });
 
+    // ----------------------------
     // Salvataggio nuovo turno
+    // ----------------------------
+
     saveBtn.addEventListener("click", () => {
       clearError();
 
@@ -315,18 +337,17 @@
       }
     });
 
-    // (eventuale toggle visualizza turnazione in futuro)
-    // const visualOn = loadVisualToggle();
-    // ...
+    // (toggle visualizza turnazione potrà usare loadVisualToggle/saveVisualToggle in futuro)
   }
 
-  // ----------------------------
+  // ============================
   // API pubblica Turni
-  // ----------------------------
+  // ============================
 
   window.Turni = {
     init: initTurniPanel,
     getTurni: loadTurni,
-    getVisualizzaTurnazione: loadVisualToggle
+    getVisualizzaTurnazione: loadVisualToggle,
+    // saveVisualToggle resta interno per ora, ma è pronto se ti serve
   };
 })();

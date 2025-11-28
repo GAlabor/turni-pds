@@ -1,30 +1,42 @@
-// theme.js
-
 // ============================
 // Tema: system / light / dark
+// - Salvataggio preferenza in localStorage
+// - Attributo data-theme su <html>
+// - Sincronizzazione con pannello Impostazioni → Tema
 // ============================
 
 (function () {
   if (!window.AppConfig) {
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (theme.js)");
   }
+
   const { STORAGE_KEYS, UI } = window.AppConfig;
   const THEME_KEY    = STORAGE_KEYS.theme;
   const THEME_LABELS = UI.themeLabels || {};
 
-  // Applica il tema al <html>
+  // ============================
+  // Applicazione tema a <html>
+  // ============================
+
+  // Applica il tema al documento:
+  // - "light" / "dark" → data-theme sull’elemento <html>
+  // - "system" → rimozione data-theme, usa prefers-color-scheme
   function applyTheme(theme) {
     const root = document.documentElement;
 
     if (theme === "light" || theme === "dark") {
       root.setAttribute("data-theme", theme);
     } else {
-      // "system" → nessun data-theme, usa prefers-color-scheme
       root.removeAttribute("data-theme");
     }
   }
 
-  // Allinea UI: pulsanti tema + riepilogo in riga impostazioni
+  // ============================
+  // Sincronizzazione UI (pannello Tema)
+  // ============================
+
+  // Evidenzia il pulsante attivo e aggiorna il riepilogo
+  // in riga Impostazioni → Tema (elemento #themeSummary)
   function syncThemeUI(theme) {
     const choices = document.querySelectorAll(".settings-choice");
     choices.forEach(btn => {
@@ -38,7 +50,8 @@
     }
   }
 
-  // Riempie le label dei bottoni tema usando AppConfig.UI.themeLabels
+  // Riempie le label interne dei pulsanti tema
+  // usando AppConfig.UI.themeLabels (system / light / dark)
   function fillThemeLabels() {
     const labels = document.querySelectorAll("[data-theme-label]");
     labels.forEach(el => {
@@ -49,16 +62,21 @@
       if (typeof txt === "string" && txt.trim() !== "") {
         el.textContent = txt;
       } else {
-        // fallback decente se manca qualcosa in config
+        // fallback dignitoso se manca qualcosa nel config
         el.textContent = key;
       }
     });
   }
 
-  // Carica tema salvato da localStorage (default: system)
+  // ============================
+  // Caricamento / salvataggio tema
+  // ============================
+
+  // Legge il tema da localStorage (default: "system")
   function loadTheme() {
     let saved = localStorage.getItem(THEME_KEY);
     if (!saved) saved = "system";
+
     applyTheme(saved);
     syncThemeUI(saved);
   }
@@ -84,9 +102,14 @@
     });
   }
 
+  // ============================
+  // Init pubblico
+  // ============================
+
   function initTheme() {
-    // Prima riempiamo le label dei bottoni dal config,
-    // poi allineiamo stato theme salvato + UI.
+    // 1) riempie le etichette dei pulsanti dal config
+    // 2) applica il tema salvato
+    // 3) aggancia i listener di click
     fillThemeLabels();
     loadTheme();
     setupThemeControls();
