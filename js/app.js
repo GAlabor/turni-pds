@@ -2,6 +2,7 @@
 // Bootstrap UI core
 // - Inizializza moduli principali
 // - Gestisce il comportamento della tabbar
+// app.js
 // ============================
 
 (function () {

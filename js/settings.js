@@ -1,4 +1,5 @@
 // ============================
+// settings.js
 // Navigazione schermate Impostazioni
 // Gestisce:
 // - lista principale (.settings-main)

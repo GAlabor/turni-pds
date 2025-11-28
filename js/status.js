@@ -1,4 +1,5 @@
 // ============================
+// status.js
 // Icona stato / salvataggio
 // Usa l’elemento #statusIcon con classi:
 // - status-idle
