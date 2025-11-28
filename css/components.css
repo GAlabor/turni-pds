@@ -1,6 +1,7 @@
 /* 
 ===========================================
- Turni PDS — Mappa file components.css
+ Turni PDS — components.css
+ Componenti UI condivisi (card, bottoni, stato)
 ===========================================
 */
 
@@ -8,6 +9,11 @@
    CARD PRINCIPALI
    ========================= */
 
+/* Contenitori principali:
+   - calendario: .calendar-container
+   - viste semplici (Inspag, Riepilogo): .settings-container
+   (in .view-settings lo stile viene sovrascritto in settings.css)
+*/
 .calendar-container,
 .settings-container {
   background: var(--surface);
@@ -20,9 +26,11 @@
    LABEL / TESTI DI RIGA
    ========================= */
 
-/* Titoli delle righe (impostazioni, turni, ecc.) */
-.settings-row-label,
-.turni-row-label {
+/* Titoli delle righe (impostazioni, turni, ecc.)
+   usato da:
+   - <span class="settings-row-label"> nelle righe impostazioni
+*/
+.settings-row-label {
   font-size: var(--fs-row-label);
   font-weight: var(--fw-row-label);
   color: var(--text);
@@ -32,10 +40,13 @@
    PULSANTI / BOTTONI ICONA
    ========================= */
 
-/* Base comune per bottoni tondi con icona */
+/* Base comune per bottoni tondi con icona:
+   - .nav-btn        → frecce mese calendario
+   - .settings-back  → freccia back in Impostazioni
+   - .icon-circle-btn→ cerchio "+" in Turni e altri bottoni tondi
+*/
 .nav-btn,
 .settings-back,
-.turni-add-btn,
 .icon-circle-btn {
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -65,7 +76,6 @@
 /* SVG interni dei bottoni icona tondi */
 .nav-btn svg,
 .settings-back svg,
-.turni-add-btn svg,
 .icon-circle-btn svg {
   width: 22px;
   height: 22px;
@@ -122,6 +132,10 @@
    PULSANTE "PILLOLA" GENERICO
    ========================= */
 
+/* Bottone pillola generico:
+   usato come base anche per il "Modifica" in Turni (poi
+   ulteriormente rifinito in turni.css)
+*/
 .pill-btn {
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -145,7 +159,6 @@
     transform 0.08s ease-out;
 }
 
-
 @media (hover:hover) {
   .pill-btn:hover {
     background: var(--accent);
@@ -167,6 +180,7 @@
    BOTTONE ICONA TONDO COMPATTO
    ========================= */
 
+/* Cerchio con icona (es. "+" nel pannello Turni) */
 .icon-circle-btn {
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -183,11 +197,13 @@
   box-shadow: 0 4px 10px rgba(15,23,42,0.08);
 }
 
-
 /* =========================
    ICONA STATO / SALVATAGGIO
    ========================= */
 
+/* Contenitore fisso in alto a destra:
+   <div id="statusIcon" class="app-status status-idle"><div id="icoStatus"></div></div>
+*/
 .app-status {
   position: fixed;
   top: 20px;   /* più giù */
@@ -201,6 +217,7 @@
   pointer-events: none;
 }
 
+/* SVG login.svg iniettato in #icoStatus da Icons.loadStatusIcon() */
 #icoStatus svg {
   width: 48px;   /* icona più grande */
   height: 48px;
@@ -212,7 +229,7 @@
   fill: var(--subtext);
 }
 
-/* Cerchio base: sempre pieno, mai animato */
+/* Cerchio base: sempre presente, mai animato */
 #icoStatus #loginCircleBase {
   stroke: var(--accent);
   fill: none;

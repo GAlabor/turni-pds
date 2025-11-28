@@ -2,45 +2,65 @@
   /* =========================
      PALETTE / LAYOUT BASE
      ========================= */
-  /* tema chiaro di default */
-  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
-  --bg-solid: #e7ecff;
-  --surface: rgba(255,255,255,0.88);
-  --surface-strong: rgba(255,255,255,0.96);
-  --border: rgba(120,130,170,0.18);
-  --text: #111827;
-  --subtext: #6b7280;
-  --accent: #0a84ff;
-  --radius-xl: 20px;
-  --radius: 14px;
-  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);
-  --shadow-light: 0 10px 26px rgba(15,23,42,0.12);
 
-  --dow-muted: #6b7280;
-  --weekend: #e25555;
-  --hover-bg: rgba(10,132,255,0.08);
-  --today-border: var(--accent);
+  /* Sfondo app (usato da body) */
+  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+
+  /* Superfici (card, contenitori principali) */
+  --surface: rgba(255,255,255,0.88);      /* .calendar-container, .settings-container, .turni-card, ecc. */
+  --surface-strong: rgba(255,255,255,0.96);
+
+  /* Bordi / linee di separazione */
+  --border: rgba(120,130,170,0.18);
+
+  /* Testo principale / secondario */
+  --text: #111827;     /* body, label, titoli secondari, ecc. */
+  --subtext: #6b7280;  /* hint, meta, sottotitoli, icone status, ecc. */
+
+  /* Colore accento / azioni principali */
+  --accent: #0a84ff;   /* hover, focus, today-border, bottoni, status, ecc. */
+
+  /* Raggi angoli card / componenti principali */
+  --radius-xl: 20px;   /* card grandi: .calendar-container, .settings-group-card, .turni-card */
+  --radius: 14px;      /* blocchi più piccoli / secondari */
+
+  /* Ombre globali per card / elementi sollevati */
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);  /* card principali */
+  --shadow-light: 0 10px 26px rgba(15,23,42,0.12); /* celle giorno, elementi minori */
+
+  /* Colori specifici calendario */
+  --dow-muted: #6b7280;     /* intestazione giorni settimana (.dow) */
+  --weekend: #e25555;       /* sabato/domenica in calendario */
+  --today-border: var(--accent); /* bordo giorno corrente */
+
+  /* Colore etichetta versione (in basso a sinistra) */
   --version-color: rgba(15,23,42,0.65);
 
-  /* distanza standard sopra ai contenitori settings */ 
+  /* Distanza standard sopra ai contenitori settings (Impostazioni, Inspag, Riepilogo, ecc.) */
   --settings-top-gap: 4px;
 
-  /* frecce mese */
+  /* Frecce mese calendario (.nav-btn in components.css, usate anche in Turni) */
   --nav-fg: #111827;
 
-  /* altezza logica tabbar (per padding body) */
+  /* =========================
+     TABBAR (MOBILE / DESKTOP)
+     ========================= */
+
+  /* Altezza logica tabbar (per padding body su mobile) */
   --tabbar-h: 78px;
 
-  /* tabbar palette */
+  /* Sfondo / bordo tabbar */
   --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
   --tabbar-border: rgba(148,163,184,0.4);
 
-  /* tabbar */
+  /* Dimensioni / stile tab (usati in tabbar.css) */
   --tabH: 54px;
-  --tabIcon: 38px; /* icone tabbar più grandi, struttura invariata */
+  --tabIcon: 38px;   /* icone tabbar più grandi */
   --tabMaxW: 120px;
-  --tabColor: #9ca3af;
-  --tabActiveColor: #0a84ff;
+  --tabColor: #9ca3af;        /* colore base icone/tab non attive */
+  --tabActiveColor: #0a84ff;  /* colore tab attiva */
+
+  /* Effetti interazione tab (hover / active) */
   --active-bright: 1.12;
   --active-contrast: 1.03;
   --icon-pop: 1.08;
@@ -51,40 +71,38 @@
   /* =========================
      TIPO / TESTI GLOBALI
      ========================= */
+
+  /* Font UI principale (usato da body) */
   --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 
-  /* Titolo grande di pagina (es: "Turni") */
+  /* Titolo grande di pagina (es: "Turni" in .app-title) */
   --fs-page-title: 34px;
   --fw-page-title: 700;
 
-  /* Sottotitolo di pagina (non usato al momento ma lasciato per futuro) */
+  /* Sottotitolo di pagina (placeholder futuro, nessuna classe dedicata attuale) */
   --fs-page-subtitle: 14px;
 
-  /* Titoli secondari / barre (es: label impostazioni, etichette "Turni") */
+  /* Titoli secondari / barre (es: label impostazioni, intestazioni pannelli come "Turni") */
   --fs-section-title: 24px;
 
-  /* Label di riga (impostazioni, turni, ecc.) */
+  /* Label di riga (impostazioni, righe elenco, ecc.) */
   --fs-row-label: 15px;
   --fw-row-label: 500;
 
-  /* Testi secondari / summary / hint */
+  /* Testi secondari / summary / hint (es. .settings-hint, descrizioni brevi) */
   --fs-row-subtext: 13px;
 
-  /* Testi meta / micro (sigle, piccoli hint) */
+  /* Testi meta / micro (sigle, orari, badge piccoli) */
   --fs-meta: 12px;
 
-  /* Label tabbar desktop */
+  /* Label tabbar desktop (testo sotto le icone) */
   --fs-tab-label: 11px;
-
-  /* Input / pillole */
-  --fs-input: 12px;
 }
 
 /* Tema “system” scuro, solo se NON è forzato un tema via data-theme */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
-    --bg-solid: #020617;
     --surface: rgba(15,23,42,0.94);
     --surface-strong: rgba(15,23,42,0.98);
     --border: rgba(148,163,184,0.26);
@@ -96,7 +114,6 @@
 
     --dow-muted: #9ca3af;
     --weekend: #ff8f8f;
-    --hover-bg: rgba(75,141,255,0.18);
     --today-border: var(--accent);
     --version-color: rgba(226,232,240,0.8);
 
@@ -110,10 +127,9 @@
   }
 }
 
-/* Forzatura tema scuro */
+/* Forzatura tema scuro (imposta data-theme="dark" sul <html>) */
 :root[data-theme="dark"] {
   --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
-  --bg-solid: #020617;
   --surface: rgba(15,23,42,0.94);
   --surface-strong: rgba(15,23,42,0.98);
   --border: rgba(148,163,184,0.26);
@@ -125,7 +141,6 @@
 
   --dow-muted: #9ca3af;
   --weekend: #ff8f8f;
-  --hover-bg: rgba(75,141,255,0.18);
   --today-border: var(--accent);
   --version-color: rgba(226,232,240,0.8);
 
@@ -171,6 +186,7 @@ body {
   margin: 0 auto;
 }
 
+/* Ogni .view corrisponde a una tab (Calendario, Inspag, Riepilogo, Impostazioni) */
 .view {
   display: none;
 }
@@ -188,17 +204,12 @@ body {
   gap: 8px;
 }
 
+/* Titolo principale di pagina */
 .app-title {
   margin: 0;
   font-size: var(--fs-page-title);
   font-weight: var(--fw-page-title);
   letter-spacing: -0.035em;
-}
-
-.app-subtitle {
-  margin: 4px 0 0 2px;
-  font-size: var(--fs-page-subtitle);
-  color: var(--subtext);
 }
 
 /* =========================
@@ -207,24 +218,19 @@ body {
 
 @media (max-width: 900px) {
   body {
-    /* meno padding laterale per dare più larghezza al calendario */
+    /* meno padding laterale per dare più larghezza al calendario,
+       spazio sotto per la tabbar (usa --tabbar-h) */
     padding: calc(env(safe-area-inset-top) + 26px) 4px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
 
   .app-header {
-    padding: 10px 4px 8px 4px; /* il 3 valore cambia lo spazio tra turni e frecce */
+    padding: 10px 4px 8px 4px; /* il 3° valore cambia lo spazio tra titolo e frecce mese */
   }
 
   .app-title {
     font-size: 24px;
     font-weight: 600;
     letter-spacing: -0.025em;
-  }
-
-  .app-subtitle {
-    font-size: 11px;
-    margin-top: 0;
-    opacity: 0.7;
   }
 }
 

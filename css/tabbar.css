@@ -1,8 +1,20 @@
 /* 
 ===========================================
- Turni PDS — Mappa file tabbar.css
+ Turni PDS — tabbar.css
+ Tabbar inferiore + label versione
 ===========================================
+*/
 
+/* =========================
+   TABBAR INFERIORE
+   ========================= */
+
+/* Barra inferiore fissa:
+   contiene i 4 tab:
+   - Calendario
+   - Riepilogo
+   - Ins/Pag
+   - Impostazioni
 */
 .tabbar {
   position: fixed;
@@ -23,6 +35,10 @@
   -webkit-touch-callout: none;
 }
 
+/* Singolo tab:
+   - icona (SVG iniettato da icons.js)
+   - label (desktop)
+*/
 .tab {
   position: relative;
   display: flex;
@@ -48,21 +64,19 @@
     filter .12s ease;
 }
 
-.tab::after {
-  display: none !important;
-}
-
+/* evita overlay strani: tutto il contenuto sopra eventuali effetti futuri */
 .tab > * {
   position: relative;
   z-index: 1;
 }
 
+/* Label sotto l’icona (solo desktop, vedi media query) */
 .tab-label {
   font-size: var(--fs-tab-label);
   line-height: 1;
 }
 
-/* hover desktop */
+/* Hover desktop: piccolo lift */
 @media (hover:hover) {
   .tab:hover {
     transform: translateY(var(--lift));
@@ -70,22 +84,31 @@
   }
 }
 
+/* Pressione (touch/mouse) */
 .tab:active {
   transform: translateY(var(--press));
 }
 
+/* Focus tastiera */
 .tab:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
 
-/* STATO ATTIVO: solo colore icona/testo, nessun contorno */
+/* Stato attivo:
+   - colore accent
+   - font leggermente più marcato
+*/
 .tab.active {
   color: var(--tabActiveColor);
   font-weight: 600;
   filter: none;
 }
 
+/* Icone tab:
+   - inizialmente invisibili
+   - resi visibili quando icons.js ha iniettato gli SVG
+*/
 .tab svg {
   width: var(--tabIcon);
   height: var(--tabIcon);
@@ -102,22 +125,33 @@
   visibility: hidden;
 }
 
+/* Icona nel tab attivo: leggermente più “piena” e pop */
 .tab.active svg {
   stroke-width: 1.6;
   transform: scale(var(--icon-pop));
 }
 
-/* touch */
+/* touch-only: leggero feedback luminosità */
 @media (hover:none) {
   .tab:active {
     filter: brightness(1.08) contrast(1.02);
   }
 }
 
+/* Quando le icone SVG sono state caricate da icons.js:
+   Icons.initTabbar() aggiunge .tabbar-icons-ready
+*/
+.tabbar.tabbar-icons-ready .tab svg {
+  visibility: visible;
+}
+
 /* =========================
-   VERSION BADGE
+   VERSION LABEL (in basso a sinistra)
    ========================= */
 
+/* Etichetta versione:
+   popolata da sw-register.js tramite #versionLabel
+*/
 .version-label {
   position: fixed;
   bottom: 6px;
@@ -143,7 +177,7 @@
     padding-inline: 10px;
   }
 
-  /* MOBILE: niente scritte sotto le icone */
+  /* MOBILE: niente scritte sotto le icone, solo i simboli */
   .tab-label {
     display: none;
   }
@@ -153,9 +187,4 @@
   .tab-label {
     display: block;
   }
-}
-
-/* Quando le icone SVG sono state caricate da icons.js */
-.tabbar.tabbar-icons-ready .tab svg {
-  visibility: visible;
 }

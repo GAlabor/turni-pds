@@ -2,7 +2,7 @@
 // Turni PDS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V5.8';
+const VERSION    = '2025-11-20 V6.6';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -59,11 +59,11 @@ const PRECACHE_URLS = [
   `${ROOT}/svg/add.svg`,
   `${ROOT}/svg/arrow-back.svg`,
   `${ROOT}/svg/arrow-right.svg`,
-  `${ROOT}/svg/arrow-down.svg`,
-  `${ROOT}/svg/arrow-up.svg`,
-  `${ROOT}/svg/cancel.svg`,
+  //`${ROOT}/svg/arrow-down.svg`,
+  //`${ROOT}/svg/arrow-up.svg`,
+  //`${ROOT}/svg/cancel.svg`,
   `${ROOT}/svg/calendar.svg`,
-  `${ROOT}/svg/check.svg`,
+  //`${ROOT}/svg/check.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
   `${ROOT}/svg/settings.svg`,

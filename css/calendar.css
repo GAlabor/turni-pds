@@ -1,9 +1,18 @@
 /* 
 ===========================================
- Turni PDS — Mappa file calendar.css
+ Turni PDS — calendar.css
+ Vista calendario: giorni / mesi / anni
 ===========================================
- */
+*/
 
+/* =========================
+   HEADER MESE (barra sopra il calendario)
+   ========================= */
+
+/* Barra con:
+   - titolo mese/anno (.month-label)
+   - frecce mese (.nav-btn da components.css)
+*/
 .monthbar {
   margin: 14px 0 20px 0; /* distacco dal titolo e dal calendario */
   display: flex;
@@ -12,19 +21,29 @@
   gap: 16px;
 }
 
+/* Etichetta mese/anno:
+   testo cliccabile che cambia modalità:
+   - giorni → mesi → anni (gestito da calendar.js)
+*/
 .month-label {
   font-size: var(--fs-section-title);
   font-weight: 600;
   cursor: pointer;
 }
 
-/* Contenitore calendario */
+/* =========================
+   CONTENITORE CALENDARIO
+   ========================= */
 
 .calendar-wrapper {
   display: flex;
   justify-content: center;
 }
 
+/* Contenitore principale calendario:
+   - classi di modalità aggiunte da calendar.js:
+     .mode-days / .mode-months / .mode-years
+*/
 .calendar-container {
   margin-top: 6px; /* contenitore giorni più giù */
   padding: 22px 18px 26px; /* meno padding laterale → più larghezza utile */
@@ -34,8 +53,13 @@
   -webkit-backdrop-filter: blur(22px);
 }
 
-/* Intestazioni giorni settimana */
+/* =========================
+   INTESTAZIONI GIORNI SETTIMANA
+   ========================= */
 
+/* Riga abbreviata:
+   Lun / Mar / ... / Dom
+*/
 .dow-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -43,6 +67,9 @@
   margin-bottom: 12px;
 }
 
+/* Singola label giorno:
+   usata solo in modalità giorni
+*/
 .dow {
   padding: 6px 0;
   text-align: center;
@@ -53,16 +80,23 @@
   letter-spacing: 0.06em;
 }
 
-/* Griglia giorni */
+/* =========================
+   GRIGLIA GIORNI
+   ========================= */
 
+/* Griglia principale per i giorni del mese:
+   celle .day create da calendar.js
+*/
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 10px; /* tiene un po’ respiro ma lascia più spazio alle celle */
 }
 
-/* Celle giorno */
-
+/* Celle giorno:
+   - classi aggiunte da calendar.js:
+     .weekend, .today, .empty
+*/
 .day {
   background: var(--surface-strong);
   padding: 12px 12px 16px;
@@ -77,6 +111,7 @@
   box-shadow: var(--shadow-light);
 }
 
+/* Highlight hover desktop (alone blu) */
 .day::before {
   content: "";
   position: absolute;
@@ -87,6 +122,7 @@
   pointer-events: none;
 }
 
+/* Celle vuote (prima del giorno 1, dopo la fine mese) */
 .day.empty {
   background: transparent;
   border: none;
@@ -94,6 +130,7 @@
   pointer-events: none;
 }
 
+/* Hover cella giorno */
 .day:hover {
   transform: translateY(-1px);
   border-color: var(--accent);
@@ -103,8 +140,9 @@
   opacity: 1;
 }
 
-/* Weekend e oggi */
-
+/* Weekend e oggi
+   (classi aggiunte da calendar.js)
+*/
 .weekend {
   color: var(--weekend);
 }
@@ -116,8 +154,13 @@
 
 /* ===================================
    MODALITÀ: GIORNI / MESI / ANNI
+   (gestite da calendar.js)
    =================================== */
 
+/* Griglie alternative per viste:
+   - .month-grid → vista mesi
+   - .year-grid  → vista anni
+*/
 .month-grid,
 .year-grid {
   display: none;
@@ -133,7 +176,10 @@
   display: none;
 }
 
-/* Modalità mesi */
+/* Modalità mesi:
+   - nasconde intestazione giorni
+   - mostra solo la griglia mesi
+*/
 .calendar-container.mode-months .dow-row {
   display: none;
 }
@@ -147,7 +193,10 @@
   display: grid;
 }
 
-/* Modalità anni */
+/* Modalità anni:
+   - nasconde intestazione giorni e griglia mesi
+   - mostra griglia anni
+*/
 .calendar-container.mode-years .dow-row {
   display: none;
 }
@@ -161,7 +210,9 @@
   display: grid;
 }
 
-/* Griglia mesi */
+/* =========================
+   VISTA MESI (mode-months)
+   ========================= */
 
 .month-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -169,6 +220,10 @@
   padding-top: 8px;
 }
 
+/* Singolo mese:
+   - etichetta breve (Gen, Feb, ...), testo inserito da calendar.js
+   - .is-current evidenzia il mese reale di oggi nello stesso anno
+*/
 .month-cell {
   background: var(--surface-strong);
   border-radius: 18px;
@@ -197,12 +252,15 @@
   box-shadow: 0 8px 18px rgba(10,132,255,0.25);
 }
 
+/* Mese corrispondente a oggi (stesso anno) */
 .month-cell.is-current {
   border: 2px solid var(--today-border);
   font-weight: 700;
 }
 
-/* Griglia anni */
+/* =========================
+   VISTA ANNI (mode-years)
+   ========================= */
 
 .year-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -210,6 +268,10 @@
   padding-top: 10px;
 }
 
+/* Singolo anno:
+   - range centrato su yearRangeStart (gestito da calendar.js)
+   - .is-current evidenzia l’anno reale di oggi
+*/
 .year-cell {
   background: var(--surface-strong);
   border-radius: 18px;
@@ -279,7 +341,7 @@
     border-radius: 14px;
     padding: 6px 6px 10px;
     min-height: 58px; /* altezza celle giorni */
-    font-size: 14px; 
+    font-size: 14px;
     box-shadow: none;
   }
 

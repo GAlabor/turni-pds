@@ -1,140 +1,20 @@
-/* turni.css */
-
-/* =========================
+/* turni.css
+   =========================
    PANNELLO TURNI
    ========================= */
-
-.settings-row-left-column {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.settings-row-subhint {
-  margin: 0;
-  font-size: var(--fs-meta);
-  color: var(--subtext);
-}
-
-/* Toggle switch turnazione (non usato nel layout attuale, lasciato pronto) */
-
-.toggle-switch {
-  width: 44px;
-  height: 24px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.06);
-  display: inline-flex;
-  align-items: center;
-  padding: 2px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-  transition:
-    background 0.16s ease,
-    border-color 0.16s ease;
-}
-
-:root[data-theme="dark"] .toggle-switch {
-  background: rgba(15,23,42,0.7);
-}
-
-.toggle-knob {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(15,23,42,0.35);
-  transform: translateX(0);
-  transition: transform 0.18s ease;
-}
-
-.toggle-switch.is-on {
-  background: rgba(10,132,255,0.18);
-  border-color: var(--accent);
-}
-
-.toggle-switch.is-on .toggle-knob {
-  transform: translateX(18px);
-}
-
-/* =========================
-   VECCHIA CARD TURNI COLLASSABILE
-   (non usata nell’HTML attuale, lasciata per eventuale riuso)
-   ========================= */
-
-.turni-section {
-  margin-top: 4px;
-  background: var(--surface-strong);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-light);
-  padding: 2px 8px;
-}
-
-.turni-row {
-  width: 100%;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 2px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Pulsante tondo per freccia open/close */
-.turni-add-btn {
-  width: 28px;
-  height: 28px;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.turni-add-btn svg {
-  transition: transform 0.16s ease;
-}
-
-.turni-row[aria-expanded="true"] .turni-add-btn svg {
-  transform: rotate(180deg);
-}
-
-.turni-row[aria-expanded="true"] .turni-add-btn {
-  border-color: var(--accent);
-  box-shadow: 0 4px 10px rgba(10,132,255,0.25);
-}
-
-@media (hover:hover) {
-  .turni-row:hover .turni-add-btn {
-    border-color: var(--accent);
-    box-shadow: 0 4px 10px rgba(10,132,255,0.25);
-  }
-}
-
-.turni-row:active .turni-add-btn {
-  transform: translateY(1px);
-}
-
-.turni-form {
-  margin-top: 6px;
-  display: block;
-}
-
-.turni-form[hidden] {
-  display: none;
-}
 
 /* =========================
    LISTA TURNI SALVATI
    ========================= */
 
+/* Contenitore lista turni nel pannello "Turni" */
 .turni-list {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
 }
 
+/* Hint mostrato quando non ci sono turni salvati */
 .turni-empty-hint {
   margin: 8px 2px 0 2px;
   font-size: var(--fs-meta);
@@ -143,7 +23,6 @@
 
 /* Singola riga turno:
    [SIGLA]  Nome turno   06:55 - 13:08
-   → solo una linea di separazione, niente pill contenitore
 */
 .turno-item {
   display: flex;
@@ -157,7 +36,7 @@
   border-bottom: none;
 }
 
-/* pill quadrata per la sigla (come i giorni, ma quadrata) */
+/* Pill quadrata per la sigla */
 .turno-sigla-pill {
   width: 28px;
   height: 28px;
@@ -191,7 +70,7 @@
 }
 
 /* =========================
-   CAMPi / FORM
+   CAMPI / FORM "AGGIUNGI TURNO"
    ========================= */
 
 .turni-field-row {
@@ -244,7 +123,7 @@
   box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
 }
 
-/* Layout Colore sigla: label + pallino sulla stessa riga */
+/* Layout "Colore sigla": label + pallino sulla stessa riga */
 
 .turni-field-color-row {
   display: flex;
@@ -274,7 +153,6 @@
 }
 
 /* Colore turno */
-
 .turni-color-preview {
   width: 20px;
   height: 20px;
@@ -294,9 +172,10 @@
 }
 
 /* =========================
-   NUOVO HEADER CARD TURNI
+   CARD / HEADER PANNELLO TURNI
    ========================= */
 
+/* Card principale del pannello "Turni" */
 .turni-card {
   margin-top: 8px;
   background: var(--surface);
@@ -321,82 +200,27 @@
   letter-spacing: -0.02em;
 }
 
-/* Contenitore dei controlli a destra (Modifica + +) */
+/* Contenitore dei controlli a destra (Modifica + "+") */
 .turni-card-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Pill "Modifica" – stessa altezza del cerchio */
-.pill-btn {
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  height: 32px;
-  padding: 0 12px;
-  background: var(--surface-strong);
-  font-size: var(--fs-row-subtext);
-  font-weight: 500;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Cerchio con icona + */
-.icon-circle-btn {
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface-strong);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  outline: none;
-}
-
-.icon-circle-btn svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.1;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* Nel pannello Turni, Modifica e + usano il colore delle frecce mese */
+/* Nel pannello Turni, "Modifica" e "+" usano il colore delle frecce mese */
 .settings-panel.settings-turni .pill-btn,
 .settings-panel.settings-turni .icon-circle-btn {
   color: var(--nav-fg);
-}
-
-/* Hover desktop: leggero highlight */
-@media (hover:hover) {
-  .pill-btn:hover,
-  .icon-circle-btn:hover {
-    border-color: var(--accent);
-    box-shadow: 0 4px 10px rgba(10,132,255,0.18);
-  }
-}
-
-/* Pressione */
-.pill-btn:active,
-.icon-circle-btn:active {
-  transform: translateY(1px);
 }
 
 /* =========================
    TOOLBAR "AGGIUNGI TURNO"
    ========================= */
 
+/* Barra in alto nel pannello "Aggiungi turno":
+   - bottone Salva
+   - messaggio errore
+*/
 .turni-add-toolbar {
   display: flex;
   flex-direction: column;
@@ -407,7 +231,7 @@
   margin-bottom: 4px;
 }
 
-/* bottone Salva più grande, senza ombra blu */
+/* bottone Salva (pill-btn + override) */
 .turni-save-btn {
   background: var(--accent);
   color: #ffffff;
@@ -448,15 +272,5 @@
 
   .turni-card-actions {
     gap: 6px;
-  }
-
-  .pill-btn {
-    height: 30px;
-    padding: 0 10px;
-  }
-
-  .icon-circle-btn {
-    width: 30px;
-    height: 30px;
   }
 }
