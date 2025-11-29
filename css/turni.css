@@ -117,14 +117,29 @@
   box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
 }
 
+/* Campo sigla: input + pallino + anteprima pill sulla stessa riga */
+.turni-sigla-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.turni-input-sigla {
+  max-width: 90px;
+}
+
+/* la pill di anteprima riusa lo stile della pill nella lista turni */
+.turni-preview-pill {
+  flex-shrink: 0;
+}
+
 /* stato errore validazione, più evidente */
 .turni-input.is-invalid {
   border-color: #dc2626 !important;
   box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
 }
 
-/* Layout "Colore sigla": label + pallino sulla stessa riga */
-
+/* Layout "Colore sigla": contenitore del pallino + input color */
 .turni-field-color-row {
   display: flex;
   align-items: center;
@@ -141,18 +156,22 @@
   gap: 6px;
 }
 
+/* Pulsante pallino colore: area di tap più grande */
 .turni-color-dot {
   border: none;
   background: transparent;
-  padding: 0;
+  padding: 4px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 999px;
+  min-width: 32px;
+  min-height: 32px;
 }
 
-/* Colore turno */
+/* Colore turno: vero pallino dentro il bottone */
 .turni-color-preview {
   width: var(--color-dot-size);
   height: var(--color-dot-size);
