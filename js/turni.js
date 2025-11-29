@@ -179,23 +179,22 @@
     const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
 
     // --- elementi pannello "Aggiungi turno" ---
-    const formEl         = panelAdd.querySelector("[data-turni-add-form]");
-    const inputNome      = panelAdd.querySelector("#addTurnoNome");
-    const inputSigla     = panelAdd.querySelector("#addTurnoSigla");
-    const inputInizio    = panelAdd.querySelector("#addTurnoOraInizio");
-    const inputFine      = panelAdd.querySelector("#addTurnoOraFine");
-    const colorInput     = panelAdd.querySelector("[data-turni-color]");
-    const colorPreview   = panelAdd.querySelector("[data-turni-color-preview]");
-    const colorTrigger   = panelAdd.querySelector("[data-turni-color-trigger]");
-    const saveBtn        = panelAdd.querySelector("[data-turni-save]");
-    const errorEl        = panelAdd.querySelector("[data-turni-error]");
-    const previewSiglaEl = panelAdd.querySelector("[data-turni-preview-sigla]");
+    const formEl       = panelAdd.querySelector("[data-turni-add-form]");
+    const inputNome    = panelAdd.querySelector("#addTurnoNome");
+    const inputSigla   = panelAdd.querySelector("#addTurnoSigla");
+    const inputInizio  = panelAdd.querySelector("#addTurnoOraInizio");
+    const inputFine    = panelAdd.querySelector("#addTurnoOraFine");
+    const colorInput   = panelAdd.querySelector("[data-turni-color]");
+    const colorPreview = panelAdd.querySelector("[data-turni-color-preview]");
+    const colorTrigger = panelAdd.querySelector("[data-turni-color-trigger]");
+    const saveBtn      = panelAdd.querySelector("[data-turni-save]");
+    const errorEl      = panelAdd.querySelector("[data-turni-error]");
 
     if (
       !listEl || !btnAdd || !formEl ||
       !inputNome || !inputSigla || !inputInizio || !inputFine ||
       !colorInput || !colorPreview || !colorTrigger ||
-      !saveBtn || !errorEl || !previewSiglaEl
+      !saveBtn || !errorEl
     ) {
       return;
     }
@@ -211,7 +210,6 @@
     function applyColorPreview() {
       const v = colorInput.value || "#0a84ff";
       colorPreview.style.backgroundColor = v;
-      previewSiglaEl.style.color = v;
     }
 
     applyColorPreview();
@@ -221,22 +219,6 @@
 
     colorTrigger.addEventListener("click", () => {
       colorInput.click();
-    });
-
-    // ----------------------------
-    // Gestione preview sigla (testo)
-    // ----------------------------
-
-    function updateSiglaPreview() {
-      const txt = (inputSigla.value || "").trim();
-      previewSiglaEl.textContent = txt || "M";
-    }
-
-    updateSiglaPreview();
-
-    inputSigla.addEventListener("input", () => {
-      inputSigla.classList.remove("is-invalid");
-      updateSiglaPreview();
     });
 
     // ----------------------------
@@ -271,8 +253,8 @@
       }, 2000);
     }
 
-    // appena l'utente digita, togliamo il bordo rosso (nome / orari)
-    [inputNome, inputInizio, inputFine].forEach(inp => {
+    // appena l'utente digita, togliamo il bordo rosso
+    [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => {
       inp.addEventListener("input", () => {
         inp.classList.remove("is-invalid");
       });
@@ -290,7 +272,6 @@
       inputFine.value   = "";
       colorInput.value  = "#0a84ff";
       applyColorPreview();
-      previewSiglaEl.textContent = "M";
     }
 
     // ----------------------------

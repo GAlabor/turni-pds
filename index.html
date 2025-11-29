@@ -312,38 +312,37 @@
               </div>
             </div>
 
-            <!-- Sigla (campo + pallino colore + anteprima pill) -->
+            <!-- Sigla -->
             <div class="turni-field-row">
               <div class="turni-field">
                 <label class="turni-label" for="addTurnoSigla">Sigla</label>
-                <div class="turni-sigla-row">
+                <input
+                  class="turni-input"
+                  id="addTurnoSigla"
+                  type="text"
+                  maxlength="4"
+                  autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Colore sigla -->
+            <div class="turni-field-row">
+              <div class="turni-field turni-field-color-row">
+                <label class="turni-label" for="addTurnoColore">Colore sigla</label>
+                <div class="turni-color-wrapper">
+                  <button
+                    class="turni-color-dot"
+                    type="button"
+                    data-turni-color-trigger
+                    aria-label="Scegli colore sigla">
+                    <span class="turni-color-preview" data-turni-color-preview></span>
+                  </button>
                   <input
-                    class="turni-input turni-input-sigla"
-                    id="addTurnoSigla"
-                    type="text"
-                    maxlength="4"
-                    autocomplete="off">
-
-                  <div class="turni-color-wrapper">
-                    <button
-                      class="turni-color-dot"
-                      type="button"
-                      data-turni-color-trigger
-                      aria-label="Scegli colore sigla">
-                      <span class="turni-color-preview" data-turni-color-preview></span>
-                    </button>
-                    <input
-                      class="turni-color-input"
-                      id="addTurnoColore"
-                      type="color"
-                      value="#0a84ff"
-                      data-turni-color>
-                  </div>
-
-                  <!-- Anteprima pill sigla (stesso stile lista turni) -->
-                  <div class="turno-sigla-pill turni-preview-pill" aria-hidden="true">
-                    <span class="turno-sigla" data-turni-preview-sigla>M</span>
-                  </div>
+                    class="turni-color-input"
+                    id="addTurnoColore"
+                    type="color"
+                    value="#0a84ff"
+                    data-turni-color>
                 </div>
               </div>
             </div>

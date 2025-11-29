@@ -17,7 +17,7 @@
 /* Hint mostrato quando non ci sono turni salvati */
 .turni-empty-hint {
   margin: 8px 2px 0 2px;
-  font-size: var(--fs-turni-form-hint); /* FONT 14 hint */
+  font-size: var(--fs-meta);
   color: var(--subtext);
 }
 
@@ -51,20 +51,20 @@
 }
 
 .turno-sigla {
-  font-size: var(--fs-turni-sigla); /* FONT 11 */
+  font-size: var(--fs-row-subtext);
   font-weight: 600;
   color: var(--text); /* sovrascritto inline con il colore scelto */
 }
 
 .turno-name {
-  font-size: var(--fs-turni-nome); /* FONT 12 */
+  font-size: var(--fs-row-subtext);
   font-weight: 500;
   color: var(--text);
 }
 
 .turno-orario {
   margin-left: auto;
-  font-size: var(--fs-turni-orario); /* FONT 13 */
+  font-size: var(--fs-meta);
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
 }
@@ -88,7 +88,7 @@
 
 .turni-label {
   display: block;
-  font-size: var(--fs-turni-form-label); /* FONT 14 */
+  font-size: var(--fs-row-subtext);
   font-weight: 500;
   color: var(--text);
   margin-bottom: 4px;
@@ -101,7 +101,7 @@
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
   padding: 0 12px;
-  font-size: var(--fs-turni-form-input); /* FONT 14 */
+  font-size: var(--fs-row-subtext);
   color: var(--text);
   outline: none;
   -webkit-appearance: none;
@@ -117,29 +117,14 @@
   box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
 }
 
-/* Campo sigla: input + pallino + anteprima pill sulla stessa riga */
-.turni-sigla-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.turni-input-sigla {
-  max-width: 90px;
-}
-
-/* la pill di anteprima riusa lo stile della pill nella lista turni */
-.turni-preview-pill {
-  flex-shrink: 0;
-}
-
 /* stato errore validazione, più evidente */
 .turni-input.is-invalid {
   border-color: #dc2626 !important;
   box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
 }
 
-/* Layout "Colore sigla": contenitore del pallino + input color */
+/* Layout "Colore sigla": label + pallino sulla stessa riga */
+
 .turni-field-color-row {
   display: flex;
   align-items: center;
@@ -156,25 +141,21 @@
   gap: 6px;
 }
 
-/* Pulsante pallino colore: area di tap più grande */
 .turni-color-dot {
   border: none;
   background: transparent;
-  padding: 4px;
+  padding: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  min-width: 32px;
-  min-height: 32px;
 }
 
-/* Colore turno: vero pallino dentro il bottone */
+/* Colore turno */
 .turni-color-preview {
-  width: var(--color-dot-size);
-  height: var(--color-dot-size);
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
   border: 1px solid var(--border);
   box-shadow: 0 2px 4px rgba(15,23,42,0.25);
@@ -211,12 +192,12 @@
   gap: 12px;
 }
 
-/* Titolo interno del pannello Turni (FONT 9, più piccolo del titolo pagina) */
+/* Titolo interno del pannello Turni (più piccolo del titolo pagina) */
 .turni-panel-title {
   margin: 0;
-  font-size: var(--fs-turni-panel-title-desktop);
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: var(--ls-turni-panel-title);
+  letter-spacing: -0.02em;
 }
 
 /* Contenitore dei controlli a destra (Modifica + "+") */
@@ -268,7 +249,7 @@
    subito sotto il pulsante Salva */
 .turni-error {
   margin: 0 2px 4px;
-  font-size: var(--fs-turni-form-hint);
+  font-size: var(--fs-meta);
   color: #dc2626;
 }
 
@@ -286,7 +267,7 @@
   }
 
   .turni-panel-title {
-    font-size: var(--fs-turni-panel-title-mobile);
+    font-size: 17px;
   }
 
   .turni-card-actions {
