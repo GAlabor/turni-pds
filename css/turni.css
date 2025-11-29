@@ -73,30 +73,59 @@
    CAMPI / FORM "AGGIUNGI TURNO"
    ========================= */
 
-.turni-field-row {
+.turni-form {
+  margin-top: 18px; /* aria sotto il pulsante Salva */
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  align-items: stretch;
-  margin-bottom: 10px;
+  gap: 10px; /* spazio tra le righe-card */
 }
 
-.turni-field {
-  flex: 1;
-  min-width: 0;
+/* Singola riga-card:
+   - label a sinistra
+   - contenuto (input / controlli) a destra
+*/
+.turni-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
 }
 
+/* Label nella riga-card */
 .turni-label {
-  display: block;
   font-size: var(--fs-row-subtext);
   font-weight: 500;
   color: var(--text);
-  margin-bottom: 4px;
+  margin: 0;
+  flex-shrink: 0;
+
+  /* colonna allineata e coerente su tutte le righe */
+  flex: 0 0 8ch;
 }
 
+/* Contenitore parte destra (input / controlli) */
+.turni-field-control {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start; /* campi allineati dopo la label */
+}
+
+/* Riga SIGLA: controlli più compatti e allineati a destra */
+.turni-field-control-sigla {
+  gap: 12px;
+}
+
+/* Input di testo / ora dentro la riga-card */
 .turni-input {
   width: 100%;
-  height: 38px;
+  max-width: 220px;
+  height: 34px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
@@ -106,6 +135,12 @@
   outline: none;
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Campo SIGLA più compatto e centrato */
+#addTurnoSigla.turni-input {
+  max-width: 9ch;
+  text-align: center;
 }
 
 :root[data-theme="dark"] .turni-input {
@@ -123,28 +158,17 @@
   box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
 }
 
-/* Layout "Colore sigla": label + pallino sulla stessa riga */
+/* =========================
+   CONTROLLI COLORE / PREVIEW SIGLA
+   ========================= */
 
-.turni-field-color-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.turni-field-color-row .turni-label {
-  margin: 0;
-}
-
-.turni-color-wrapper {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
+/* Button pallino colore */
 .turni-color-dot {
+  margin-left: 4px;
   border: none;
   background: transparent;
-  padding: 0;
+  padding: 6px;
+  border-radius: 999px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   display: inline-flex;
@@ -152,10 +176,10 @@
   justify-content: center;
 }
 
-/* Colore turno */
+/* Pallino colore sigla */
 .turni-color-preview {
-  width: 20px;
-  height: 20px;
+  width: var(--color-dot-size);
+  height: var(--color-dot-size);
   border-radius: 999px;
   border: 1px solid var(--border);
   box-shadow: 0 2px 4px rgba(15,23,42,0.25);
@@ -169,6 +193,27 @@
   pointer-events: none;
   width: 0;
   height: 0;
+}
+
+/* Anteprima sigla come quadrato (stile lista turni / calendario) */
+.turni-sigla-preview-pill {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.turni-sigla-preview-text {
+  font-size: var(--fs-row-subtext);
+  font-weight: 600;
+  color: var(--text); /* sovrascritto via JS con il colore scelto */
 }
 
 /* =========================
@@ -226,9 +271,9 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-end;
-  gap: 2px;
+  gap: 4px;
   margin-top: 4px;
-  margin-bottom: 4px;
+  margin-bottom: 6px; /* distacco definito dal form */
 }
 
 /* bottone Salva (pill-btn + override) */
@@ -272,5 +317,24 @@
 
   .turni-card-actions {
     gap: 6px;
+  }
+
+  .turni-field-row {
+    padding: 10px 10px;
+  }
+
+  .turni-input {
+    max-width: 180px;
+    height: 32px;
+  }
+
+  /* colonna label leggermente più stretta su mobile */
+  .turni-label {
+    flex: 0 0 7ch;
+  }
+
+  /* sigla ancora un filo più corta su mobile */
+  #addTurnoSigla.turni-input {
+    max-width: 9ch;
   }
 }

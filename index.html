@@ -297,12 +297,12 @@
             </p>
           </div>
 
-          <!-- Form Aggiungi turno -->
+          <!-- Form Aggiungi turno (righe-card) -->
           <div class="turni-form" data-turni-add-form>
             <!-- Turno -->
             <div class="turni-field-row">
-              <div class="turni-field">
-                <label class="turni-label" for="addTurnoNome">Turno</label>
+              <label class="turni-label" for="addTurnoNome">Turno</label>
+              <div class="turni-field-control">
                 <input
                   class="turni-input"
                   id="addTurnoNome"
@@ -312,45 +312,42 @@
               </div>
             </div>
 
-            <!-- Sigla -->
+            <!-- Sigla + colore + anteprima [M] -->
             <div class="turni-field-row">
-              <div class="turni-field">
-                <label class="turni-label" for="addTurnoSigla">Sigla</label>
+              <label class="turni-label" for="addTurnoSigla">Sigla</label>
+              <div class="turni-field-control turni-field-control-sigla">
                 <input
                   class="turni-input"
                   id="addTurnoSigla"
                   type="text"
                   maxlength="4"
                   autocomplete="off">
-              </div>
-            </div>
 
-            <!-- Colore sigla -->
-            <div class="turni-field-row">
-              <div class="turni-field turni-field-color-row">
-                <label class="turni-label" for="addTurnoColore">Colore sigla</label>
-                <div class="turni-color-wrapper">
-                  <button
-                    class="turni-color-dot"
-                    type="button"
-                    data-turni-color-trigger
-                    aria-label="Scegli colore sigla">
-                    <span class="turni-color-preview" data-turni-color-preview></span>
-                  </button>
-                  <input
-                    class="turni-color-input"
-                    id="addTurnoColore"
-                    type="color"
-                    value="#0a84ff"
-                    data-turni-color>
+                <button
+                  class="turni-color-dot"
+                  type="button"
+                  data-turni-color-trigger
+                  aria-label="Scegli colore sigla">
+                  <span class="turni-color-preview" data-turni-color-preview></span>
+                </button>
+
+                <div class="turni-sigla-preview-pill" aria-hidden="true">
+                  <span class="turni-sigla-preview-text" data-turni-sigla-preview></span>
                 </div>
+
+                <input
+                  class="turni-color-input"
+                  id="addTurnoColore"
+                  type="color"
+                  value="#0a84ff"
+                  data-turni-color>
               </div>
             </div>
 
             <!-- Ora inizio -->
             <div class="turni-field-row">
-              <div class="turni-field">
-                <label class="turni-label" for="addTurnoOraInizio">Ora inizio</label>
+              <label class="turni-label" for="addTurnoOraInizio">Ora inizio</label>
+              <div class="turni-field-control">
                 <input
                   class="turni-input"
                   id="addTurnoOraInizio"
@@ -361,8 +358,8 @@
 
             <!-- Ora fine -->
             <div class="turni-field-row">
-              <div class="turni-field">
-                <label class="turni-label" for="addTurnoOraFine">Ora fine</label>
+              <label class="turni-label" for="addTurnoOraFine">Ora fine</label>
+              <div class="turni-field-control">
                 <input
                   class="turni-input"
                   id="addTurnoOraFine"

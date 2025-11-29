@@ -82,7 +82,7 @@
   --icon-circle-sm: 32px;  /* "+" Turni (.icon-circle-btn) */
 
   /* Pallino colore sigla Turni */
-  --color-dot-size: 20px;  /* .turni-color-preview */
+  --color-dot-size: 24px;  /* .turni-color-preview */
 
   /* Icona omino stato (SVG interno) */
   --status-icon-size: 48px; /* #icoStatus svg */
