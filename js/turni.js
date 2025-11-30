@@ -233,10 +233,6 @@
       }
     }
 
-    colorTrigger.addEventListener("click", () => {
-      openColorPicker();
-    });
-
     // ----------------------------
     // Gestione anteprima sigla [M]
     // ----------------------------
