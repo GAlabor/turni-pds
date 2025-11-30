@@ -219,8 +219,22 @@
     colorInput.addEventListener("input", applyColorPreview);
     colorInput.addEventListener("change", applyColorPreview);
 
+    // Apertura tavolozza: cerca prima showPicker (supporto migliore su mobile),
+    // poi fallback su click "classico"
+    function openColorPicker() {
+      try {
+        if (typeof colorInput.showPicker === "function") {
+          colorInput.showPicker();
+        } else {
+          colorInput.click();
+        }
+      } catch (e) {
+        colorInput.click();
+      }
+    }
+
     colorTrigger.addEventListener("click", () => {
-      colorInput.click();
+      openColorPicker();
     });
 
     // ----------------------------
