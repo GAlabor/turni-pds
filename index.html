@@ -315,33 +315,37 @@
             <!-- Sigla + colore + anteprima [M] -->
             <div class="turni-field-row">
               <label class="turni-label" for="addTurnoSigla">Sigla</label>
-              <div class="turni-field-control turni-field-control-sigla">
-                <input
-                  class="turni-input"
-                  id="addTurnoSigla"
-                  type="text"
-                  maxlength="4"
-                  autocomplete="off">
 
-                <button
-                  class="turni-color-dot"
-                  type="button"
-                  data-turni-color-trigger
-                  aria-label="Scegli colore sigla">
-                  <span class="turni-color-preview" data-turni-color-preview></span>
-                </button>
+<div class="turni-field-control turni-field-control-sigla">
+  <input
+    class="turni-input"
+    id="addTurnoSigla"
+    type="text"
+    maxlength="4"
+    autocomplete="off">
 
-                <div class="turni-sigla-preview-pill" aria-hidden="true">
-                  <span class="turni-sigla-preview-text" data-turni-sigla-preview></span>
-                </div>
+  <!-- Il pallino DIVENTA un label collegato all'input colore -->
+  <label
+    class="turni-color-dot"
+    for="addTurnoColore"
+    data-turni-color-trigger
+    aria-label="Scegli colore sigla">
+    <span class="turni-color-preview" data-turni-color-preview></span>
+  </label>
 
-                <input
-                  class="turni-color-input"
-                  id="addTurnoColore"
-                  type="color"
-                  value="#0a84ff"
-                  data-turni-color>
-              </div>
+  <div class="turni-sigla-preview-pill" aria-hidden="true">
+    <span class="turni-sigla-preview-text" data-turni-sigla-preview></span>
+  </div>
+
+  <input
+    class="turni-color-input"
+    id="addTurnoColore"
+    type="color"
+    value="#0a84ff"
+    data-turni-color>
+</div>
+
+
             </div>
 
             <!-- Ora inizio -->
