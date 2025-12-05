@@ -187,11 +187,11 @@
   */
   --fs-settings-choice: 13px;
 
-  /* FONT 9 — Titolo pannello Turni:
+  /* FONT 9 — Titolo pannello Turni (e futuri pannelli interni):
      - .turni-panel-title ("Turni" nella card Turni)
   */
-  --fs-turni-panel-title-desktop: 18px;
-  --fs-turni-panel-title-mobile: 17px;
+  --fs-turni-panel-title-desktop: 19px;
+  --fs-turni-panel-title-mobile: 18px;
   --ls-turni-panel-title: -0.02em;
 
   /* FONT 10 — Bottoni pillola:
@@ -199,28 +199,30 @@
   */
   --fs-pill-btn: 15px;
 
-  /* FONT 11 — Sigla turno nel quadrato:
+  /* FONT 11 — Sigla turno nel quadrato / preview:
      - .turno-sigla
+     - .turni-sigla-preview-text
   */
-  --fs-turni-sigla: 13px;
+  --fs-turni-sigla: 15px;
 
-  /* FONT 12 — Nome turno:
+  /* FONT 12 — Nome turno (lista) / testi principali pannello Turni:
      - .turno-name
   */
-  --fs-turni-nome: 13px;
+  --fs-turni-nome: 15px;
 
-  /* FONT 13 — Orario turno (grigio):
+  /* FONT 13 — Orario turno (grigio) / testi meta pannello Turni:
      - .turno-orario
   */
-  --fs-turni-orario: 12px;
+  --fs-turni-orario: 13px;
 
   /* FONT 14 — Form "Aggiungi turno":
      - .turni-label (etichette)
      - .turni-input (campi testo/ora)
+     - hint / error del form
   */
-  --fs-turni-form-label: 13px;
-  --fs-turni-form-input: 13px;
-  --fs-turni-form-hint: 12px;
+  --fs-turni-form-label: 15px;
+  --fs-turni-form-input: 15px;
+  --fs-turni-form-hint: 13px;
 
   /* (FONT 15/16 sono già coperti nelle variabili ICON / CONTROL SIZES in alto) */
 }

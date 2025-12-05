@@ -17,7 +17,7 @@
 /* Hint mostrato quando non ci sono turni salvati */
 .turni-empty-hint {
   margin: 8px 2px 0 2px;
-  font-size: var(--fs-meta);
+  font-size: var(--fs-turni-form-hint);
   color: var(--subtext);
 }
 
@@ -51,20 +51,20 @@
 }
 
 .turno-sigla {
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-sigla);
   font-weight: 600;
   color: var(--text); /* sovrascritto inline con il colore scelto */
 }
 
 .turno-name {
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-nome);
   font-weight: 500;
   color: var(--text);
 }
 
 .turno-orario {
   margin-left: auto;
-  font-size: var(--fs-meta);
+  font-size: var(--fs-turni-orario);
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
 }
@@ -96,7 +96,7 @@
 
 /* Label nella riga-card */
 .turni-label {
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-form-label);
   font-weight: 500;
   color: var(--text);
   margin: 0;
@@ -130,7 +130,7 @@
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
   padding: 0 12px;
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-form-input);
   color: var(--text);
   outline: none;
   -webkit-appearance: none;
@@ -211,7 +211,7 @@
 }
 
 .turni-sigla-preview-text {
-  font-size: var(--fs-row-subtext);
+  font-size: var(--fs-turni-sigla);
   font-weight: 600;
   color: var(--text); /* sovrascritto via JS con il colore scelto */
 }
@@ -240,9 +240,9 @@
 /* Titolo interno del pannello Turni (più piccolo del titolo pagina) */
 .turni-panel-title {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--fs-turni-panel-title-desktop);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ls-turni-panel-title);
 }
 
 /* Contenitore dei controlli a destra (Modifica + "+") */
@@ -294,7 +294,7 @@
    subito sotto il pulsante Salva */
 .turni-error {
   margin: 0 2px 4px;
-  font-size: var(--fs-meta);
+  font-size: var(--fs-turni-form-hint);
   color: #dc2626;
 }
 
@@ -312,7 +312,7 @@
   }
 
   .turni-panel-title {
-    font-size: 17px;
+    font-size: var(--fs-turni-panel-title-mobile);
   }
 
   .turni-card-actions {
