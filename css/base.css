@@ -81,8 +81,9 @@
   --icon-circle-md: 34px;  /* back impostazioni (.settings-back), slot icona stato (.app-status) */
   --icon-circle-sm: 32px;  /* "+" Turni (.icon-circle-btn) */
 
-  /* Pallino colore sigla Turni */
-  --color-dot-size: 24px;  /* .turni-color-preview */
+  /* Pallino colore sigla Turni:
+     agganciato alla stessa misura dell’anteprima sigla turni */
+  --color-dot-size: 24px; /*var(--turni-sigla-size); */  /* .turni-color-preview */ 
 
   /* Icona omino stato (SVG interno) */
   --status-icon-size: 48px; /* #icoStatus svg */
@@ -95,6 +96,19 @@
   /* Freccia BACK impostazioni (icone SVG) */
   --icon-back-size: 22px;      /* FONT 16 — dimensione SVG dentro .settings-back */
   --color-back-icon: var(--text); /* colore freccia back */
+
+  /* =========================
+     CALENDARIO / TURNI: MISURE CELLE
+     ========================= */
+
+  /* Larghezza cella giorno calendario (impostata da calendar.js; fallback 40px) */
+  --cal-day-size: 40px;
+
+  /* Scala per l'anteprima sigla dei turni rispetto alla cella giorno */
+  --turni-sigla-scale: 0.65;
+
+  /* Lato quadrato anteprima sigla turni (clampato per non diventare enorme su desktop) */
+  --turni-sigla-size: min(40px, calc(var(--cal-day-size) * var(--turni-sigla-scale)));
 
   /* =========================
      TIPO / TESTI GLOBALI (SCALA BASE)
@@ -202,6 +216,8 @@
   /* FONT 11 — Sigla turno nel quadrato / preview:
      - .turno-sigla
      - .turni-sigla-preview-text
+     15px è il valore utilizzato per 1 o 2 caratteri;
+     tramite turni.js, 3 caratteri = 14px e 4 caratteri = 12px.
   */
   --fs-turni-sigla: 15px;
 

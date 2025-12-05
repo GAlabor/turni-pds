@@ -36,10 +36,12 @@
   border-bottom: none;
 }
 
-/* Pill quadrata per la sigla */
+/* Pill quadrata per la sigla
+   → lato basato sulla larghezza cella giorno calendario (scala da base.css)
+*/
 .turno-sigla-pill {
-  width: 28px;
-  height: 28px;
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
   border-radius: 8px;
   background: var(--surface-strong);
   border: 1px solid var(--border);
@@ -103,7 +105,7 @@
   flex-shrink: 0;
 
   /* colonna allineata e coerente su tutte le righe */
-  flex: 0 0 8ch;
+  flex: 0 0 9ch;
 }
 
 /* Contenitore parte destra (input / controlli) */
@@ -121,11 +123,13 @@
   gap: 12px;
 }
 
-/* Input di testo / ora dentro la riga-card */
+/* Input di testo / ora dentro la riga-card
+   → altezza agganciata alla stessa misura della sigla (turni-sigla-size)
+*/
 .turni-input {
   width: 100%;
   max-width: 220px;
-  height: 34px;
+  height: var(--turni-sigla-size);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
@@ -162,12 +166,16 @@
    CONTROLLI COLORE / PREVIEW SIGLA
    ========================= */
 
-/* Button pallino colore */
+/* Button pallino colore:
+   stessa altezza logica della sigla, niente padding che lo gonfia
+*/
 .turni-color-dot {
   margin-left: 4px;
   border: none;
   background: transparent;
-  padding: 6px;
+  padding: 2;
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
   border-radius: 999px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -176,7 +184,9 @@
   justify-content: center;
 }
 
-/* Pallino colore sigla */
+/* Pallino colore sigla
+   → dimensione agganciata a --turni-sigla-size tramite --color-dot-size
+*/
 .turni-color-preview {
   width: var(--color-dot-size);
   height: var(--color-dot-size);
@@ -195,10 +205,12 @@
   height: 0;
 }
 
-/* Anteprima sigla come quadrato (stile lista turni / calendario) */
+/* Anteprima sigla come quadrato (stile lista turni / calendario)
+   → stessa logica della pill principale: lato = --turni-sigla-size
+*/
 .turni-sigla-preview-pill {
-  width: 28px;
-  height: 28px;
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
   border-radius: 8px;
   background: var(--surface-strong);
   border: 1px solid var(--border);
@@ -325,12 +337,12 @@
 
   .turni-input {
     max-width: 180px;
-    height: 32px;
+    /* altezza resta agganciata a var(--turni-sigla-size) anche su mobile */
   }
 
   /* colonna label leggermente più stretta su mobile */
   .turni-label {
-    flex: 0 0 7ch;
+    flex: 0 0 9ch;
   }
 
   /* sigla ancora un filo più corta su mobile */

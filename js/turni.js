@@ -17,6 +17,48 @@
   const TURNI_VIS_KEY = STORAGE_KEYS.turniVisualizza;
 
   // ============================
+  // Font sigla: lettura da CSS var
+  // ============================
+
+  let BASE_SIGLA_FONT_PX = null;
+
+  function getBaseSiglaFontSize() {
+    if (BASE_SIGLA_FONT_PX !== null) {
+      return BASE_SIGLA_FONT_PX;
+    }
+
+    try {
+      const rootStyles = getComputedStyle(document.documentElement);
+      const raw = rootStyles.getPropertyValue("--fs-turni-sigla") || "";
+      const parsed = parseFloat(raw);
+      BASE_SIGLA_FONT_PX = Number.isNaN(parsed) ? 15 : parsed;
+    } catch {
+      BASE_SIGLA_FONT_PX = 15;
+    }
+
+    return BASE_SIGLA_FONT_PX;
+  }
+
+  // 1 carattere  → base
+  // 2 caratteri  → base
+  // 3 caratteri  → base - 1
+  // 4+ caratteri → base - 3
+  function getSiglaFontSizeValue(siglaText) {
+    const base = getBaseSiglaFontSize();
+    const len  = (siglaText || "").length;
+
+    if (len <= 2) return base;
+    if (len === 3) return base - 1;
+    return base - 3;
+  }
+
+  function applySiglaFontSize(el, siglaText) {
+    if (!el) return;
+    const sizePx = getSiglaFontSizeValue(siglaText);
+    el.style.fontSize = `${sizePx}px`;
+  }
+
+  // ============================
   // Storage: turni personalizzati
   // ============================
 
@@ -107,10 +149,13 @@
 
       const siglaEl = document.createElement("span");
       siglaEl.className = "turno-sigla";
-      siglaEl.textContent = t.sigla || "";
+      const siglaTxt = t.sigla || "";
+      siglaEl.textContent = siglaTxt;
       if (t.colore) {
         siglaEl.style.color = t.colore;
       }
+      // font dinamico in base alla lunghezza sigla
+      applySiglaFontSize(siglaEl, siglaTxt);
 
       siglaPill.appendChild(siglaEl);
 
@@ -200,6 +245,9 @@
       return;
     }
 
+    // Forziamo una lettura iniziale della var CSS (cache)
+    getBaseSiglaFontSize();
+
     // Render iniziale da localStorage
     const turniIniziali = loadTurni();
     renderTurni(listEl, turniIniziali, emptyHint, btnEdit);
@@ -219,20 +267,6 @@
     colorInput.addEventListener("input", applyColorPreview);
     colorInput.addEventListener("change", applyColorPreview);
 
-    // Apertura tavolozza: cerca prima showPicker (supporto migliore su mobile),
-    // poi fallback su click "classico"
-    function openColorPicker() {
-      try {
-        if (typeof colorInput.showPicker === "function") {
-          colorInput.showPicker();
-        } else {
-          colorInput.click();
-        }
-      } catch (e) {
-        colorInput.click();
-      }
-    }
-
     // ----------------------------
     // Gestione anteprima sigla [M]
     // ----------------------------
@@ -240,6 +274,7 @@
     function updateSiglaPreview() {
       const txt = (inputSigla.value || "").trim();
       siglaPreviewEl.textContent = txt || "";
+      applySiglaFontSize(siglaPreviewEl, txt);
     }
 
     updateSiglaPreview();
@@ -299,6 +334,7 @@
       inputInizio.value = "";
       inputFine.value   = "";
       siglaPreviewEl.textContent = "";
+      applySiglaFontSize(siglaPreviewEl, "");
       colorInput.value  = "#0a84ff";
       applyColorPreview();
     }

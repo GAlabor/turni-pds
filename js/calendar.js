@@ -43,6 +43,23 @@
   let calendarContainer = null;
 
   // ============================
+  // Util: misura larghezza cella giorno → variabile CSS
+  // ============================
+
+  function updateDayCellSize() {
+    if (!gridDays || !calendarContainer) return;
+    if (currentMode !== MODES.DAYS) return;
+
+    const dayEl = gridDays.querySelector(".day:not(.empty)");
+    if (!dayEl) return;
+
+    const rect = dayEl.getBoundingClientRect();
+    if (!rect.width) return;
+
+    document.documentElement.style.setProperty("--cal-day-size", rect.width + "px");
+  }
+
+  // ============================
   // Render header
   // ============================
 
@@ -128,6 +145,7 @@
     }
 
     updateHeader();
+    updateDayCellSize();
   }
 
   // ============================
@@ -370,6 +388,11 @@
 
     setupOutsideClickHandler();
     renderDays();
+
+    // Aggiorna larghezza cella anche su resize
+    window.addEventListener("resize", () => {
+      updateDayCellSize();
+    });
   }
 
   window.Calendar = {
