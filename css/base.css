@@ -104,8 +104,8 @@
   /* Larghezza cella giorno calendario (impostata da calendar.js; fallback 40px) */
   --cal-day-size: 40px;
 
-  /* Scala per l'anteprima sigla dei turni rispetto alla cella giorno */
-  --turni-sigla-scale: 0.65;
+  /* Scala in percentuale l'anteprima sigla dei turni rispetto alla cella giorno */
+  --turni-sigla-scale: 0.7;
 
   /* Lato quadrato anteprima sigla turni (clampato per non diventare enorme su desktop) */
   --turni-sigla-size: min(40px, calc(var(--cal-day-size) * var(--turni-sigla-scale)));

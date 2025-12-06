@@ -39,16 +39,14 @@
     return BASE_SIGLA_FONT_PX;
   }
 
-  // 1 carattere  → base
-  // 2 caratteri  → base
-  // 3 caratteri  → base - 1
-  // 4+ caratteri → base - 3
+  // modifica la dimensione di --fs-turni-sigla in base ai caratteri
+  // della preview - anteprima della sigla
 function getSiglaFontSizeValue(siglaText) {
   const len = (siglaText || "").length;
 
-  if (len <= 2) return 15;  // 1–2 caratteri
-  if (len === 3) return 14; // 3 caratteri
-  return 11.5;                // 4+ caratteri
+  if (len <= 2) return 15;    // 1–2 caratteri
+  if (len === 3) return 14 // 3 caratteri
+  return 11.5;                  // 4+ caratteri
 }
 
 
