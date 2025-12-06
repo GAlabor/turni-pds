@@ -41,14 +41,13 @@
 
   // modifica la dimensione di --fs-turni-sigla in base ai caratteri
   // della preview - anteprima della sigla
-function getSiglaFontSizeValue(siglaText) {
-  const len = (siglaText || "").length;
+  function getSiglaFontSizeValue(siglaText) {
+    const len = (siglaText || "").length;
 
-  if (len <= 2) return 15;    // 1–2 caratteri
-  if (len === 3) return 14 // 3 caratteri
-  return 11.5;                  // 4+ caratteri
-}
-
+    if (len <= 2) return 15;    // 1–2 caratteri
+    if (len === 3) return 14;   // 3 caratteri
+    return 11.5;                // 4+ caratteri
+  }
 
   function applySiglaFontSize(el, siglaText) {
     if (!el) return;
@@ -114,18 +113,30 @@ function getSiglaFontSizeValue(siglaText) {
   // ============================
   // Render lista turni
   // Usata nel pannello Impostazioni → Turni
+  // options:
+  //   - isEditing: bool
+  //   - onDelete: function(index)
   // ============================
 
-  function renderTurni(listEl, turni, emptyHintEl, editBtn) {
+  function renderTurni(listEl, turni, emptyHintEl, editBtn, options) {
     if (!listEl) return;
+
+    const opts = options || {};
+    const isEditing = !!opts.isEditing;
+    const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
+
     listEl.innerHTML = "";
 
-    if (!Array.isArray(turni) || !turni.length) {
+    const hasTurni = Array.isArray(turni) && turni.length > 0;
+
+    if (!hasTurni) {
       if (emptyHintEl) {
         emptyHintEl.hidden = false;
       }
       if (editBtn) {
         editBtn.disabled = true;
+        editBtn.textContent = "Modifica";
+        editBtn.removeAttribute("aria-pressed");
       }
       return;
     }
@@ -133,13 +144,39 @@ function getSiglaFontSizeValue(siglaText) {
     if (emptyHintEl) {
       emptyHintEl.hidden = true;
     }
+
     if (editBtn) {
       editBtn.disabled = false;
+      editBtn.textContent = isEditing ? "Fine" : "Modifica";
+      if (isEditing) {
+        editBtn.setAttribute("aria-pressed", "true");
+      } else {
+        editBtn.removeAttribute("aria-pressed");
+      }
     }
 
-    turni.forEach(t => {
+    turni.forEach((t, index) => {
       const row = document.createElement("div");
       row.className = "turno-item";
+
+      // In modalità Modifica: pallino rosso (-) a sinistra
+      if (isEditing && onDelete) {
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "turno-delete-btn";
+        delBtn.setAttribute("aria-label", "Elimina turno");
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "turno-delete-icon";
+        iconSpan.textContent = "−";
+        delBtn.appendChild(iconSpan);
+
+        delBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          onDelete(index);
+        });
+
+        row.appendChild(delBtn);
+      }
 
       // [SIGLA] → pill quadrata, testo con colore scelto
       const siglaPill = document.createElement("span");
@@ -246,9 +283,29 @@ function getSiglaFontSizeValue(siglaText) {
     // Forziamo una lettura iniziale della var CSS (cache)
     getBaseSiglaFontSize();
 
+    // Stato locale turni + modalità Modifica
+    let turni = loadTurni();
+    let isEditing = false;
+
+    function refreshList() {
+      renderTurni(listEl, turni, emptyHint, btnEdit, {
+        isEditing,
+        onDelete: (index) => {
+          if (index < 0 || index >= turni.length) return;
+          turni.splice(index, 1);
+          saveTurni(turni);
+
+          if (!turni.length) {
+            isEditing = false;
+          }
+
+          refreshList();
+        }
+      });
+    }
+
     // Render iniziale da localStorage
-    const turniIniziali = loadTurni();
-    renderTurni(listEl, turniIniziali, emptyHint, btnEdit);
+    refreshList();
 
     // ----------------------------
     // Gestione colore sigla
@@ -350,6 +407,20 @@ function getSiglaFontSizeValue(siglaText) {
     });
 
     // ----------------------------
+    // Bottone "Modifica" → modalità cancellazione stile iOS
+    // ----------------------------
+
+    if (btnEdit) {
+      btnEdit.addEventListener("click", () => {
+        if (!Array.isArray(turni) || !turni.length) {
+          return;
+        }
+        isEditing = !isEditing;
+        refreshList();
+      });
+    }
+
+    // ----------------------------
     // Salvataggio nuovo turno
     // ----------------------------
 
@@ -387,10 +458,9 @@ function getSiglaFontSizeValue(siglaText) {
       }
 
       // Salva turno
-      const turni = loadTurni();
       turni.push({ nome, sigla, inizio, fine, colore });
       saveTurni(turni);
-      renderTurni(listEl, turni, emptyHint, btnEdit);
+      refreshList();
 
       // pulizia form per la prossima volta
       resetAddForm();
