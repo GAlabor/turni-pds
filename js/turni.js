@@ -43,14 +43,14 @@
   // 2 caratteri  → base
   // 3 caratteri  → base - 1
   // 4+ caratteri → base - 3
-  function getSiglaFontSizeValue(siglaText) {
-    const base = getBaseSiglaFontSize();
-    const len  = (siglaText || "").length;
+function getSiglaFontSizeValue(siglaText) {
+  const len = (siglaText || "").length;
 
-    if (len <= 2) return base;
-    if (len === 3) return base - 1;
-    return base - 3;
-  }
+  if (len <= 2) return 15;  // 1–2 caratteri
+  if (len === 3) return 14; // 3 caratteri
+  return 11.5;                // 4+ caratteri
+}
+
 
   function applySiglaFontSize(el, siglaText) {
     if (!el) return;
