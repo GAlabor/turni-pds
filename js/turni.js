@@ -5,6 +5,7 @@
 // - Render lista turni salvati
 // - Form "Aggiungi turno"
 // - Toggle "visualizza turnazione" (solo storage, non agganciato alla UI)
+// - Riordino turni tramite handle a destra in modalità Modifica
 // ============================
 
 (function () {
@@ -130,6 +131,8 @@
     const hasTurni = Array.isArray(turni) && turni.length > 0;
 
     if (!hasTurni) {
+      listEl.classList.remove("editing");
+
       if (emptyHintEl) {
         emptyHintEl.hidden = false;
       }
@@ -140,6 +143,9 @@
       }
       return;
     }
+
+    // indica visivamente la modalità Modifica (serve anche al CSS per mostrare le handle)
+    listEl.classList.toggle("editing", isEditing);
 
     if (emptyHintEl) {
       emptyHintEl.hidden = true;
@@ -158,6 +164,8 @@
     turni.forEach((t, index) => {
       const row = document.createElement("div");
       row.className = "turno-item";
+      // serve per ricostruire l'ordine dei turni dopo il drag
+      row.dataset.index = String(index);
 
       // In modalità Modifica: pallino rosso (-) a sinistra
       if (isEditing && onDelete) {
@@ -204,9 +212,22 @@
         orarioEl.textContent = `${t.inizio} - ${t.fine}`;
       }
 
+      // Handle di drag a destra (sempre presente; visibilità gestita via CSS con .turni-list.editing)
+      const handle = document.createElement("div");
+      handle.className = "turni-handle";
+      handle.setAttribute("aria-hidden", "true");
+      handle.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 7 H18" />
+          <path d="M6 12 H18" />
+          <path d="M6 17 H18" />
+        </svg>
+      `;
+
       row.appendChild(siglaPill);
       row.appendChild(nameEl);
       row.appendChild(orarioEl);
+      row.appendChild(handle);
 
       listEl.appendChild(row);
     });
@@ -308,6 +329,122 @@
     refreshList();
 
     // ----------------------------
+    // Drag & drop riordino turni (pointer events)
+    // ----------------------------
+
+    let draggedRow = null;
+
+    function getDragAfterElement(container, y) {
+      const rows = [...container.querySelectorAll(".turno-item:not(.dragging)")];
+
+      return rows.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - (box.top + box.height / 2);
+          if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+          } else {
+            return closest;
+          }
+        },
+        { offset: Number.NEGATIVE_INFINITY }
+      ).element;
+    }
+
+    function onPointerMove(e) {
+      if (!draggedRow) return;
+
+      e.preventDefault();
+      const y = e.clientY;
+
+      const rows = Array.from(listEl.querySelectorAll(".turno-item"));
+      const oldRects = new Map();
+      rows.forEach(row => {
+        oldRects.set(row, row.getBoundingClientRect());
+      });
+
+      const afterElement = getDragAfterElement(listEl, y);
+
+      // Se non cambia posizione, non fare niente
+      if (afterElement === draggedRow || (afterElement && afterElement.previousSibling === draggedRow)) {
+        return;
+      }
+
+      if (afterElement == null) {
+        listEl.appendChild(draggedRow);
+      } else {
+        listEl.insertBefore(draggedRow, afterElement);
+      }
+
+      // FLIP: anima gli altri righi che si spostano
+      const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
+      newRows.forEach(row => {
+        if (row === draggedRow) return;
+
+        const oldRect = oldRects.get(row);
+        if (!oldRect) return;
+        const newRect = row.getBoundingClientRect();
+
+        const dy = oldRect.top - newRect.top;
+        if (Math.abs(dy) > 1) {
+          row.style.transition = "none";
+          row.style.transform = `translateY(${dy}px)`;
+          requestAnimationFrame(() => {
+            row.style.transition = "transform 0.12s ease";
+            row.style.transform = "";
+          });
+        }
+      });
+    }
+
+    function onPointerUp() {
+      if (draggedRow) {
+        draggedRow.classList.remove("dragging");
+
+        // Ricostruisci l'array turni in base al nuovo ordine DOM
+        const newOrder = [];
+        const rowEls = listEl.querySelectorAll(".turno-item");
+        rowEls.forEach(rowEl => {
+          const idx = parseInt(rowEl.dataset.index, 10);
+          if (!Number.isNaN(idx) && turni[idx]) {
+            newOrder.push(turni[idx]);
+          }
+        });
+
+        if (newOrder.length === turni.length) {
+          turni = newOrder;
+          saveTurni(turni);
+          // resta in modalità Modifica, ma con i nuovi index aggiornati
+          refreshList();
+        }
+
+        draggedRow = null;
+      }
+
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+    }
+
+    listEl.addEventListener("pointerdown", (e) => {
+      if (!isEditing) return;
+
+      const handle = e.target.closest(".turni-handle");
+      if (!handle) return;
+
+      const row = handle.closest(".turno-item");
+      if (!row) return;
+
+      draggedRow = row;
+      draggedRow.classList.add("dragging");
+
+      // Evita scroll durante il drag su mobile
+      e.preventDefault();
+
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+    });
+
+    // ----------------------------
     // Gestione colore sigla
     // ----------------------------
 
@@ -407,7 +544,7 @@
     });
 
     // ----------------------------
-    // Bottone "Modifica" → modalità cancellazione stile iOS
+    // Bottone "Modifica" → modalità cancellazione + drag
     // ----------------------------
 
     if (btnEdit) {
@@ -481,7 +618,7 @@
   window.Turni = {
     init: initTurniPanel,
     getTurni: loadTurni,
-    getVisualizzaTurnazione: loadVisualToggle,
+    getVisualizzaTurnazione: loadVisualToggle
     // saveVisualToggle resta interno per ora, ma è pronto se ti serve
   };
 })();
