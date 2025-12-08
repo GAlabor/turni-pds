@@ -1,7 +1,7 @@
 // config.js
 
 // ============================
-// Config globale app Turni PDS
+// Config globale app Turni PdS
 // ============================
 
 (function () {

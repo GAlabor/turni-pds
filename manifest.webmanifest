@@ -1,6 +1,6 @@
 {
   "name": "Turni Polizia di Stato",
-  "short_name": "Turni PDS",
+  "short_name": "Turni PdS",
   "start_url": "/turni-pds/",
   "scope": "/turni-pds/",
   "display": "standalone",
