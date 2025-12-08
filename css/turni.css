@@ -148,7 +148,23 @@
 /* piccolo aiuto: mentre sei in editing, niente selezione testo */
 .turni-list.editing .turno-item {
   user-select: none;
+  -webkit-user-select: none;
 }
+
+/* Durante il drag vero e proprio: disabilita selezione e menu ovunque */
+html.turni-no-select,
+body.turni-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+html.turni-no-select * ,
+body.turni-no-select * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
 
 /* Riga in drag: sollevata, più chiara, con ombra */
 .turno-item.dragging {

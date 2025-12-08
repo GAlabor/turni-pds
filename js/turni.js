@@ -398,51 +398,69 @@
     }
 
     function onPointerUp() {
-      if (draggedRow) {
-        draggedRow.classList.remove("dragging");
+  if (draggedRow) {
+    draggedRow.classList.remove("dragging");
 
-        // Ricostruisci l'array turni in base al nuovo ordine DOM
-        const newOrder = [];
-        const rowEls = listEl.querySelectorAll(".turno-item");
-        rowEls.forEach(rowEl => {
-          const idx = parseInt(rowEl.dataset.index, 10);
-          if (!Number.isNaN(idx) && turni[idx]) {
-            newOrder.push(turni[idx]);
-          }
-        });
-
-        if (newOrder.length === turni.length) {
-          turni = newOrder;
-          saveTurni(turni);
-          // resta in modalità Modifica, ma con i nuovi index aggiornati
-          refreshList();
-        }
-
-        draggedRow = null;
+    // Ricostruisci l'array turni in base al nuovo ordine DOM
+    const newOrder = [];
+    const rowEls = listEl.querySelectorAll(".turno-item");
+    rowEls.forEach(rowEl => {
+      const idx = parseInt(rowEl.dataset.index, 10);
+      if (!Number.isNaN(idx) && turni[idx]) {
+        newOrder.push(turni[idx]);
       }
+    });
 
-      document.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("pointerup", onPointerUp);
+    if (newOrder.length === turni.length) {
+      turni = newOrder;
+      saveTurni(turni);
+      // resta in modalità Modifica, ma con i nuovi index aggiornati
+      refreshList();
     }
 
-    listEl.addEventListener("pointerdown", (e) => {
-      if (!isEditing) return;
+    draggedRow = null;
+  }
 
-      const handle = e.target.closest(".turni-handle");
-      if (!handle) return;
+  // riabilita selezione normale
+  document.documentElement.classList.remove("turni-no-select");
+  document.body.classList.remove("turni-no-select");
 
-      const row = handle.closest(".turno-item");
-      if (!row) return;
+  document.removeEventListener("pointermove", onPointerMove);
+  document.removeEventListener("pointerup", onPointerUp);
+}
 
-      draggedRow = row;
-      draggedRow.classList.add("dragging");
 
-      // Evita scroll durante il drag su mobile
-      e.preventDefault();
+listEl.addEventListener("pointerdown", (e) => {
+  if (!isEditing) return;
 
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    });
+  const handle = e.target.closest(".turni-handle");
+  if (!handle) return;
+
+  const row = handle.closest(".turno-item");
+  if (!row) return;
+
+  draggedRow = row;
+  draggedRow.classList.add("dragging");
+
+  // blocca selezione/testo + menu lungo pressione
+  document.documentElement.classList.add("turni-no-select");
+  document.body.classList.add("turni-no-select");
+
+  // Evita scroll durante il drag su mobile
+  e.preventDefault();
+
+  // se c'è qualche selezione già attiva, la togliamo
+  if (window.getSelection) {
+    const sel = window.getSelection();
+    if (sel && sel.removeAllRanges) {
+      sel.removeAllRanges();
+    }
+  }
+
+  document.addEventListener("pointermove", onPointerMove);
+  document.addEventListener("pointerup", onPointerUp);
+});
+
 
     // ----------------------------
     // Gestione colore sigla
