@@ -79,27 +79,31 @@
 
 /* Pallino rosso con "-" a sinistra del turno, visibile solo in modalità Modifica */
 .turno-delete-btn {
-  width: 30px;
-  height: 30px;
+  width: 26px; 
+  height: 26px;
   border-radius: 999px;
   border: none;
   margin-right: 4px;
-  background: #ef4444;
+
+  background: #dc2626;
+  
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(220,38,38,0.5);
+
+  box-shadow: 0 1.5px 4px rgba(220,38,38,0.35);
 }
 
 .turno-delete-icon {
   color: #ffffff;
-  font-size: 20px;
+  font-size: 17px;
   line-height: 1;
   transform: translateY(-0.5px);
 }
+
 
 @media (hover:hover) {
   .turno-delete-btn:hover {
