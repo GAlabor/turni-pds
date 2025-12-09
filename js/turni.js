@@ -613,6 +613,13 @@
       toggleBtn.addEventListener("click", (e) => {
         e.stopPropagation(); // gestisce solo il toggle freccia
         isCollapsed = !isCollapsed;
+
+        // Se sto chiudendo il rigo Turni, esco anche dalla modalità Modifica
+        if (isCollapsed && isEditing) {
+          isEditing = false;
+          refreshList();
+        }
+
         applyCollapsedState();
       });
     }
@@ -626,6 +633,13 @@
         }
 
         isCollapsed = !isCollapsed;
+
+        // Se sto chiudendo il rigo Turni con tap sul rigo, esco da Modifica
+        if (isCollapsed && isEditing) {
+          isEditing = false;
+          refreshList();
+        }
+
         applyCollapsedState();
       });
     }
