@@ -3,7 +3,7 @@
 // Pannello Turni (Impostazioni → Turni)
 // - Gestione storage turni (localStorage)
 // - Render lista turni salvati
-// - Form "Aggiungi turno"
+// - Form "Aggiungi turno" / "Modifica turno"
 // - Toggle "visualizza turnazione" (solo storage, non agganciato alla UI)
 // - Riordino turni tramite handle a destra in modalità Modifica
 // ============================
@@ -272,7 +272,7 @@
 
   // ============================
   // Init pannello UI Turni
-  // (lista + pannello "Aggiungi turno")
+  // (lista + pannello "Aggiungi turno" / "Modifica turno")
   // ============================
 
   function initTurniPanel() {
@@ -317,6 +317,10 @@
       return;
     }
 
+    // Titolo predefinito del pannello add/edit
+    const defaultAddTitle = panelAdd.dataset.settingsTitle || "Aggiungi turno";
+    const editTitle       = "Modifica turno";
+
     // Forziamo una lettura iniziale della var CSS (cache)
     getBaseSiglaFontSize();
 
@@ -324,6 +328,9 @@
     let turni = loadTurni();
     let isEditing = false;
     let isCollapsed = false; // pannello aperto di default
+
+    // indice del turno attualmente in modifica; null = aggiunta nuovo
+    let editIndex = null;
 
     function applyCollapsedState() {
       cardEl.classList.toggle("is-collapsed", isCollapsed);
@@ -354,6 +361,60 @@
       isEditing = false;
       refreshList();
     };
+
+    // ============================
+    // Helper: form "nuovo" vs "modifica"
+    // ============================
+
+    function resetAddForm() {
+      // non tocca titolo pannello; solo contenuti
+      clearError();
+      inputNome.value   = "";
+      inputSigla.value  = "";
+      inputInizio.value = "";
+      inputFine.value   = "";
+      siglaPreviewEl.textContent = "";
+      applySiglaFontSize(siglaPreviewEl, "");
+      colorInput.value  = "#0a84ff";
+      applyColorPreview();
+    }
+
+    function openNewTurnoPanel() {
+      editIndex = null;
+      panelAdd.dataset.settingsTitle = defaultAddTitle;
+      resetAddForm();
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni-add");
+      }
+    }
+
+    function openEditTurnoPanel(index) {
+      const t = turni[index];
+      if (!t) return;
+
+      editIndex = index;
+      panelAdd.dataset.settingsTitle = editTitle;
+
+      clearError();
+
+      inputNome.value   = t.nome || "";
+      inputSigla.value  = t.sigla || "";
+      inputInizio.value = t.inizio || "";
+      inputFine.value   = t.fine || "";
+
+      // Colore
+      colorInput.value = t.colore || "#0a84ff";
+      applyColorPreview();
+
+      // Anteprima sigla
+      siglaPreviewEl.textContent = t.sigla || "";
+      applySiglaFontSize(siglaPreviewEl, t.sigla || "");
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni-add");
+      }
+    }
 
     // Render iniziale da localStorage
     refreshList();
@@ -492,6 +553,27 @@
     });
 
     // ----------------------------
+    // Click su rigo turno in modalità Modifica → "Modifica turno"
+    // ----------------------------
+
+    listEl.addEventListener("click", (e) => {
+      if (!isEditing) return;
+
+      // ignora click su pallino rosso e sulla maniglia
+      if (e.target.closest(".turno-delete-btn") || e.target.closest(".turni-handle")) {
+        return;
+      }
+
+      const row = e.target.closest(".turno-item");
+      if (!row) return;
+
+      const idx = parseInt(row.dataset.index, 10);
+      if (Number.isNaN(idx) || !turni[idx]) return;
+
+      openEditTurnoPanel(idx);
+    });
+
+    // ----------------------------
     // Gestione colore sigla
     // ----------------------------
 
@@ -524,7 +606,7 @@
     });
 
     // ----------------------------
-    // Gestione errori form "Aggiungi turno"
+    // Gestione errori form "Aggiungi turno" / "Modifica turno"
     // ----------------------------
 
     let errorTimer = null;
@@ -563,32 +645,12 @@
     });
 
     // ----------------------------
-    // Reset form Aggiungi turno
-    // ----------------------------
-
-    function resetAddForm() {
-      clearError();
-      inputNome.value   = "";
-      inputSigla.value  = "";
-      inputInizio.value = "";
-      inputFine.value   = "";
-      siglaPreviewEl.textContent = "";
-      applySiglaFontSize(siglaPreviewEl, "");
-      colorInput.value  = "#0a84ff";
-      applyColorPreview();
-    }
-
-    // ----------------------------
-    // Apertura pannello "Aggiungi turno"
+    // Apertura pannello "Aggiungi turno" (nuovo)
     // ----------------------------
 
     btnAdd.addEventListener("click", (e) => {
       e.stopPropagation(); // non collassare la card quando apri Aggiungi turno
-      resetAddForm();
-
-      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        SettingsUI.openPanel("turni-add");
-      }
+      openNewTurnoPanel();
     });
 
     // ----------------------------
@@ -645,7 +707,7 @@
     }
 
     // ----------------------------
-    // Salvataggio nuovo turno
+    // Salvataggio nuovo turno / modifica turno
     // ----------------------------
 
     saveBtn.addEventListener("click", () => {
@@ -681,12 +743,24 @@
         return;
       }
 
-      // Salva turno
-      turni.push({ nome, sigla, inizio, fine, colore });
+      const payload = { nome, sigla, inizio, fine, colore };
+
+      // Se ho un indice valido → MODIFICA
+      if (editIndex !== null &&
+          editIndex >= 0 &&
+          editIndex < turni.length) {
+        turni[editIndex] = payload;
+      } else {
+        // altrimenti → NUOVO turno
+        turni.push(payload);
+      }
+
       saveTurni(turni);
       refreshList();
 
-      // pulizia form per la prossima volta
+      // dopo il salvataggio, torni in modalità "Aggiungi turno" per il prossimo giro
+      editIndex = null;
+      panelAdd.dataset.settingsTitle = defaultAddTitle;
       resetAddForm();
 
       // ritorna alla schermata Turni
