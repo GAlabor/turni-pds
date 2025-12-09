@@ -57,35 +57,6 @@
   }
 
   // ============================
-  // Nome turno: font dinamico in MODIFICA
-  // - Se il testo supera 11 caratteri, riduciamo un po' in edit mode
-  // ============================
-
-  function getTurnoNameFontSizeValue(nameText, isEditing) {
-    if (!isEditing) return null;
-
-    const len = (nameText || "").length;
-
-    // fino a 11 caratteri → dimensione normale (CSS)
-    if (len <= 11) return null;
-    if (len <= 15) return 14;   // leggermente ridotto
-    if (len <= 20) return 13;   // ancora più compatto
-    return 12;                  // oltre 20 caratteri → minimo "accettabile"
-  }
-
-  function applyTurnoNameFontSize(el, nameText, isEditing) {
-    if (!el) return;
-    const sizePx = getTurnoNameFontSizeValue(nameText, isEditing);
-
-    if (sizePx) {
-      el.style.fontSize = `${sizePx}px`;
-    } else {
-      // fuori da edit o nome corto → lascia gestire tutto al CSS
-      el.style.fontSize = "";
-    }
-  }
-
-  // ============================
   // Storage: turni personalizzati
   // ============================
 
@@ -246,10 +217,7 @@
 
       const nameEl = document.createElement("span");
       nameEl.className = "turno-name";
-      const nomeTxt = t.nome || "";
-      nameEl.textContent = nomeTxt;
-      // font dinamico in MODIFICA se il nome è lungo
-      applyTurnoNameFontSize(nameEl, nomeTxt, isEditing);
+      nameEl.textContent = t.nome || "";
 
       const orarioEl = document.createElement("span");
       orarioEl.className = "turno-orario";
