@@ -347,6 +347,14 @@
       });
     }
 
+    // espone un modo per uscire dalla modalità Modifica quando
+    // si esce dal menu Impostazioni / si cambia tab
+    window.Turni.exitEditMode = function () {
+      if (!isEditing) return;
+      isEditing = false;
+      refreshList();
+    };
+
     // Render iniziale da localStorage
     refreshList();
     applyCollapsedState();
@@ -574,7 +582,8 @@
     // Apertura pannello "Aggiungi turno"
     // ----------------------------
 
-    btnAdd.addEventListener("click", () => {
+    btnAdd.addEventListener("click", (e) => {
+      e.stopPropagation(); // non collassare la card quando apri Aggiungi turno
       resetAddForm();
 
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
@@ -587,7 +596,8 @@
     // ----------------------------
 
     if (btnEdit) {
-      btnEdit.addEventListener("click", () => {
+      btnEdit.addEventListener("click", (e) => {
+        e.stopPropagation(); // non far collassare l'header
         if (!Array.isArray(turni) || !turni.length) {
           return;
         }
@@ -600,22 +610,22 @@
     // Freccia apri/chiudi pannello Turni
     // ----------------------------
     if (toggleBtn) {
-      toggleBtn.addEventListener("click", () => {
+      toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // gestisce solo il toggle freccia
         isCollapsed = !isCollapsed;
         applyCollapsedState();
       });
     }
 
-    // Header cliccabile SOLO quando il pannello è chiuso:
-    // tap su tutto il rigo riapre, ma non richiude mai.
+    // Header cliccabile: apre/chiude il pannello,
+    // ma ignora click su Modifica, + e freccia.
     if (headerEl) {
       headerEl.addEventListener("click", (e) => {
-        // se è aperto, non fa nulla (chiude solo la freccia)
-        if (!isCollapsed) return;
-        // evita doppio toggle se il click arriva dalla freccia
-        if (e.target.closest("[data-turni-toggle]")) return;
+        if (e.target.closest("[data-turni-edit],[data-turni-add],[data-turni-toggle]")) {
+          return;
+        }
 
-        isCollapsed = false;
+        isCollapsed = !isCollapsed;
         applyCollapsedState();
       });
     }
@@ -681,7 +691,8 @@
   window.Turni = {
     init: initTurniPanel,
     getTurni: loadTurni,
-    getVisualizzaTurnazione: loadVisualToggle
-    // saveVisualToggle resta interno per ora, ma è pronto se ti serve
+    getVisualizzaTurnazione: loadVisualToggle,
+    // impostata a no-op, poi rimpiazzata da initTurniPanel
+    exitEditMode: function () {}
   };
 })();

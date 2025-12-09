@@ -87,6 +87,11 @@
     // ----------------------------
 
     function showMain() {
+      // tornando alla lista principale → usciamo dalla modalità Modifica Turni
+      if (window.Turni && typeof Turni.exitEditMode === "function") {
+        Turni.exitEditMode();
+      }
+
       activePanelId = null;
       main.classList.add("is-active");
       panels.forEach(p => p.classList.remove("is-active"));
@@ -95,6 +100,22 @@
 
     function showPanel(id) {
       if (!id) return;
+
+      // Se stiamo lasciando il pannello "Turni" verso qualsiasi altro pannello,
+      // assicuriamoci di uscire dalla modalità Modifica.
+      if (activePanelId === "turni" && id !== "turni") {
+        if (window.Turni && typeof Turni.exitEditMode === "function") {
+          Turni.exitEditMode();
+        }
+      }
+
+      // Se entriamo nel pannello "Aggiungi turno", consideriamo chiusa la modalità Modifica.
+      if (id === "turni-add") {
+        if (window.Turni && typeof Turni.exitEditMode === "function") {
+          Turni.exitEditMode();
+        }
+      }
+
       activePanelId = id;
       main.classList.remove("is-active");
       panels.forEach(p => {
