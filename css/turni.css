@@ -27,7 +27,7 @@
 .turno-item {
   display: flex;
   align-items: center;
-  gap: 6px; /* RIDOTTO (prima 10px) → riga più compatta */
+  gap: 10px;
   padding: 6px 2px;
   border-bottom: 1px solid var(--border);
   position: relative;
@@ -59,26 +59,18 @@
   color: var(--text); /* sovrascritto inline con il colore scelto */
 }
 
-/* Nome turno: singola riga, ellissi, prende lo spazio centrale */
 .turno-name {
   font-size: var(--fs-turni-nome);
   font-weight: 500;
   color: var(--text);
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;        /* forzato su un rigo */
-  overflow: hidden;           /* niente wrap */
-  text-overflow: ellipsis;    /* "..." se troppo lungo */
 }
 
 /* Orario allineato verso destra, prima della maniglia */
 .turno-orario {
   margin-left: auto;
-  margin-right: 0px;          /* leggermente più vicino all’handle */
   font-size: var(--fs-turni-orario);
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;        /* orario sempre su un rigo */
 }
 
 /* =========================
@@ -92,7 +84,7 @@
   height: 22px;
   border-radius: 999px;
   border: none;
-  margin-right: 4px; /* resta basso, con gap ridotto è già più vicino alla sigla */
+  margin-right: 4px;
 
   background: #d31a1a;
 
@@ -133,7 +125,7 @@
 .turni-handle {
   width: 24px;
   height: 24px;
-  margin-left: 2px; /* RIDOTTO (prima 8px) → più vicino all’orario */
+  margin-left: 8px;
   display: none;
   flex-shrink: 0;
   cursor: grab;
@@ -185,6 +177,52 @@ body.turni-no-select * {
   box-shadow: 0 12px 28px rgba(15,23,42,0.4);
   transform: scale(1.02);
   z-index: 5;
+}
+
+/* =========================
+   LAYOUT COMPATTO SOLO IN MODIFICA
+   ========================= */
+
+/* Riga più compatta in edit */
+.turni-list.editing .turno-item {
+  gap: 6px; /* meno spazio orizzontale tra tutti gli elementi */
+}
+
+/* stringiamo ancora un filo tra pallino rosso e sigla */
+.turni-list.editing .turno-delete-btn {
+  margin-right: 2px;
+}
+
+/* e tra sigla e nome */
+.turni-list.editing .turno-sigla-pill {
+  margin-right: 2px;
+}
+
+/* Nome turno in edit:
+   - un solo rigo
+   - font leggermente più piccolo
+   - letter-spacing un filo ridotto
+   - ellissi se troppo lungo
+*/
+.turni-list.editing .turno-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: calc(var(--fs-turni-nome) * 0.9);
+  letter-spacing: -0.01em;
+}
+
+/* Orario sempre su un rigo */
+.turno-orario {
+  white-space: nowrap;
+}
+
+/* In edit, avviciniamo un po' le tre linee all'orario
+   per far scorrere l'orario leggermente più a destra */
+.turni-list.editing .turni-handle {
+  margin-left: 4px;
 }
 
 /* =========================
