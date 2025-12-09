@@ -291,6 +291,9 @@
     const emptyHint  = panelTurni.querySelector("[data-turni-empty-hint]");
     const btnAdd     = panelTurni.querySelector("[data-turni-add]");
     const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
+    const toggleBtn  = panelTurni.querySelector("[data-turni-toggle]");
+    const cardEl     = panelTurni.querySelector(".turni-card");
+    const headerEl   = panelTurni.querySelector(".turni-card-header");
 
     // --- elementi pannello "Aggiungi turno" ---
     const formEl         = panelAdd.querySelector("[data-turni-add-form]");
@@ -306,7 +309,7 @@
     const siglaPreviewEl = panelAdd.querySelector("[data-turni-sigla-preview]");
 
     if (
-      !listEl || !btnAdd || !formEl ||
+      !listEl || !btnAdd || !btnEdit || !toggleBtn || !cardEl || !headerEl || !formEl ||
       !inputNome || !inputSigla || !inputInizio || !inputFine ||
       !colorInput || !colorPreview || !colorTrigger ||
       !saveBtn || !errorEl || !siglaPreviewEl
@@ -320,6 +323,12 @@
     // Stato locale turni + modalità Modifica
     let turni = loadTurni();
     let isEditing = false;
+    let isCollapsed = false; // pannello aperto di default
+
+    function applyCollapsedState() {
+      cardEl.classList.toggle("is-collapsed", isCollapsed);
+      toggleBtn.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+    }
 
     function refreshList() {
       renderTurni(listEl, turni, emptyHint, btnEdit, {
@@ -340,6 +349,7 @@
 
     // Render iniziale da localStorage
     refreshList();
+    applyCollapsedState();
 
     // ----------------------------
     // Drag & drop riordino turni (pointer events)
@@ -583,6 +593,30 @@
         }
         isEditing = !isEditing;
         refreshList();
+      });
+    }
+
+    // ----------------------------
+    // Freccia apri/chiudi pannello Turni
+    // ----------------------------
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        isCollapsed = !isCollapsed;
+        applyCollapsedState();
+      });
+    }
+
+    // Header cliccabile SOLO quando il pannello è chiuso:
+    // tap su tutto il rigo riapre, ma non richiude mai.
+    if (headerEl) {
+      headerEl.addEventListener("click", (e) => {
+        // se è aperto, non fa nulla (chiude solo la freccia)
+        if (!isCollapsed) return;
+        // evita doppio toggle se il click arriva dalla freccia
+        if (e.target.closest("[data-turni-toggle]")) return;
+
+        isCollapsed = false;
+        applyCollapsedState();
       });
     }
 

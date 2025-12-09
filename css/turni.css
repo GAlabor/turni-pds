@@ -107,8 +107,6 @@
   pointer-events: none; /* evita click fantasma sull’icona */
 }
 
-
-
 @media (hover:hover) {
   .turno-delete-btn:hover {
     filter: brightness(1.05);
@@ -173,13 +171,102 @@ body.turni-no-select * {
   -webkit-user-select: none !important;
 }
 
-
 /* Riga in drag: sollevata, più chiara, con ombra */
 .turno-item.dragging {
   background: var(--surface-strong);
   box-shadow: 0 12px 28px rgba(15,23,42,0.4);
   transform: scale(1.02);
   z-index: 5;
+}
+
+/* =========================
+   CARD / HEADER PANNELLO TURNI
+   ========================= */
+
+/* Card principale del pannello "Turni" */
+.turni-card {
+  margin-top: 8px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  padding: 18px 16px 16px;
+}
+
+.turni-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Titolo interno del pannello Turni (più piccolo del titolo pagina) */
+.turni-panel-title {
+  margin: 0;
+  font-size: var(--fs-turni-panel-title-desktop);
+  font-weight: 600;
+  letter-spacing: var(--ls-turni-panel-title);
+}
+
+/* Contenitore dei controlli a destra (Modifica + "+" + freccia) */
+.turni-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Nel pannello Turni, "Modifica" e "+" usano il colore delle frecce mese */
+.settings-panel.settings-turni .pill-btn,
+.settings-panel.settings-turni .icon-circle-btn {
+  color: var(--nav-fg);
+}
+
+/* Freccia toggle a destra */
+.turni-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--subtext);
+}
+
+/* SVG freccia: ruota con animazione */
+.turni-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: center;
+  transition: transform 0.16s ease;
+}
+
+/* Pannello collassato: freccia ruotata verso il basso */
+.turni-card.is-collapsed .turni-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+/* Quando il pannello è collassato:
+   - nascondi la lista
+   - nascondi l'hint
+   - Modifica e + restano nello stesso spazio ma invisibili (niente click) */
+.turni-card.is-collapsed .turni-list,
+.turni-card.is-collapsed .turni-empty-hint {
+  display: none;
+}
+
+.turni-card.is-collapsed .turni-card-actions .pill-btn,
+.turni-card.is-collapsed .turni-card-actions .icon-circle-btn {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* =========================
@@ -337,48 +424,6 @@ body.turni-no-select * {
   font-size: var(--fs-turni-sigla);
   font-weight: 600;
   color: var(--text); /* sovrascritto via JS con il colore scelto */
-}
-
-/* =========================
-   CARD / HEADER PANNELLO TURNI
-   ========================= */
-
-/* Card principale del pannello "Turni" */
-.turni-card {
-  margin-top: 8px;
-  background: var(--surface);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
-  padding: 18px 16px 16px;
-}
-
-.turni-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-/* Titolo interno del pannello Turni (più piccolo del titolo pagina) */
-.turni-panel-title {
-  margin: 0;
-  font-size: var(--fs-turni-panel-title-desktop);
-  font-weight: 600;
-  letter-spacing: var(--ls-turni-panel-title);
-}
-
-/* Contenitore dei controlli a destra (Modifica + "+") */
-.turni-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Nel pannello Turni, "Modifica" e "+" usano il colore delle frecce mese */
-.settings-panel.settings-turni .pill-btn,
-.settings-panel.settings-turni .icon-circle-btn {
-  color: var(--nav-fg);
 }
 
 /* =========================

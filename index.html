@@ -15,7 +15,7 @@
 
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
-  <title>Turni PdS</title>
+  <title>Turni PDS</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/base.css">
@@ -236,7 +236,7 @@
         <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-group">
             <p class="settings-hint">
-              Scegli come visualizzare Turni PdS.
+              Scegli come visualizzare Turni PDS.
             </p>
           </div>
 
@@ -258,6 +258,7 @@
           <div class="turni-card">
             <div class="turni-card-header">
               <h2 class="turni-panel-title">Turni</h2>
+
               <div class="turni-card-actions">
                 <button class="pill-btn" type="button" data-turni-edit disabled>
                   Modifica
@@ -266,6 +267,17 @@
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 5 L12 19" />
                     <path d="M5 12 L19 12" />
+                  </svg>
+                </button>
+                <button
+                  class="turni-toggle-btn"
+                  type="button"
+                  data-turni-toggle
+                  aria-label="Mostra o nascondi i turni"
+                  aria-expanded="true">
+                  <!-- arrow-up.svg inline -->
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 14 L12 8 L18 14" />
                   </svg>
                 </button>
               </div>
@@ -316,36 +328,34 @@
             <div class="turni-field-row">
               <label class="turni-label" for="addTurnoSigla">Sigla</label>
 
-<div class="turni-field-control turni-field-control-sigla">
-  <input
-    class="turni-input"
-    id="addTurnoSigla"
-    type="text"
-    maxlength="4"
-    autocomplete="off">
+              <div class="turni-field-control turni-field-control-sigla">
+                <input
+                  class="turni-input"
+                  id="addTurnoSigla"
+                  type="text"
+                  maxlength="4"
+                  autocomplete="off">
 
-  <!-- Il pallino DIVENTA un label collegato all'input colore -->
-  <label
-    class="turni-color-dot"
-    for="addTurnoColore"
-    data-turni-color-trigger
-    aria-label="Scegli colore sigla">
-    <span class="turni-color-preview" data-turni-color-preview></span>
-  </label>
+                <!-- Il pallino DIVENTA un label collegato all'input colore -->
+                <label
+                  class="turni-color-dot"
+                  for="addTurnoColore"
+                  data-turni-color-trigger
+                  aria-label="Scegli colore sigla">
+                  <span class="turni-color-preview" data-turni-color-preview></span>
+                </label>
 
-  <div class="turni-sigla-preview-pill" aria-hidden="true">
-    <span class="turni-sigla-preview-text" data-turni-sigla-preview></span>
-  </div>
+                <div class="turni-sigla-preview-pill" aria-hidden="true">
+                  <span class="turni-sigla-preview-text" data-turni-sigla-preview></span>
+                </div>
 
-  <input
-    class="turni-color-input"
-    id="addTurnoColore"
-    type="color"
-    value="#0a84ff"
-    data-turni-color>
-</div>
-
-
+                <input
+                  class="turni-color-input"
+                  id="addTurnoColore"
+                  type="color"
+                  value="#0a84ff"
+                  data-turni-color>
+              </div>
             </div>
 
             <!-- Ora inizio -->
