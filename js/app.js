@@ -81,51 +81,6 @@
   }
 
   // ============================
-  // Normalizzazione input time: 24 → 00
-  // (per tutti gli <input type="time" data-time-fix-24>)
-  // ============================
-
-  function normalizeTime24Value(value) {
-    if (typeof value !== "string" || !value) return value;
-
-    const parts = value.split(":");
-    if (!parts.length) return value;
-
-    const rawH = parts[0].trim();
-    let h = parseInt(rawH, 10);
-    if (Number.isNaN(h)) return value;
-
-    // accettiamo 24:xx → 00:xx
-    if (h === 24) {
-      h = 0;
-    } else if (h < 0 || h > 24) {
-      // fuori range, non tocchiamo nulla
-      return value;
-    }
-
-    const mmRaw = parts[1] != null ? parts[1] : "00";
-    const mm = mmRaw.slice(0, 2);
-
-    const hh = String(h).padStart(2, "0");
-    return `${hh}:${mm}`;
-  }
-
-  function initTime24Fix() {
-    const inputs = document.querySelectorAll('input[type="time"][data-time-fix-24]');
-    if (!inputs.length) return;
-
-    inputs.forEach(input => {
-      input.addEventListener("input", () => {
-        const current = input.value;
-        const normalized = normalizeTime24Value(current);
-        if (normalized && normalized !== current) {
-          input.value = normalized;
-        }
-      });
-    });
-  }
-
-  // ============================
   // Bootstrap all’avvio
   // ============================
   window.addEventListener("DOMContentLoaded", () => {
@@ -143,9 +98,6 @@
     if (window.Theme && typeof Theme.init === "function") {
       Theme.init();
     }
-
-    // Normalizza input orari (24 -> 00) dove richiesto
-    initTime24Fix();
 
     // Tabbar (switch tra le viste principali)
     initTabs();
