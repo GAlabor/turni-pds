@@ -458,8 +458,12 @@ body.turni-no-select * {
   color: #ffffff;
   border-color: var(--accent);
   box-shadow: none;
-  height: 36px;
-  padding: 0 16px;
+}
+
+/* Salva: pill più grande solo per il pannello Turni */
+.pill-btn.turni-save-btn {
+  height: 40px;
+  padding: 0 20px;
 }
 
 .turni-save-btn:active {
