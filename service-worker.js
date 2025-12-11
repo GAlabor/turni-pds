@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V4.1';
+const VERSION    = '2025-11-20 V4.2';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -36,7 +36,10 @@ const PRECACHE_URLS = [
   `${ROOT}/js/status.js`,
   `${ROOT}/js/icons.js`,
   `${ROOT}/js/settings.js`,
+  `${ROOT}/js/turni-storage.js`,
+  `${ROOT}/js/turni-render.js`,
   `${ROOT}/js/turni.js`,
+
 
   // Icone / favicon
   `${ROOT}/favicon.ico`,
