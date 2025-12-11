@@ -14,7 +14,7 @@
   // ============================
   // Init pannello UI Turni
   // (lista + pannello "Aggiungi turno" / "Modifica turno")
-// ============================
+  // ============================
 
   function initTurniPanel() {
     const settingsView = document.querySelector(".view-settings");
@@ -35,16 +35,20 @@
 
     if (!panelTurni || !panelAdd) return;
 
-    // --- elementi pannello lista ---  
+    // --- elementi pannello lista ---
     const listEl     = panelTurni.querySelector("[data-turni-list]");
     const emptyHint  = panelTurni.querySelector("[data-turni-empty-hint]");
     const btnAdd     = panelTurni.querySelector("[data-turni-add]");
     const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
     const toggleBtn  = panelTurni.querySelector("[data-turni-toggle]");
-    const cardEl     = panelTurni.querySelector(".turni-card");
-    const headerEl   = panelTurni.querySelector(".turni-card-header");
+    const cardEl     = panelTurni.querySelector(".turni-card:not(.turnazioni-card)");
+    const headerEl   = cardEl ? cardEl.querySelector(".turni-card-header") : null;
 
-    // --- elementi pannello "Aggiungi turno" ---  
+    // Blocco "Visualizza turnazione"
+    const visualToggleBtn = panelTurni.querySelector("[data-turni-visual-toggle]");
+    const visualHint      = panelTurni.querySelector("[data-turni-visual-hint]");
+
+    // --- elementi pannello "Aggiungi turno" ---
     const formEl         = panelAdd.querySelector("[data-turni-add-form]");
     const inputNome      = panelAdd.querySelector("#addTurnoNome");
     const inputSigla     = panelAdd.querySelector("#addTurnoSigla");
@@ -73,7 +77,7 @@
     // Stato locale turni + modalità Modifica
     let turni = loadTurni();
     let isEditing = false;
-    let isCollapsed = false; // pannello aperto di default
+    let isCollapsed = true; // pannello TURNI chiuso di default
 
     // indice del turno attualmente in modifica; null = aggiunta nuovo
     let editIndex = null;
@@ -98,6 +102,86 @@
           refreshList();
         }
       });
+    }
+
+    // =========================
+    // TOGGLE "VISUALIZZA TURNAZIONE"
+    // =========================
+    if (visualToggleBtn && window.TurniStorage && typeof TurniStorage.loadVisualToggle === "function") {
+      let visualOn = TurniStorage.loadVisualToggle();
+
+      function applyVisualState() {
+        visualToggleBtn.classList.toggle("is-on", visualOn);
+        visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
+
+        // se il toggle è OFF, nascondi "Nessuna turnazione impostata"
+        if (visualHint) {
+          visualHint.hidden = !visualOn;
+        }
+      }
+
+      applyVisualState();
+
+      visualToggleBtn.addEventListener("click", () => {
+        visualOn = !visualOn;
+        applyVisualState();
+
+        if (typeof TurniStorage.saveVisualToggle === "function") {
+          TurniStorage.saveVisualToggle(visualOn);
+        }
+      });
+    }
+
+    // =========================
+    // CARD "TURNAZIONI" (scheletro)
+    // =========================
+    const turnazioniCard      = panelTurni.querySelector(".turnazioni-card");
+    const turnazioniToggleBtn = panelTurni.querySelector("[data-turnazioni-toggle]");
+    const turnazioniHeader    = turnazioniCard ? turnazioniCard.querySelector(".turni-card-header") : null;
+    const turnazioniAddBtn    = panelTurni.querySelector("[data-turnazioni-add]");
+    const turnazioniEditBtn   = panelTurni.querySelector("[data-turnazioni-edit]");
+
+    let turnazioniCollapsed = true; // di base chiusa
+
+    function applyTurnazioniCollapsed() {
+      if (!turnazioniCard || !turnazioniToggleBtn) return;
+      turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
+      turnazioniToggleBtn.setAttribute("aria-expanded", turnazioniCollapsed ? "false" : "true");
+    }
+
+    applyTurnazioniCollapsed();
+
+    if (turnazioniToggleBtn) {
+      turnazioniToggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        turnazioniCollapsed = !turnazioniCollapsed;
+        applyTurnazioniCollapsed();
+      });
+    }
+
+    if (turnazioniHeader) {
+      turnazioniHeader.addEventListener("click", (e) => {
+        // non intercettare click su + o freccia
+        if (e.target.closest("[data-turnazioni-add],[data-turnazioni-toggle]")) {
+          return;
+        }
+        turnazioniCollapsed = !turnazioniCollapsed;
+        applyTurnazioniCollapsed();
+      });
+    }
+
+    if (turnazioniAddBtn) {
+      turnazioniAddBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          SettingsUI.openPanel("turnazioni-add");
+        }
+      });
+    }
+
+    // Modifica resta disabilitato fino a quando non implementiamo davvero le turnazioni
+    if (turnazioniEditBtn) {
+      turnazioniEditBtn.disabled = true;
     }
 
     // espone un modo per uscire dalla modalità Modifica quando
@@ -511,6 +595,12 @@
 
       // ritorna alla schermata Turni
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        // quando rientro in Impostazioni → Turni li voglio compressi
+        isCollapsed = true;
+        applyCollapsedState();
+        turnazioniCollapsed = true;
+        applyTurnazioniCollapsed();
+
         SettingsUI.openPanel("turni");
       }
     });

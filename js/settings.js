@@ -145,13 +145,21 @@
 
     // click sulla freccia in alto a sinistra
     backBtn.addEventListener("click", () => {
-      // Caso speciale: se siamo nel pannello "Aggiungi turno",
+      // Caso speciale 1: se siamo nel pannello "Aggiungi turno",
       // il back riporta al pannello "Turni", NON alla main list.
       if (activePanelId === "turni-add") {
         showPanel("turni");
         return;
       }
 
+      // Caso speciale 2: se siamo nel pannello "Aggiungi turnazione",
+      // stesso comportamento: si torna a "Turni".
+      if (activePanelId === "turnazioni-add") {
+        showPanel("turni");
+        return;
+      }
+
+      // Default: torna al menu impostazioni
       showMain();
     });
   }
@@ -170,7 +178,7 @@
       }
     },
 
-    // usato da turni.js per aprire pannelli specifici (es. "turni-add")
+    // usato da turni.js per aprire pannelli specifici (es. "turni-add", "turnazioni-add")
     openPanel: function (id) {
       if (typeof settingsApi.showPanelFn === "function") {
         settingsApi.showPanelFn(id);

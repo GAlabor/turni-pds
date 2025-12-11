@@ -253,9 +253,64 @@
           </button>
         </div>
 
-        <!-- PANNELLO TURNI (lista + pulsanti) -->
+        <!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
         <div class="settings-panel settings-turni" data-settings-id="turni">
-          <div class="turni-card">
+
+          <!-- 1) BLOCCO: VISUALIZZA TURNAZIONE -->
+          <div class="turni-visual-section">
+            <div class="turni-visual-header">
+              <h2 class="turni-panel-title">Visualizza Turnazione</h2>
+              <button
+                class="toggle-switch"
+                type="button"
+                role="switch"
+                aria-checked="true"
+                data-turni-visual-toggle
+                aria-label="Attiva o disattiva la visualizzazione della turnazione">
+              </button>
+            </div>
+            <p class="turni-visual-hint" data-turni-visual-hint>
+              Nessuna turnazione impostata.
+            </p>
+          </div>
+
+          <!-- 2) CARD TURNAZIONI (chiusa di default) -->
+          <div class="turni-card turnazioni-card is-collapsed">
+            <div class="turni-card-header">
+              <h2 class="turni-panel-title">Turnazioni</h2>
+
+              <div class="turni-card-actions">
+                <button class="pill-btn" type="button" data-turnazioni-edit disabled>
+                  Modifica
+                </button>
+                <button class="icon-circle-btn" type="button" data-turnazioni-add aria-label="Aggiungi turnazione">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 5 L12 19" />
+                    <path d="M5 12 L19 12" />
+                  </svg>
+                </button>
+                <button
+                  class="turni-toggle-btn"
+                  type="button"
+                  data-turnazioni-toggle
+                  aria-label="Mostra o nascondi le turnazioni"
+                  aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 14 L12 8 L18 14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="turni-list" data-turnazioni-list></div>
+
+            <p class="turni-empty-hint" data-turnazioni-empty-hint>
+              Nessuna turnazione salvata. Tocca + per aggiungerne una.
+            </p>
+          </div>
+
+          <!-- 3) CARD TURNI (chiusa di default) -->
+          <div class="turni-card is-collapsed">
             <div class="turni-card-header">
               <h2 class="turni-panel-title">Turni</h2>
 
@@ -274,7 +329,7 @@
                   type="button"
                   data-turni-toggle
                   aria-label="Mostra o nascondi i turni"
-                  aria-expanded="true">
+                  aria-expanded="false">
                   <!-- arrow-up.svg inline -->
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M6 14 L12 8 L18 14" />
@@ -384,6 +439,18 @@
           </div>
         </div>
 
+        <!-- PANNELLO AGGIUNGI TURNAZIONE -->
+        <div
+          class="settings-panel settings-turnazioni-add"
+          data-settings-id="turnazioni-add"
+          data-settings-title="Aggiungi turnazione">
+          <div class="settings-group">
+            <p class="settings-hint">
+              Qui potrai definire le turnazioni (sequenze di turni, cicli, ecc.).
+            </p>
+          </div>
+        </div>
+
         <!-- PANNELLO INDENNITÀ -->
         <div class="settings-panel settings-indennita" data-settings-id="indennita">
           <!-- volutamente vuoto per ora -->
@@ -442,20 +509,19 @@
   <div id="versionLabel" class="version-label"></div>
 
   <!-- JS -->
-<script src="js/config.js" defer></script>
-<script src="js/calendar.js" defer></script>
-<script src="js/theme.js" defer></script>
-<script src="js/status.js" defer></script>
-<script src="js/icons.js" defer></script>
-<script src="js/settings.js" defer></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/calendar.js" defer></script>
+  <script src="js/theme.js" defer></script>
+  <script src="js/status.js" defer></script>
+  <script src="js/icons.js" defer></script>
+  <script src="js/settings.js" defer></script>
 
-<script src="js/turni-storage.js" defer></script>
-<script src="js/turni-render.js" defer></script>
-<script src="js/turni.js" defer></script>
+  <script src="js/turni-storage.js" defer></script>
+  <script src="js/turni-render.js" defer></script>
+  <script src="js/turni.js" defer></script>
 
-<script src="js/app.js" defer></script>
-<script src="js/sw-register.js" defer></script>
-
+  <script src="js/app.js" defer></script>
+  <script src="js/sw-register.js" defer></script>
 
 </body>
 </html>

@@ -49,9 +49,10 @@
       const raw = localStorage.getItem(TURNI_VIS_KEY);
       if (raw === "true") return true;
       if (raw === "false") return false;
-      return false; // default: spento
+      // default: acceso
+      return true;
     } catch {
-      return false;
+      return true;
     }
   }
 

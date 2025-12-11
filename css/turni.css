@@ -483,6 +483,28 @@ body.turni-no-select * {
 }
 
 /* =========================
+   BLOCCO "VISUALIZZA TURNazione"
+   ========================= */
+
+.turni-visual-section {
+  margin-bottom: 18px;
+}
+
+.turni-visual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turni-visual-hint {
+  margin: 4px 2px 0 2px;
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+}
+
+
+/* =========================
    RESPONSIVE (Turni)
    ========================= */
 
