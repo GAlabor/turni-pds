@@ -77,7 +77,10 @@
     // Stato locale turni + modalità Modifica
     let turni = loadTurni();
     let isEditing = false;
-    let isCollapsed = true; // pannello TURNI chiuso di default
+
+    // Stato collassato della card TURNI:
+    // lo leggiamo dalla classe iniziale nell'HTML (is-collapsed)
+    let isCollapsed = cardEl.classList.contains("is-collapsed");
 
     // indice del turno attualmente in modifica; null = aggiunta nuovo
     let editIndex = null;
@@ -134,14 +137,17 @@
 
     // =========================
     // CARD "TURNAZIONI" (scheletro)
-    // =========================
+     // =========================
     const turnazioniCard      = panelTurni.querySelector(".turnazioni-card");
     const turnazioniToggleBtn = panelTurni.querySelector("[data-turnazioni-toggle]");
     const turnazioniHeader    = turnazioniCard ? turnazioniCard.querySelector(".turni-card-header") : null;
     const turnazioniAddBtn    = panelTurni.querySelector("[data-turnazioni-add]");
     const turnazioniEditBtn   = panelTurni.querySelector("[data-turnazioni-edit]");
 
-    let turnazioniCollapsed = true; // di base chiusa
+    // Stato iniziale preso dalla classe HTML
+    let turnazioniCollapsed = turnazioniCard
+      ? turnazioniCard.classList.contains("is-collapsed")
+      : true;
 
     function applyTurnazioniCollapsed() {
       if (!turnazioniCard || !turnazioniToggleBtn) return;
@@ -174,6 +180,8 @@
       turnazioniAddBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          // segnalazione: nav interna da Turni verso sotto-pannello
+          window.__turniInternalNav = true;
           SettingsUI.openPanel("turnazioni-add");
         }
       });
@@ -184,8 +192,55 @@
       turnazioniEditBtn.disabled = true;
     }
 
+    // =========================
+    // Osservatore: capisco quando ESCI da Impostazioni → Turni
+    // =========================
+
+    // Quando il pannello "turni" perde .is-active:
+    // - se NON è una nav interna (verso turni-add / turnazioni-add) → chiudo le card
+    // - se è nav interna → lascio lo stato com'è
+    let wasActive = panelTurni.classList.contains("is-active");
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (m.type !== "attributes" || m.attributeName !== "class") return;
+
+        const isActiveNow = panelTurni.classList.contains("is-active");
+
+        // Uscita dal pannello Turni
+        if (wasActive && !isActiveNow) {
+          // Se non è nav interna, resetto lo stato (card chiuse)
+          if (!window.__turniInternalNav) {
+            // chiudo Turni
+            isCollapsed = true;
+            applyCollapsedState();
+
+            // chiudo Turnazioni
+            turnazioniCollapsed = true;
+            applyTurnazioniCollapsed();
+
+            // esco anche da modalità Modifica
+            if (isEditing) {
+              isEditing = false;
+              refreshList();
+            }
+          } else {
+            // nav interna consumata
+            window.__turniInternalNav = false;
+          }
+        }
+
+        wasActive = isActiveNow;
+      });
+    });
+
+    observer.observe(panelTurni, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
     // espone un modo per uscire dalla modalità Modifica quando
-    // si esce dal menu Impostazioni / si cambia tab
+    // si esce dal menu Impostazioni / si cambia tab (fallback per SettingsUI)
     window.Turni.exitEditMode = function () {
       if (!isEditing) return;
       isEditing = false;
@@ -215,6 +270,8 @@
       resetAddForm();
 
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        // nav interna: da Turni → turni-add
+        window.__turniInternalNav = true;
         SettingsUI.openPanel("turni-add");
       }
     }
@@ -242,6 +299,8 @@
       applySiglaFontSize(siglaPreviewEl, t.sigla || "");
 
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        // nav interna: da Turni → turni-add
+        window.__turniInternalNav = true;
         SettingsUI.openPanel("turni-add");
       }
     }
@@ -593,14 +652,9 @@
       panelAdd.dataset.settingsTitle = defaultAddTitle;
       resetAddForm();
 
-      // ritorna alla schermata Turni
+      // ritorna alla schermata Turni SENZA toccare lo stato aperto/chiuso delle card
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        // quando rientro in Impostazioni → Turni li voglio compressi
-        isCollapsed = true;
-        applyCollapsedState();
-        turnazioniCollapsed = true;
-        applyTurnazioniCollapsed();
-
+        window.__turniInternalNav = true; // nav interna: da turni-add → turni
         SettingsUI.openPanel("turni");
       }
     });
