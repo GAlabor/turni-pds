@@ -198,12 +198,9 @@
   background: var(--accent);
 }
 
-/* Stesso spazio: 3px a sinistra quando OFF, 3px a destra quando ON */
 .toggle-switch.is-on::before {
   transform: translateX(var(--knob-shift));
 }
-
-
 
 /* =========================
    PULSANTE "PILLOLA" GENERICO
