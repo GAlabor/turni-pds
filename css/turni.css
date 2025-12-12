@@ -518,27 +518,28 @@ body.turni-no-select * {
   justify-content: flex-end;
 }
 
-/* Stato visivo quando il turno è senza orario:
-   i campi ora diventano disattivi e desaturati */
-.turni-no-time-on #addTurnoOraInizio,
-.turni-no-time-on #addTurnoOraFine {
-  background: rgba(148,163,184,0.18);
-  border-style: dashed;
+/* Campi ORA disattivati (solo Ora inizio / Ora fine) */
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-input {
+  background: transparent;
+  border-color: rgba(148,163,184,0.25); /* bordo leggerissimo */
   color: var(--subtext);
+  opacity: 0.55;                         /* aspetto disattivato */
   cursor: default;
+  pointer-events: none;                  /* totalmente non cliccabile */
 }
 
-.turni-no-time-on #addTurnoOraInizio:focus-visible,
-.turni-no-time-on #addTurnoOraFine:focus-visible {
-  box-shadow: none;
-  border-color: var(--border);
+/* Etichette "Ora inizio" / "Ora fine" disattivate */
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-label {
+  opacity: 0.55;
 }
 
-.turni-no-time-on #addTurnoOraInizio::-webkit-calendar-picker-indicator,
-.turni-no-time-on #addTurnoOraFine::-webkit-calendar-picker-indicator {
-  filter: grayscale(1);
-  opacity: 0.7;
+/* Iconcina calendario nascosta nei campi ora disattivati */
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
 }
+
+
+
 
 /* =========================
    RESPONSIVE (Turni)
