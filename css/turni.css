@@ -229,6 +229,16 @@ body.turni-no-select * {
   color: var(--nav-fg);
 }
 
+/* Stato "Modifica" disattivato (nessun turno / nessuna turnazione) */
+.settings-panel.settings-turni .pill-btn[disabled] {
+  background: transparent;
+  color: var(--subtext);
+  border-color: rgba(148,163,184,0.35);
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+
 /* Freccia toggle a destra */
 .turni-toggle-btn {
   border: none;
@@ -537,8 +547,6 @@ body.turni-no-select * {
 .turni-no-time-on .turni-field-row[data-type="ora"] .turni-input::-webkit-calendar-picker-indicator {
   opacity: 0;
 }
-
-
 
 
 /* =========================
