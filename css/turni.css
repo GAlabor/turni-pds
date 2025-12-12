@@ -503,6 +503,42 @@ body.turni-no-select * {
   color: var(--subtext);
 }
 
+/* =========================
+   "TURNO SENZA ORARIO"
+   ========================= */
+
+.turni-field-row-notime .turni-label {
+  flex: 0 0 16ch;
+  display: flex;
+  align-items: center;
+  height: var(--turni-sigla-size);
+}
+
+.turni-field-row-notime .turni-field-control {
+  justify-content: flex-end;
+}
+
+/* Stato visivo quando il turno è senza orario:
+   i campi ora diventano disattivi e desaturati */
+.turni-no-time-on #addTurnoOraInizio,
+.turni-no-time-on #addTurnoOraFine {
+  background: rgba(148,163,184,0.18);
+  border-style: dashed;
+  color: var(--subtext);
+  cursor: default;
+}
+
+.turni-no-time-on #addTurnoOraInizio:focus-visible,
+.turni-no-time-on #addTurnoOraFine:focus-visible {
+  box-shadow: none;
+  border-color: var(--border);
+}
+
+.turni-no-time-on #addTurnoOraInizio::-webkit-calendar-picker-indicator,
+.turni-no-time-on #addTurnoOraFine::-webkit-calendar-picker-indicator {
+  filter: grayscale(1);
+  opacity: 0.7;
+}
 
 /* =========================
    RESPONSIVE (Turni)

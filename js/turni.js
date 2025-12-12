@@ -60,12 +60,13 @@
     const saveBtn        = panelAdd.querySelector("[data-turni-save]");
     const errorEl        = panelAdd.querySelector("[data-turni-error]");
     const siglaPreviewEl = panelAdd.querySelector("[data-turni-sigla-preview]");
+    const noTimeToggleBtn = panelAdd.querySelector("[data-turni-no-time-toggle]");
 
     if (
       !listEl || !btnAdd || !btnEdit || !toggleBtn || !cardEl || !headerEl || !formEl ||
       !inputNome || !inputSigla || !inputInizio || !inputFine ||
       !colorInput || !colorPreview || !colorTrigger ||
-      !saveBtn || !errorEl || !siglaPreviewEl
+      !saveBtn || !errorEl || !siglaPreviewEl || !noTimeToggleBtn
     ) {
       return;
     }
@@ -84,6 +85,9 @@
 
     // indice del turno attualmente in modifica; null = aggiunta nuovo
     let editIndex = null;
+
+    // Stato "turno senza orario"
+    let isNoTime = false;
 
     function applyCollapsedState() {
       cardEl.classList.toggle("is-collapsed", isCollapsed);
@@ -137,7 +141,7 @@
 
     // =========================
     // CARD "TURNAZIONI" (scheletro)
-     // =========================
+    // =========================
     const turnazioniCard      = panelTurni.querySelector(".turnazioni-card");
     const turnazioniToggleBtn = panelTurni.querySelector("[data-turnazioni-toggle]");
     const turnazioniHeader    = turnazioniCard ? turnazioniCard.querySelector(".turni-card-header") : null;
@@ -248,6 +252,25 @@
     };
 
     // ============================
+    // Helper: stato "turno senza orario"
+    // ============================
+
+    function applyNoTimeState() {
+      noTimeToggleBtn.classList.toggle("is-on", isNoTime);
+      noTimeToggleBtn.setAttribute("aria-checked", isNoTime ? "true" : "false");
+
+      [inputInizio, inputFine].forEach(inp => {
+        inp.disabled = isNoTime;
+        inp.classList.remove("is-invalid");
+        if (isNoTime) {
+          inp.value = "";
+        }
+      });
+
+      panelAdd.classList.toggle("turni-no-time-on", isNoTime);
+    }
+
+    // ============================
     // Helper: form "nuovo" vs "modifica"
     // ============================
 
@@ -262,6 +285,9 @@
       applySiglaFontSize(siglaPreviewEl, "");
       colorInput.value  = "#0a84ff";
       applyColorPreview();
+
+      isNoTime = false;
+      applyNoTimeState();
     }
 
     function openNewTurnoPanel() {
@@ -287,8 +313,19 @@
 
       inputNome.value   = t.nome || "";
       inputSigla.value  = t.sigla || "";
-      inputInizio.value = t.inizio || "";
-      inputFine.value   = t.fine || "";
+
+      // Se il turno è marcato come "senza orario", ignora i campi ora
+      isNoTime = !!t.noTime;
+
+      if (isNoTime) {
+        inputInizio.value = "";
+        inputFine.value   = "";
+      } else {
+        inputInizio.value = t.inizio || "";
+        inputFine.value   = t.fine || "";
+      }
+
+      applyNoTimeState();
 
       // Colore
       colorInput.value = t.colore || "#0a84ff";
@@ -308,6 +345,7 @@
     // Render iniziale da localStorage
     refreshList();
     applyCollapsedState();
+    applyNoTimeState();
 
     // ----------------------------
     // Drag & drop riordino turni (pointer events)
@@ -534,6 +572,15 @@
     });
 
     // ----------------------------
+    // Toggle "Turno senza orario"
+    // ----------------------------
+
+    noTimeToggleBtn.addEventListener("click", () => {
+      isNoTime = !isNoTime;
+      applyNoTimeState();
+    });
+
+    // ----------------------------
     // Apertura pannello "Aggiungi turno" (nuovo)
     // ----------------------------
 
@@ -604,8 +651,8 @@
 
       const nome   = (inputNome.value || "").trim();
       const sigla  = (inputSigla.value || "").trim();
-      const inizio = (inputInizio.value || "").trim();
-      const fine   = (inputFine.value || "").trim();
+      let inizio   = (inputInizio.value || "").trim();
+      let fine     = (inputFine.value || "").trim();
       const colore = colorInput.value || "#0a84ff";
 
       let hasError = false;
@@ -618,21 +665,40 @@
         inputSigla.classList.add("is-invalid");
         hasError = true;
       }
-      if (!inizio || !isValidTime(inizio)) {
-        inputInizio.classList.add("is-invalid");
-        hasError = true;
-      }
-      if (!fine || !isValidTime(fine)) {
-        inputFine.classList.add("is-invalid");
-        hasError = true;
+
+      if (!isNoTime) {
+        if (!inizio || !isValidTime(inizio)) {
+          inputInizio.classList.add("is-invalid");
+          hasError = true;
+        }
+        if (!fine || !isValidTime(fine)) {
+          inputFine.classList.add("is-invalid");
+          hasError = true;
+        }
+      } else {
+        // se è senza orario, azzera per coerenza
+        inizio = "";
+        fine   = "";
       }
 
       if (hasError) {
         showError();
+      } else {
+        errorEl.hidden = true;
+      }
+
+      if (hasError) {
         return;
       }
 
-      const payload = { nome, sigla, inizio, fine, colore };
+      const payload = {
+        nome,
+        sigla,
+        inizio,
+        fine,
+        colore,
+        noTime: isNoTime
+      };
 
       // Se ho un indice valido → MODIFICA
       if (editIndex !== null &&
