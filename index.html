@@ -330,7 +330,6 @@
                   data-turni-toggle
                   aria-label="Mostra o nascondi i turni"
                   aria-expanded="false">
-                  <!-- arrow-up.svg inline -->
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M6 14 L12 8 L18 14" />
                   </svg>
@@ -338,10 +337,8 @@
               </div>
             </div>
 
-            <!-- Lista turni salvati -->
             <div class="turni-list" data-turni-list></div>
 
-            <!-- Hint quando non ci sono turni -->
             <p class="turni-empty-hint" data-turni-empty-hint>
               Nessun turno salvato. Tocca + per aggiungerne uno.
             </p>
@@ -354,7 +351,6 @@
           data-settings-id="turni-add"
           data-settings-title="Aggiungi turno">
 
-          <!-- Toolbar Salva + messaggio errore -->
           <div class="turni-add-toolbar">
             <button class="pill-btn turni-save-btn" type="button" data-turni-save>
               Salva
@@ -364,9 +360,7 @@
             </p>
           </div>
 
-          <!-- Form Aggiungi turno (righe-card) -->
           <div class="turni-form" data-turni-add-form>
-            <!-- Turno -->
             <div class="turni-field-row">
               <label class="turni-label" for="addTurnoNome">Turno</label>
               <div class="turni-field-control">
@@ -379,7 +373,6 @@
               </div>
             </div>
 
-            <!-- Sigla + colore + anteprima [M] -->
             <div class="turni-field-row">
               <label class="turni-label" for="addTurnoSigla">Sigla</label>
 
@@ -391,7 +384,6 @@
                   maxlength="4"
                   autocomplete="off">
 
-                <!-- Il pallino DIVENTA un label collegato all'input colore -->
                 <label
                   class="turni-color-dot"
                   for="addTurnoColore"
@@ -413,7 +405,6 @@
               </div>
             </div>
 
-            <!-- Turno senza orario -->
             <div class="turni-field-row turni-field-row-notime">
               <p class="turni-label">Turno senza orario</p>
               <div class="turni-field-control">
@@ -428,7 +419,6 @@
               </div>
             </div>
 
-            <!-- Ora inizio -->
             <div class="turni-field-row" data-type="ora">
               <label class="turni-label" for="addTurnoOraInizio">Ora inizio</label>
               <div class="turni-field-control">
@@ -440,7 +430,6 @@
               </div>
             </div>
 
-            <!-- Ora fine -->
             <div class="turni-field-row" data-type="ora">
               <label class="turni-label" for="addTurnoOraFine">Ora fine</label>
               <div class="turni-field-control">
@@ -454,37 +443,66 @@
           </div>
         </div>
 
-        <!-- PANNELLO AGGIUNGI TURNAZIONE -->
+        <!-- PANNELLO AGGIUNGI TURNAZIONE (NUOVO CONTENUTO) -->
         <div
           class="settings-panel settings-turnazioni-add"
           data-settings-id="turnazioni-add"
           data-settings-title="Aggiungi turnazione">
-          <div class="settings-group">
-            <p class="settings-hint">
-              Qui potrai definire le turnazioni (sequenze di turni, cicli, ecc.).
-            </p>
+
+          <div class="turnazioni-add-wrap">
+
+            <!-- CARD 1: Giorni -->
+            <div class="turni-field-row turnazioni-days-row">
+              <label class="turni-label turnazioni-days-label" for="turnazioniDaysInput">Giorni</label>
+
+              <div class="turni-field-control turnazioni-days-control">
+                <!-- Desktop -->
+                <div class="turnazioni-desktop-select">
+                  <select id="turnazioniDaysSelect" class="turni-input turnazioni-days-select" aria-label="Seleziona numero giorni">
+                    <option value="" selected></option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                  </select>
+                </div>
+
+                <!-- Mobile -->
+                <input
+                  id="turnazioniDaysInput"
+                  class="turni-input turnazioni-days-input"
+                  type="number"
+                  min="1"
+                  max="7"
+                  step="1"
+                  value=""
+                  inputmode="numeric"
+                  aria-label="Numero giorni">
+              </div>
+            </div>
+
+            <!-- CARD 2: caselle -->
+            <div class="turnazioni-days-card" aria-label="Giorni turnazione">
+              <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
+            </div>
+
           </div>
         </div>
 
         <!-- PANNELLO INDENNITÀ -->
-        <div class="settings-panel settings-indennita" data-settings-id="indennita">
-          <!-- volutamente vuoto per ora -->
-        </div>
+        <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
 
         <!-- PANNELLO FESTIVITÀ -->
-        <div class="settings-panel settings-festivita" data-settings-id="festivita">
-          <!-- volutamente vuoto per ora -->
-        </div>
+        <div class="settings-panel settings-festivita" data-settings-id="festivita"></div>
 
         <!-- PANNELLO INFO -->
-        <div class="settings-panel settings-info" data-settings-id="info">
-          <!-- volutamente vuoto per ora -->
-        </div>
+        <div class="settings-panel settings-info" data-settings-id="info"></div>
 
         <!-- PANNELLO VERSIONE -->
-        <div class="settings-panel settings-updates" data-settings-id="updates">
-          <!-- volutamente vuoto per ora -->
-        </div>
+        <div class="settings-panel settings-updates" data-settings-id="updates"></div>
       </div>
     </section>
   </main>
@@ -520,7 +538,6 @@
     </button>
   </nav>
 
-  <!-- Etichetta versione -->
   <div id="versionLabel" class="version-label"></div>
 
   <!-- JS -->
@@ -531,11 +548,13 @@
   <script src="js/icons.js" defer></script>
   <script src="js/settings.js" defer></script>
 
-<script src="js/turni-storage.js" defer></script>
-<script src="js/turni-render.js" defer></script>
-<script src="js/turni-interactions.js" defer></script>
-<script src="js/turnazione.js" defer></script>
-<script src="js/turni.js" defer></script>
+  <script src="js/turni-storage.js" defer></script>
+  <script src="js/turni-render.js" defer></script>
+
+  <!-- NUOVI -->
+  <script src="js/turni-interactions.js" defer></script>
+  <script src="js/turnazione.js" defer></script>
+  <script src="js/turni.js" defer></script>
 
   <script src="js/app.js" defer></script>
   <script src="js/sw-register.js" defer></script>

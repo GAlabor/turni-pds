@@ -1,10 +1,68 @@
 // ============================
 // turnazione.js
 // (per ora) Gestione CARD Turnazioni + navigazione verso pannello "turnazioni-add"
-// Non implementa ancora i dati: mantiene lo scheletro pulito e separato.
+// + UI "Aggiungi turnazione": Giorni (desktop select / mobile input) + caselle 1..7
 // ============================
 
 (function () {
+  function initTurnazioniAddUI() {
+    // pannello "Aggiungi turnazione"
+    const panelAdd = document.querySelector('.settings-panel.settings-turnazioni-add[data-settings-id="turnazioni-add"]');
+    if (!panelAdd) return;
+
+    const select = panelAdd.querySelector("#turnazioniDaysSelect");
+    const input  = panelAdd.querySelector("#turnazioniDaysInput");
+    const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
+
+    if (!select || !input || !grid) return;
+
+    function render(n) {
+      grid.innerHTML = "";
+
+      for (let i = 1; i <= 7; i++) {
+        const b = document.createElement("div");
+        b.className = "turnazioni-day-box";
+
+        if (!n || i > n) {
+          b.style.visibility = "hidden";
+        } else {
+          b.textContent = String(i);
+        }
+
+        grid.appendChild(b);
+      }
+    }
+
+    // stato iniziale: 0/null
+    render(null);
+
+    // Desktop: select
+    select.addEventListener("change", () => {
+      const v = Number(select.value) || null;
+      input.value = select.value;
+      render(v);
+    });
+
+    // Mobile: input -> prende solo ultimo carattere, sovrascrive sempre
+    input.addEventListener("input", () => {
+      const digits = (input.value || "").replace(/\D/g, "");
+      const last = digits.slice(-1);
+
+      const v = Number(last);
+
+      if (!v || v < 1 || v > 7) {
+        input.value = "";
+        select.value = "";
+        render(null);
+        return;
+      }
+
+      input.value = last;
+      select.value = last;
+      render(v);
+    });
+  }
+
   const Turnazione = {
     init(ctx) {
       const {
@@ -16,7 +74,11 @@
         turnazioniEditBtn
       } = ctx || {};
 
-      if (!panelTurni || !turnazioniCard || !turnazioniToggleBtn) return;
+      if (!panelTurni || !turnazioniCard || !turnazioniToggleBtn) {
+        // anche se non ho la card, la UI del pannello add può esistere comunque
+        initTurnazioniAddUI();
+        return;
+      }
 
       // Stato iniziale dalla classe HTML
       let turnazioniCollapsed = turnazioniCard.classList.contains("is-collapsed");
@@ -35,7 +97,6 @@
           ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"]
         });
       } else {
-        // fallback minimale
         function apply() {
           turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
           turnazioniToggleBtn.setAttribute("aria-expanded", turnazioniCollapsed ? "false" : "true");
@@ -63,6 +124,9 @@
       if (turnazioniEditBtn) {
         turnazioniEditBtn.disabled = true;
       }
+
+      // Init UI dentro "Aggiungi turnazione"
+      initTurnazioniAddUI();
 
       // API interna opzionale (se poi vuoi comandarla da turni.js)
       this._getState = () => ({ collapsed: turnazioniCollapsed });

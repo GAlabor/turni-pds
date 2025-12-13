@@ -585,3 +585,121 @@ body.turni-no-select * {
     max-width: 9ch;
   }
 }
+
+/* =========================
+   TURNAZIONI — PANNELLO "AGGIUNGI TURNAZIONE"
+   Layout generale del pannello:
+   ========================= */
+
+.turnazioni-add-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* =========================
+   CARD 1 — "Giorni"
+   ========================= */
+
+/* Label "Giorni" */
+.turnazioni-days-label{
+  flex: 0 0 6ch;
+  display: flex;
+  align-items: center;
+  height: var(--turni-sigla-size);
+}
+
+/* Area controllo (a destra):
+   - spinge select/input verso destra come nelle altre righe-card */
+.turnazioni-days-control{
+  justify-content: flex-end;
+}
+
+/* =========================
+   Selettore N giorni
+   - Desktop: <select>
+   - Mobile: <input type="number"> con 1 cifra (logica JS)
+   Mostriamo UNO dei due in base al tipo di puntatore.
+   ========================= */
+
+.turnazioni-desktop-select{ display:none; }
+.turnazioni-days-input{ display:none; }
+
+/* Smartphone/tablet (touch): mostra input numerico nativo */
+@media (pointer: coarse){
+  .turnazioni-days-input{ display:block; }
+  .turnazioni-desktop-select{ display:none; }
+}
+
+/* Desktop (mouse/trackpad): mostra select */
+@media (pointer: fine){
+  .turnazioni-days-input{ display:none; }
+  .turnazioni-desktop-select{ display:block; }
+}
+
+/* Select:
+   - centrato e compatto (max 1 cifra utile)
+   - disattiva stile nativo "pesante" dove possibile */
+.turnazioni-days-select{
+  max-width: 9ch;
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* spazio a destra per eventuale chevron custom */
+  padding-right: 28px;
+}
+
+/* Input mobile:
+   - centrato
+   - pensato per una sola cifra (la logica di sovrascrittura è in JS) */
+.turnazioni-days-input{
+  max-width: 9ch;
+  text-align:center;
+  font-weight: 700;
+}
+
+/* =========================
+   CARD 2 — Griglia caselle 1..7
+   Contenitore della griglia:
+   ========================= */
+
+.turnazioni-days-card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+/* Griglia 7 colonne:
+   - 1 riga da 7
+   - gap uniforme */
+.turnazioni-days-grid{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  width:100%;
+}
+
+/* Singola casella giorno:
+   - sempre quadrata (aspect-ratio:1)
+   - centrata (numero dentro)
+   - non selezionabile (anti highlight) */
+.turnazioni-day-box{
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.25);
+
+  display:grid;
+  place-items:center;
+
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  user-select: none;
+}
