@@ -3,7 +3,7 @@
 // Gestione CARD Turnazioni + navigazione verso pannello "turnazioni-add"
 // + UI "Aggiungi turnazione":
 //   - Giorni (desktop select / mobile input) + caselle 1..7
-//   - Cambia Riposo Lunedì (toggle + espansione Nome/Sigla/Colore/Preview)
+//   - Riposo del Lunedì (toggle + espansione Nome/Sigla/Colore/Preview)
 // ============================
 
 (function () {
@@ -69,7 +69,7 @@
     }
 
     // ----------------------------
-    // CARD: Cambia Riposo Lunedì (nuova)
+    // CARD: Riposo del Lunedì
     // ----------------------------
     const riposoCard  = panelAdd.querySelector("[data-turnazioni-riposo-card]");
     const toggleBtn   = panelAdd.querySelector("[data-turnazioni-riposo-toggle]");
