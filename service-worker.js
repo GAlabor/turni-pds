@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V6.3';
+const VERSION    = '2025-11-20 V6.4';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -23,9 +23,11 @@ const PRECACHE_URLS = [
   `${ROOT}/css/base.css`,
   `${ROOT}/css/calendar.css`,
   `${ROOT}/css/settings.css`,
+  `${ROOT}/css/turni-panel.css`,
+  `${ROOT}/css/turni-form.css`,
+  `${ROOT}/css/turnazioni.css`,
   `${ROOT}/css/components.css`,
   `${ROOT}/css/tabbar.css`,
-  `${ROOT}/css/turni.css`,
 
   // JS core + moduli UI
   `${ROOT}/js/config.js`,

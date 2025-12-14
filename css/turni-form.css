@@ -1,0 +1,227 @@
+/* turni-form.css
+   =========================
+   FORM "AGGIUNGI TURNO"
+   ========================= */
+
+.turni-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.turni-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+}
+
+.turni-label {
+  font-size: var(--fs-turni-form-label);
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+  flex-shrink: 0;
+  flex: 0 0 9ch;
+}
+
+.turni-field-control {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.turni-field-control-sigla {
+  gap: 12px;
+}
+
+.turni-input {
+  width: 100%;
+  max-width: 220px;
+  height: var(--turni-sigla-size);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.08);
+  padding: 0 12px;
+  font-size: var(--fs-turni-form-input);
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#addTurnoSigla.turni-input {
+  max-width: 9ch;
+  text-align: center;
+}
+
+:root[data-theme="dark"] .turni-input {
+  background: rgba(15,23,42,0.7);
+}
+
+.turni-input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(10,132,255,0.4);
+}
+
+.turni-input.is-invalid {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
+}
+
+/* =========================
+   CONTROLLI COLORE / PREVIEW SIGLA
+   ========================= */
+
+.turni-color-dot {
+  margin-left: 4px;
+  border: none;
+  background: transparent;
+  padding: 2;
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.turni-color-preview {
+  width: var(--color-dot-size);
+  height: var(--color-dot-size);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px rgba(15,23,42,0.25);
+  background: var(--accent);
+}
+
+.turni-color-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.turni-sigla-preview-pill {
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.turni-sigla-preview-text {
+  font-size: var(--fs-turni-sigla);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* =========================
+   TOOLBAR "AGGIUNGI TURNO"
+   ========================= */
+
+.turni-add-toolbar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.turni-save-btn {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.pill-btn.turni-save-btn {
+  height: 40px;
+  padding: 0 20px;
+}
+
+.turni-save-btn:active {
+  transform: translateY(1px);
+}
+
+.turni-error {
+  margin: 0 2px 4px;
+  font-size: var(--fs-turni-form-hint);
+  color: #dc2626;
+}
+
+.turni-error[hidden] {
+  display: none;
+}
+
+/* =========================
+   "TURNO SENZA ORARIO"
+   ========================= */
+
+.turni-field-row-notime .turni-label {
+  flex: 0 0 16ch;
+  display: flex;
+  align-items: center;
+  height: var(--turni-sigla-size);
+}
+
+.turni-field-row-notime .turni-field-control {
+  justify-content: flex-end;
+}
+
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-input {
+  background: transparent;
+  border-color: rgba(148,163,184,0.25);
+  color: var(--subtext);
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-label {
+  opacity: 0.55;
+}
+
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+/* =========================
+   RESPONSIVE (Turni form)
+   ========================= */
+
+@media (max-width: 900px) {
+  .turni-field-row {
+    padding: 10px 10px;
+  }
+
+  .turni-input {
+    max-width: 180px;
+  }
+
+  .turni-label {
+    flex: 0 0 9ch;
+  }
+
+  #addTurnoSigla.turni-input {
+    max-width: 9ch;
+  }
+}

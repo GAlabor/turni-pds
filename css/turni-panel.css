@@ -1,0 +1,305 @@
+/* turni-panel.css
+   =========================
+   PANNELLO TURNI — LISTA + CARD
+   ========================= */
+
+/* =========================
+   LISTA TURNI SALVATI
+   ========================= */
+
+/* Contenitore lista turni nel pannello "Turni" */
+.turni-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hint mostrato quando non ci sono turni salvati */
+.turni-empty-hint {
+  margin: 8px 2px 0 2px;
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+}
+
+/* Singola riga turno:
+   [SIGLA]  Nome turno   06:55 - 13:08   [handle]
+*/
+.turno-item {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* RIDOTTO (prima 10px) → riga più compatta */
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.turno-item:last-child {
+  border-bottom: none;
+}
+
+/* Pill quadrata per la sigla */
+.turno-sigla-pill {
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  flex-shrink: 0;
+}
+
+.turno-sigla {
+  font-size: var(--fs-turni-sigla);
+  font-weight: 600;
+  color: var(--text); /* sovrascritto inline con il colore scelto */
+}
+
+/* Nome turno: singola riga, ellissi, prende lo spazio centrale */
+.turno-name {
+  font-size: var(--fs-turni-nome);
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Orario allineato verso destra, prima della maniglia */
+.turno-orario {
+  margin-left: auto;
+  margin-right: 2px;
+  font-size: var(--fs-turni-orario);
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* =========================
+   MODIFICA / CANCELLAZIONE (stile iOS)
+   ========================= */
+
+.turno-delete-btn {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  margin-right: 4px;
+
+  background: #d31a1a;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  padding: 6px;
+
+  box-shadow: 0 1px 3px rgba(220,38,38,0.30);
+}
+
+.turno-delete-icon {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1;
+  transform: translateY(-0.4px);
+  pointer-events: none;
+}
+
+@media (hover:hover) {
+  .turno-delete-btn:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.turno-delete-btn:active {
+  transform: scale(0.9);
+}
+
+/* =========================
+   HANDLE DRAG / RIORDINO
+   ========================= */
+
+.turni-handle {
+  width: 24px;
+  height: 24px;
+  margin-left: 2px;
+  display: none;
+  flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.turni-handle svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.turni-list.editing .turni-handle {
+  display: flex;
+  color: var(--nav-fg);
+}
+
+.turni-list.editing .turno-item {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html.turni-no-select,
+body.turni-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+html.turni-no-select * ,
+body.turni-no-select * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.turno-item.dragging {
+  background: var(--surface-strong);
+  box-shadow: 0 12px 28px rgba(15,23,42,0.4);
+  transform: scale(1.02);
+  z-index: 5;
+}
+
+/* =========================
+   CARD / HEADER PANNELLO TURNI
+   ========================= */
+
+.turni-card {
+  margin-top: 8px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  padding: 18px 16px 16px;
+}
+
+.turni-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turni-panel-title {
+  margin: 0;
+  font-size: var(--fs-turni-panel-title-desktop);
+  font-weight: 600;
+  letter-spacing: var(--ls-turni-panel-title);
+}
+
+.turni-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-panel.settings-turni .pill-btn,
+.settings-panel.settings-turni .icon-circle-btn {
+  color: var(--nav-fg);
+}
+
+.settings-panel.settings-turni .pill-btn[disabled] {
+  background: transparent;
+  color: var(--subtext);
+  border-color: rgba(148,163,184,0.35);
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+
+.turni-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--subtext);
+}
+
+.turni-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: center;
+  transition: transform 0.16s ease;
+}
+
+.turni-card.is-collapsed .turni-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+.turni-card.is-collapsed .turni-list,
+.turni-card.is-collapsed .turni-empty-hint {
+  display: none;
+}
+
+.turni-card.is-collapsed .turni-card-actions .pill-btn,
+.turni-card.is-collapsed .turni-card-actions .icon-circle-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* =========================
+   BLOCCO "VISUALIZZA TURNAZIONE"
+   ========================= */
+
+.turni-visual-section {
+  margin-bottom: 18px;
+}
+
+.turni-visual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turni-visual-hint {
+  margin: 4px 2px 0 2px;
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+}
+
+/* =========================
+   RESPONSIVE (Turni panel)
+   ========================= */
+
+@media (max-width: 900px) {
+  .turni-card {
+    padding: 14px 12px 12px;
+  }
+
+  .turni-panel-title {
+    font-size: var(--fs-turni-panel-title-mobile);
+  }
+
+  .turni-card-actions {
+    gap: 6px;
+  }
+}

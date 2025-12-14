@@ -1,0 +1,133 @@
+/* turnazioni.css
+   =========================
+   TURNAZIONI — PANNELLO "AGGIUNGI TURNAZIONE"
+   ========================= */
+
+.turnazioni-add-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* =========================
+   CARD 1 — "Giorni"
+   ========================= */
+
+.turnazioni-days-label{
+  flex: 0 0 6ch;
+  display: flex;
+  align-items: center;
+  height: var(--turni-sigla-size);
+}
+
+.turnazioni-days-control{
+  justify-content: flex-end;
+}
+
+/* Desktop vs Mobile */
+.turnazioni-desktop-select{ display:none; }
+.turnazioni-days-input{ display:none; }
+
+@media (pointer: coarse){
+  .turnazioni-days-input{ display:block; }
+  .turnazioni-desktop-select{ display:none; }
+}
+
+@media (pointer: fine){
+  .turnazioni-days-input{ display:none; }
+  .turnazioni-desktop-select{ display:block; }
+}
+
+/* Select desktop */
+.turnazioni-days-select{
+  max-width: 9ch;
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  padding-right: 28px;
+}
+
+/* Input mobile */
+.turnazioni-days-input{
+  max-width: 9ch;
+  text-align:center;
+  font-weight: 700;
+}
+
+/* =========================
+   CARD 2 — Griglia caselle 1..7
+   ========================= */
+
+.turnazioni-days-card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.turnazioni-days-grid{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  width:100%;
+}
+
+.turnazioni-day-box{
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.25);
+
+  display:grid;
+  place-items:center;
+
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  user-select: none;
+}
+
+/* =========================
+   CARD 3 — "Riposo del Lunedì" (espandibile via .is-on)
+   ========================= */
+
+.turnazioni-riposo-card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.turnazioni-riposo-header{
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.turnazioni-riposo-label{
+  flex: 0 0 21ch;
+  display:flex;
+  align-items:center;
+  height: var(--turni-sigla-size);
+}
+
+.turnazioni-riposo-control{
+  justify-content: flex-end;
+}
+
+.turnazioni-riposo-body{
+  display:none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.turnazioni-riposo-card.is-on .turnazioni-riposo-body{
+  display:flex;
+}
