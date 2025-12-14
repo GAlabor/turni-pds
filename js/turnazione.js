@@ -4,6 +4,7 @@
 // + UI "Aggiungi turnazione":
 //   - Giorni (desktop select / mobile input) + caselle 1..7
 //   - Riposo del Lunedì (toggle + espansione Nome/Sigla/Colore/Preview)
+//   - Help (?) con toast 2 secondi
 // ============================
 
 (function () {
@@ -57,13 +58,13 @@
 
         if (!v || v < 1 || v > 7) {
           input.value = "";
-          select.value = "";
+          if (select) select.value = "";
           renderDaysGrid(null);
           return;
         }
 
         input.value = last;
-        select.value = last;
+        if (select) select.value = last;
         renderDaysGrid(v);
       });
     }
@@ -74,6 +75,9 @@
     const riposoCard  = panelAdd.querySelector("[data-turnazioni-riposo-card]");
     const toggleBtn   = panelAdd.querySelector("[data-turnazioni-riposo-toggle]");
     const bodyEl      = panelAdd.querySelector("[data-turnazioni-riposo-body]");
+
+    const helpBtn     = panelAdd.querySelector("[data-turnazioni-help]");
+    const helpToast   = panelAdd.querySelector("[data-turnazioni-help-toast]");
 
     const inputNome   = panelAdd.querySelector("#turnazioniRiposoNome");
     const inputSigla  = panelAdd.querySelector("#turnazioniRiposoSigla");
@@ -135,11 +139,7 @@
       riposoCard.classList.toggle("is-on", riposoOn);
 
       // corpo: mostra/nascondi
-      if (riposoOn) {
-        bodyEl.hidden = false;
-      } else {
-        bodyEl.hidden = true;
-      }
+      bodyEl.hidden = !riposoOn;
     }
 
     // stato iniziale: OFF
@@ -168,6 +168,28 @@
     if (inputSigla) {
       inputSigla.addEventListener("input", () => {
         updateSiglaPreview();
+      });
+    }
+
+    // ----------------------------
+    // Help toast (?) — 2 secondi
+    // ----------------------------
+    if (helpBtn && helpToast) {
+      let t = null;
+
+      function showToast() {
+        helpToast.hidden = false;
+
+        if (t) clearTimeout(t);
+        t = setTimeout(() => {
+          helpToast.hidden = true;
+          t = null;
+        }, 2000);
+      }
+
+      helpBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showToast();
       });
     }
   }

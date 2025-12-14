@@ -18,17 +18,16 @@
   <title>Turni PDS</title>
 
   <!-- CSS -->
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/calendar.css">
-<link rel="stylesheet" href="css/settings.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/calendar.css">
+  <link rel="stylesheet" href="css/settings.css">
 
-<link rel="stylesheet" href="css/turni-panel.css">
-<link rel="stylesheet" href="css/turni-form.css">
-<link rel="stylesheet" href="css/turnazioni.css">
+  <link rel="stylesheet" href="css/turni-panel.css">
+  <link rel="stylesheet" href="css/turni-form.css">
+  <link rel="stylesheet" href="css/turnazioni.css">
 
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/tabbar.css">
-
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/tabbar.css">
 </head>
 
 <body>
@@ -494,12 +493,20 @@
               <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
             </div>
 
-            <!-- CARD 3: Riposo del Lunedì (nuova) -->
+            <!-- CARD 3: Riposo del Lunedì -->
             <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
 
               <!-- header sempre visibile -->
               <div class="turni-field-row turnazioni-riposo-header">
-                <p class="turni-label turnazioni-riposo-label">Riposo del Lunedì</p>
+                <p class="turni-label turnazioni-riposo-label">
+                  Riposo del Lunedì
+                  <button
+                    class="turnazioni-help-btn"
+                    type="button"
+                    aria-label="Aiuto riposo del Lunedì"
+                    data-turnazioni-help>?</button>
+                </p>
+
                 <div class="turni-field-control turnazioni-riposo-control">
                   <button
                     class="toggle-switch"
@@ -510,6 +517,11 @@
                     aria-label="Riposo del lunedì">
                   </button>
                 </div>
+              </div>
+
+              <!-- toast 2s -->
+              <div class="turnazioni-help-toast" data-turnazioni-help-toast hidden>
+                Scegli cosa visualizzare se il riposo cade di Lunedì
               </div>
 
               <!-- corpo: visibile solo con toggle ON -->
