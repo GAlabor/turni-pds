@@ -93,7 +93,7 @@
 }
 
 /* =========================
-   CARD 3 — "Riposo del Lunedì" (espandibile via .is-on)
+   CARD 3/4 — "Riposo" (espandibile via .is-on)
    ========================= */
 
 .turnazioni-riposo-card{
@@ -133,7 +133,7 @@
 }
 
 /* =========================
-   HELP "?" + TOAST (Riposo del Lunedì)
+   HELP "?" + TOAST (Riposo)
    ========================= */
 
 .turnazioni-help-btn{

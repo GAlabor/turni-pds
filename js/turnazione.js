@@ -4,7 +4,8 @@
 // + UI "Aggiungi turnazione":
 //   - Giorni (desktop select / mobile input) + caselle 1..7
 //   - Riposo del Lunedì (toggle + espansione Nome/Sigla/Colore/Preview)
-//   - Help (?) con toast 2 secondi
+//   - Riposo del Martedì (identico)
+//   - Help (?) con toast 3 secondi (per ciascuna card)
 // ============================
 
 (function () {
@@ -69,28 +70,9 @@
       });
     }
 
-    // ----------------------------
-    // CARD: Riposo del Lunedì
-    // ----------------------------
-    const riposoCard  = panelAdd.querySelector("[data-turnazioni-riposo-card]");
-    const toggleBtn   = panelAdd.querySelector("[data-turnazioni-riposo-toggle]");
-    const bodyEl      = panelAdd.querySelector("[data-turnazioni-riposo-body]");
-
-    const helpBtn     = panelAdd.querySelector("[data-turnazioni-help]");
-    const helpToast   = panelAdd.querySelector("[data-turnazioni-help-toast]");
-
-    const inputNome   = panelAdd.querySelector("#turnazioniRiposoNome");
-    const inputSigla  = panelAdd.querySelector("#turnazioniRiposoSigla");
-
-    const colorInput  = panelAdd.querySelector("[data-turnazioni-riposo-color]");
-    const colorPrev   = panelAdd.querySelector("[data-turnazioni-riposo-color-preview]");
-    const siglaPrev   = panelAdd.querySelector("[data-turnazioni-riposo-sigla-preview]");
-
-    if (!riposoCard || !toggleBtn || !bodyEl) return;
-
-    let riposoOn = false;
-
-    // fallback se TurniRender non c'è (ma nel tuo load order c'è)
+    // -----------------------------------------
+    // Helpers condivisi per le card "Riposo"
+    // -----------------------------------------
     function applySiglaFontSize(el, txt) {
       if (!el) return;
 
@@ -106,92 +88,145 @@
       el.style.fontSize = `${size}px`;
     }
 
-    function applyColorPreview() {
-      if (!colorInput || !colorPrev || !siglaPrev) return;
+    function initRiposoCard(opts) {
+      const {
+        cardSel,
+        toggleSel,
+        bodySel,
+        helpBtnSel,
+        helpToastSel,
+        inputNomeSel,
+        inputSiglaSel,
+        colorInputSel,
+        colorPrevSel,
+        siglaPrevSel
+      } = opts || {};
 
-      const v = colorInput.value || "#0a84ff";
-      colorPrev.style.backgroundColor = v;
-      siglaPrev.style.color = v;
-    }
+      const cardEl    = panelAdd.querySelector(cardSel);
+      const toggleBtn = panelAdd.querySelector(toggleSel);
+      const bodyEl    = panelAdd.querySelector(bodySel);
 
-    function updateSiglaPreview() {
-      if (!siglaPrev || !inputSigla) return;
+      const helpBtn   = panelAdd.querySelector(helpBtnSel);
+      const helpToast = panelAdd.querySelector(helpToastSel);
 
-      const txt = (inputSigla.value || "").trim();
-      siglaPrev.textContent = txt || "";
-      applySiglaFontSize(siglaPrev, txt);
-    }
+      const inputNome  = panelAdd.querySelector(inputNomeSel);
+      const inputSigla = panelAdd.querySelector(inputSiglaSel);
 
-    function clearRiposoFields() {
-      if (inputNome)  inputNome.value = "";
-      if (inputSigla) inputSigla.value = "";
-      if (siglaPrev)  siglaPrev.textContent = "";
+      const colorInput = panelAdd.querySelector(colorInputSel);
+      const colorPrev  = panelAdd.querySelector(colorPrevSel);
+      const siglaPrev  = panelAdd.querySelector(siglaPrevSel);
 
-      if (colorInput) colorInput.value = "#0a84ff";
-      applyColorPreview();
-      updateSiglaPreview();
-    }
+      if (!cardEl || !toggleBtn || !bodyEl) return;
 
-    function applyRiposoState() {
-      toggleBtn.classList.toggle("is-on", riposoOn);
-      toggleBtn.setAttribute("aria-checked", riposoOn ? "true" : "false");
+      let on = false;
 
-      riposoCard.classList.toggle("is-on", riposoOn);
-
-      // corpo: mostra/nascondi
-      bodyEl.hidden = !riposoOn;
-    }
-
-    // stato iniziale: OFF
-    bodyEl.hidden = true;
-    clearRiposoFields();
-    applyRiposoState();
-
-    // toggle
-    toggleBtn.addEventListener("click", () => {
-      riposoOn = !riposoOn;
-
-      // se spengo: reset campi
-      if (!riposoOn) {
-        clearRiposoFields();
+      function applyColorPreview() {
+        if (!colorInput || !colorPrev || !siglaPrev) return;
+        const v = colorInput.value || "#0a84ff";
+        colorPrev.style.backgroundColor = v;
+        siglaPrev.style.color = v;
       }
 
-      applyRiposoState();
+      function updateSiglaPreview() {
+        if (!siglaPrev || !inputSigla) return;
+        const txt = (inputSigla.value || "").trim();
+        siglaPrev.textContent = txt || "";
+        applySiglaFontSize(siglaPrev, txt);
+      }
+
+      function clearFields() {
+        if (inputNome)  inputNome.value = "";
+        if (inputSigla) inputSigla.value = "";
+        if (siglaPrev)  siglaPrev.textContent = "";
+
+        if (colorInput) colorInput.value = "#0a84ff";
+        applyColorPreview();
+        updateSiglaPreview();
+      }
+
+      function applyState() {
+        toggleBtn.classList.toggle("is-on", on);
+        toggleBtn.setAttribute("aria-checked", on ? "true" : "false");
+        cardEl.classList.toggle("is-on", on);
+        bodyEl.hidden = !on;
+      }
+
+      // stato iniziale: OFF
+      bodyEl.hidden = true;
+      clearFields();
+      applyState();
+
+      // toggle
+      toggleBtn.addEventListener("click", () => {
+        on = !on;
+        if (!on) clearFields();
+        applyState();
+      });
+
+      // listeners input
+      if (colorInput) {
+        colorInput.addEventListener("input", applyColorPreview);
+        colorInput.addEventListener("change", applyColorPreview);
+      }
+
+      if (inputSigla) {
+        inputSigla.addEventListener("input", () => {
+          updateSiglaPreview();
+        });
+      }
+
+      // Help toast (?) — 3 secondi
+      if (helpBtn && helpToast) {
+        let t = null;
+
+        function showToast() {
+          helpToast.hidden = false;
+
+          if (t) clearTimeout(t);
+          t = setTimeout(() => {
+            helpToast.hidden = true;
+            t = null;
+          }, 3000);
+        }
+
+        helpBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          showToast();
+        });
+      }
+    }
+
+    // ----------------------------
+    // CARD: Riposo del Lunedì
+    // ----------------------------
+    initRiposoCard({
+      cardSel:      "[data-turnazioni-riposo-card]",
+      toggleSel:    "[data-turnazioni-riposo-toggle]",
+      bodySel:      "[data-turnazioni-riposo-body]",
+      helpBtnSel:   "[data-turnazioni-help]",
+      helpToastSel: "[data-turnazioni-help-toast]",
+      inputNomeSel: "#turnazioniRiposoNome",
+      inputSiglaSel:"#turnazioniRiposoSigla",
+      colorInputSel:"[data-turnazioni-riposo-color]",
+      colorPrevSel: "[data-turnazioni-riposo-color-preview]",
+      siglaPrevSel: "[data-turnazioni-riposo-sigla-preview]"
     });
 
-    // listeners input
-    if (colorInput) {
-      colorInput.addEventListener("input", applyColorPreview);
-      colorInput.addEventListener("change", applyColorPreview);
-    }
-
-    if (inputSigla) {
-      inputSigla.addEventListener("input", () => {
-        updateSiglaPreview();
-      });
-    }
-
     // ----------------------------
-    // Help toast (?) — 2 secondi
+    // CARD: Riposo del Martedì (identica)
     // ----------------------------
-    if (helpBtn && helpToast) {
-      let t = null;
-
-      function showToast() {
-        helpToast.hidden = false;
-
-        if (t) clearTimeout(t);
-        t = setTimeout(() => {
-          helpToast.hidden = true;
-          t = null;
-        }, 2000);
-      }
-
-      helpBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        showToast();
-      });
-    }
+    initRiposoCard({
+      cardSel:      "[data-turnazioni-riposo2-card]",
+      toggleSel:    "[data-turnazioni-riposo2-toggle]",
+      bodySel:      "[data-turnazioni-riposo2-body]",
+      helpBtnSel:   "[data-turnazioni-help2]",
+      helpToastSel: "[data-turnazioni-help-toast2]",
+      inputNomeSel: "#turnazioniRiposo2Nome",
+      inputSiglaSel:"#turnazioniRiposo2Sigla",
+      colorInputSel:"[data-turnazioni-riposo2-color]",
+      colorPrevSel: "[data-turnazioni-riposo2-color-preview]",
+      siglaPrevSel: "[data-turnazioni-riposo2-sigla-preview]"
+    });
   }
 
   const Turnazione = {

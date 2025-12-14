@@ -572,6 +572,85 @@
               </div>
             </div>
 
+            <!-- CARD 4: Riposo del Martedì (identica) -->
+            <div class="turnazioni-riposo-card" data-turnazioni-riposo2-card>
+
+              <!-- header sempre visibile -->
+              <div class="turni-field-row turnazioni-riposo-header">
+                <p class="turni-label turnazioni-riposo-label">
+                  Riposo del Martedì
+                  <button
+                    class="turnazioni-help-btn"
+                    type="button"
+                    aria-label="Aiuto riposo del Martedì"
+                    data-turnazioni-help2>?</button>
+                </p>
+
+                <div class="turni-field-control turnazioni-riposo-control">
+                  <button
+                    class="toggle-switch"
+                    type="button"
+                    role="switch"
+                    aria-checked="false"
+                    data-turnazioni-riposo2-toggle
+                    aria-label="Riposo del martedì">
+                  </button>
+                </div>
+              </div>
+
+              <!-- toast 2s -->
+              <div class="turnazioni-help-toast" data-turnazioni-help-toast2 hidden>
+                Scegli cosa visualizzare se il riposo cade di Martedì
+              </div>
+
+              <!-- corpo: visibile solo con toggle ON -->
+              <div class="turnazioni-riposo-body" data-turnazioni-riposo2-body>
+                <div class="turni-field-row">
+                  <label class="turni-label" for="turnazioniRiposo2Nome">Nome</label>
+                  <div class="turni-field-control">
+                    <input
+                      class="turni-input"
+                      id="turnazioniRiposo2Nome"
+                      type="text"
+                      maxlength="15"
+                      autocomplete="off">
+                  </div>
+                </div>
+
+                <div class="turni-field-row">
+                  <label class="turni-label" for="turnazioniRiposo2Sigla">Sigla</label>
+
+                  <div class="turni-field-control turni-field-control-sigla">
+                    <input
+                      class="turni-input"
+                      id="turnazioniRiposo2Sigla"
+                      type="text"
+                      maxlength="4"
+                      autocomplete="off">
+
+                    <label
+                      class="turni-color-dot"
+                      for="turnazioniRiposo2Colore"
+                      data-turnazioni-riposo2-color-trigger
+                      aria-label="Scegli colore sigla riposo">
+                      <span class="turni-color-preview" data-turnazioni-riposo2-color-preview></span>
+                    </label>
+
+                    <div class="turni-sigla-preview-pill" aria-hidden="true">
+                      <span class="turni-sigla-preview-text" data-turnazioni-riposo2-sigla-preview></span>
+                    </div>
+
+                    <input
+                      class="turni-color-input"
+                      id="turnazioniRiposo2Colore"
+                      type="color"
+                      value="#0a84ff"
+                      data-turnazioni-riposo2-color>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
