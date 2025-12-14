@@ -18,30 +18,58 @@
     // CARD: Giorni + griglia 1..7
     // ----------------------------
     const select = panelAdd.querySelector("#turnazioniDaysSelect");
-    const input  = panelAdd.querySelector("#turnazioniDaysInput");
-    const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
+const input  = panelAdd.querySelector("#turnazioniDaysInput");
+const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
 
-    function renderDaysGrid(n) {
-      if (!grid) return;
-      grid.innerHTML = "";
+const subtitleEl    = panelAdd.querySelector("#turnazioniDaysSubtitle");
+const placeholderEl = panelAdd.querySelector("#turnazioniDaysPlaceholder");
 
-      for (let i = 1; i <= 7; i++) {
-        const b = document.createElement("div");
-        b.className = "turnazioni-day-box";
 
-        if (!n || i > n) {
-          b.style.visibility = "hidden";
-        } else {
-          b.textContent = String(i);
-        }
+    function applyDaysUIState(n){
+  const hasDays = !!n && n >= 1 && n <= 7;
 
-        grid.appendChild(b);
-      }
+  if (subtitleEl) {
+    subtitleEl.textContent = hasDays
+      ? "Seleziona un giorno per impostare il turno"
+      : "Nessuna rotazione impostata";
+  }
+
+  if (placeholderEl) {
+    placeholderEl.style.display = hasDays ? "none" : "block";
+    placeholderEl.textContent = "Seleziona da 1 a 7 per visualizzare la rotazione";
+  }
+
+  if (grid) {
+    grid.style.display = hasDays ? "grid" : "none";
+  }
+}
+
+function renderDaysGrid(n) {
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  for (let i = 1; i <= 7; i++) {
+    const b = document.createElement("div");
+    b.className = "turnazioni-day-box";
+
+    if (!n || i > n) {
+      b.style.visibility = "hidden";
+    } else {
+      b.textContent = String(i);
     }
+
+    grid.appendChild(b);
+  }
+
+  applyDaysUIState(n);
+}
+
 
     // stato iniziale: 0/null
     if (select && input && grid) {
       renderDaysGrid(null);
+      
 
       // Desktop: select
       select.addEventListener("change", () => {
