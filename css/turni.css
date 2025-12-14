@@ -671,7 +671,7 @@ body.turni-no-select * {
   background: var(--surface-strong);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 12px;
+  padding: 8px;
 }
 
 /* Griglia 7 colonne:
@@ -702,4 +702,46 @@ body.turni-no-select * {
   font-weight: 700;
   color: var(--text);
   user-select: none;
+}
+
+/* =========================
+   CARD 3 — "Cambia Riposo Lunedì" (nuova)
+   ========================= */
+
+.turnazioni-riposo-card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+/* header: una “riga” pulita, senza doppio bordo/padding */
+.turnazioni-riposo-header{
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.turnazioni-riposo-label{
+  flex: 0 0 21ch;
+  display:flex;
+  align-items:center;
+  height: var(--turni-sigla-size);
+}
+
+.turnazioni-riposo-control{
+  justify-content: flex-end;
+}
+
+/* corpo espandibile */
+.turnazioni-riposo-body{
+  display:none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.turnazioni-riposo-card.is-on .turnazioni-riposo-body{
+  display:flex;
 }

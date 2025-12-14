@@ -1,7 +1,9 @@
 // ============================
 // turnazione.js
-// (per ora) Gestione CARD Turnazioni + navigazione verso pannello "turnazioni-add"
-// + UI "Aggiungi turnazione": Giorni (desktop select / mobile input) + caselle 1..7
+// Gestione CARD Turnazioni + navigazione verso pannello "turnazioni-add"
+// + UI "Aggiungi turnazione":
+//   - Giorni (desktop select / mobile input) + caselle 1..7
+//   - Cambia Riposo Lunedì (toggle + espansione Nome/Sigla/Colore/Preview)
 // ============================
 
 (function () {
@@ -10,13 +12,15 @@
     const panelAdd = document.querySelector('.settings-panel.settings-turnazioni-add[data-settings-id="turnazioni-add"]');
     if (!panelAdd) return;
 
+    // ----------------------------
+    // CARD: Giorni + griglia 1..7
+    // ----------------------------
     const select = panelAdd.querySelector("#turnazioniDaysSelect");
     const input  = panelAdd.querySelector("#turnazioniDaysInput");
     const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
 
-    if (!select || !input || !grid) return;
-
-    function render(n) {
+    function renderDaysGrid(n) {
+      if (!grid) return;
       grid.innerHTML = "";
 
       for (let i = 1; i <= 7; i++) {
@@ -34,33 +38,138 @@
     }
 
     // stato iniziale: 0/null
-    render(null);
+    if (select && input && grid) {
+      renderDaysGrid(null);
 
-    // Desktop: select
-    select.addEventListener("change", () => {
-      const v = Number(select.value) || null;
-      input.value = select.value;
-      render(v);
-    });
+      // Desktop: select
+      select.addEventListener("change", () => {
+        const v = Number(select.value) || null;
+        input.value = select.value;
+        renderDaysGrid(v);
+      });
 
-    // Mobile: input -> prende solo ultimo carattere, sovrascrive sempre
-    input.addEventListener("input", () => {
-      const digits = (input.value || "").replace(/\D/g, "");
-      const last = digits.slice(-1);
+      // Mobile: input -> prende solo ultimo carattere, sovrascrive sempre
+      input.addEventListener("input", () => {
+        const digits = (input.value || "").replace(/\D/g, "");
+        const last = digits.slice(-1);
 
-      const v = Number(last);
+        const v = Number(last);
 
-      if (!v || v < 1 || v > 7) {
-        input.value = "";
-        select.value = "";
-        render(null);
+        if (!v || v < 1 || v > 7) {
+          input.value = "";
+          select.value = "";
+          renderDaysGrid(null);
+          return;
+        }
+
+        input.value = last;
+        select.value = last;
+        renderDaysGrid(v);
+      });
+    }
+
+    // ----------------------------
+    // CARD: Cambia Riposo Lunedì (nuova)
+    // ----------------------------
+    const riposoCard  = panelAdd.querySelector("[data-turnazioni-riposo-card]");
+    const toggleBtn   = panelAdd.querySelector("[data-turnazioni-riposo-toggle]");
+    const bodyEl      = panelAdd.querySelector("[data-turnazioni-riposo-body]");
+
+    const inputNome   = panelAdd.querySelector("#turnazioniRiposoNome");
+    const inputSigla  = panelAdd.querySelector("#turnazioniRiposoSigla");
+
+    const colorInput  = panelAdd.querySelector("[data-turnazioni-riposo-color]");
+    const colorPrev   = panelAdd.querySelector("[data-turnazioni-riposo-color-preview]");
+    const siglaPrev   = panelAdd.querySelector("[data-turnazioni-riposo-sigla-preview]");
+
+    if (!riposoCard || !toggleBtn || !bodyEl) return;
+
+    let riposoOn = false;
+
+    // fallback se TurniRender non c'è (ma nel tuo load order c'è)
+    function applySiglaFontSize(el, txt) {
+      if (!el) return;
+
+      if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
+        TurniRender.applySiglaFontSize(el, txt);
         return;
       }
 
-      input.value = last;
-      select.value = last;
-      render(v);
+      const len = (txt || "").length;
+      let size = 11.5;
+      if (len <= 2) size = 15;
+      else if (len === 3) size = 14;
+      el.style.fontSize = `${size}px`;
+    }
+
+    function applyColorPreview() {
+      if (!colorInput || !colorPrev || !siglaPrev) return;
+
+      const v = colorInput.value || "#0a84ff";
+      colorPrev.style.backgroundColor = v;
+      siglaPrev.style.color = v;
+    }
+
+    function updateSiglaPreview() {
+      if (!siglaPrev || !inputSigla) return;
+
+      const txt = (inputSigla.value || "").trim();
+      siglaPrev.textContent = txt || "";
+      applySiglaFontSize(siglaPrev, txt);
+    }
+
+    function clearRiposoFields() {
+      if (inputNome)  inputNome.value = "";
+      if (inputSigla) inputSigla.value = "";
+      if (siglaPrev)  siglaPrev.textContent = "";
+
+      if (colorInput) colorInput.value = "#0a84ff";
+      applyColorPreview();
+      updateSiglaPreview();
+    }
+
+    function applyRiposoState() {
+      toggleBtn.classList.toggle("is-on", riposoOn);
+      toggleBtn.setAttribute("aria-checked", riposoOn ? "true" : "false");
+
+      riposoCard.classList.toggle("is-on", riposoOn);
+
+      // corpo: mostra/nascondi
+      if (riposoOn) {
+        bodyEl.hidden = false;
+      } else {
+        bodyEl.hidden = true;
+      }
+    }
+
+    // stato iniziale: OFF
+    bodyEl.hidden = true;
+    clearRiposoFields();
+    applyRiposoState();
+
+    // toggle
+    toggleBtn.addEventListener("click", () => {
+      riposoOn = !riposoOn;
+
+      // se spengo: reset campi
+      if (!riposoOn) {
+        clearRiposoFields();
+      }
+
+      applyRiposoState();
     });
+
+    // listeners input
+    if (colorInput) {
+      colorInput.addEventListener("input", applyColorPreview);
+      colorInput.addEventListener("change", applyColorPreview);
+    }
+
+    if (inputSigla) {
+      inputSigla.addEventListener("input", () => {
+        updateSiglaPreview();
+      });
+    }
   }
 
   const Turnazione = {

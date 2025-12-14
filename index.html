@@ -443,7 +443,7 @@
           </div>
         </div>
 
-        <!-- PANNELLO AGGIUNGI TURNAZIONE (NUOVO CONTENUTO) -->
+        <!-- PANNELLO AGGIUNGI TURNAZIONE -->
         <div
           class="settings-panel settings-turnazioni-add"
           data-settings-id="turnazioni-add"
@@ -487,6 +487,72 @@
             <!-- CARD 2: caselle -->
             <div class="turnazioni-days-card" aria-label="Giorni turnazione">
               <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
+            </div>
+
+            <!-- CARD 3: Cambia Riposo Lunedì (nuova) -->
+            <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
+
+              <!-- header sempre visibile -->
+              <div class="turni-field-row turnazioni-riposo-header">
+                <p class="turni-label turnazioni-riposo-label">Cambia Riposo Lunedì</p>
+                <div class="turni-field-control turnazioni-riposo-control">
+                  <button
+                    class="toggle-switch"
+                    type="button"
+                    role="switch"
+                    aria-checked="false"
+                    data-turnazioni-riposo-toggle
+                    aria-label="Cambia riposo del lunedì">
+                  </button>
+                </div>
+              </div>
+
+              <!-- corpo: visibile solo con toggle ON -->
+              <div class="turnazioni-riposo-body" data-turnazioni-riposo-body>
+                <div class="turni-field-row">
+                  <label class="turni-label" for="turnazioniRiposoNome">Nome</label>
+                  <div class="turni-field-control">
+                    <input
+                      class="turni-input"
+                      id="turnazioniRiposoNome"
+                      type="text"
+                      maxlength="15"
+                      autocomplete="off">
+                  </div>
+                </div>
+
+                <div class="turni-field-row">
+                  <label class="turni-label" for="turnazioniRiposoSigla">Sigla</label>
+
+                  <div class="turni-field-control turni-field-control-sigla">
+                    <input
+                      class="turni-input"
+                      id="turnazioniRiposoSigla"
+                      type="text"
+                      maxlength="4"
+                      autocomplete="off">
+
+                    <label
+                      class="turni-color-dot"
+                      for="turnazioniRiposoColore"
+                      data-turnazioni-riposo-color-trigger
+                      aria-label="Scegli colore sigla riposo">
+                      <span class="turni-color-preview" data-turnazioni-riposo-color-preview></span>
+                    </label>
+
+                    <div class="turni-sigla-preview-pill" aria-hidden="true">
+                      <span class="turni-sigla-preview-text" data-turnazioni-riposo-sigla-preview></span>
+                    </div>
+
+                    <input
+                      class="turni-color-input"
+                      id="turnazioniRiposoColore"
+                      type="color"
+                      value="#0a84ff"
+                      data-turnazioni-riposo-color>
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
