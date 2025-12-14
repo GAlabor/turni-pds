@@ -14,7 +14,7 @@
    ========================= */
 
 .turnazioni-days-label{
-  flex: 0 0 6ch;
+  flex: 0 0 23ch;
   display: flex;
   align-items: center;
   height: var(--turni-sigla-size);
@@ -91,6 +91,16 @@
   color: var(--text);
   user-select: none;
 }
+
+.turnazioni-days-range {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--subtext);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
 
 /* =========================
    CARD 3/4 — "Riposo" (espandibile via .is-on)
