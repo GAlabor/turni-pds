@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V7.6';
+const VERSION    = '2025-12-15 V7.8';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -80,6 +80,7 @@ function normalizeHTMLRequest(req) {
 
   if (!wantsHTML) return req;
 
+  // ROOT -> index.html
   if (url.pathname === ROOT || url.pathname === ROOT + '/') {
     return new Request(`${ROOT}/index.html`, {
       credentials: 'same-origin'
@@ -128,47 +129,52 @@ async function handleHtmlFetch(event, req) {
 }
 
 // ==============================
-// HANDLER SVG (network-first, URL-keyed)
+// HANDLER SVG (network-first, match ignoring search)
 // ==============================
 async function handleSvgFetch(req) {
   const cache = await caches.open(CACHE_NAME);
-  const url = new URL(req.url);
-  const key = url.href;
 
   try {
     const fresh = await fetch(req, {
       cache: 'no-store',
       credentials: 'same-origin'
     });
-    try { await cache.put(key, fresh.clone()); } catch {}
+    try { await cache.put(req, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    const cached = await cache.match(key);
+    const cached = await cache.match(req, { ignoreSearch: true });
     if (cached) return cached;
     return new Response('', { status: 504 });
   }
 }
 
 // ==============================
-// HANDLER STATICI (SWR coerente)
+// HANDLER STATICI (SWR coerente + ignoreSearch)
 // ==============================
 async function handleStaticFetch(event, req) {
   const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(req);
+
+  const cached = await cache.match(req, { ignoreSearch: true });
 
   if (cached) {
     event.waitUntil((async () => {
       try {
-        const fresh = await fetch(req, { cache: 'no-store' });
-        await cache.put(req, fresh.clone());
+        const fresh = await fetch(req, {
+          cache: 'no-store',
+          credentials: 'same-origin'
+        });
+        try { await cache.put(req, fresh.clone()); } catch {}
       } catch {}
     })());
     return cached;
   }
 
   try {
-    const fresh = await fetch(req, { cache: 'no-store' });
-    await cache.put(req, fresh.clone());
+    const fresh = await fetch(req, {
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
+    try { await cache.put(req, fresh.clone()); } catch {}
     return fresh;
   } catch {
     return new Response('', { status: 504 });
@@ -176,12 +182,17 @@ async function handleStaticFetch(event, req) {
 }
 
 // ==============================
-// INSTALL
+// INSTALL (robusto: non fallisce se manca 1 asset)
 // ==============================
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(PRECACHE_URLS);
+
+    // Precache "best effort": se manca qualcosa, install non muore.
+    await Promise.allSettled(
+      PRECACHE_URLS.map((u) => cache.add(u))
+    );
+
     await self.skipWaiting();
   })());
 });

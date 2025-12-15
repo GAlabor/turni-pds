@@ -10,9 +10,39 @@
 }
 
 /* =========================
-   CARD 1 — "Giorni"
+   Scroll pannello "Aggiungi turnazione"
    ========================= */
 
+.settings-panel.settings-turnazioni-add.is-active{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
+/* =========================
+   CARD 0 — "Nome" (come "Aggiungi turno")
+   ========================= */
+
+
+.turnazioni-name-row .turni-field-control{
+  justify-content: flex-end;
+}
+
+/* Nome turnazione: più lungo (toglie il limite dei 220px di .turni-input) */
+.turnazioni-name-input{
+  width: 100%;
+  max-width: 100%;
+}
+
+
+/* =========================
+   CARD 1 — "Giorni Rotazione"
+   - input manuale
+   - allineato a sinistra come Nome
+   - più stretto
+   ========================= */
+
+/* rendilo coerente con gli altri label (9ch) */
 .turnazioni-days-label{
   flex: 0 0 23ch;
   display: flex;
@@ -20,43 +50,29 @@
   height: var(--turni-sigla-size);
 }
 
+/* PRIMA era flex-end: lo portiamo a sinistra */
 .turnazioni-days-control{
   justify-content: flex-end;
 }
 
-/* Desktop vs Mobile */
-.turnazioni-desktop-select{ display:none; }
-.turnazioni-days-input{ display:none; }
+/* nascondi definitivamente lo select desktop (per ora) */
+.turnazioni-desktop-select{ display:none !important; }
 
-@media (pointer: coarse){
-  .turnazioni-days-input{ display:block; }
-  .turnazioni-desktop-select{ display:none; }
-}
-
-@media (pointer: fine){
-  .turnazioni-days-input{ display:none; }
-  .turnazioni-desktop-select{ display:block; }
-}
-
-/* Select desktop */
-.turnazioni-days-select{
-  max-width: 9ch;
+/* input giorni: piccolo e leggibile */
+.turnazioni-days-input{
+  display:block;
+  width: 100%;
+  max-width: 7ch;
   text-align: center;
   font-weight: 700;
-  cursor: pointer;
-
-  -webkit-appearance: none;
-  appearance: none;
-
-  padding-right: 28px;
+}
+.turnazioni-days-range{
+  margin-left: 6px;
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+  font-weight: 500;
 }
 
-/* Input mobile */
-.turnazioni-days-input{
-  max-width: 9ch;
-  text-align:center;
-  font-weight: 700;
-}
 
 /* =========================
    CARD 2 — Griglia caselle 1..7
@@ -91,16 +107,6 @@
   color: var(--text);
   user-select: none;
 }
-
-.turnazioni-days-range {
-  margin-left: 6px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--subtext);
-  opacity: 0.85;
-  white-space: nowrap;
-}
-
 
 /* =========================
    CARD 3/4 — "Riposo" (espandibile via .is-on)
@@ -140,6 +146,13 @@
 
 .turnazioni-riposo-card.is-on .turnazioni-riposo-body{
   display:flex;
+}
+
+/* Sigla RIPOSO: stretta come "Aggiungi turno" */
+#turnazioniRiposoSigla.turni-input,
+#turnazioniRiposo2Sigla.turni-input{
+  max-width: 9ch;
+  text-align: center;
 }
 
 /* =========================
@@ -221,16 +234,15 @@
 
 .turnazioni-days-card-title{
   font-size: var(--fs-row-label);
-  font-weight: 600;              /* più simile agli altri titoli “normali” */
+  font-weight: 600;
   color: var(--text);
   line-height: 1.15;
   margin: 0;
 }
 
-
 .turnazioni-days-card-subtitle{
   font-size: var(--fs-row-subtext);
-  color: var(--subtext); /* <-- il “grigio” arriva da qui */
+  color: var(--subtext);
   line-height: 1.2;
 }
 
@@ -250,7 +262,3 @@
   background: rgba(15,23,42,0.35);
   border-color: rgba(148,163,184,0.30);
 }
-
-
-
-
