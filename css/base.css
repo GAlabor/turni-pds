@@ -199,7 +199,7 @@
   /* FONT 8 — Voci secondarie menu:
      - testo interno .settings-choice (Sistema, Chiaro, Scuro)
   */
-  --fs-settings-choice: 13px;
+  --fs-settings-choice: var(--fs-turni-nome);
 
   /* FONT 9 — Titolo pannello Turni (e futuri pannelli interni):
      - .turni-panel-title ("Turni" nella card Turni)
