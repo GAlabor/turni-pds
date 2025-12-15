@@ -456,21 +456,20 @@
           <div class="turnazioni-add-wrap">
 
             <!-- CARD 0: Nome Turnazione -->
-<div class="turni-field-row turnazioni-name-row">
-  <label class="turni-label turnazioni-name-label" for="turnazioniNome">
-    Nome
-  </label>
+            <div class="turni-field-row turnazioni-name-row">
+              <label class="turni-label turnazioni-name-label" for="turnazioniNome">
+                Nome
+              </label>
 
-  <div class="turni-field-control turnazioni-name-control">
-    <input
-      class="turni-input turnazioni-name-input"
-      id="turnazioniNome"
-      type="text"
-      maxlength="20"
-      autocomplete="off">
-  </div>
-</div>
-
+              <div class="turni-field-control turnazioni-name-control">
+                <input
+                  class="turni-input turnazioni-name-input"
+                  id="turnazioniNome"
+                  type="text"
+                  maxlength="20"
+                  autocomplete="off">
+              </div>
+            </div>
 
             <!-- CARD 1: Giorni -->
             <div class="turni-field-row turnazioni-days-row">
@@ -478,7 +477,6 @@
                 Giorni Rotazione
                 <span class="turnazioni-days-range"> (1–7)</span>
               </label>
-
 
               <div class="turni-field-control turnazioni-days-control">
                 <!-- Desktop -->
@@ -509,21 +507,19 @@
               </div>
             </div>
 
-            
             <!-- CARD 2: Rotazione (titolo + sottotitolo + contenuto) -->
-<div class="turnazioni-days-card" aria-label="Turni rotazione">
-  <div class="turnazioni-days-card-header">
-    <div class="turnazioni-days-card-title">Turni Rotazione</div>
-    <div class="turnazioni-days-card-subtitle" id="turnazioniDaysSubtitle"></div>
-  </div>
+            <div class="turnazioni-days-card" aria-label="Turni rotazione">
+              <div class="turnazioni-days-card-header">
+                <div class="turnazioni-days-card-title">Turni Rotazione</div>
+                <div class="turnazioni-days-card-subtitle" id="turnazioniDaysSubtitle"></div>
+              </div>
 
-  <!-- testo guida quando non ci sono giorni -->
-  <div class="turnazioni-days-placeholder" id="turnazioniDaysPlaceholder"></div>
+              <!-- testo guida quando non ci sono giorni -->
+              <div class="turnazioni-days-placeholder" id="turnazioniDaysPlaceholder"></div>
 
-  <!-- griglia giorni -->
-  <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
-</div>
-
+              <!-- griglia giorni -->
+              <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
+            </div>
 
             <!-- CARD 3: Riposo del Lunedì -->
             <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
@@ -683,6 +679,25 @@
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- NUOVO PANNELLO: SELEZIONA TURNO PER ROTAZIONE -->
+        <div
+          class="settings-panel settings-turnazioni-pick"
+          data-settings-id="turnazioni-pick"
+          data-settings-title="Seleziona turno">
+
+          <div class="turnazioni-pick-wrap">
+            <p class="settings-hint" id="turnazioniPickHint">
+              Seleziona un turno.
+            </p>
+
+            <div class="turnazioni-pick-list" id="turnazioniPickList"></div>
+
+            <p class="turnazioni-pick-empty" id="turnazioniPickEmpty" hidden>
+              Nessun turno creato.
+            </p>
           </div>
         </div>
 

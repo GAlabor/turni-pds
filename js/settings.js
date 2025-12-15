@@ -159,6 +159,12 @@
         return;
       }
 
+      // Caso speciale 3: picker turni per rotazione → torna a "Aggiungi turnazione"
+      if (activePanelId === "turnazioni-pick") {
+        showPanel("turnazioni-add");
+        return;
+      }
+
       // Default: torna al menu impostazioni
       showMain();
     });

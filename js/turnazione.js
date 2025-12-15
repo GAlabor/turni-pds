@@ -2,10 +2,9 @@
 // turnazione.js
 // Gestione CARD Turnazioni + navigazione verso pannello "turnazioni-add"
 // + UI "Aggiungi turnazione":
-//   - Giorni (desktop select / mobile input) + caselle 1..7
-//   - Riposo del Lunedì (toggle + espansione Nome/Sigla/Colore/Preview)
-//   - Riposo del Martedì (identico)
-//   - Help (?) con toast 3 secondi (per ciascuna card)
+//   - Giorni (desktop select / mobile input) + pill rotazione cliccabili
+//   - Picker "Seleziona turno" (pagina) con lista turni creati
+//   - Riposo del Lunedì / Martedì (toggle + espansione + help toast)
 // ============================
 
 (function () {
@@ -14,93 +13,48 @@
     const panelAdd = document.querySelector('.settings-panel.settings-turnazioni-add[data-settings-id="turnazioni-add"]');
     if (!panelAdd) return;
 
+    // pannello picker (pagina)
+    const panelPick = document.querySelector('.settings-panel.settings-turnazioni-pick[data-settings-id="turnazioni-pick"]');
+
     // ----------------------------
-    // CARD: Giorni + griglia 1..7
+    // CARD: Giorni + griglia pill
     // ----------------------------
     const select = panelAdd.querySelector("#turnazioniDaysSelect");
-const input  = panelAdd.querySelector("#turnazioniDaysInput");
-const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
+    const input  = panelAdd.querySelector("#turnazioniDaysInput");
+    const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
 
-const subtitleEl    = panelAdd.querySelector("#turnazioniDaysSubtitle");
-const placeholderEl = panelAdd.querySelector("#turnazioniDaysPlaceholder");
+    const subtitleEl    = panelAdd.querySelector("#turnazioniDaysSubtitle");
+    const placeholderEl = panelAdd.querySelector("#turnazioniDaysPlaceholder");
 
+    // picker UI
+    const pickListEl = panelPick ? panelPick.querySelector("#turnazioniPickList") : null;
+    const pickEmpty  = panelPick ? panelPick.querySelector("#turnazioniPickEmpty") : null;
+    const pickHint   = panelPick ? panelPick.querySelector("#turnazioniPickHint") : null;
+
+    // stato rotazione: 7 slot max (1..7)
+    let rotationDaysCount = null;              // 1..7 o null
+    let rotationSlots = new Array(7).fill(null); // slot -> { nome, sigla, colore, ... } oppure null
+    let activePickIndex = null;                // quale pill sto impostando (0..6)
 
     function applyDaysUIState(n){
-  const hasDays = !!n && n >= 1 && n <= 7;
+      const hasDays = !!n && n >= 1 && n <= 7;
 
-  if (subtitleEl) {
-    subtitleEl.textContent = hasDays
-      ? "Seleziona un giorno per impostare il turno"
-      : "Nessuna rotazione impostata";
-  }
+      if (subtitleEl) {
+        subtitleEl.textContent = hasDays
+          ? "Tocca una casella per scegliere il turno"
+          : "Nessuna rotazione impostata";
+      }
 
-  if (placeholderEl) {
-    placeholderEl.style.display = hasDays ? "none" : "block";
-    placeholderEl.textContent = "Seleziona da 1 a 7 per visualizzare la rotazione";
-  }
+      if (placeholderEl) {
+        placeholderEl.style.display = hasDays ? "none" : "block";
+        placeholderEl.textContent = "Seleziona da 1 a 7 per visualizzare la rotazione";
+      }
 
-  if (grid) {
-    grid.style.display = hasDays ? "grid" : "none";
-  }
-}
-
-function renderDaysGrid(n) {
-  if (!grid) return;
-
-  grid.innerHTML = "";
-
-  for (let i = 1; i <= 7; i++) {
-    const b = document.createElement("div");
-    b.className = "turnazioni-day-box";
-
-    if (!n || i > n) {
-      b.style.visibility = "hidden";
-    } else {
-      b.textContent = String(i);
+      if (grid) {
+        grid.style.display = hasDays ? "grid" : "none";
+      }
     }
 
-    grid.appendChild(b);
-  }
-
-  applyDaysUIState(n);
-}
-
-
-    // stato iniziale: 0/null
-    if (select && input && grid) {
-      renderDaysGrid(null);
-      
-
-      // Desktop: select
-      select.addEventListener("change", () => {
-        const v = Number(select.value) || null;
-        input.value = select.value;
-        renderDaysGrid(v);
-      });
-
-      // Mobile: input -> prende solo ultimo carattere, sovrascrive sempre
-      input.addEventListener("input", () => {
-        const digits = (input.value || "").replace(/\D/g, "");
-        const last = digits.slice(-1);
-
-        const v = Number(last);
-
-        if (!v || v < 1 || v > 7) {
-          input.value = "";
-          if (select) select.value = "";
-          renderDaysGrid(null);
-          return;
-        }
-
-        input.value = last;
-        if (select) select.value = last;
-        renderDaysGrid(v);
-      });
-    }
-
-    // -----------------------------------------
-    // Helpers condivisi per le card "Riposo"
-    // -----------------------------------------
     function applySiglaFontSize(el, txt) {
       if (!el) return;
 
@@ -116,6 +70,192 @@ function renderDaysGrid(n) {
       el.style.fontSize = `${size}px`;
     }
 
+    function sameTurno(a, b) {
+      if (!a || !b) return false;
+      const an = (a.nome || "").trim();
+      const as = (a.sigla || "").trim();
+      const bn = (b.nome || "").trim();
+      const bs = (b.sigla || "").trim();
+      return an === bn && as === bs;
+    }
+
+    function openPickPanelForDay(index) {
+      activePickIndex = index;
+
+      if (pickHint) {
+        pickHint.textContent = `Seleziona un turno per il giorno ${index + 1}.`;
+      }
+
+      renderPickList();
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        window.__turniInternalNav = true;
+        SettingsUI.openPanel("turnazioni-pick");
+      }
+    }
+
+    function setSlotFromTurno(index, turnoObj) {
+      if (index == null || index < 0 || index > 6) return;
+      rotationSlots[index] = turnoObj || null;
+      renderDaysGrid(rotationDaysCount);
+    }
+
+    function renderPickList() {
+      if (!pickListEl) return;
+
+      const turni = (window.TurniStorage && typeof TurniStorage.loadTurni === "function")
+        ? TurniStorage.loadTurni()
+        : [];
+
+      pickListEl.innerHTML = "";
+
+      const hasTurni = Array.isArray(turni) && turni.length > 0;
+
+      if (pickEmpty) {
+        pickEmpty.hidden = hasTurni;
+      }
+
+      if (!hasTurni) return;
+
+      const selected = (activePickIndex !== null) ? rotationSlots[activePickIndex] : null;
+
+      turni.forEach((t) => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "turnazioni-pick-row";
+
+        // evidenzia se già selezionato per questa pill
+        if (selected && sameTurno(selected, t)) {
+          row.classList.add("is-selected");
+        }
+
+        const name = document.createElement("span");
+        name.className = "turnazioni-pick-name";
+        name.textContent = t.nome || "";
+
+        row.appendChild(name);
+
+        row.addEventListener("click", () => {
+          // salva nello slot attivo
+          if (activePickIndex !== null) {
+            setSlotFromTurno(activePickIndex, t);
+          }
+
+          // torna alla pagina "Aggiungi turnazione"
+          if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+            window.__turniInternalNav = true;
+            SettingsUI.openPanel("turnazioni-add");
+          }
+        });
+
+        pickListEl.appendChild(row);
+      });
+    }
+
+    function renderDaysGrid(n) {
+      if (!grid) return;
+
+      rotationDaysCount = n || null;
+
+      grid.innerHTML = "";
+
+      for (let i = 1; i <= 7; i++) {
+        // slot fuori range → non esiste
+        if (!n || i > n) {
+          const ghost = document.createElement("div");
+          ghost.style.visibility = "hidden";
+          grid.appendChild(ghost);
+          continue;
+        }
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "turnazioni-day-pill";
+
+        const pill = document.createElement("div");
+        pill.className = "turni-sigla-preview-pill";
+
+        const txt = document.createElement("span");
+        txt.className = "turni-sigla-preview-text";
+
+        const slot = rotationSlots[i - 1];
+
+        // se non selezionato → mostra numero (stesso stile, ma muted)
+        if (!slot) {
+          btn.classList.add("is-empty");
+          txt.textContent = String(i);
+          applySiglaFontSize(txt, String(i));
+          txt.style.color = "";
+        } else {
+          const siglaVal = (slot.sigla || "").trim();
+          txt.textContent = siglaVal; // qui compare SOLO la sigla
+          applySiglaFontSize(txt, siglaVal);
+
+          if (slot.colore) txt.style.color = slot.colore;
+          else txt.style.color = "";
+        }
+
+        pill.appendChild(txt);
+        btn.appendChild(pill);
+
+        btn.addEventListener("click", () => {
+          openPickPanelForDay(i - 1);
+        });
+
+        grid.appendChild(btn);
+      }
+
+      applyDaysUIState(n);
+    }
+
+    // stato iniziale: 0/null
+    if (select && input && grid) {
+      renderDaysGrid(null);
+
+      // Desktop: select
+      select.addEventListener("change", () => {
+        const v = Number(select.value) || null;
+        input.value = select.value;
+
+        // reset slot oltre range (se riduci i giorni)
+        if (v && v >= 1 && v <= 7) {
+          for (let k = v; k < 7; k++) rotationSlots[k] = null;
+        } else {
+          rotationSlots = new Array(7).fill(null);
+        }
+
+        renderDaysGrid(v);
+      });
+
+      // Mobile: input -> prende solo ultimo carattere, sovrascrive sempre
+      input.addEventListener("input", () => {
+        const digits = (input.value || "").replace(/\D/g, "");
+        const last = digits.slice(-1);
+
+        const v = Number(last);
+
+        if (!v || v < 1 || v > 7) {
+          input.value = "";
+          if (select) select.value = "";
+
+          rotationSlots = new Array(7).fill(null);
+          renderDaysGrid(null);
+          return;
+        }
+
+        input.value = last;
+        if (select) select.value = last;
+
+        // reset slot oltre range
+        for (let k = v; k < 7; k++) rotationSlots[k] = null;
+
+        renderDaysGrid(v);
+      });
+    }
+
+    // -----------------------------------------
+    // Helpers condivisi per le card "Riposo"
+    // -----------------------------------------
     function initRiposoCard(opts) {
       const {
         cardSel,
