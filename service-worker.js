@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V7.5';
+const VERSION    = '2025-11-20 V7.6';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -42,10 +42,10 @@ const PRECACHE_URLS = [
   `${ROOT}/js/turnazione.js`,
   `${ROOT}/js/turni.js`,
 
-  // Icone / favicon
+  // Favicon
   `${ROOT}/favicon.ico`,
 
-  // Cartella ICO
+  // ICO
   `${ROOT}/ico/apple-touch-icon-120x120.png`,
   `${ROOT}/ico/apple-touch-icon-152x152.png`,
   `${ROOT}/ico/apple-touch-icon-167x167.png`,
@@ -81,14 +81,16 @@ function normalizeHTMLRequest(req) {
   if (!wantsHTML) return req;
 
   if (url.pathname === ROOT || url.pathname === ROOT + '/') {
-    return new Request(`${ROOT}/index.html`, { credentials: 'same-origin' });
+    return new Request(`${ROOT}/index.html`, {
+      credentials: 'same-origin'
+    });
   }
 
   return req;
 }
 
 // ==============================
-// HANDLER HTML
+// HANDLER HTML (network-first)
 // ==============================
 async function handleHtmlFetch(event, req) {
   const htmlReq = normalizeHTMLRequest(req);
@@ -105,17 +107,23 @@ async function handleHtmlFetch(event, req) {
   }
 
   try {
-    const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
+    const fresh = await fetch(htmlReq, {
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
     try { await cache.put(`${ROOT}/index.html`, fresh.clone()); } catch {}
     return fresh;
   } catch {
     const cached = await cache.match(`${ROOT}/index.html`);
     if (cached) return cached;
 
-    return new Response('<h1>Offline</h1><p>Nessuna cache disponibile.</p>', {
-      headers: { 'Content-Type': 'text/html; charset=utf-8' },
-      status: 503
-    });
+    return new Response(
+      '<h1>Offline</h1><p>Nessuna cache disponibile.</p>',
+      {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        status: 503
+      }
+    );
   }
 }
 
@@ -128,7 +136,10 @@ async function handleSvgFetch(req) {
   const key = url.href;
 
   try {
-    const fresh = await fetch(req, { cache: 'no-store' });
+    const fresh = await fetch(req, {
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
     try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
@@ -139,7 +150,7 @@ async function handleSvgFetch(req) {
 }
 
 // ==============================
-// HANDLER STATICI (SWR)
+// HANDLER STATICI (SWR coerente)
 // ==============================
 async function handleStaticFetch(event, req) {
   const cache = await caches.open(CACHE_NAME);
@@ -156,7 +167,7 @@ async function handleStaticFetch(event, req) {
   }
 
   try {
-    const fresh = await fetch(req);
+    const fresh = await fetch(req, { cache: 'no-store' });
     await cache.put(req, fresh.clone());
     return fresh;
   } catch {
@@ -181,7 +192,9 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await Promise.all(
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+    );
 
     if (self.registration.navigationPreload) {
       try { await self.registration.navigationPreload.enable(); } catch {}
