@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-11-20 V7.4';
+const VERSION    = '2025-11-20 V7.5';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -11,8 +11,6 @@ const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
 // ==============================
 // PRECACHE COMPLETO (APP READY)
 // ==============================
-// Tutto ciò che serve per avere l’app pienamente
-// funzionante offline già dal primo avvio.
 const PRECACHE_URLS = [
   // Shell base
   `${ROOT}/`,
@@ -47,7 +45,7 @@ const PRECACHE_URLS = [
   // Icone / favicon
   `${ROOT}/favicon.ico`,
 
-  // Cartella ICO completa
+  // Cartella ICO
   `${ROOT}/ico/apple-touch-icon-120x120.png`,
   `${ROOT}/ico/apple-touch-icon-152x152.png`,
   `${ROOT}/ico/apple-touch-icon-167x167.png`,
@@ -62,7 +60,6 @@ const PRECACHE_URLS = [
   `${ROOT}/ico/mstile-150x150.png`,
 
   // SVG UI
-
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
@@ -97,35 +94,21 @@ async function handleHtmlFetch(event, req) {
   const htmlReq = normalizeHTMLRequest(req);
   const cache = await caches.open(CACHE_NAME);
 
-  // navigationPreload se disponibile
   let preload = null;
   if (event.preloadResponse) {
-    try {
-      preload = await event.preloadResponse;
-    } catch (e) {
-      preload = null;
-    }
+    try { preload = await event.preloadResponse; } catch {}
   }
 
   if (preload) {
-    try {
-      await cache.put(`${ROOT}/index.html`, preload.clone());
-    } catch (e) {
-      // ignorato
-    }
+    try { await cache.put(`${ROOT}/index.html`, preload.clone()); } catch {}
     return preload;
   }
 
-  // rete → cache → fallback
   try {
     const fresh = await fetch(htmlReq, { cache: 'no-store', credentials: 'same-origin' });
-    try {
-      await cache.put(`${ROOT}/index.html`, fresh.clone());
-    } catch (e) {
-      // ignorato
-    }
+    try { await cache.put(`${ROOT}/index.html`, fresh.clone()); } catch {}
     return fresh;
-  } catch (e) {
+  } catch {
     const cached = await cache.match(`${ROOT}/index.html`);
     if (cached) return cached;
 
@@ -137,51 +120,46 @@ async function handleHtmlFetch(event, req) {
 }
 
 // ==============================
-// HANDLER SVG (network-first)
+// HANDLER SVG (network-first, URL-keyed)
 // ==============================
 async function handleSvgFetch(req) {
   const cache = await caches.open(CACHE_NAME);
+  const url = new URL(req.url);
+  const key = url.href;
+
   try {
     const fresh = await fetch(req, { cache: 'no-store' });
-    try {
-      await cache.put(req, fresh.clone());
-    } catch (e) {
-      // ignorato
-    }
+    try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
-  } catch (e) {
-    const cached = await cache.match(req);
+  } catch {
+    const cached = await cache.match(key);
     if (cached) return cached;
     return new Response('', { status: 504 });
   }
 }
 
 // ==============================
-// HANDLER STATICI (SWR reale)
+// HANDLER STATICI (SWR)
 // ==============================
 async function handleStaticFetch(event, req) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(req);
 
   if (cached) {
-    // Aggiornamento in background
     event.waitUntil((async () => {
       try {
         const fresh = await fetch(req, { cache: 'no-store' });
         await cache.put(req, fresh.clone());
-      } catch (e) {
-        // ignorato
-      }
+      } catch {}
     })());
     return cached;
   }
 
-  // non in cache → rete diretta
   try {
     const fresh = await fetch(req);
     await cache.put(req, fresh.clone());
     return fresh;
-  } catch (e) {
+  } catch {
     return new Response('', { status: 504 });
   }
 }
@@ -203,16 +181,10 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    );
+    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
 
     if (self.registration.navigationPreload) {
-      try {
-        await self.registration.navigationPreload.enable();
-      } catch (e) {
-        // ignorato
-      }
+      try { await self.registration.navigationPreload.enable(); } catch {}
     }
 
     await self.clients.claim();
@@ -220,7 +192,7 @@ self.addEventListener('activate', event => {
 });
 
 // ==============================
-// MESSAGGI (SKIP WAITING)
+// MESSAGGI
 // ==============================
 self.addEventListener('message', ev => {
   if (ev.data && ev.data.type === 'SKIP_WAITING') {
@@ -233,37 +205,25 @@ self.addEventListener('message', ev => {
 // ==============================
 self.addEventListener('fetch', event => {
   const req = event.request;
-
-  if (req.method !== 'GET') {
-    return;
-  }
+  if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin) {
-    return;
-  }
-
-  // Non catturare il file del service worker
-  if (url.pathname.endsWith('/service-worker.js')) {
-    return;
-  }
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith('/service-worker.js')) return;
 
   const isHTML =
     req.mode === 'navigate' ||
     (req.headers.get('accept') || '').includes('text/html');
 
-  // 1) HTML → app shell veloce
   if (isHTML) {
     event.respondWith(handleHtmlFetch(event, req));
     return;
   }
 
-  // 2) SVG → network-first
   if (url.pathname.startsWith(`${ROOT}/svg/`)) {
     event.respondWith(handleSvgFetch(req));
     return;
   }
 
-  // 3) Statici → stale-while-revalidate
   event.respondWith(handleStaticFetch(event, req));
 });
