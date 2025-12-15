@@ -32,9 +32,9 @@
     const pickHint   = panelPick ? panelPick.querySelector("#turnazioniPickHint") : null;
 
     // stato rotazione: 7 slot max (1..7)
-    let rotationDaysCount = null;              // 1..7 o null
+    let rotationDaysCount = null;                // 1..7 o null
     let rotationSlots = new Array(7).fill(null); // slot -> { nome, sigla, colore, ... } oppure null
-    let activePickIndex = null;                // quale pill sto impostando (0..6)
+    let activePickIndex = null;                  // quale pill sto impostando (0..6)
 
     function applyDaysUIState(n){
       const hasDays = !!n && n >= 1 && n <= 7;

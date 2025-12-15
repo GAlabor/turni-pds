@@ -304,24 +304,29 @@
   gap:10px;
 }
 
+/* STILE "TEMA": pill separate, non lista con separatori */
 .turnazioni-pick-list{
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* RIGA: solo testo a sinistra, niente sigla a destra */
+/* PILL — stile IDENTICO a selezione Tema */
 .turnazioni-pick-row{
   width: 100%;
-  border: none;
-  background: transparent;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 16px;
 
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
 
-  gap: 10px;
   padding: 14px 12px;
 
   cursor: pointer;
@@ -330,18 +335,9 @@
   color: var(--text);
   text-align: left;
 
-  position: relative;
-}
-
-/* separatore "inset" (non full width) */
-.turnazioni-pick-row + .turnazioni-pick-row::before{
-  content:"";
-  position:absolute;
-  left: 12px;
-  right: 12px;
-  top: 0;
-  height: 1px;
-  background: rgba(148,163,184,0.35);
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
 }
 
 /* nome */
@@ -355,27 +351,32 @@
   flex: 1;
 }
 
-/* selezionato (blu) */
-.turnazioni-pick-row.is-selected .turnazioni-pick-name{
-  color: var(--accent);
-  font-weight: 600;
+/* selezionata — SOLO contorno + fondo leggero */
+.turnazioni-pick-row.is-selected{
+  border-color: var(--accent);
+  background: rgba(10,132,255,0.08);
 }
 
+/* hover coerente */
 @media (hover:hover){
   .turnazioni-pick-row:hover{
     background: rgba(10,132,255,0.06);
   }
 }
 
-.turnazioni-pick-row:active{
-  transform: translateY(1px);
+/* focus accessibilità (uguale a Tema) */
+.turnazioni-pick-row:focus-visible{
+  outline: none;
+  border-color: var(--accent);
 }
 
+/* vuoto */
 .turnazioni-pick-empty{
   margin: 6px 2px 0 2px;
   font-size: var(--fs-row-subtext);
   color: var(--subtext);
 }
+
 
 /* Forza i button della rotazione a usare ESATTAMENTE lo stesso font del contesto */
 .turnazioni-day-pill{
