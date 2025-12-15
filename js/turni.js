@@ -12,6 +12,9 @@
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (turni.js)");
   }
 
+  // Implementazione reale (viene impostata dopo initTurniPanel)
+  let exitEditModeImpl = function () {};
+
   function initTurniPanel() {
     const settingsView = document.querySelector(".view-settings");
     if (!settingsView) return;
@@ -452,7 +455,7 @@
     // ----------------------------
     // API: uscita forzata modalità Modifica (usata da app.js / settings.js)
     // ----------------------------
-    window.Turni.exitEditMode = function () {
+    exitEditModeImpl = function () {
       if (!isEditing) return;
       isEditing = false;
       refreshList();
@@ -470,6 +473,8 @@
     getVisualizzaTurnazione: function () {
       return window.TurniStorage ? TurniStorage.loadVisualToggle() : false;
     },
-    exitEditMode: function () {}
+    exitEditMode: function () {
+      exitEditModeImpl();
+    }
   };
 })();
