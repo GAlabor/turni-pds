@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-12-15 V9.0';
+const VERSION    = '2025-12-15 V9.1';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
