@@ -112,11 +112,6 @@
   font-size: var(--fs-row-subtext);
 }
 
-:root[data-theme="dark"] .turnazioni-days-placeholder{
-  background: rgba(15,23,42,0.35);
-  border-color: rgba(148,163,184,0.30);
-}
-
 /* =========================
    GRID pill rotazione (1..7)
    ========================= */
@@ -167,7 +162,6 @@
 }
 
 /* ✅ Badge "R" in alto a destra */
-
 .turnazioni-rest-badge{
   position: absolute;
   top: 3.5px;
@@ -188,7 +182,6 @@
   user-select: none;
 }
 
-
 /* feedback hover/press senza inventare nuovi componenti */
 @media (hover:hover){
   .turnazioni-day-pill:hover .turni-sigla-preview-pill{
@@ -207,6 +200,70 @@
 .turnazioni-day-pill .turni-sigla-preview-text{
   font: inherit;          /* mantiene font-family/weight */
   line-height: 1;         /* evita differenze verticali */
+}
+
+/* =========================
+   ✅ NUOVA CARD — "Giorni di Riposo" (1 / 2)
+   ========================= */
+
+.turnazioni-restdays-label{
+  flex: 0 0 21ch;
+  display:flex;
+  align-items:center;
+  height: var(--turni-sigla-size);
+}
+
+.turnazioni-restdays-control{
+  justify-content: flex-end;
+}
+
+.turnazioni-restdays-pills{
+  display:flex;
+  gap: 8px;
+  align-items:center;
+  justify-content: flex-end;
+}
+
+.turnazioni-restdays-pill{
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+
+  height: 30px;
+  min-width: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.08s ease-out;
+}
+
+.turnazioni-restdays-pill.is-active{
+  border-color: var(--accent);
+  background: rgba(10,132,255,0.08);
+}
+
+.turnazioni-restdays-pill:active{
+  transform: scale(0.97);
+}
+
+.turnazioni-restdays-pill:focus-visible{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(10,132,255,0.25);
 }
 
 /* =========================

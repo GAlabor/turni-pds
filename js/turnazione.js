@@ -5,7 +5,8 @@
 //   - Giorni (desktop select / mobile input) + pill rotazione cliccabili
 //   - Picker "Seleziona turno" (pagina) con lista turni creati
 //   - Riposo del Lunedì / Martedì (toggle + espansione + help toast)
-//   - ✅ Nuovo: "Imposta come giorno di riposo" nel picker + badge "R" nella pill
+//   - "Imposta come giorno di riposo" nel picker + badge "R" nella pill
+//   - ✅ Nuovo: Card "Giorni di Riposo" (1 / 2) che limita quanti giorni riposo puoi impostare
 // ============================
 
 (function () {
@@ -32,17 +33,40 @@
     const pickEmpty  = panelPick ? panelPick.querySelector("#turnazioniPickEmpty") : null;
     const pickHint   = panelPick ? panelPick.querySelector("#turnazioniPickHint") : null;
 
-    // ✅ nuovo: riposo nel picker
+    // riposo nel picker
     const restRowEl    = panelPick ? panelPick.querySelector("#turnazioniPickRestRow") : null;
     const restToggleEl = panelPick ? panelPick.querySelector("#turnazioniRestToggle") : null;
+
+    // ✅ nuova card "Giorni di Riposo" (1 / 2)
+    const restDaysBtns = panelAdd.querySelectorAll('[data-turnazioni-rest-days]');
 
     // stato rotazione: 7 slot max (1..7)
     let rotationDaysCount = null;                // 1..7 o null
     let rotationSlots = new Array(7).fill(null); // slot -> { nome, sigla, colore, ... } oppure null
     let activePickIndex = null;                  // quale pill sto impostando (0..6)
 
-    // ✅ stato "giorno di riposo": solo uno per turnazione
-    let restDayIndex = null; // 0..6 oppure null
+    // ✅ quanti "giorni riposo" puoi impostare nella rotazione
+    let restDaysAllowed = 1; // 1 o 2
+
+    // ✅ stato "giorni di riposo": array di indici (0..6), lunghezza <= restDaysAllowed
+    let restDayIndices = []; // es: [2] oppure [2,5]
+
+    function clampRestDaysAllowed(v) {
+      const n = Number(v);
+      if (n === 2) return 2;
+      return 1;
+    }
+
+    function normalizeRestIndicesToAllowed() {
+      // se riduci da 2 -> 1, tieni solo il primo (quello “più vecchio”)
+      if (restDayIndices.length > restDaysAllowed) {
+        restDayIndices = restDayIndices.slice(0, restDaysAllowed);
+      }
+    }
+
+    function isRestIndex(idx) {
+      return restDayIndices.includes(idx);
+    }
 
     function applyDaysUIState(n){
       const hasDays = !!n && n >= 1 && n <= 7;
@@ -62,15 +86,14 @@
         grid.style.display = hasDays ? "grid" : "none";
       }
 
-      // se la rotazione è stata ridotta e il riposo va fuori range -> reset
-      if (hasDays && restDayIndex !== null && restDayIndex >= n) {
-        restDayIndex = null;
+      // se la rotazione è stata ridotta e qualche riposo va fuori range -> rimuovi quelli fuori range
+      if (hasDays) {
+        restDayIndices = restDayIndices.filter(i => i < n);
+      } else {
+        restDayIndices = [];
       }
 
-      // se non ci sono giorni, azzera anche il riposo
-      if (!hasDays) {
-        restDayIndex = null;
-      }
+      normalizeRestIndicesToAllowed();
     }
 
     function applySiglaFontSize(el, txt) {
@@ -98,12 +121,46 @@
     }
 
     // ----------------------------
+    // ✅ Card "Giorni di Riposo" (1 / 2) - UI
+    // ----------------------------
+    function syncRestDaysCardUI() {
+      if (!restDaysBtns || !restDaysBtns.length) return;
+
+      restDaysBtns.forEach(btn => {
+        const v = clampRestDaysAllowed(btn.dataset.turnazioniRestDays || btn.dataset.turnazioniRestDays);
+        const isActive = (v === restDaysAllowed);
+        btn.classList.toggle("is-active", isActive);
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    }
+
+    function setRestDaysAllowed(next) {
+      restDaysAllowed = clampRestDaysAllowed(next);
+      normalizeRestIndicesToAllowed();
+      syncRestDaysCardUI();
+      syncRestToggleUI();
+      renderDaysGrid(rotationDaysCount);
+    }
+
+    if (restDaysBtns && restDaysBtns.length) {
+      // default UI coerente con default (1)
+      setRestDaysAllowed(1);
+
+      restDaysBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const v = btn.dataset.turnazioniRestDays;
+          setRestDaysAllowed(v);
+        });
+      });
+    }
+
+    // ----------------------------
     // ✅ Riposo: UI toggle nel picker
     // ----------------------------
     function syncRestToggleUI() {
       if (!restToggleEl) return;
 
-      const isOn = (activePickIndex !== null && restDayIndex === activePickIndex);
+      const isOn = (activePickIndex !== null && isRestIndex(activePickIndex));
       restToggleEl.classList.toggle("is-on", isOn);
       restToggleEl.setAttribute("aria-checked", isOn ? "true" : "false");
     }
@@ -112,10 +169,19 @@
       if (activePickIndex === null) return;
 
       if (nextOn) {
-        // solo uno: sovrascrive automaticamente il precedente
-        restDayIndex = activePickIndex;
+        if (!isRestIndex(activePickIndex)) {
+          // aggiungi e se sfori, rimuovi il più vecchio (FIFO)
+          restDayIndices.push(activePickIndex);
+
+          // unica regola: nessun duplicato
+          restDayIndices = [...new Set(restDayIndices)];
+
+          while (restDayIndices.length > restDaysAllowed) {
+            restDayIndices.shift();
+          }
+        }
       } else {
-        if (restDayIndex === activePickIndex) restDayIndex = null;
+        restDayIndices = restDayIndices.filter(i => i !== activePickIndex);
       }
 
       syncRestToggleUI();
@@ -136,7 +202,6 @@
         pickHint.textContent = `Seleziona un turno per il giorno ${index + 1}.`;
       }
 
-      // mostra/nascondi riga riposo (se esiste)
       if (restRowEl) {
         restRowEl.style.display = "flex";
       }
@@ -254,9 +319,9 @@
         pill.appendChild(txt);
 
         // ✅ badge "R" solo se:
-        // - questo giorno è quello di riposo
-        // - ed esiste un turno selezionato (così rispetti la tua richiesta)
-        if (restDayIndex === (i - 1) && slot) {
+        // - questo giorno è tra i giorni di riposo
+        // - ed esiste un turno selezionato (come avevi richiesto)
+        if (isRestIndex(i - 1) && slot) {
           const badge = document.createElement("span");
           badge.className = "turnazioni-rest-badge";
           badge.textContent = "R";
@@ -288,11 +353,12 @@
         if (v && v >= 1 && v <= 7) {
           for (let k = v; k < 7; k++) rotationSlots[k] = null;
 
-          // ✅ se il riposo è fuori range, lo resettiamo
-          if (restDayIndex !== null && restDayIndex >= v) restDayIndex = null;
+          // riposo fuori range -> rimuovi
+          restDayIndices = restDayIndices.filter(i => i < v);
+          normalizeRestIndicesToAllowed();
         } else {
           rotationSlots = new Array(7).fill(null);
-          restDayIndex = null;
+          restDayIndices = [];
         }
 
         renderDaysGrid(v);
@@ -310,7 +376,7 @@
           if (select) select.value = "";
 
           rotationSlots = new Array(7).fill(null);
-          restDayIndex = null;
+          restDayIndices = [];
           renderDaysGrid(null);
           return;
         }
@@ -321,8 +387,9 @@
         // reset slot oltre range
         for (let k = v; k < 7; k++) rotationSlots[k] = null;
 
-        // ✅ riposo fuori range -> reset
-        if (restDayIndex !== null && restDayIndex >= v) restDayIndex = null;
+        // riposo fuori range -> rimuovi
+        restDayIndices = restDayIndices.filter(i => i < v);
+        normalizeRestIndicesToAllowed();
 
         renderDaysGrid(v);
       });

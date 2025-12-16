@@ -521,6 +521,27 @@
               <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
             </div>
 
+            <!-- ✅ NUOVA CARD: Giorni di Riposo (1 / 2) -->
+            <div class="turni-field-row turnazioni-restdays-row">
+              <p class="turni-label turnazioni-restdays-label">Giorni di Riposo</p>
+
+              <div class="turni-field-control turnazioni-restdays-control">
+                <div class="turnazioni-restdays-pills" role="group" aria-label="Numero giorni di riposo">
+                  <button
+                    type="button"
+                    class="turnazioni-restdays-pill is-active"
+                    data-turnazioni-rest-days="1"
+                    aria-pressed="true">1</button>
+
+                  <button
+                    type="button"
+                    class="turnazioni-restdays-pill"
+                    data-turnazioni-rest-days="2"
+                    aria-pressed="false">2</button>
+                </div>
+              </div>
+            </div>
+
             <!-- CARD 3: Riposo del Lunedì -->
             <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
 
@@ -693,7 +714,7 @@
               Seleziona un turno.
             </p>
 
-            <!-- ✅ NUOVO: toggle "giorno di riposo" -->
+            <!-- ✅ toggle "giorno di riposo" -->
             <div class="turnazioni-pick-rest-row" id="turnazioniPickRestRow">
               <span class="turnazioni-pick-rest-label">Imposta come giorno di riposo</span>
               <button
