@@ -5,6 +5,7 @@
 //   - Giorni (desktop select / mobile input) + pill rotazione cliccabili
 //   - Picker "Seleziona turno" (pagina) con lista turni creati
 //   - Riposo del Lunedì / Martedì (toggle + espansione + help toast)
+//   - ✅ Nuovo: "Imposta come giorno di riposo" nel picker + badge "R" nella pill
 // ============================
 
 (function () {
@@ -31,10 +32,17 @@
     const pickEmpty  = panelPick ? panelPick.querySelector("#turnazioniPickEmpty") : null;
     const pickHint   = panelPick ? panelPick.querySelector("#turnazioniPickHint") : null;
 
+    // ✅ nuovo: riposo nel picker
+    const restRowEl    = panelPick ? panelPick.querySelector("#turnazioniPickRestRow") : null;
+    const restToggleEl = panelPick ? panelPick.querySelector("#turnazioniRestToggle") : null;
+
     // stato rotazione: 7 slot max (1..7)
     let rotationDaysCount = null;                // 1..7 o null
     let rotationSlots = new Array(7).fill(null); // slot -> { nome, sigla, colore, ... } oppure null
     let activePickIndex = null;                  // quale pill sto impostando (0..6)
+
+    // ✅ stato "giorno di riposo": solo uno per turnazione
+    let restDayIndex = null; // 0..6 oppure null
 
     function applyDaysUIState(n){
       const hasDays = !!n && n >= 1 && n <= 7;
@@ -52,6 +60,16 @@
 
       if (grid) {
         grid.style.display = hasDays ? "grid" : "none";
+      }
+
+      // se la rotazione è stata ridotta e il riposo va fuori range -> reset
+      if (hasDays && restDayIndex !== null && restDayIndex >= n) {
+        restDayIndex = null;
+      }
+
+      // se non ci sono giorni, azzera anche il riposo
+      if (!hasDays) {
+        restDayIndex = null;
       }
     }
 
@@ -79,6 +97,38 @@
       return an === bn && as === bs;
     }
 
+    // ----------------------------
+    // ✅ Riposo: UI toggle nel picker
+    // ----------------------------
+    function syncRestToggleUI() {
+      if (!restToggleEl) return;
+
+      const isOn = (activePickIndex !== null && restDayIndex === activePickIndex);
+      restToggleEl.classList.toggle("is-on", isOn);
+      restToggleEl.setAttribute("aria-checked", isOn ? "true" : "false");
+    }
+
+    function setRestForActiveDay(nextOn) {
+      if (activePickIndex === null) return;
+
+      if (nextOn) {
+        // solo uno: sovrascrive automaticamente il precedente
+        restDayIndex = activePickIndex;
+      } else {
+        if (restDayIndex === activePickIndex) restDayIndex = null;
+      }
+
+      syncRestToggleUI();
+      renderDaysGrid(rotationDaysCount);
+    }
+
+    if (restToggleEl) {
+      restToggleEl.addEventListener("click", () => {
+        const isOn = restToggleEl.classList.contains("is-on");
+        setRestForActiveDay(!isOn);
+      });
+    }
+
     function openPickPanelForDay(index) {
       activePickIndex = index;
 
@@ -86,6 +136,12 @@
         pickHint.textContent = `Seleziona un turno per il giorno ${index + 1}.`;
       }
 
+      // mostra/nascondi riga riposo (se esiste)
+      if (restRowEl) {
+        restRowEl.style.display = "flex";
+      }
+
+      syncRestToggleUI();
       renderPickList();
 
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
@@ -196,6 +252,17 @@
         }
 
         pill.appendChild(txt);
+
+        // ✅ badge "R" solo se:
+        // - questo giorno è quello di riposo
+        // - ed esiste un turno selezionato (così rispetti la tua richiesta)
+        if (restDayIndex === (i - 1) && slot) {
+          const badge = document.createElement("span");
+          badge.className = "turnazioni-rest-badge";
+          badge.textContent = "R";
+          pill.appendChild(badge);
+        }
+
         btn.appendChild(pill);
 
         btn.addEventListener("click", () => {
@@ -220,8 +287,12 @@
         // reset slot oltre range (se riduci i giorni)
         if (v && v >= 1 && v <= 7) {
           for (let k = v; k < 7; k++) rotationSlots[k] = null;
+
+          // ✅ se il riposo è fuori range, lo resettiamo
+          if (restDayIndex !== null && restDayIndex >= v) restDayIndex = null;
         } else {
           rotationSlots = new Array(7).fill(null);
+          restDayIndex = null;
         }
 
         renderDaysGrid(v);
@@ -239,6 +310,7 @@
           if (select) select.value = "";
 
           rotationSlots = new Array(7).fill(null);
+          restDayIndex = null;
           renderDaysGrid(null);
           return;
         }
@@ -248,6 +320,9 @@
 
         // reset slot oltre range
         for (let k = v; k < 7; k++) rotationSlots[k] = null;
+
+        // ✅ riposo fuori range -> reset
+        if (restDayIndex !== null && restDayIndex >= v) restDayIndex = null;
 
         renderDaysGrid(v);
       });

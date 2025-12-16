@@ -145,6 +145,10 @@
 
   aspect-ratio: 1;
   width: 100%;
+
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
 }
 
 /* riusiamo ESATTAMENTE lo stile pill preview già definito in turni-form.css:
@@ -154,11 +158,38 @@
   width: 100%;
   height: 100%;
   border-radius: 10px; /* un pelo più morbido qui */
+  position: relative;  /* ✅ per badge "R" */
 }
 
 .turnazioni-day-pill.is-empty .turni-sigla-preview-text{
   color: var(--subtext);
   opacity: 0.85;
+}
+
+/* ✅ Badge "R" in alto a destra */
+.turnazioni-rest-badge{
+  position: absolute;
+  top: 3.5px;
+  right: 3.5px;
+
+  background: none;
+  border: none;
+  padding: 0;
+
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+:root[data-theme="dark"] .turnazioni-rest-badge{
+  background: rgba(15,23,42,0.65);
+  color: rgba(226,232,240,0.90);
+  border-color: rgba(148,163,184,0.30);
 }
 
 /* feedback hover/press senza inventare nuovi componenti */
@@ -173,6 +204,12 @@
 
 .turnazioni-day-pill:active .turni-sigla-preview-pill{
   transform: scale(0.96);
+}
+
+/* Forza i text della rotazione a usare ESATTAMENTE lo stesso font del contesto */
+.turnazioni-day-pill .turni-sigla-preview-text{
+  font: inherit;          /* mantiene font-family/weight */
+  line-height: 1;         /* evita differenze verticali */
 }
 
 /* =========================
@@ -304,6 +341,28 @@
   gap:10px;
 }
 
+/* ✅ Riga toggle "giorno di riposo" */
+.turnazioni-pick-rest-row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+
+  padding: 12px 12px;
+  border-radius: 16px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-soft);
+}
+
+.turnazioni-pick-rest-label{
+  font-size: var(--fs-row-label);
+  font-weight: 500;
+  color: var(--text);
+  min-width: 0;
+}
+
 /* STILE "TEMA": pill separate, non lista con separatori */
 .turnazioni-pick-list{
   background: transparent;
@@ -375,17 +434,4 @@
   margin: 6px 2px 0 2px;
   font-size: var(--fs-row-subtext);
   color: var(--subtext);
-}
-
-
-/* Forza i button della rotazione a usare ESATTAMENTE lo stesso font del contesto */
-.turnazioni-day-pill{
-  font: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-}
-
-.turnazioni-day-pill .turni-sigla-preview-text{
-  font: inherit;          /* mantiene font-family/weight */
-  line-height: 1;         /* evita differenze verticali */
 }
