@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 
@@ -34,6 +33,45 @@
 
 <body>
 
+  <!-- ===================================================== -->
+  <!-- SVG ICON SPRITE (famiglie separate, niente forzature) -->
+  <!-- ===================================================== -->
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+
+      <!-- Chevron UI (settings rows, chevron laterale) -->
+      <symbol id="ico-ui-chevron-right" viewBox="0 0 24 24">
+        <path d="M10 6 L16 12 L10 18" />
+      </symbol>
+      <symbol id="ico-ui-chevron-left" viewBox="0 0 24 24">
+        <path d="M14 6 L8 12 L14 18" />
+      </symbol>
+
+      <!-- Chevron NAV (calendario prev/next) -->
+      <symbol id="ico-nav-prev" viewBox="0 0 24 24">
+        <path d="M14 6 L8 12 L14 18" />
+      </symbol>
+      <symbol id="ico-nav-next" viewBox="0 0 24 24">
+        <path d="M10 6 L16 12 L10 18" />
+      </symbol>
+
+      <!-- Chevron TOGGLE (espandi/collassa card) -->
+      <symbol id="ico-toggle-up" viewBox="0 0 24 24">
+        <path d="M6 14 L12 8 L18 14" />
+      </symbol>
+      <symbol id="ico-toggle-down" viewBox="0 0 24 24">
+        <path d="M6 10 L12 16 L18 10" />
+      </symbol>
+
+      <!-- Plus -->
+      <symbol id="ico-plus" viewBox="0 0 24 24">
+        <path d="M12 5 L12 19" />
+        <path d="M5 12 L19 12" />
+      </symbol>
+
+    </defs>
+  </svg>
+
   <!-- ICONA STATO / SALVATAGGIO -->
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
@@ -51,13 +89,13 @@
       <section class="monthbar">
         <button class="nav-btn prev" type="button" aria-label="Mese precedente">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M14 6 L8 12 L14 18" />
+            <use href="#ico-nav-prev"></use>
           </svg>
         </button>
         <div class="month-label"></div>
         <button class="nav-btn next" type="button" aria-label="Mese successivo">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M10 6 L16 12 L10 18" />
+            <use href="#ico-nav-next"></use>
           </svg>
         </button>
       </section>
@@ -130,7 +168,7 @@
           aria-label="Torna alle impostazioni"
           hidden>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M14 6 L8 12 L14 18" />
+            <use href="#ico-ui-chevron-left"></use>
           </svg>
         </button>
 
@@ -153,7 +191,7 @@
               <div class="settings-row-right">
                 <span class="settings-row-chevron" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 6 L16 12 L10 18" />
+                    <use href="#ico-ui-chevron-right"></use>
                   </svg>
                 </span>
               </div>
@@ -168,7 +206,7 @@
               <div class="settings-row-right">
                 <span class="settings-row-chevron" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 6 L16 12 L10 18" />
+                    <use href="#ico-ui-chevron-right"></use>
                   </svg>
                 </span>
               </div>
@@ -183,7 +221,7 @@
               <div class="settings-row-right">
                 <span class="settings-row-chevron" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 6 L16 12 L10 18" />
+                    <use href="#ico-ui-chevron-right"></use>
                   </svg>
                 </span>
               </div>
@@ -201,7 +239,7 @@
                 <span class="settings-row-summary" id="themeSummary"></span>
                 <span class="settings-row-chevron" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 6 L16 12 L10 18" />
+                    <use href="#ico-ui-chevron-right"></use>
                   </svg>
                 </span>
               </div>
@@ -216,7 +254,7 @@
               <div class="settings-row-right">
                 <span class="settings-row-chevron" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 6 L16 12 L10 18" />
+                    <use href="#ico-ui-chevron-right"></use>
                   </svg>
                 </span>
               </div>
@@ -231,7 +269,7 @@
               <div class="settings-row-right">
                 <span class="settings-row-chevron" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M10 6 L16 12 L10 18" />
+                    <use href="#ico-ui-chevron-right"></use>
                   </svg>
                 </span>
               </div>
@@ -293,8 +331,7 @@
                 </button>
                 <button class="icon-circle-btn" type="button" data-turnazioni-add aria-label="Aggiungi turnazione">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M12 5 L12 19" />
-                    <path d="M5 12 L19 12" />
+                    <use href="#ico-plus"></use>
                   </svg>
                 </button>
                 <button
@@ -304,7 +341,7 @@
                   aria-label="Mostra o nascondi le turnazioni"
                   aria-expanded="false">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M6 14 L12 8 L18 14" />
+                    <use href="#ico-toggle-up"></use>
                   </svg>
                 </button>
               </div>
@@ -328,8 +365,7 @@
                 </button>
                 <button class="icon-circle-btn" type="button" data-turni-add aria-label="Aggiungi turno">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M12 5 L12 19" />
-                    <path d="M5 12 L19 12" />
+                    <use href="#ico-plus"></use>
                   </svg>
                 </button>
                 <button
@@ -339,7 +375,7 @@
                   aria-label="Mostra o nascondi i turni"
                   aria-expanded="false">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M6 14 L12 8 L18 14" />
+                    <use href="#ico-toggle-up"></use>
                   </svg>
                 </button>
               </div>
@@ -810,4 +846,3 @@
 
 </body>
 </html>
-
