@@ -1,7 +1,7 @@
-<!-- INIZIO index.html -->
+
 <!DOCTYPE html>
 <html lang="it">
-<!-- INIZIO src/partials/head.html -->
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -31,22 +31,16 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/tabbar.css">
 </head>
-<!-- FINE src/partials/head.html -->
 
 <body>
 
-  <!-- INIZIO src/partials/status.html -->
   <!-- ICONA STATO / SALVATAGGIO -->
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
   </div>
-  <!-- FINE src/partials/status.html -->
 
-  <!-- INIZIO src/partials/shell-start.html -->
   <main class="app-shell">
-  <!-- FINE src/partials/shell-start.html -->
 
-    <!-- INIZIO src/partials/views/calendar.html -->
     <!-- VISTA CALENDARIO -->
     <section class="view view-calendar is-active" data-view="calendar">
       <header class="app-header">
@@ -98,9 +92,7 @@
         </div>
       </div>
     </section>
-    <!-- FINE src/partials/views/calendar.html -->
 
-    <!-- INIZIO src/partials/views/inspag.html -->
     <!-- VISTA INSERIMENTI / PAGAMENTI -->
     <section class="view view-inspag" data-view="inspag">
       <header class="app-header">
@@ -113,9 +105,7 @@
         </p>
       </div>
     </section>
-    <!-- FINE src/partials/views/inspag.html -->
 
-    <!-- INIZIO src/partials/views/riepilogo.html -->
     <!-- VISTA RIEPILOGO -->
     <section class="view view-riepilogo" data-view="riepilogo">
       <header class="app-header">
@@ -128,9 +118,7 @@
         </p>
       </div>
     </section>
-    <!-- FINE src/partials/views/riepilogo.html -->
 
-    <!-- INIZIO src/partials/views/settings.html -->
     <!-- VISTA IMPOSTAZIONI -->
     <section class="view view-settings" data-view="settings">
       <header class="app-header">
@@ -151,7 +139,7 @@
       </header>
 
       <div class="settings-container">
-        <!-- INIZIO src/partials/views/settings/panel-main.html -->
+
         <!-- Schermata principale impostazioni -->
         <div class="settings-main is-active">
 
@@ -251,9 +239,7 @@
           </div>
 
         </div>
-        <!-- FINE src/partials/views/settings/panel-main.html -->
 
-        <!-- INIZIO src/partials/views/settings/panel-theme.html -->
         <!-- PANNELLO TEMA -->
         <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-group">
@@ -274,9 +260,7 @@
             <span class="settings-choice-label" data-theme-label="dark"></span>
           </button>
         </div>
-        <!-- FINE src/partials/views/settings/panel-theme.html -->
 
-        <!-- INIZIO src/partials/views/settings/panel-turni.html -->
         <!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
@@ -368,9 +352,7 @@
             </p>
           </div>
         </div>
-        <!-- FINE src/partials/views/settings/panel-turni.html -->
 
-        <!-- INIZIO src/partials/views/settings/panel-turni-add.html -->
         <!-- PANNELLO AGGIUNGI TURNO -->
         <div
           class="settings-panel settings-turni-add"
@@ -468,9 +450,7 @@
             </div>
           </div>
         </div>
-        <!-- FINE src/partials/views/settings/panel-turni-add.html -->
 
-        <!-- INIZIO src/partials/views/settings/panel-turnazioni-add.html -->
         <!-- PANNELLO AGGIUNGI TURNAZIONE -->
         <div
           class="settings-panel settings-turnazioni-add"
@@ -726,9 +706,7 @@
 
           </div>
         </div>
-        <!-- FINE src/partials/views/settings/panel-turnazioni-add.html -->
 
-        <!-- INIZIO src/partials/views/settings/panel-turnazioni-pick.html -->
         <!-- NUOVO PANNELLO: SELEZIONA TURNO PER ROTAZIONE -->
         <div
           class="settings-panel settings-turnazioni-pick"
@@ -760,9 +738,7 @@
             </p>
           </div>
         </div>
-        <!-- FINE src/partials/views/settings/panel-turnazioni-pick.html -->
 
-        <!-- INIZIO src/partials/views/settings/panel-misc.html -->
         <!-- PANNELLO INDENNITÀ -->
         <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
 
@@ -774,16 +750,12 @@
 
         <!-- PANNELLO VERSIONE -->
         <div class="settings-panel settings-updates" data-settings-id="updates"></div>
-        <!-- FINE src/partials/views/settings/panel-misc.html -->
+
       </div>
     </section>
-    <!-- FINE src/partials/views/settings.html -->
 
-  <!-- INIZIO src/partials/shell-end.html -->
   </main>
-  <!-- FINE src/partials/shell-end.html -->
 
-  <!-- INIZIO src/partials/tabbar.html -->
   <!-- TABBAR IN BASSO -->
   <nav class="tabbar" aria-label="Barra schede">
     <button class="tab active" data-tab="calendar" aria-label="Calendario">
@@ -814,11 +786,9 @@
       <span class="tab-label">Impostazioni</span>
     </button>
   </nav>
-  <!-- FINE src/partials/tabbar.html -->
 
   <div id="versionLabel" class="version-label"></div>
 
-  <!-- INIZIO src/partials/scripts.html -->
   <!-- JS -->
   <script src="js/config.js" defer></script>
   <script src="js/calendar.js" defer></script>
@@ -837,8 +807,7 @@
 
   <script src="js/app.js" defer></script>
   <script src="js/sw-register.js" defer></script>
-  <!-- FINE src/partials/scripts.html -->
 
 </body>
 </html>
-<!-- FINE index.html -->
+
