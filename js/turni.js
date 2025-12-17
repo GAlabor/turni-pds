@@ -39,9 +39,12 @@
     const emptyHint  = panelTurni.querySelector("[data-turni-empty-hint]");
     const btnAdd     = panelTurni.querySelector("[data-turni-add]");
     const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
-    const toggleBtn  = panelTurni.querySelector("[data-turni-toggle]");
-    const cardEl     = panelTurni.querySelector(".turni-card:not(.turnazioni-card)");
-    const headerEl   = cardEl ? cardEl.querySelector(".turni-card-header") : null;
+
+const toggleBtn = panelTurni.querySelector("[data-turni-toggle]");
+
+// La card "Turni" corretta è quella che contiene il suo toggle
+const cardEl = toggleBtn ? toggleBtn.closest(".turni-card") : null;
+const headerEl = cardEl ? cardEl.querySelector(".turni-card-header") : null;
 
     // Blocco "Visualizza turnazione"
     const visualToggleBtn = panelTurni.querySelector("[data-turni-visual-toggle]");
