@@ -2,7 +2,6 @@
 <html lang="it">
 
 <head>
-  <!-- TPDS:SPLIT:HEAD:START (NON CANCELLARE) -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
@@ -30,13 +29,10 @@
 
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/tabbar.css">
-  <!-- TPDS:SPLIT:HEAD:END (NON CANCELLARE) -->
 </head>
 
 <body>
-  <!-- TPDS:SPLIT:BODY:START (NON CANCELLARE) -->
 
-  <!-- TPDS:SPLIT:SVG_SPRITE:START (NON CANCELLARE) -->
   <!-- ===================================================== -->
   <!-- SVG ICON SPRITE (famiglie separate, niente forzature) -->
   <!-- ===================================================== -->
@@ -75,19 +71,14 @@
 
     </defs>
   </svg>
-  <!-- TPDS:SPLIT:SVG_SPRITE:END (NON CANCELLARE) -->
 
-  <!-- TPDS:SPLIT:STATUS:START (NON CANCELLARE) -->
   <!-- ICONA STATO / SALVATAGGIO -->
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
   </div>
-  <!-- TPDS:SPLIT:STATUS:END (NON CANCELLARE) -->
 
-  <!-- TPDS:SPLIT:MAIN:START (NON CANCELLARE) -->
   <main class="app-shell">
 
-    <!-- TPDS:SPLIT:VIEW_CALENDAR:START (NON CANCELLARE) -->
     <!-- VISTA CALENDARIO -->
     <section class="view view-calendar is-active" data-view="calendar">
       <header class="app-header">
@@ -139,9 +130,7 @@
         </div>
       </div>
     </section>
-    <!-- TPDS:SPLIT:VIEW_CALENDAR:END (NON CANCELLARE) -->
 
-    <!-- TPDS:SPLIT:VIEW_INSPAG:START (NON CANCELLARE) -->
     <!-- VISTA INSERIMENTI / PAGAMENTI -->
     <section class="view view-inspag" data-view="inspag">
       <header class="app-header">
@@ -154,9 +143,7 @@
         </p>
       </div>
     </section>
-    <!-- TPDS:SPLIT:VIEW_INSPAG:END (NON CANCELLARE) -->
 
-    <!-- TPDS:SPLIT:VIEW_RIEPILOGO:START (NON CANCELLARE) -->
     <!-- VISTA RIEPILOGO -->
     <section class="view view-riepilogo" data-view="riepilogo">
       <header class="app-header">
@@ -169,13 +156,9 @@
         </p>
       </div>
     </section>
-    <!-- TPDS:SPLIT:VIEW_RIEPILOGO:END (NON CANCELLARE) -->
 
-    <!-- TPDS:SPLIT:VIEW_SETTINGS:START (NON CANCELLARE) -->
     <!-- VISTA IMPOSTAZIONI -->
     <section class="view view-settings" data-view="settings">
-
-      <!-- TPDS:SPLIT:SETTINGS_HEADER:START (NON CANCELLARE) -->
       <header class="app-header">
         <!-- Freccia BACK principale, visibile solo dentro i pannelli -->
         <button
@@ -192,11 +175,9 @@
         <!-- Titolo principale dinamico -->
         <h1 class="app-title" id="settingsTitle">Impostazioni</h1>
       </header>
-      <!-- TPDS:SPLIT:SETTINGS_HEADER:END (NON CANCELLARE) -->
 
       <div class="settings-container">
 
-        <!-- TPDS:SPLIT:SETTINGS_HOME:START (NON CANCELLARE) -->
         <!-- Schermata principale impostazioni -->
         <div class="settings-main is-active">
 
@@ -296,9 +277,7 @@
           </div>
 
         </div>
-        <!-- TPDS:SPLIT:SETTINGS_HOME:END (NON CANCELLARE) -->
 
-        <!-- TPDS:SPLIT:SETTINGS_PANELS_MISC:START (NON CANCELLARE) -->
         <!-- PANNELLO TEMA -->
         <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-group">
@@ -320,20 +299,6 @@
           </button>
         </div>
 
-        <!-- PANNELLO INDENNITÀ -->
-        <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
-
-        <!-- PANNELLO FESTIVITÀ -->
-        <div class="settings-panel settings-festivita" data-settings-id="festivita"></div>
-
-        <!-- PANNELLO INFO -->
-        <div class="settings-panel settings-info" data-settings-id="info"></div>
-
-        <!-- PANNELLO VERSIONE -->
-        <div class="settings-panel settings-updates" data-settings-id="updates"></div>
-        <!-- TPDS:SPLIT:SETTINGS_PANELS_MISC:END (NON CANCELLARE) -->
-
-        <!-- TPDS:SPLIT:SETTINGS_PANELS_TURNI:START (NON CANCELLARE) -->
         <!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
@@ -809,17 +774,24 @@
             </p>
           </div>
         </div>
-        <!-- TPDS:SPLIT:SETTINGS_PANELS_TURNI:END (NON CANCELLARE) -->
+
+        <!-- PANNELLO INDENNITÀ -->
+        <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
+
+        <!-- PANNELLO FESTIVITÀ -->
+        <div class="settings-panel settings-festivita" data-settings-id="festivita"></div>
+
+        <!-- PANNELLO INFO -->
+        <div class="settings-panel settings-info" data-settings-id="info"></div>
+
+        <!-- PANNELLO VERSIONE -->
+        <div class="settings-panel settings-updates" data-settings-id="updates"></div>
 
       </div>
-
     </section>
-    <!-- TPDS:SPLIT:VIEW_SETTINGS:END (NON CANCELLARE) -->
 
   </main>
-  <!-- TPDS:SPLIT:MAIN:END (NON CANCELLARE) -->
 
-  <!-- TPDS:SPLIT:TABBAR:START (NON CANCELLARE) -->
   <!-- TABBAR IN BASSO -->
   <nav class="tabbar" aria-label="Barra schede">
     <button class="tab active" data-tab="calendar" aria-label="Calendario">
@@ -850,11 +822,9 @@
       <span class="tab-label">Impostazioni</span>
     </button>
   </nav>
-  <!-- TPDS:SPLIT:TABBAR:END (NON CANCELLARE) -->
 
   <div id="versionLabel" class="version-label"></div>
 
-  <!-- TPDS:SPLIT:SCRIPTS:START (NON CANCELLARE) -->
   <!-- JS -->
   <script src="js/config.js" defer></script>
   <script src="js/calendar.js" defer></script>
@@ -873,8 +843,6 @@
 
   <script src="js/app.js" defer></script>
   <script src="js/sw-register.js" defer></script>
-  <!-- TPDS:SPLIT:SCRIPTS:END (NON CANCELLARE) -->
 
-  <!-- TPDS:SPLIT:BODY:END (NON CANCELLARE) -->
 </body>
 </html>
