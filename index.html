@@ -335,97 +335,102 @@
 
         <!-- TPDS:SPLIT:SETTINGS_PANELS_TURNI:START (NON CANCELLARE) -->
 
-        <!-- TPDS:SPLIT:SETTINGS_TURNI_OVERVIEW:START (NON CANCELLARE) -->
-        <!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
-        <div class="settings-panel settings-turni" data-settings-id="turni">
+<!-- TPDS:SPLIT:SETTINGS_TURNI_OVERVIEW:START (NON CANCELLARE) -->
+<!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
+<div class="settings-panel settings-turni" data-settings-id="turni">
 
-          <!-- 1) BLOCCO: VISUALIZZA TURNAZIONE -->
-          <div class="turni-visual-section">
-            <div class="turni-visual-header">
-              <h2 class="turni-panel-title">Visualizza Turnazione</h2>
-              <button
-                class="toggle-switch"
-                type="button"
-                role="switch"
-                aria-checked="true"
-                data-turni-visual-toggle
-                aria-label="Attiva o disattiva la visualizzazione della turnazione">
-              </button>
-            </div>
-            <p class="turni-visual-hint" data-turni-visual-hint>
-              Nessuna turnazione impostata.
-            </p>
-          </div>
+  <!-- 1) CARD: VISUALIZZA TURNAZIONE -->
+  <div class="turni-card turni-visual-card">
+    <div class="turni-card-header">
+      <h2 class="turni-panel-title">Visualizza Turnazione</h2>
 
-          <!-- 2) CARD TURNAZIONI (chiusa di default) -->
-          <div class="turni-card turnazioni-card is-collapsed">
-            <div class="turni-card-header">
-              <h2 class="turni-panel-title">Turnazioni</h2>
+      <div class="turni-card-actions">
+        <button
+          class="toggle-switch"
+          type="button"
+          role="switch"
+          aria-checked="true"
+          data-turni-visual-toggle
+          aria-label="Attiva o disattiva la visualizzazione della turnazione">
+        </button>
+      </div>
+    </div>
 
-              <div class="turni-card-actions">
-                <button class="pill-btn" type="button" data-turnazioni-edit disabled>
-                  Modifica
-                </button>
-                <button class="icon-circle-btn" type="button" data-turnazioni-add aria-label="Aggiungi turnazione">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <use href="#ico-plus"></use>
-                  </svg>
-                </button>
-                <button
-                  class="turni-toggle-btn"
-                  type="button"
-                  data-turnazioni-toggle
-                  aria-label="Mostra o nascondi le turnazioni"
-                  aria-expanded="false">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <use href="#ico-toggle-up"></use>
-                  </svg>
-                </button>
-              </div>
-            </div>
+    <p class="turni-visual-hint" data-turni-visual-hint>
+      Nessuna turnazione impostata.
+    </p>
+  </div>
 
-            <div class="turni-list" data-turnazioni-list></div>
+  <!-- 2) CARD TURNAZIONI (chiusa di default) -->
+  <div class="turni-card turnazioni-card is-collapsed">
+    <div class="turni-card-header">
+      <h2 class="turni-panel-title">Turnazioni</h2>
 
-            <p class="turni-empty-hint" data-turnazioni-empty-hint>
-              Nessuna turnazione salvata. Tocca + per aggiungerne una.
-            </p>
-          </div>
+      <div class="turni-card-actions">
+        <button class="pill-btn" type="button" data-turnazioni-edit disabled>
+          Modifica
+        </button>
+        <button class="icon-circle-btn" type="button" data-turnazioni-add aria-label="Aggiungi turnazione">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-plus"></use>
+          </svg>
+        </button>
+        <button
+          class="turni-toggle-btn"
+          type="button"
+          data-turnazioni-toggle
+          aria-label="Mostra o nascondi le turnazioni"
+          aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-toggle-up"></use>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-          <!-- 3) CARD TURNI (chiusa di default) -->
-          <div class="turni-card is-collapsed">
-            <div class="turni-card-header">
-              <h2 class="turni-panel-title">Turni</h2>
+    <div class="turni-list" data-turnazioni-list></div>
 
-              <div class="turni-card-actions">
-                <button class="pill-btn" type="button" data-turni-edit disabled>
-                  Modifica
-                </button>
-                <button class="icon-circle-btn" type="button" data-turni-add aria-label="Aggiungi turno">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <use href="#ico-plus"></use>
-                  </svg>
-                </button>
-                <button
-                  class="turni-toggle-btn"
-                  type="button"
-                  data-turni-toggle
-                  aria-label="Mostra o nascondi i turni"
-                  aria-expanded="false">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <use href="#ico-toggle-up"></use>
-                  </svg>
-                </button>
-              </div>
-            </div>
+    <p class="turni-empty-hint" data-turnazioni-empty-hint>
+      Nessuna turnazione salvata. Tocca + per aggiungerne una.
+    </p>
+  </div>
 
-            <div class="turni-list" data-turni-list></div>
+  <!-- 3) CARD TURNI (chiusa di default) -->
+  <div class="turni-card is-collapsed">
+    <div class="turni-card-header">
+      <h2 class="turni-panel-title">Turni</h2>
 
-            <p class="turni-empty-hint" data-turni-empty-hint>
-              Nessun turno salvato. Tocca + per aggiungerne uno.
-            </p>
-          </div>
-        </div>
-        <!-- TPDS:SPLIT:SETTINGS_TURNI_OVERVIEW:END (NON CANCELLARE) -->
+      <div class="turni-card-actions">
+        <button class="pill-btn" type="button" data-turni-edit disabled>
+          Modifica
+        </button>
+        <button class="icon-circle-btn" type="button" data-turni-add aria-label="Aggiungi turno">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-plus"></use>
+          </svg>
+        </button>
+        <button
+          class="turni-toggle-btn"
+          type="button"
+          data-turni-toggle
+          aria-label="Mostra o nascondi i turni"
+          aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-toggle-up"></use>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="turni-list" data-turni-list></div>
+
+    <p class="turni-empty-hint" data-turni-empty-hint>
+      Nessun turno salvato. Tocca + per aggiungerne uno.
+    </p>
+  </div>
+</div>
+<!-- TPDS:SPLIT:SETTINGS_TURNI_OVERVIEW:END (NON CANCELLARE) -->
+
 
         <!-- TPDS:SPLIT:SETTINGS_TURNI_ADD:START (NON CANCELLARE) -->
         <!-- PANNELLO AGGIUNGI TURNO -->

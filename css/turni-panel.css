@@ -266,22 +266,17 @@ body.turni-no-select * {
 }
 
 /* =========================
-   BLOCCO "VISUALIZZA TURNAZIONE"
+   BLOCCO "VISUALIZZA TURNAZIONE" (ORA IN CARD)
    ========================= */
 
-.turni-visual-section {
-  margin-bottom: 18px;
-}
-
-.turni-visual-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+.turni-visual-card {
+  /* separazione leggermente più evidente dal blocco sotto */
+  margin-top: 0;
+  margin-bottom: 10px;
 }
 
 .turni-visual-hint {
-  margin: 4px 2px 0 2px;
+  margin: 6px 2px 0 2px;
   font-size: var(--fs-turni-form-hint);
   color: var(--subtext);
 }
