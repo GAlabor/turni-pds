@@ -489,3 +489,78 @@
   font-size: var(--fs-row-subtext);
   color: var(--subtext);
 }
+
+/* =========================
+   TURNAZIONI — LISTA CARD (nel pannello Turni)
+   ========================= */
+
+.turnazioni-card [data-turnazioni-list]{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.turnazione-mini-card{
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  border-radius: 16px;
+  padding: 12px 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  box-shadow: var(--shadow-soft);
+
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.turnazione-mini-card.is-selected{
+  border-color: var(--accent);
+  background: rgba(10,132,255,0.08);
+}
+
+@media (hover:hover){
+  .turnazione-mini-card:hover{
+    background: rgba(10,132,255,0.06);
+  }
+}
+
+.turnazione-mini-name{
+  font-size: var(--fs-row-label);
+  font-weight: 500;
+  color: var(--text);
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.turnazione-mini-sigle{
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* evita che elementi vuoti vengano “disegnati” come card */
+.turnazione-mini-card:empty { display: none; }
+
+.turnazione-mini-card{
+  text-align: left;
+}
+
+.turnazione-mini-name{
+  text-align: left;
+}
+

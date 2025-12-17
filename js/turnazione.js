@@ -6,21 +6,43 @@
 //   - Picker "Seleziona turno" (pagina) con lista turni creati
 //   - Riposo del Lunedì / Martedì (toggle + espansione + help toast)
 //   - "Imposta come giorno di riposo" nel picker + badge "R" nella pill
-//   - ✅ Nuovo: Card "Giorni di Riposo" (1 / 2) che limita quanti giorni riposo puoi impostare
+//   - ✅ Card "Giorni di Riposo" (1 / 2) che limita quanti giorni riposo puoi impostare
+//   - ✅ Salvataggio turnazione + lista card selezionabili come preferita
 // ============================
 
 (function () {
-  function initTurnazioniAddUI() {
+  function initTurnazioniAddUI(ctx) {
     // pannello "Aggiungi turnazione"
-    const panelAdd = document.querySelector('.settings-panel.settings-turnazioni-add[data-settings-id="turnazioni-add"]');
+    const panelAdd = document.querySelector(
+      '.settings-panel.settings-turnazioni-add[data-settings-id="turnazioni-add"]'
+    );
     if (!panelAdd) return;
 
-    // pannello picker (pagina)
-    const panelPick = document.querySelector('.settings-panel.settings-turnazioni-pick[data-settings-id="turnazioni-pick"]');
+    // pannello picker
+    const panelPick = document.querySelector(
+      '.settings-panel.settings-turnazioni-pick[data-settings-id="turnazioni-pick"]'
+    );
 
-    // ----------------------------
-    // CARD: Giorni + griglia pill
-    // ----------------------------
+    // ✅ refs pannello Turni (lista turnazioni + hint + visualizza turnazione)
+    const panelTurni = (ctx && ctx.panelTurni)
+      ? ctx.panelTurni
+      : document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"]');
+
+    const turnazioniListEl = (ctx && ctx.turnazioniListEl)
+      ? ctx.turnazioniListEl
+      : (panelTurni ? panelTurni.querySelector("[data-turnazioni-list]") : null);
+
+    const turnazioniEmptyEl = (ctx && ctx.turnazioniEmptyEl)
+      ? ctx.turnazioniEmptyEl
+      : (panelTurni ? panelTurni.querySelector("[data-turnazioni-empty-hint]") : null);
+
+    const visualHintEl = panelTurni ? panelTurni.querySelector("[data-turni-visual-hint]") : null;
+
+    // ✅ toolbar Salva (identica ad Aggiungi turno)
+    const btnSave = panelAdd.querySelector("[data-turnazioni-save]");
+    const errEl   = panelAdd.querySelector("[data-turnazioni-error]");
+
+    // Giorni + griglia
     const select = panelAdd.querySelector("#turnazioniDaysSelect");
     const input  = panelAdd.querySelector("#turnazioniDaysInput");
     const grid   = panelAdd.querySelector("#turnazioniDaysGrid");
@@ -28,7 +50,10 @@
     const subtitleEl    = panelAdd.querySelector("#turnazioniDaysSubtitle");
     const placeholderEl = panelAdd.querySelector("#turnazioniDaysPlaceholder");
 
-    // picker UI
+    // Nome turnazione
+    const nameInput = panelAdd.querySelector("#turnazioniNome");
+
+    // picker list
     const pickListEl = panelPick ? panelPick.querySelector("#turnazioniPickList") : null;
     const pickEmpty  = panelPick ? panelPick.querySelector("#turnazioniPickEmpty") : null;
     const pickHint   = panelPick ? panelPick.querySelector("#turnazioniPickHint") : null;
@@ -37,28 +62,61 @@
     const restRowEl    = panelPick ? panelPick.querySelector("#turnazioniPickRestRow") : null;
     const restToggleEl = panelPick ? panelPick.querySelector("#turnazioniRestToggle") : null;
 
-    // ✅ nuova card "Giorni di Riposo" (1 / 2)
+    // card "Giorni di Riposo" (1/2)
     const restDaysBtns = panelAdd.querySelectorAll('[data-turnazioni-rest-days]');
 
-    // stato rotazione: 7 slot max (1..7)
+    // stato rotazione
     let rotationDaysCount = null;                // 1..7 o null
-    let rotationSlots = new Array(7).fill(null); // slot -> { nome, sigla, colore, ... } oppure null
-    let activePickIndex = null;                  // quale pill sto impostando (0..6)
+    let rotationSlots = new Array(7).fill(null); // slot -> turno obj oppure null
+    let activePickIndex = null;                  // 0..6
 
-    // ✅ quanti "giorni riposo" puoi impostare nella rotazione
+    // quanti giorni riposo
     let restDaysAllowed = 1; // 1 o 2
+    let restDayIndices = []; // indici 0..6
 
-    // ✅ stato "giorni di riposo": array di indici (0..6), lunghezza <= restDaysAllowed
-    let restDayIndices = []; // es: [2] oppure [2,5]
+    // ✅ Storage turnazioni
+    const hasStorage =
+      window.TurniStorage &&
+      typeof TurniStorage.loadTurnazioni === "function" &&
+      typeof TurniStorage.saveTurnazioni === "function" &&
+      typeof TurniStorage.loadPreferredTurnazioneId === "function" &&
+      typeof TurniStorage.savePreferredTurnazioneId === "function";
 
+    let savedTurnazioni = hasStorage ? TurniStorage.loadTurnazioni() : [];
+    let preferredId     = hasStorage ? TurniStorage.loadPreferredTurnazioneId() : null;
+
+    // ----------------------------
+    // Errori toolbar
+    // ----------------------------
+    let errorTimer = null;
+
+    function clearError() {
+      if (!errEl) return;
+      if (errorTimer) {
+        clearTimeout(errorTimer);
+        errorTimer = null;
+      }
+      errEl.hidden = true;
+    }
+
+    function showError() {
+      if (!errEl) return;
+      clearError();
+      errEl.hidden = false;
+      errorTimer = setTimeout(() => {
+        errEl.hidden = true;
+      }, 2000);
+    }
+
+    // ----------------------------
+    // Helpers UI giorni
+    // ----------------------------
     function clampRestDaysAllowed(v) {
       const n = Number(v);
-      if (n === 2) return 2;
-      return 1;
+      return (n === 2) ? 2 : 1;
     }
 
     function normalizeRestIndicesToAllowed() {
-      // se riduci da 2 -> 1, tieni solo il primo (quello “più vecchio”)
       if (restDayIndices.length > restDaysAllowed) {
         restDayIndices = restDayIndices.slice(0, restDaysAllowed);
       }
@@ -68,7 +126,7 @@
       return restDayIndices.includes(idx);
     }
 
-    function applyDaysUIState(n){
+    function applyDaysUIState(n) {
       const hasDays = !!n && n >= 1 && n <= 7;
 
       if (subtitleEl) {
@@ -86,7 +144,7 @@
         grid.style.display = hasDays ? "grid" : "none";
       }
 
-      // se la rotazione è stata ridotta e qualche riposo va fuori range -> rimuovi quelli fuori range
+      // riposi fuori range
       if (hasDays) {
         restDayIndices = restDayIndices.filter(i => i < n);
       } else {
@@ -98,12 +156,10 @@
 
     function applySiglaFontSize(el, txt) {
       if (!el) return;
-
       if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
         TurniRender.applySiglaFontSize(el, txt);
         return;
       }
-
       const len = (txt || "").length;
       let size = 11.5;
       if (len <= 2) size = 15;
@@ -121,13 +177,13 @@
     }
 
     // ----------------------------
-    // ✅ Card "Giorni di Riposo" (1 / 2) - UI
+    // Card "Giorni di Riposo" (1 / 2)
     // ----------------------------
     function syncRestDaysCardUI() {
       if (!restDaysBtns || !restDaysBtns.length) return;
 
       restDaysBtns.forEach(btn => {
-        const v = clampRestDaysAllowed(btn.dataset.turnazioniRestDays || btn.dataset.turnazioniRestDays);
+        const v = clampRestDaysAllowed(btn.dataset.turnazioniRestDays);
         const isActive = (v === restDaysAllowed);
         btn.classList.toggle("is-active", isActive);
         btn.setAttribute("aria-pressed", isActive ? "true" : "false");
@@ -143,9 +199,7 @@
     }
 
     if (restDaysBtns && restDaysBtns.length) {
-      // default UI coerente con default (1)
       setRestDaysAllowed(1);
-
       restDaysBtns.forEach(btn => {
         btn.addEventListener("click", () => {
           const v = btn.dataset.turnazioniRestDays;
@@ -155,7 +209,7 @@
     }
 
     // ----------------------------
-    // ✅ Riposo: UI toggle nel picker
+    // Riposo: toggle nel picker
     // ----------------------------
     function syncRestToggleUI() {
       if (!restToggleEl) return;
@@ -170,14 +224,10 @@
 
       if (nextOn) {
         if (!isRestIndex(activePickIndex)) {
-          // aggiungi e se sfori, rimuovi il più vecchio (FIFO)
           restDayIndices.push(activePickIndex);
-
-          // unica regola: nessun duplicato
           restDayIndices = [...new Set(restDayIndices)];
-
           while (restDayIndices.length > restDaysAllowed) {
-            restDayIndices.shift();
+            restDayIndices.shift(); // FIFO
           }
         }
       } else {
@@ -245,7 +295,6 @@
         row.type = "button";
         row.className = "turnazioni-pick-row";
 
-        // evidenzia se già selezionato per questa pill
         if (selected && sameTurno(selected, t)) {
           row.classList.add("is-selected");
         }
@@ -257,12 +306,10 @@
         row.appendChild(name);
 
         row.addEventListener("click", () => {
-          // salva nello slot attivo
           if (activePickIndex !== null) {
             setSlotFromTurno(activePickIndex, t);
           }
 
-          // torna alla pagina "Aggiungi turnazione"
           if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
             window.__turniInternalNav = true;
             SettingsUI.openPanel("turnazioni-add");
@@ -277,11 +324,9 @@
       if (!grid) return;
 
       rotationDaysCount = n || null;
-
       grid.innerHTML = "";
 
       for (let i = 1; i <= 7; i++) {
-        // slot fuori range → non esiste
         if (!n || i > n) {
           const ghost = document.createElement("div");
           ghost.style.visibility = "hidden";
@@ -295,13 +340,13 @@
 
         const pill = document.createElement("div");
         pill.className = "turni-sigla-preview-pill";
+        pill.style.position = "relative";
 
         const txt = document.createElement("span");
         txt.className = "turni-sigla-preview-text";
 
         const slot = rotationSlots[i - 1];
 
-        // se non selezionato → mostra numero (stesso stile, ma muted)
         if (!slot) {
           btn.classList.add("is-empty");
           txt.textContent = String(i);
@@ -309,18 +354,14 @@
           txt.style.color = "";
         } else {
           const siglaVal = (slot.sigla || "").trim();
-          txt.textContent = siglaVal; // qui compare SOLO la sigla
+          txt.textContent = siglaVal;
           applySiglaFontSize(txt, siglaVal);
-
-          if (slot.colore) txt.style.color = slot.colore;
-          else txt.style.color = "";
+          txt.style.color = slot.colore ? slot.colore : "";
         }
 
         pill.appendChild(txt);
 
-        // ✅ badge "R" solo se:
-        // - questo giorno è tra i giorni di riposo
-        // - ed esiste un turno selezionato (come avevi richiesto)
+        // badge R solo se riposo + turno presente
         if (isRestIndex(i - 1) && slot) {
           const badge = document.createElement("span");
           badge.className = "turnazioni-rest-badge";
@@ -340,20 +381,216 @@
       applyDaysUIState(n);
     }
 
-    // stato iniziale: 0/null
+    // ----------------------------
+    // ✅ Rendering lista turnazioni (card piccole)
+    // ----------------------------
+    function formatSigle(turnazione) {
+      const n = Number(turnazione && turnazione.days) || 0;
+      const slots = Array.isArray(turnazione && turnazione.slots) ? turnazione.slots : [];
+      const restIdx = Array.isArray(turnazione && turnazione.restIndices) ? turnazione.restIndices : [];
+
+      const out = [];
+      for (let i = 0; i < n; i++) {
+        if (restIdx.includes(i)) {
+          out.push("R");
+        } else {
+          const s = (slots[i] && slots[i].sigla) ? String(slots[i].sigla).trim() : "";
+          out.push(s || "?");
+        }
+      }
+      return out.join(" - ");
+    }
+
+    function syncVisualizzaTurnazioneHint() {
+      if (!visualHintEl) return;
+
+      if (!Array.isArray(savedTurnazioni) || savedTurnazioni.length === 0) {
+        visualHintEl.textContent = "Nessuna turnazione impostata.";
+        return;
+      }
+
+      let pick = null;
+      if (preferredId) {
+        pick = savedTurnazioni.find(t => String(t.id) === String(preferredId)) || null;
+      }
+      if (!pick) pick = savedTurnazioni[savedTurnazioni.length - 1];
+
+      visualHintEl.textContent = (pick && pick.name) ? pick.name : "Turnazione";
+    }
+
+    function renderTurnazioniCards() {
+      if (!turnazioniListEl) return;
+
+      // ✅ ammazza qualsiasi “fantasma”
+      turnazioniListEl.innerHTML = "";
+
+      // ricarica storage (se è cambiato altrove)
+      if (hasStorage) {
+        savedTurnazioni = TurniStorage.loadTurnazioni();
+        preferredId = TurniStorage.loadPreferredTurnazioneId();
+      }
+
+      const has = Array.isArray(savedTurnazioni) && savedTurnazioni.length > 0;
+
+      // ✅ hint “Nessuna turnazione…”
+      if (turnazioniEmptyEl) {
+        turnazioniEmptyEl.hidden = has;
+      }
+
+      if (!has) {
+        syncVisualizzaTurnazioneHint();
+        return;
+      }
+
+      // preferita valida?
+      if (preferredId) {
+        const ok = savedTurnazioni.some(t => String(t.id) === String(preferredId));
+        if (!ok) preferredId = null;
+      }
+
+      // se non c’è preferita, scegli ultima
+      if (!preferredId && savedTurnazioni.length) {
+        preferredId = String(savedTurnazioni[savedTurnazioni.length - 1].id);
+        if (hasStorage) TurniStorage.savePreferredTurnazioneId(preferredId);
+      }
+
+      savedTurnazioni.forEach((t) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "turnazione-mini-card";
+
+        const isSel = preferredId && String(t.id) === String(preferredId);
+        btn.classList.toggle("is-selected", !!isSel);
+
+        const name = document.createElement("span");
+        name.className = "turnazione-mini-name";
+        name.textContent = t.name || "";
+
+        const sigle = document.createElement("span");
+        sigle.className = "turnazione-mini-sigle";
+        sigle.textContent = formatSigle(t);
+
+        btn.appendChild(name);
+        btn.appendChild(sigle);
+
+        btn.addEventListener("click", () => {
+          preferredId = String(t.id);
+          if (hasStorage) TurniStorage.savePreferredTurnazioneId(preferredId);
+          renderTurnazioniCards();
+          syncVisualizzaTurnazioneHint();
+        });
+
+        turnazioniListEl.appendChild(btn);
+      });
+
+      syncVisualizzaTurnazioneHint();
+    }
+
+    // ----------------------------
+    // ✅ Salvataggio turnazione
+    // ----------------------------
+    function resetTurnazioneForm() {
+      clearError();
+
+      if (nameInput) nameInput.value = "";
+      if (input) input.value = "";
+      if (select) select.value = "";
+
+      rotationDaysCount = null;
+      rotationSlots = new Array(7).fill(null);
+      restDayIndices = [];
+      restDaysAllowed = 1;
+      syncRestDaysCardUI();
+
+      renderDaysGrid(null);
+    }
+
+    function validateTurnazione() {
+      const name = (nameInput && nameInput.value ? nameInput.value : "").trim();
+      const days = Number(rotationDaysCount);
+
+      if (!name) return { ok: false, msg: "nome" };
+      if (!days || days < 1 || days > 7) return { ok: false, msg: "giorni" };
+
+      for (let i = 0; i < days; i++) {
+        if (!rotationSlots[i]) return { ok: false, msg: "turni" };
+      }
+
+      return { ok: true, name, days };
+    }
+
+    function buildPayload(name, days) {
+      const slots = [];
+      for (let i = 0; i < days; i++) {
+        const s = rotationSlots[i];
+        slots.push({
+          nome:   s && s.nome   ? s.nome   : "",
+          sigla:  s && s.sigla  ? s.sigla  : "",
+          colore: s && s.colore ? s.colore : ""
+        });
+      }
+
+      return {
+        id: String(Date.now()),
+        name,
+        days,
+        slots,
+        restDaysAllowed,
+        restIndices: restDayIndices.slice(0, restDaysAllowed)
+      };
+    }
+
+    if (btnSave) {
+      btnSave.addEventListener("click", () => {
+        clearError();
+
+        if (!hasStorage) {
+          showError();
+          return;
+        }
+
+        const v = validateTurnazione();
+        if (!v.ok) {
+          showError();
+          return;
+        }
+
+        const payload = buildPayload(v.name, v.days);
+
+        savedTurnazioni = TurniStorage.loadTurnazioni();
+        savedTurnazioni.push(payload);
+        TurniStorage.saveTurnazioni(savedTurnazioni);
+
+        preferredId = String(payload.id);
+        TurniStorage.savePreferredTurnazioneId(preferredId);
+
+        // aggiorna UI pannello Turni
+        renderTurnazioniCards();
+        syncVisualizzaTurnazioneHint();
+
+        // reset form e torna al pannello Turni
+        resetTurnazioneForm();
+
+        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          window.__turniInternalNav = true;
+          SettingsUI.openPanel("turni");
+        }
+      });
+    }
+
+    // ----------------------------
+    // Stato iniziale UI add
+    // ----------------------------
     if (select && input && grid) {
       renderDaysGrid(null);
 
-      // Desktop: select
+      // Desktop select
       select.addEventListener("change", () => {
         const v = Number(select.value) || null;
         input.value = select.value;
 
-        // reset slot oltre range (se riduci i giorni)
         if (v && v >= 1 && v <= 7) {
           for (let k = v; k < 7; k++) rotationSlots[k] = null;
-
-          // riposo fuori range -> rimuovi
           restDayIndices = restDayIndices.filter(i => i < v);
           normalizeRestIndicesToAllowed();
         } else {
@@ -364,17 +601,15 @@
         renderDaysGrid(v);
       });
 
-      // Mobile: input -> prende solo ultimo carattere, sovrascrive sempre
+      // Mobile input
       input.addEventListener("input", () => {
         const digits = (input.value || "").replace(/\D/g, "");
         const last = digits.slice(-1);
-
         const v = Number(last);
 
         if (!v || v < 1 || v > 7) {
           input.value = "";
           if (select) select.value = "";
-
           rotationSlots = new Array(7).fill(null);
           restDayIndices = [];
           renderDaysGrid(null);
@@ -384,10 +619,7 @@
         input.value = last;
         if (select) select.value = last;
 
-        // reset slot oltre range
         for (let k = v; k < 7; k++) rotationSlots[k] = null;
-
-        // riposo fuori range -> rimuovi
         restDayIndices = restDayIndices.filter(i => i < v);
         normalizeRestIndicesToAllowed();
 
@@ -396,7 +628,7 @@
     }
 
     // -----------------------------------------
-    // Helpers condivisi per le card "Riposo"
+    // Helpers card "Riposo" (come prima)
     // -----------------------------------------
     function initRiposoCard(opts) {
       const {
@@ -461,19 +693,16 @@
         bodyEl.hidden = !on;
       }
 
-      // stato iniziale: OFF
       bodyEl.hidden = true;
       clearFields();
       applyState();
 
-      // toggle
       toggleBtn.addEventListener("click", () => {
         on = !on;
         if (!on) clearFields();
         applyState();
       });
 
-      // listeners input
       if (colorInput) {
         colorInput.addEventListener("input", applyColorPreview);
         colorInput.addEventListener("change", applyColorPreview);
@@ -485,7 +714,6 @@
         });
       }
 
-      // Help toast (?) — 3 secondi
       if (helpBtn && helpToast) {
         let t = null;
 
@@ -506,9 +734,6 @@
       }
     }
 
-    // ----------------------------
-    // CARD: Riposo del Lunedì
-    // ----------------------------
     initRiposoCard({
       cardSel:      "[data-turnazioni-riposo-card]",
       toggleSel:    "[data-turnazioni-riposo-toggle]",
@@ -522,9 +747,6 @@
       siglaPrevSel: "[data-turnazioni-riposo-sigla-preview]"
     });
 
-    // ----------------------------
-    // CARD: Riposo del Martedì (identica)
-    // ----------------------------
     initRiposoCard({
       cardSel:      "[data-turnazioni-riposo2-card]",
       toggleSel:    "[data-turnazioni-riposo2-toggle]",
@@ -537,6 +759,10 @@
       colorPrevSel: "[data-turnazioni-riposo2-color-preview]",
       siglaPrevSel: "[data-turnazioni-riposo2-sigla-preview]"
     });
+
+    // ✅ render iniziale lista turnazioni
+    renderTurnazioniCards();
+    syncVisualizzaTurnazioneHint();
   }
 
   const Turnazione = {
@@ -550,39 +776,46 @@
         turnazioniEditBtn
       } = ctx || {};
 
-      if (!panelTurni || !turnazioniCard || !turnazioniToggleBtn) {
-        // anche se non ho la card, la UI del pannello add può esistere comunque
-        initTurnazioniAddUI();
+      // anche se non ho la card, la UI add può esistere
+      if (!panelTurni) {
+        initTurnazioniAddUI(ctx);
         return;
       }
 
-      // Stato iniziale dalla classe HTML
-      let turnazioniCollapsed = turnazioniCard.classList.contains("is-collapsed");
+      const turnazioniListEl = panelTurni.querySelector("[data-turnazioni-list]");
+      const turnazioniEmpty  = panelTurni.querySelector("[data-turnazioni-empty-hint]");
+
+      // Stato iniziale
+      let turnazioniCollapsed = turnazioniCard
+        ? turnazioniCard.classList.contains("is-collapsed")
+        : true;
 
       function getCollapsed() { return turnazioniCollapsed; }
       function setCollapsed(v) { turnazioniCollapsed = !!v; }
 
-      // Collapse behavior (header + freccia)
-      if (window.TurniInteractions && typeof TurniInteractions.attachCollapsibleCard === "function") {
-        TurniInteractions.attachCollapsibleCard({
-          cardEl: turnazioniCard,
-          toggleBtn: turnazioniToggleBtn,
-          headerEl: turnazioniHeader,
-          getCollapsed,
-          setCollapsed,
-          ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"]
-        });
-      } else {
-        function apply() {
-          turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
-          turnazioniToggleBtn.setAttribute("aria-expanded", turnazioniCollapsed ? "false" : "true");
-        }
-        apply();
-        turnazioniToggleBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          turnazioniCollapsed = !turnazioniCollapsed;
+      // Collapse behavior
+      if (turnazioniCard && turnazioniToggleBtn) {
+        if (window.TurniInteractions && typeof TurniInteractions.attachCollapsibleCard === "function") {
+          TurniInteractions.attachCollapsibleCard({
+            cardEl: turnazioniCard,
+            toggleBtn: turnazioniToggleBtn,
+            headerEl: turnazioniHeader,
+            getCollapsed,
+            setCollapsed,
+            ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"]
+          });
+        } else {
+          function apply() {
+            turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
+            turnazioniToggleBtn.setAttribute("aria-expanded", turnazioniCollapsed ? "false" : "true");
+          }
           apply();
-        });
+          turnazioniToggleBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            turnazioniCollapsed = !turnazioniCollapsed;
+            apply();
+          });
+        }
       }
 
       // Add -> pannello turnazioni-add
@@ -596,20 +829,25 @@
         });
       }
 
-      // Edit resta disabilitato finché non ci sono turnazioni reali
+      // Edit resta disabilitato (non richiesto ora)
       if (turnazioniEditBtn) {
         turnazioniEditBtn.disabled = true;
       }
 
-      // Init UI dentro "Aggiungi turnazione"
-      initTurnazioniAddUI();
+      // Init UI add + render lista card
+      initTurnazioniAddUI({
+        panelTurni,
+        turnazioniListEl,
+        turnazioniEmptyEl: turnazioniEmpty
+      });
 
-      // API interna opzionale (se poi vuoi comandarla da turni.js)
-      this._getState = () => ({ collapsed: turnazioniCollapsed });
+      // API interna per collassare da turni.js
       this._setCollapsed = (v) => {
         turnazioniCollapsed = !!v;
-        turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
-        turnazioniToggleBtn.setAttribute("aria-expanded", turnazioniCollapsed ? "false" : "true");
+        if (turnazioniCard && turnazioniToggleBtn) {
+          turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
+          turnazioniToggleBtn.setAttribute("aria-expanded", turnazioniCollapsed ? "false" : "true");
+        }
       };
     }
   };

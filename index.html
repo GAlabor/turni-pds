@@ -532,263 +532,274 @@
         </div>
         <!-- TPDS:SPLIT:SETTINGS_TURNI_ADD:END (NON CANCELLARE) -->
 
-        <!-- TPDS:SPLIT:SETTINGS_TURNAZIONI_ADD:START (NON CANCELLARE) -->
-        <!-- PANNELLO AGGIUNGI TURNAZIONE -->
-        <div
-          class="settings-panel settings-turnazioni-add"
-          data-settings-id="turnazioni-add"
-          data-settings-title="Aggiungi turnazione">
+<!-- TPDS:SPLIT:SETTINGS_TURNAZIONI_ADD:START (NON CANCELLARE) -->
+<!-- PANNELLO AGGIUNGI TURNAZIONE -->
+<div
+  class="settings-panel settings-turnazioni-add"
+  data-settings-id="turnazioni-add"
+  data-settings-title="Aggiungi turnazione">
 
-          <div class="turnazioni-add-wrap">
+  <!-- ✅ Toolbar identica ad "Aggiungi turno" -->
+  <div class="turni-add-toolbar">
+    <button class="pill-btn turni-save-btn" type="button" data-turnazioni-save>
+      Salva
+    </button>
+    <p class="turni-error" data-turnazioni-error hidden>
+      Compila tutti i campi
+    </p>
+  </div>
 
-            <!-- CARD 0: Nome Turnazione -->
-            <div class="turni-field-row turnazioni-name-row">
-              <label class="turni-label turnazioni-name-label" for="turnazioniNome">
-                Nome
-              </label>
+  <div class="turnazioni-add-wrap">
 
-              <div class="turni-field-control turnazioni-name-control">
-                <input
-                  class="turni-input turnazioni-name-input"
-                  id="turnazioniNome"
-                  type="text"
-                  maxlength="20"
-                  autocomplete="off">
-              </div>
-            </div>
+    <!-- CARD 0: Nome Turnazione -->
+    <div class="turni-field-row turnazioni-name-row">
+      <label class="turni-label turnazioni-name-label" for="turnazioniNome">
+        Nome
+      </label>
 
-            <!-- CARD 1: Giorni -->
-            <div class="turni-field-row turnazioni-days-row">
-              <label class="turni-label turnazioni-days-label" for="turnazioniDaysInput">
-                Giorni Rotazione
-                <span class="turnazioni-days-range"> (1–7)</span>
-              </label>
+      <div class="turni-field-control turnazioni-name-control">
+        <input
+          class="turni-input turnazioni-name-input"
+          id="turnazioniNome"
+          type="text"
+          maxlength="20"
+          autocomplete="off">
+      </div>
+    </div>
 
-              <div class="turni-field-control turnazioni-days-control">
-                <!-- Desktop -->
-                <div class="turnazioni-desktop-select">
-                  <select id="turnazioniDaysSelect" class="turni-input turnazioni-days-select" aria-label="Seleziona numero giorni">
-                    <option value="" selected></option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                  </select>
-                </div>
+    <!-- CARD 1: Giorni -->
+    <div class="turni-field-row turnazioni-days-row">
+      <label class="turni-label turnazioni-days-label" for="turnazioniDaysInput">
+        Giorni Rotazione
+        <span class="turnazioni-days-range"> (1–7)</span>
+      </label>
 
-                <!-- Mobile -->
-                <input
-                  id="turnazioniDaysInput"
-                  class="turni-input turnazioni-days-input"
-                  type="number"
-                  min="1"
-                  max="7"
-                  step="1"
-                  value=""
-                  inputmode="numeric"
-                  aria-label="Numero giorni">
-              </div>
-            </div>
+      <div class="turni-field-control turnazioni-days-control">
+        <!-- Desktop -->
+        <div class="turnazioni-desktop-select">
+          <select id="turnazioniDaysSelect" class="turni-input turnazioni-days-select" aria-label="Seleziona numero giorni">
+            <option value="" selected></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+        </div>
 
-            <!-- CARD 2: Rotazione (titolo + sottotitolo + contenuto) -->
-            <div class="turnazioni-days-card" aria-label="Turni rotazione">
-              <div class="turnazioni-days-card-header">
-                <div class="turnazioni-days-card-title">Turni Rotazione</div>
-                <div class="turnazioni-days-card-subtitle" id="turnazioniDaysSubtitle"></div>
-              </div>
+        <!-- Mobile -->
+        <input
+          id="turnazioniDaysInput"
+          class="turni-input turnazioni-days-input"
+          type="number"
+          min="1"
+          max="7"
+          step="1"
+          value=""
+          inputmode="numeric"
+          aria-label="Numero giorni">
+      </div>
+    </div>
 
-              <!-- testo guida quando non ci sono giorni -->
-              <div class="turnazioni-days-placeholder" id="turnazioniDaysPlaceholder"></div>
+    <!-- CARD 2: Rotazione (titolo + sottotitolo + contenuto) -->
+    <div class="turnazioni-days-card" aria-label="Turni rotazione">
+      <div class="turnazioni-days-card-header">
+        <div class="turnazioni-days-card-title">Turni Rotazione</div>
+        <div class="turnazioni-days-card-subtitle" id="turnazioniDaysSubtitle"></div>
+      </div>
 
-              <!-- griglia giorni -->
-              <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
-            </div>
+      <!-- testo guida quando non ci sono giorni -->
+      <div class="turnazioni-days-placeholder" id="turnazioniDaysPlaceholder"></div>
 
-            <!-- ✅ NUOVA CARD: Giorni di Riposo (1 / 2) -->
-            <div class="turni-field-row turnazioni-restdays-row">
-              <p class="turni-label turnazioni-restdays-label">Giorni di Riposo</p>
+      <!-- griglia giorni -->
+      <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
+    </div>
 
-              <div class="turni-field-control turnazioni-restdays-control">
-                <div class="turnazioni-restdays-pills" role="group" aria-label="Numero giorni di riposo">
-                  <button
-                    type="button"
-                    class="turnazioni-restdays-pill is-active"
-                    data-turnazioni-rest-days="1"
-                    aria-pressed="true">1</button>
+    <!-- ✅ NUOVA CARD: Giorni di Riposo (1 / 2) -->
+    <div class="turni-field-row turnazioni-restdays-row">
+      <p class="turni-label turnazioni-restdays-label">Giorni di Riposo</p>
 
-                  <button
-                    type="button"
-                    class="turnazioni-restdays-pill"
-                    data-turnazioni-rest-days="2"
-                    aria-pressed="false">2</button>
-                </div>
-              </div>
-            </div>
+      <div class="turni-field-control turnazioni-restdays-control">
+        <div class="turnazioni-restdays-pills" role="group" aria-label="Numero giorni di riposo">
+          <button
+            type="button"
+            class="turnazioni-restdays-pill is-active"
+            data-turnazioni-rest-days="1"
+            aria-pressed="true">1</button>
 
-            <!-- CARD 3: Riposo del Lunedì -->
-            <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
+          <button
+            type="button"
+            class="turnazioni-restdays-pill"
+            data-turnazioni-rest-days="2"
+            aria-pressed="false">2</button>
+        </div>
+      </div>
+    </div>
 
-              <!-- header sempre visibile -->
-              <div class="turni-field-row turnazioni-riposo-header">
-                <p class="turni-label turnazioni-riposo-label">
-                  Riposo del Lunedì
-                  <button
-                    class="turnazioni-help-btn"
-                    type="button"
-                    aria-label="Aiuto riposo del Lunedì"
-                    data-turnazioni-help>?</button>
-                </p>
+    <!-- CARD 3: Riposo del Lunedì -->
+    <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
 
-                <div class="turni-field-control turnazioni-riposo-control">
-                  <button
-                    class="toggle-switch"
-                    type="button"
-                    role="switch"
-                    aria-checked="false"
-                    data-turnazioni-riposo-toggle
-                    aria-label="Riposo del lunedì">
-                  </button>
-                </div>
-              </div>
+      <!-- header sempre visibile -->
+      <div class="turni-field-row turnazioni-riposo-header">
+        <p class="turni-label turnazioni-riposo-label">
+          Riposo del Lunedì
+          <button
+            class="turnazioni-help-btn"
+            type="button"
+            aria-label="Aiuto riposo del Lunedì"
+            data-turnazioni-help>?</button>
+        </p>
 
-              <!-- toast 3s -->
-              <div class="turnazioni-help-toast" data-turnazioni-help-toast hidden>
-                Scegli cosa visualizzare se il riposo cade di Lunedì
-              </div>
+        <div class="turni-field-control turnazioni-riposo-control">
+          <button
+            class="toggle-switch"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            data-turnazioni-riposo-toggle
+            aria-label="Riposo del lunedì">
+          </button>
+        </div>
+      </div>
 
-              <!-- corpo: visibile solo con toggle ON -->
-              <div class="turnazioni-riposo-body" data-turnazioni-riposo-body>
-                <div class="turni-field-row">
-                  <label class="turni-label" for="turnazioniRiposoNome">Nome</label>
-                  <div class="turni-field-control">
-                    <input
-                      class="turni-input"
-                      id="turnazioniRiposoNome"
-                      type="text"
-                      maxlength="15"
-                      autocomplete="off">
-                  </div>
-                </div>
+      <!-- toast 3s -->
+      <div class="turnazioni-help-toast" data-turnazioni-help-toast hidden>
+        Scegli cosa visualizzare se il riposo cade di Lunedì
+      </div>
 
-                <div class="turni-field-row">
-                  <label class="turni-label" for="turnazioniRiposoSigla">Sigla</label>
-
-                  <div class="turni-field-control turni-field-control-sigla">
-                    <input
-                      class="turni-input"
-                      id="turnazioniRiposoSigla"
-                      type="text"
-                      maxlength="4"
-                      autocomplete="off">
-
-                    <label
-                      class="turni-color-dot"
-                      for="turnazioniRiposoColore"
-                      data-turnazioni-riposo-color-trigger
-                      aria-label="Scegli colore sigla riposo">
-                      <span class="turni-color-preview" data-turnazioni-riposo-color-preview></span>
-                    </label>
-
-                    <div class="turni-sigla-preview-pill" aria-hidden="true">
-                      <span class="turni-sigla-preview-text" data-turnazioni-riposo-sigla-preview></span>
-                    </div>
-
-                    <input
-                      class="turni-color-input"
-                      id="turnazioniRiposoColore"
-                      type="color"
-                      value="#0a84ff"
-                      data-turnazioni-riposo-color>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- CARD 4: Riposo del Martedì (identica) -->
-            <div class="turnazioni-riposo-card" data-turnazioni-riposo2-card>
-
-              <!-- header sempre visibile -->
-              <div class="turni-field-row turnazioni-riposo-header">
-                <p class="turni-label turnazioni-riposo-label">
-                  Riposo del Martedì
-                  <button
-                    class="turnazioni-help-btn"
-                    type="button"
-                    aria-label="Aiuto riposo del Martedì"
-                    data-turnazioni-help2>?</button>
-                </p>
-
-                <div class="turni-field-control turnazioni-riposo-control">
-                  <button
-                    class="toggle-switch"
-                    type="button"
-                    role="switch"
-                    aria-checked="false"
-                    data-turnazioni-riposo2-toggle
-                    aria-label="Riposo del martedì">
-                  </button>
-                </div>
-              </div>
-
-              <!-- toast 3s -->
-              <div class="turnazioni-help-toast" data-turnazioni-help-toast2 hidden>
-                Scegli cosa visualizzare se il riposo cade di Martedì
-              </div>
-
-              <!-- corpo: visibile solo con toggle ON -->
-              <div class="turnazioni-riposo-body" data-turnazioni-riposo2-body>
-                <div class="turni-field-row">
-                  <label class="turni-label" for="turnazioniRiposo2Nome">Nome</label>
-                  <div class="turni-field-control">
-                    <input
-                      class="turni-input"
-                      id="turnazioniRiposo2Nome"
-                      type="text"
-                      maxlength="15"
-                      autocomplete="off">
-                  </div>
-                </div>
-
-                <div class="turni-field-row">
-                  <label class="turni-label" for="turnazioniRiposo2Sigla">Sigla</label>
-
-                  <div class="turni-field-control turni-field-control-sigla">
-                    <input
-                      class="turni-input"
-                      id="turnazioniRiposo2Sigla"
-                      type="text"
-                      maxlength="4"
-                      autocomplete="off">
-
-                    <label
-                      class="turni-color-dot"
-                      for="turnazioniRiposo2Colore"
-                      data-turnazioni-riposo2-color-trigger
-                      aria-label="Scegli colore sigla riposo">
-                      <span class="turni-color-preview" data-turnazioni-riposo2-color-preview></span>
-                    </label>
-
-                    <div class="turni-sigla-preview-pill" aria-hidden="true">
-                      <span class="turni-sigla-preview-text" data-turnazioni-riposo2-sigla-preview></span>
-                    </div>
-
-                    <input
-                      class="turni-color-input"
-                      id="turnazioniRiposo2Colore"
-                      type="color"
-                      value="#0a84ff"
-                      data-turnazioni-riposo2-color>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+      <!-- corpo: visibile solo con toggle ON -->
+      <div class="turnazioni-riposo-body" data-turnazioni-riposo-body>
+        <div class="turni-field-row">
+          <label class="turni-label" for="turnazioniRiposoNome">Nome</label>
+          <div class="turni-field-control">
+            <input
+              class="turni-input"
+              id="turnazioniRiposoNome"
+              type="text"
+              maxlength="15"
+              autocomplete="off">
           </div>
         </div>
-        <!-- TPDS:SPLIT:SETTINGS_TURNAZIONI_ADD:END (NON CANCELLARE) -->
+
+        <div class="turni-field-row">
+          <label class="turni-label" for="turnazioniRiposoSigla">Sigla</label>
+
+          <div class="turni-field-control turni-field-control-sigla">
+            <input
+              class="turni-input"
+              id="turnazioniRiposoSigla"
+              type="text"
+              maxlength="4"
+              autocomplete="off">
+
+            <label
+              class="turni-color-dot"
+              for="turnazioniRiposoColore"
+              data-turnazioni-riposo-color-trigger
+              aria-label="Scegli colore sigla riposo">
+              <span class="turni-color-preview" data-turnazioni-riposo-color-preview></span>
+            </label>
+
+            <div class="turni-sigla-preview-pill" aria-hidden="true">
+              <span class="turni-sigla-preview-text" data-turnazioni-riposo-sigla-preview></span>
+            </div>
+
+            <input
+              class="turni-color-input"
+              id="turnazioniRiposoColore"
+              type="color"
+              value="#0a84ff"
+              data-turnazioni-riposo-color>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4: Riposo del Martedì (identica) -->
+    <div class="turnazioni-riposo-card" data-turnazioni-riposo2-card>
+
+      <!-- header sempre visibile -->
+      <div class="turni-field-row turnazioni-riposo-header">
+        <p class="turni-label turnazioni-riposo-label">
+          Riposo del Martedì
+          <button
+            class="turnazioni-help-btn"
+            type="button"
+            aria-label="Aiuto riposo del Martedì"
+            data-turnazioni-help2>?</button>
+        </p>
+
+        <div class="turni-field-control turnazioni-riposo-control">
+          <button
+            class="toggle-switch"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            data-turnazioni-riposo2-toggle
+            aria-label="Riposo del martedì">
+          </button>
+        </div>
+      </div>
+
+      <!-- toast 3s -->
+      <div class="turnazioni-help-toast" data-turnazioni-help-toast2 hidden>
+        Scegli cosa visualizzare se il riposo cade di Martedì
+      </div>
+
+      <!-- corpo: visibile solo con toggle ON -->
+      <div class="turnazioni-riposo-body" data-turnazioni-riposo2-body>
+        <div class="turni-field-row">
+          <label class="turni-label" for="turnazioniRiposo2Nome">Nome</label>
+          <div class="turni-field-control">
+            <input
+              class="turni-input"
+              id="turnazioniRiposo2Nome"
+              type="text"
+              maxlength="15"
+              autocomplete="off">
+          </div>
+        </div>
+
+        <div class="turni-field-row">
+          <label class="turni-label" for="turnazioniRiposo2Sigla">Sigla</label>
+
+          <div class="turni-field-control turni-field-control-sigla">
+            <input
+              class="turni-input"
+              id="turnazioniRiposo2Sigla"
+              type="text"
+              maxlength="4"
+              autocomplete="off">
+
+            <label
+              class="turni-color-dot"
+              for="turnazioniRiposo2Colore"
+              data-turnazioni-riposo2-color-trigger
+              aria-label="Scegli colore sigla riposo">
+              <span class="turni-color-preview" data-turnazioni-riposo2-color-preview></span>
+            </label>
+
+            <div class="turni-sigla-preview-pill" aria-hidden="true">
+              <span class="turni-sigla-preview-text" data-turnazioni-riposo2-sigla-preview></span>
+            </div>
+
+            <input
+              class="turni-color-input"
+              id="turnazioniRiposo2Colore"
+              type="color"
+              value="#0a84ff"
+              data-turnazioni-riposo2-color>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- TPDS:SPLIT:SETTINGS_TURNAZIONI_ADD:END (NON CANCELLARE) -->
+
 
         <!-- TPDS:SPLIT:SETTINGS_TURNAZIONI_PICK:START (NON CANCELLARE) -->
         <!-- NUOVO PANNELLO: SELEZIONA TURNO PER ROTAZIONE -->

@@ -9,8 +9,13 @@
   }
 
   const { STORAGE_KEYS } = window.AppConfig;
+
   const TURNI_KEY     = STORAGE_KEYS.turni;
   const TURNI_VIS_KEY = STORAGE_KEYS.turniVisualizza;
+
+  // ✅ Turnazioni
+  const TURNAZIONI_KEY = STORAGE_KEYS.turnazioni;
+  const TURNAZIONI_PREF_KEY = STORAGE_KEYS.turnazioniPreferred;
 
   // ============================
   // Storage: turni personalizzati
@@ -41,7 +46,6 @@
 
   // ============================
   // Storage: toggle visualizzazione turnazione
-  // (solo storage; non ancora collegato al calendario nella UI attuale)
   // ============================
 
   function loadVisualToggle() {
@@ -49,8 +53,7 @@
       const raw = localStorage.getItem(TURNI_VIS_KEY);
       if (raw === "true") return true;
       if (raw === "false") return false;
-      // default: acceso
-      return true;
+      return true; // default: acceso
     } catch {
       return true;
     }
@@ -65,6 +68,58 @@
       }
     } catch (e) {
       console.warn("Salvataggio toggle turnazione fallito:", e);
+    }
+  }
+
+  // ============================
+  // ✅ Storage: turnazioni
+  // ============================
+
+  function loadTurnazioni() {
+    try {
+      const raw = localStorage.getItem(TURNAZIONI_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveTurnazioni(arr) {
+    try {
+      localStorage.setItem(TURNAZIONI_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
+
+      if (window.Status && typeof Status.markSaved === "function") {
+        Status.markSaved();
+      }
+    } catch (e) {
+      console.warn("Salvataggio turnazioni fallito:", e);
+    }
+  }
+
+  function loadPreferredTurnazioneId() {
+    try {
+      const v = localStorage.getItem(TURNAZIONI_PREF_KEY);
+      return v || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function savePreferredTurnazioneId(id) {
+    try {
+      if (!id) {
+        localStorage.removeItem(TURNAZIONI_PREF_KEY);
+      } else {
+        localStorage.setItem(TURNAZIONI_PREF_KEY, String(id));
+      }
+
+      if (window.Status && typeof Status.markSaved === "function") {
+        Status.markSaved();
+      }
+    } catch (e) {
+      console.warn("Salvataggio preferita fallito:", e);
     }
   }
 
@@ -99,6 +154,12 @@
     saveTurni,
     loadVisualToggle,
     saveVisualToggle,
-    isValidTime
+    isValidTime,
+
+    // ✅ Turnazioni
+    loadTurnazioni,
+    saveTurnazioni,
+    loadPreferredTurnazioneId,
+    savePreferredTurnazioneId
   };
 })();

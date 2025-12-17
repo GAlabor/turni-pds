@@ -22,13 +22,8 @@
     // PERCORSI / PWA
     // ============================
     PATHS: {
-      // Base del sito ("" in locale, "/turni-pds" in produzione)
       base: BASE,
-
-      // Cartella SVG per icone
       svgBase: `${BASE}/svg`,
-
-      // Scope e file del service worker
       swScope: `${BASE}/`,
       swFile: `${BASE}/service-worker.js`
     },
@@ -37,7 +32,6 @@
     // STORAGE KEYS (localStorage)
     // ============================
     STORAGE_KEYS: {
-      // Tema: system / light / dark
       theme: "turnipds-theme",
 
       // Turni personalizzati
@@ -45,6 +39,10 @@
 
       // Toggle "visualizza turnazione su calendario"
       turniVisualizza: "turnipds-turni-visualizza",
+
+      // ✅ Turnazioni
+      turnazioni: "turnipds-turnazioni",
+      turnazioniPreferred: "turnipds-turnazioni-preferred",
 
       // Chiavi future (NON usate al momento)
       indennita: "turnipds-indennita",
@@ -57,23 +55,18 @@
     // TESTI UI GLOBALI (usati dai JS)
     // ============================
     UI: {
-      // Label usate dal modulo theme.js per il riepilogo
       themeLabels: {
         system: "Sistema",
         light: "Chiaro",
         dark: "Scuro"
       }
-      // In futuro puoi aggiungere qui altre label condivise usate dallo script
     },
 
     // ============================
     // STATO / ANIMAZIONI (Status.js)
     // ============================
     STATUS: {
-      // ms di durata stato "OK" prima di tornare idle
       savedDelay: 1200,
-
-      // ms di "saving" prima di passare a OK
       spinnerVisibleMs: 800
     },
 
@@ -81,7 +74,6 @@
     // VERSIONE / LABEL
     // ============================
     VERSION: {
-      // id dello span che mostra la versione in UI
       labelElementId: "versionLabel"
     }
   };
