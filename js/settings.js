@@ -1,11 +1,8 @@
 // ============================
 // settings.js
 // Navigazione schermate Impostazioni
-// Gestisce:
-// - lista principale (.settings-main)
-// - pannelli secondari (.settings-panel[data-settings-id])
-// - header dinamico + pulsante back
-// - API globale SettingsUI usata da app.js e turni.js
+// + "internal nav" centralizzata qui (niente flag globali sparsi)
+// + eventi di cambio pannello (SettingsUI.onChange)
 // ============================
 
 (function () {
@@ -14,6 +11,25 @@
     showMainFn: null,
     showPanelFn: null
   };
+
+  // Stato navigazione centralizzato
+  let activePanelId = null; // null = main
+  let pendingInternalNav = false;
+
+  // listeners cambio pannello
+  const changeListeners = new Set();
+
+  function emitChange(prevId, nextId, meta) {
+    changeListeners.forEach((cb) => {
+      try { cb(prevId, nextId, meta || {}); } catch {}
+    });
+  }
+
+  function consumeInternalNav() {
+    const v = pendingInternalNav;
+    pendingInternalNav = false;
+    return v;
+  }
 
   function initSettingsNavigation() {
     const settingsView = document.querySelector(".view-settings");
@@ -29,8 +45,6 @@
 
     if (!main || !titleEl || !backBtn) return;
 
-    let activePanelId = null;
-
     // ----------------------------
     // Util: gestione pulsante back
     // ----------------------------
@@ -41,27 +55,20 @@
 
     function showBackBtn() {
       backBtn.hidden = false;
-      // inline-flex per allinearsi bene col titolo
       backBtn.style.display = "inline-flex";
     }
 
     // ----------------------------
     // Header: titolo per main e pannelli
     // ----------------------------
-
-    // Titolo quando siamo sulla lista principale Impostazioni
     function setHeaderForMain() {
       titleEl.textContent = "Impostazioni";
       hideBackBtn();
     }
 
-    // Titolo quando siamo su un pannello secondario:
-    // - se il pannello ha data-settings-title → usa quello
-    // - altrimenti "Impostazioni - <label riga corrispondente>"
     function setHeaderForPanel(id) {
       let label = id;
 
-      // 1) Pannello con titolo custom (es: "Aggiungi turno")
       const panel = settingsView.querySelector(`.settings-panel[data-settings-id="${id}"]`);
       if (panel && panel.dataset.settingsTitle) {
         titleEl.textContent = panel.dataset.settingsTitle;
@@ -69,7 +76,6 @@
         return;
       }
 
-      // 2) Recupera testo dalla riga principale di impostazioni
       const row = settingsView.querySelector(`.settings-row[data-settings-page="${id}"]`);
       if (row) {
         const lblEl = row.querySelector(".settings-row-label");
@@ -85,43 +91,49 @@
     // ----------------------------
     // Switch vista: main / pannelli
     // ----------------------------
-
-    function showMain() {
+    function showMain(meta) {
       // tornando alla lista principale → usciamo dalla modalità Modifica Turni
       if (window.Turni && typeof Turni.exitEditMode === "function") {
         Turni.exitEditMode();
       }
 
+      const prev = activePanelId;
       activePanelId = null;
+
       main.classList.add("is-active");
       panels.forEach(p => p.classList.remove("is-active"));
       setHeaderForMain();
+
+      emitChange(prev, null, meta);
     }
 
-    function showPanel(id) {
+    function showPanel(id, meta) {
       if (!id) return;
 
-      // Se stiamo lasciando il pannello "Turni" verso qualsiasi altro pannello,
-      // assicuriamoci di uscire dalla modalità Modifica.
-      if (activePanelId === "turni" && id !== "turni") {
-        if (window.Turni && typeof Turni.exitEditMode === "function") {
-          Turni.exitEditMode();
-        }
-      }
-
-      // Se entriamo nel pannello "Aggiungi turno", consideriamo chiusa la modalità Modifica.
-      if (id === "turni-add") {
-        if (window.Turni && typeof Turni.exitEditMode === "function") {
-          Turni.exitEditMode();
-        }
-      }
-
+      const prev = activePanelId;
       activePanelId = id;
+
+      // Regole “coerenti” con il tuo flusso:
+      // - se lasci il pannello turni → esci da edit mode (ma ci pensa già in parte Turni)
+      // - se entri in turni-add / turnazioni-add -> esci da edit mode
+      if (prev === "turni" && id !== "turni") {
+        if (window.Turni && typeof Turni.exitEditMode === "function") {
+          Turni.exitEditMode();
+        }
+      }
+      if (id === "turni-add" || id === "turnazioni-add") {
+        if (window.Turni && typeof Turni.exitEditMode === "function") {
+          Turni.exitEditMode();
+        }
+      }
+
       main.classList.remove("is-active");
       panels.forEach(p => {
         p.classList.toggle("is-active", p.dataset.settingsId === id);
       });
       setHeaderForPanel(id);
+
+      emitChange(prev, id, meta);
     }
 
     // esponi le funzioni interne all’API globale
@@ -129,56 +141,44 @@
     settingsApi.showPanelFn = showPanel;
 
     // stato iniziale → schermata principale senza freccia
-    showMain();
+    showMain({ reason: "init" });
 
     // ----------------------------
     // Eventi UI
     // ----------------------------
-
-    // click sulle righe della lista principale (aprono il pannello corrispondente)
     rows.forEach(row => {
       row.addEventListener("click", () => {
         const id = row.dataset.settingsPage;
-        showPanel(id);
+        showPanel(id, { reason: "row" });
       });
     });
 
-    // click sulla freccia in alto a sinistra
     backBtn.addEventListener("click", () => {
-      // Caso speciale 1: se siamo nel pannello "Aggiungi turno",
-      // il back riporta al pannello "Turni", NON alla main list.
+      // comportamento “back” basato su pannello attivo
+      // Nota: qui mantengo i tuoi casi speciali.
+
       if (activePanelId === "turni-add") {
-        showPanel("turni");
+        showPanel("turni", { reason: "back" });
         return;
       }
-
-      // ✅ Caso speciale 1b: turno iniziale -> torna a Turni
       if (activePanelId === "turni-start") {
-        showPanel("turni");
+        showPanel("turni", { reason: "back" });
         return;
       }
-
-      // ✅ Caso speciale 1c: picker turno iniziale -> torna a turno iniziale
       if (activePanelId === "turni-start-pick") {
-        showPanel("turni-start");
+        showPanel("turni-start", { reason: "back" });
         return;
       }
-
-      // Caso speciale 2: se siamo nel pannello "Aggiungi turnazione",
-      // stesso comportamento: si torna a "Turni".
       if (activePanelId === "turnazioni-add") {
-        showPanel("turni");
+        showPanel("turni", { reason: "back" });
         return;
       }
-
-      // Caso speciale 3: picker turni per rotazione → torna a "Aggiungi turnazione"
       if (activePanelId === "turnazioni-pick") {
-        showPanel("turnazioni-add");
+        showPanel("turnazioni-add", { reason: "back" });
         return;
       }
 
-      // Default: torna al menu impostazioni
-      showMain();
+      showMain({ reason: "back" });
     });
   }
 
@@ -186,21 +186,40 @@
   // API globale SettingsUI
   // ============================
   window.SettingsUI = {
-    // inizializzazione chiamata da app.js
     init: initSettingsNavigation,
 
-    // usato da app.js quando tocchi la tab Impostazioni
     showMain: function () {
       if (typeof settingsApi.showMainFn === "function") {
-        settingsApi.showMainFn();
+        settingsApi.showMainFn({ reason: "api" });
       }
     },
 
-    // usato da turni.js per aprire pannelli specifici
-    openPanel: function (id) {
-      if (typeof settingsApi.showPanelFn === "function") {
-        settingsApi.showPanelFn(id);
+    // Backward compatible:
+    // SettingsUI.openPanel("id") funziona
+    // SettingsUI.openPanel("id", { internal: true }) marca navigazione interna
+    openPanel: function (id, opts) {
+      if (opts && opts.internal) {
+        pendingInternalNav = true;
       }
+      if (typeof settingsApi.showPanelFn === "function") {
+        settingsApi.showPanelFn(id, { reason: "api", internal: !!(opts && opts.internal) });
+      }
+    },
+
+    // Stato / internal nav (usato dai moduli per decidere reset)
+    getActivePanelId: function () {
+      return activePanelId;
+    },
+
+    consumeInternalNav: function () {
+      return consumeInternalNav();
+    },
+
+    // Eventi cambio pannello
+    onChange: function (cb) {
+      if (typeof cb !== "function") return function () {};
+      changeListeners.add(cb);
+      return function () { changeListeners.delete(cb); };
     }
   };
 })();

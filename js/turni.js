@@ -1,10 +1,11 @@
 // ============================
-// turni.js (nuovo)
+// turni.js
 // Orchestratore Pannello Turni
 // - Usa TurniStorage per storage/validazione
 // - Usa TurniRender per render lista
 // - Usa TurniInteractions per interazioni (edit, drag, collapse, reset on exit)
-// - Deleghe Turnazioni a turnazione.js
+// - Deleghe Turnazioni a turnazioni.js
+// - Deleghe Turno Iniziale a turni-start.js
 // ============================
 
 (function () {
@@ -12,24 +13,7 @@
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (turni.js)");
   }
 
-  // Implementazione reale (viene impostata dopo initTurniPanel)
   let exitEditModeImpl = function () {};
-
-  // helper: format data breve in IT (dd/mm o simile)
-  function formatDateShortISO(iso) {
-    if (!iso || typeof iso !== "string") return "";
-    const d = new Date(iso + "T00:00:00");
-    if (Number.isNaN(d.getTime())) return "";
-    try {
-      return new Intl.DateTimeFormat("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
-    } catch {
-      // fallback
-      const dd = String(d.getDate()).padStart(2, "0");
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const yy = String(d.getFullYear());
-      return `${dd}/${mm}/${yy}`;
-    }
-  }
 
   function initTurniPanel() {
     const settingsView = document.querySelector(".view-settings");
@@ -44,25 +28,14 @@
       loadTurni,
       saveTurni,
       isValidTime,
-      loadTurnazioni,
-      loadPreferredTurnazioneId,
       loadVisualToggle,
-      saveVisualToggle,
-      loadTurnoIniziale,
-      saveTurnoIniziale
+      saveVisualToggle
     } = window.TurniStorage;
 
     const { renderTurni, applySiglaFontSize } = window.TurniRender;
 
-    // Pannello principale turni (lista)
     const panelTurni = settingsView.querySelector('.settings-panel.settings-turni[data-settings-id="turni"]');
-    // Pannello "Aggiungi turno"
     const panelAdd   = settingsView.querySelector('.settings-panel.settings-turni-add[data-settings-id="turni-add"]');
-
-    // ✅ nuovi pannelli
-    const panelStart = settingsView.querySelector('.settings-panel.settings-turni-start[data-settings-id="turni-start"]');
-    const panelStartPick = settingsView.querySelector('.settings-panel.settings-turni-start-pick[data-settings-id="turni-start-pick"]');
-
     if (!panelTurni || !panelAdd) return;
 
     // --- elementi pannello lista ---
@@ -70,21 +43,14 @@
     const emptyHint  = panelTurni.querySelector("[data-turni-empty-hint]");
     const btnAdd     = panelTurni.querySelector("[data-turni-add]");
     const btnEdit    = panelTurni.querySelector("[data-turni-edit]");
+    const toggleBtn  = panelTurni.querySelector("[data-turni-toggle]");
 
-    const toggleBtn = panelTurni.querySelector("[data-turni-toggle]");
-
-    // La card "Turni" corretta è quella che contiene il suo toggle
-    const cardEl = toggleBtn ? toggleBtn.closest(".turni-card") : null;
+    const cardEl   = toggleBtn ? toggleBtn.closest(".turni-card") : null;
     const headerEl = cardEl ? cardEl.querySelector(".turni-card-header") : null;
 
     // Blocco "Visualizza turnazione"
     const visualToggleBtn = panelTurni.querySelector("[data-turni-visual-toggle]");
     const visualHint      = panelTurni.querySelector("[data-turni-visual-hint]");
-
-    // ✅ Riga "Imposta turno iniziale" (dentro Visualizza Turnazione)
-    const startRowBtn   = panelTurni.querySelector("[data-turni-start-row]");
-    const startSummaryEl = panelTurni.querySelector("[data-turni-start-summary]");
-    const startChevronEl = panelTurni.querySelector("[data-turni-start-chevron]");
 
     // --- elementi pannello "Aggiungi turno" ---
     const formEl          = panelAdd.querySelector("[data-turni-add-form]");
@@ -109,33 +75,29 @@
       return;
     }
 
-    // ---- Turnazioni refs (passate a Turnazione.init) ----
+    // ---- Turnazioni refs (passate a Turnazioni.init) ----
     const turnazioniCard      = panelTurni.querySelector(".turnazioni-card");
     const turnazioniToggleBtn = panelTurni.querySelector("[data-turnazioni-toggle]");
     const turnazioniHeader    = turnazioniCard ? turnazioniCard.querySelector(".turni-card-header") : null;
     const turnazioniAddBtn    = panelTurni.querySelector("[data-turnazioni-add]");
     const turnazioniEditBtn   = panelTurni.querySelector("[data-turnazioni-edit]");
 
-    // Titolo predefinito del pannello add/edit
     const defaultAddTitle = panelAdd.dataset.settingsTitle || "Aggiungi turno";
     const editTitle       = "Modifica turno";
 
-    // Stato
     let turni = loadTurni();
     let isEditing = false;
-
-    // Stato collassato letto da HTML
     let isCollapsed = cardEl.classList.contains("is-collapsed");
-
-    // indice del turno in modifica; null = nuovo
     let editIndex = null;
 
-    // Stato "turno senza orario"
+    // Turno senza orario
     let isNoTime = false;
 
-    // ----------------------------
-    // Helpers: collapse turni card
-    // ----------------------------
+    // Error helper
+    const errorCtl = (window.UIFeedback && typeof UIFeedback.createTempError === "function")
+      ? UIFeedback.createTempError(errorEl, 2000)
+      : null;
+
     function getCollapsed() { return isCollapsed; }
     function setCollapsed(v) { isCollapsed = !!v; }
 
@@ -144,9 +106,6 @@
       toggleBtn.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
     }
 
-    // ----------------------------
-    // Render lista
-    // ----------------------------
     function refreshList() {
       renderTurni(listEl, turni, emptyHint, btnEdit, {
         isEditing,
@@ -162,244 +121,11 @@
       });
     }
 
-    // Render iniziale
     refreshList();
     applyCollapsedState();
 
-    // =====================================================
-    // ✅ TURNO INIZIALE (nuovo)
-    // =====================================================
-
-    // elementi pannello "turni-start"
-    const startDateInput = panelStart ? panelStart.querySelector("#turniStartDate") : null;
-    const startTurnoRow  = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
-    const startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
-
-    // elementi pannello pick
-    const startPickList  = panelStartPick ? panelStartPick.querySelector("#turniStartPickList") : null;
-    const startPickEmpty = panelStartPick ? panelStartPick.querySelector("#turniStartPickEmpty") : null;
-
-    function getPreferredTurnazione() {
-      const all = (typeof loadTurnazioni === "function") ? loadTurnazioni() : [];
-      if (!Array.isArray(all) || all.length === 0) return null;
-
-      let pref = null;
-      const prefId = (typeof loadPreferredTurnazioneId === "function")
-        ? loadPreferredTurnazioneId()
-        : null;
-
-      if (prefId) {
-        pref = all.find(t => String(t.id) === String(prefId)) || null;
-      }
-      if (!pref) pref = all[all.length - 1];
-      return pref || null;
-    }
-
-    function canUseTurnoIniziale() {
-      const t = getPreferredTurnazione();
-      return !!t;
-    }
-
-    function setStartRowEnabled(enabled) {
-      if (!startRowBtn) return;
-
-      startRowBtn.classList.toggle("is-disabled", !enabled);
-      startRowBtn.setAttribute("aria-disabled", enabled ? "false" : "true");
-
-      if (startChevronEl) {
-        startChevronEl.style.display = enabled ? "" : "none";
-      }
-    }
-
-    function buildStartSummaryText() {
-      const cfg = (typeof loadTurnoIniziale === "function") ? loadTurnoIniziale() : { date: "", slotIndex: null };
-      const dateTxt = cfg.date ? formatDateShortISO(cfg.date) : "";
-
-      const t = getPreferredTurnazione();
-      const slotIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
-
-      let turnoTxt = "";
-      if (t && slotIndex !== null && slotIndex >= 0) {
-        const n = Number(t.days) || 0;
-        const slots = Array.isArray(t.slots) ? t.slots : [];
-        if (slotIndex < n) {
-          const s = slots[slotIndex] || null;
-          const sigla = s && s.sigla ? String(s.sigla).trim() : "";
-          // mostriamo sempre “Giorno X”, e se c’è la sigla anche quella
-          turnoTxt = `Giorno ${slotIndex + 1}${sigla ? ` (${sigla})` : ""}`;
-        }
-      }
-
-      if (dateTxt && turnoTxt) return `${dateTxt} · ${turnoTxt}`;
-      if (dateTxt) return dateTxt;
-      if (turnoTxt) return turnoTxt;
-      return "";
-    }
-
-    function syncTurnoInizialeSummaryUI() {
-      const txt = buildStartSummaryText();
-
-      if (startSummaryEl) startSummaryEl.textContent = txt;
-      if (startTurnoSummary) {
-        // nel pannello: mostra solo la parte turno (se presente)
-        const cfg = (typeof loadTurnoIniziale === "function") ? loadTurnoIniziale() : { date: "", slotIndex: null };
-        const t = getPreferredTurnazione();
-
-        let turnoTxt = "";
-        if (t && Number.isInteger(cfg.slotIndex)) {
-          const n = Number(t.days) || 0;
-          const slots = Array.isArray(t.slots) ? t.slots : [];
-          const i = cfg.slotIndex;
-          if (i >= 0 && i < n) {
-            const s = slots[i] || null;
-            const sigla = s && s.sigla ? String(s.sigla).trim() : "";
-            const nome  = s && s.nome  ? String(s.nome).trim()  : "";
-            turnoTxt = sigla ? sigla : (nome || "");
-            if (sigla && nome) turnoTxt = `${sigla} — ${nome}`;
-            // aggiungi info del giorno
-            turnoTxt = `Giorno ${i + 1}${turnoTxt ? ` · ${turnoTxt}` : ""}`;
-          }
-        }
-
-        startTurnoSummary.textContent = turnoTxt;
-      }
-
-      // se non c’è turnazione, il summary in card deve restare vuoto
-      if (!canUseTurnoIniziale()) {
-        if (startSummaryEl) startSummaryEl.textContent = "";
-        if (startTurnoSummary) startTurnoSummary.textContent = "";
-      }
-    }
-
-    function syncTurnoInizialeAvailabilityUI() {
-      const ok = canUseTurnoIniziale();
-      setStartRowEnabled(ok);
-      syncTurnoInizialeSummaryUI();
-    }
-
-    // Esposta per turnazione.js quando cambia preferita / lista
-    function syncTurnoInizialeUI() {
-      syncTurnoInizialeAvailabilityUI();
-      // se siamo nel picker aperto e non c’è più turnazione, aggiorna lista
-      if (panelStartPick && panelStartPick.classList.contains("is-active")) {
-        renderStartPickList();
-      }
-    }
-
-    function openTurnoInizialePanel() {
-      if (!panelStart) return;
-      if (!canUseTurnoIniziale()) return;
-
-      // carica valori attuali
-      const cfg = (typeof loadTurnoIniziale === "function") ? loadTurnoIniziale() : { date: "", slotIndex: null };
-
-      if (startDateInput) {
-        startDateInput.value = cfg.date || "";
-      }
-
-      syncTurnoInizialeSummaryUI();
-
-      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        window.__turniInternalNav = true;
-        SettingsUI.openPanel("turni-start");
-      }
-    }
-
-    function renderStartPickList() {
-      if (!startPickList) return;
-
-      const t = getPreferredTurnazione();
-      startPickList.innerHTML = "";
-
-      const cfg = (typeof loadTurnoIniziale === "function") ? loadTurnoIniziale() : { date: "", slotIndex: null };
-      const selectedIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
-
-      const has = !!t && (Number(t.days) || 0) > 0 && Array.isArray(t.slots);
-
-      if (startPickEmpty) {
-        startPickEmpty.hidden = has;
-      }
-
-      if (!has) return;
-
-      const days = Number(t.days) || 0;
-      const slots = Array.isArray(t.slots) ? t.slots : [];
-
-      for (let i = 0; i < days; i++) {
-        const s = slots[i] || {};
-        const sigla = s.sigla ? String(s.sigla).trim() : "";
-        const nome  = s.nome  ? String(s.nome).trim()  : "";
-
-        const row = document.createElement("button");
-        row.type = "button";
-        row.className = "turnazioni-pick-row";
-        if (selectedIndex !== null && i === selectedIndex) {
-          row.classList.add("is-selected");
-        }
-
-        const nameEl = document.createElement("span");
-        nameEl.className = "turnazioni-pick-name";
-        // come richiesto: visualizza solo i turni della rotazione
-        // metto “Giorno X — SIGLA Nome” (compatto)
-        let label = `Giorno ${i + 1}`;
-        if (sigla && nome) label += ` — ${sigla} ${nome}`;
-        else if (sigla)    label += ` — ${sigla}`;
-        else if (nome)     label += ` — ${nome}`;
-
-        nameEl.textContent = label;
-
-        row.appendChild(nameEl);
-
-        row.addEventListener("click", () => {
-          const next = (typeof loadTurnoIniziale === "function") ? loadTurnoIniziale() : { date: "", slotIndex: null };
-          next.slotIndex = i;
-          if (typeof saveTurnoIniziale === "function") saveTurnoIniziale(next);
-
-          syncTurnoInizialeSummaryUI();
-
-          if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-            window.__turniInternalNav = true;
-            SettingsUI.openPanel("turni-start");
-          }
-        });
-
-        startPickList.appendChild(row);
-      }
-    }
-
-    // click dalla card “Visualizza Turnazione” -> pannello turno iniziale
-    if (startRowBtn) {
-      startRowBtn.addEventListener("click", () => {
-        if (startRowBtn.classList.contains("is-disabled")) return;
-        openTurnoInizialePanel();
-      });
-    }
-
-    // pannello: cambia data -> salva e aggiorna summary
-    if (startDateInput) {
-      startDateInput.addEventListener("change", () => {
-        const cfg = (typeof loadTurnoIniziale === "function") ? loadTurnoIniziale() : { date: "", slotIndex: null };
-        cfg.date = startDateInput.value || "";
-        if (typeof saveTurnoIniziale === "function") saveTurnoIniziale(cfg);
-        syncTurnoInizialeSummaryUI();
-      });
-    }
-
-    // pannello: click “Turno” -> apre picker
-    if (startTurnoRow) {
-      startTurnoRow.addEventListener("click", () => {
-        if (!canUseTurnoIniziale()) return;
-        renderStartPickList();
-
-        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-          window.__turniInternalNav = true;
-          SettingsUI.openPanel("turni-start-pick");
-        }
-      });
-    }
-
     // ----------------------------
-    // TOGGLE "VISUALIZZA TURNAZIONE"
+    // Toggle visualizza turnazione
     // ----------------------------
     if (visualToggleBtn && typeof loadVisualToggle === "function") {
       let visualOn = loadVisualToggle();
@@ -408,19 +134,13 @@
         visualToggleBtn.classList.toggle("is-on", visualOn);
         visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
 
-        // se OFF, nascondi il hint "Nessuna turnazione impostata"
         if (visualHint) {
           visualHint.hidden = !visualOn;
         }
 
-        // ✅ mostra/nasconde la riga “Imposta turno iniziale”
-        if (startRowBtn) {
-          startRowBtn.hidden = !visualOn;
-        }
-
-        // ogni volta che cambia, riallinea abilitazione/summary
-        if (visualOn) {
-          syncTurnoInizialeAvailabilityUI();
+        // se esiste TurniStart, allinea visibilità riga “turno iniziale”
+        if (window.TurniStart && typeof TurniStart.syncVisibility === "function") {
+          TurniStart.syncVisibility(visualOn);
         }
       }
 
@@ -429,18 +149,14 @@
       visualToggleBtn.addEventListener("click", () => {
         visualOn = !visualOn;
         applyVisualState();
-
         if (typeof saveVisualToggle === "function") {
           saveVisualToggle(visualOn);
         }
       });
     }
 
-    // init stato UI turno iniziale (anche se toggle è OFF, prepariamo summary)
-    syncTurnoInizialeAvailabilityUI();
-
     // ----------------------------
-    // Helper: stato "turno senza orario"
+    // Helper: turno senza orario
     // ----------------------------
     function applyNoTimeState() {
       noTimeToggleBtn.classList.toggle("is-on", isNoTime);
@@ -456,7 +172,7 @@
     }
 
     // ----------------------------
-    // Helper: errori
+    // Errori form
     // ----------------------------
     let errorTimer = null;
 
@@ -465,15 +181,20 @@
         clearTimeout(errorTimer);
         errorTimer = null;
       }
-
       errorEl.hidden = true;
       [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => inp.classList.remove("is-invalid"));
+      if (errorCtl) errorCtl.clear();
     }
 
     function showError() {
+      [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => inp.classList.remove("is-invalid"));
+      if (errorCtl) {
+        errorCtl.show();
+        return;
+      }
+      // fallback vecchio
       clearError();
       errorEl.hidden = false;
-
       errorTimer = setTimeout(() => {
         errorEl.hidden = true;
         [inputNome, inputSigla, inputInizio, inputFine].forEach(inp => inp.classList.remove("is-invalid"));
@@ -533,8 +254,7 @@
       resetAddForm();
 
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        window.__turniInternalNav = true;
-        SettingsUI.openPanel("turni-add");
+        SettingsUI.openPanel("turni-add", { internal: true });
       }
     }
 
@@ -569,8 +289,7 @@
       applySiglaFontSize(siglaPreviewEl, t.sigla || "");
 
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        window.__turniInternalNav = true;
-        SettingsUI.openPanel("turni-add");
+        SettingsUI.openPanel("turni-add", { internal: true });
       }
     }
 
@@ -633,15 +352,12 @@
       saveTurni(turni);
       refreshList();
 
-      // ritorna in "Aggiungi turno" pulito
       editIndex = null;
       panelAdd.dataset.settingsTitle = defaultAddTitle;
       resetAddForm();
 
-      // torna al pannello Turni senza alterare collapse
       if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        window.__turniInternalNav = true;
-        SettingsUI.openPanel("turni");
+        SettingsUI.openPanel("turni", { internal: true });
       }
     });
 
@@ -649,7 +365,6 @@
     // Interactions: collapse / edit / row click / drag / reset on exit
     // ----------------------------
     if (window.TurniInteractions) {
-      // collapse card Turni
       TurniInteractions.attachCollapsibleCard({
         cardEl,
         toggleBtn,
@@ -658,7 +373,6 @@
         setCollapsed,
         ignoreClickSelectors: ["[data-turni-edit]", "[data-turni-add]", "[data-turni-toggle]"],
         onCollapse: (collapsed) => {
-          // se chiudo la card, esco da Modifica
           if (collapsed && isEditing) {
             isEditing = false;
             refreshList();
@@ -666,7 +380,6 @@
         }
       });
 
-      // edit toggle
       TurniInteractions.attachEditToggle({
         btnEdit,
         canEdit: () => Array.isArray(turni) && turni.length > 0,
@@ -675,7 +388,6 @@
         refresh: refreshList
       });
 
-      // click rigo in edit -> modifica turno
       TurniInteractions.attachRowEditClick({
         listEl,
         getEditing: () => isEditing,
@@ -685,7 +397,6 @@
         }
       });
 
-      // drag sort
       TurniInteractions.attachDragSort({
         listEl,
         getEditing: () => isEditing,
@@ -695,25 +406,19 @@
         refresh: refreshList
       });
 
-      // reset quando esci dal pannello Turni (se non è nav interna)
       TurniInteractions.attachPanelExitReset({
         panelEl: panelTurni,
-        getInternalNavFlag: () => !!window.__turniInternalNav,
-        consumeInternalNavFlag: () => { window.__turniInternalNav = false; },
         onExit: () => {
-          // chiudi Turni card
           isCollapsed = true;
           applyCollapsedState();
 
-          // chiudi Turnazioni card (se presente) via Turnazione API, altrimenti classe diretta
-          if (window.Turnazione && typeof Turnazione._setCollapsed === "function") {
-            Turnazione._setCollapsed(true);
+          if (window.Turnazioni && typeof Turnazioni._setCollapsed === "function") {
+            Turnazioni._setCollapsed(true);
           } else if (turnazioniCard && turnazioniToggleBtn) {
             turnazioniCard.classList.add("is-collapsed");
             turnazioniToggleBtn.setAttribute("aria-expanded", "false");
           }
 
-          // esci da Modifica
           if (isEditing) {
             isEditing = false;
             refreshList();
@@ -723,35 +428,37 @@
     }
 
     // ----------------------------
-    // Init Turnazioni (scheletro separato)
+    // Init Turnazioni (modulo separato)
     // ----------------------------
-    if (window.Turnazione && typeof Turnazione.init === "function") {
-      Turnazione.init({
+    if (window.Turnazioni && typeof Turnazioni.init === "function") {
+      Turnazioni.init({
         panelTurni,
         turnazioniCard,
         turnazioniToggleBtn,
         turnazioniHeader,
         turnazioniAddBtn,
-        turnazioniEditBtn
+        turnazioniEditBtn,
+        visualHintEl: visualHint
       });
     }
 
     // ----------------------------
-    // API: uscita forzata modalità Modifica (usata da app.js / settings.js)
+    // Init Turno Iniziale (modulo separato)
+    // ----------------------------
+    if (window.TurniStart && typeof TurniStart.init === "function") {
+      TurniStart.init({ panelTurni });
+    }
+
+    // ----------------------------
+    // API: uscita forzata modalità Modifica
     // ----------------------------
     exitEditModeImpl = function () {
       if (!isEditing) return;
       isEditing = false;
       refreshList();
     };
-
-    // ✅ API interna esposta (usata da turnazione.js)
-    window.Turni.syncTurnoInizialeUI = syncTurnoInizialeUI;
   }
 
-  // ============================
-  // API pubblica Turni
-  // ============================
   window.Turni = {
     init: initTurniPanel,
     getTurni: function () {
@@ -763,8 +470,7 @@
     exitEditMode: function () {
       exitEditModeImpl();
     },
-
-    // placeholder: viene sovrascritta dentro init
+    // compat: verrà usata dai moduli, se presente
     syncTurnoInizialeUI: function () {}
   };
 })();

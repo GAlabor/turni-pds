@@ -5,7 +5,8 @@
 // - modalità Modifica (toggle)
 // - click rigo in edit -> modifica
 // - drag & drop (pointer) con FLIP
-// - reset stato quando esci dal pannello "turni" (MutationObserver)
+// - reset stato quando esci dal pannello "turni"
+//   (ora: preferisce SettingsUI.onChange, fallback MutationObserver)
 // ============================
 
 (function () {
@@ -14,9 +15,6 @@
     catch { return null; }
   }
 
-  // ----------------------------
-  // Collapse card (header + freccia)
-  // ----------------------------
   function attachCollapsibleCard(opts) {
     const {
       cardEl,
@@ -59,24 +57,12 @@
       });
     }
 
-    // stato iniziale
     apply();
-
     return { apply };
   }
 
-  // ----------------------------
-  // Modalità Modifica (toggle bottone)
-  // ----------------------------
   function attachEditToggle(opts) {
-    const {
-      btnEdit,
-      canEdit,
-      getEditing,
-      setEditing,
-      refresh
-    } = opts || {};
-
+    const { btnEdit, canEdit, getEditing, setEditing, refresh } = opts || {};
     if (!btnEdit) return;
 
     btnEdit.addEventListener("click", (e) => {
@@ -90,9 +76,6 @@
     });
   }
 
-  // ----------------------------
-  // Click rigo in edit -> modifica
-  // ----------------------------
   function attachRowEditClick(opts) {
     const {
       listEl,
@@ -121,19 +104,8 @@
     });
   }
 
-  // ----------------------------
-  // Drag & drop riordino (pointer) + FLIP
-  // ----------------------------
   function attachDragSort(opts) {
-    const {
-      listEl,
-      getEditing,
-      getItems,
-      setItems,
-      saveItems,
-      refresh
-    } = opts || {};
-
+    const { listEl, getEditing, getItems, setItems, saveItems, refresh } = opts || {};
     if (!listEl) return;
 
     let draggedRow = null;
@@ -244,7 +216,6 @@
 
       e.preventDefault();
 
-      // rimuovi eventuale selezione
       if (window.getSelection) {
         const sel = window.getSelection();
         if (sel && sel.removeAllRanges) sel.removeAllRanges();
@@ -257,17 +228,34 @@
 
   // ----------------------------
   // Reset quando esci dal pannello "turni"
+  // Ora preferisce SettingsUI.onChange per capire prev/next,
+  // e usa SettingsUI.consumeInternalNav() per distinguere nav interne.
   // ----------------------------
   function attachPanelExitReset(opts) {
-    const {
-      panelEl,
-      onExit,
-      getInternalNavFlag,
-      consumeInternalNavFlag
-    } = opts || {};
-
+    const { panelEl, onExit } = opts || {};
     if (!panelEl) return;
 
+    // 1) via SettingsUI.onChange (preferito)
+    if (window.SettingsUI && typeof SettingsUI.onChange === "function") {
+      const off = SettingsUI.onChange((prevId, nextId) => {
+        const panelId = panelEl.dataset.settingsId || null;
+        if (!panelId) return;
+
+        if (prevId === panelId && nextId !== panelId) {
+          const internal = (window.SettingsUI && typeof SettingsUI.consumeInternalNav === "function")
+            ? !!SettingsUI.consumeInternalNav()
+            : false;
+
+          if (!internal) {
+            if (typeof onExit === "function") onExit();
+          }
+        }
+      });
+
+      return { disconnect: off };
+    }
+
+    // 2) fallback MutationObserver (se SettingsUI non c’è)
     let wasActive = panelEl.classList.contains("is-active");
 
     const obs = new MutationObserver((mutations) => {
@@ -277,19 +265,7 @@
         const isActiveNow = panelEl.classList.contains("is-active");
 
         if (wasActive && !isActiveNow) {
-          const internal = typeof getInternalNavFlag === "function"
-            ? !!getInternalNavFlag()
-            : !!window.__turniInternalNav;
-
-          if (!internal) {
-            if (typeof onExit === "function") onExit();
-          } else {
-            if (typeof consumeInternalNavFlag === "function") {
-              consumeInternalNavFlag();
-            } else {
-              window.__turniInternalNav = false;
-            }
-          }
+          if (typeof onExit === "function") onExit();
         }
 
         wasActive = isActiveNow;
@@ -297,13 +273,9 @@
     });
 
     obs.observe(panelEl, { attributes: true, attributeFilter: ["class"] });
-
     return { disconnect: () => obs.disconnect() };
   }
 
-  // ============================
-  // API pubblica
-  // ============================
   window.TurniInteractions = {
     attachCollapsibleCard,
     attachEditToggle,

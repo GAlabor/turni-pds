@@ -2,7 +2,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-12-15 V1.3';
+const VERSION    = '2025-12-15 V1.4';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -29,18 +29,40 @@ const PRECACHE_URLS = [
 
   // JS core + moduli UI
   `${ROOT}/js/config.js`,
-  `${ROOT}/js/app.js`,
-  `${ROOT}/js/sw-register.js`,
+
+  // UI core
   `${ROOT}/js/calendar.js`,
   `${ROOT}/js/theme.js`,
   `${ROOT}/js/status.js`,
   `${ROOT}/js/icons.js`,
+  `${ROOT}/js/ui-feedback.js`,
+
+  // Settings navigation
   `${ROOT}/js/settings.js`,
+
+  // Turni: storage/render/interactions
   `${ROOT}/js/turni-storage.js`,
   `${ROOT}/js/turni-render.js`,
   `${ROOT}/js/turni-interactions.js`,
-  `${ROOT}/js/turnazione.js`,
+
+  // Turnazioni (nuovi moduli)
+  `${ROOT}/js/turnazioni-list.js`,
+  `${ROOT}/js/turnazioni-add.js`,
+  `${ROOT}/js/turnazioni.js`,
+
+  // Turno iniziale (nuovo modulo)
+  `${ROOT}/js/turni-start.js`,
+
+  // Turni orchestratore
   `${ROOT}/js/turni.js`,
+
+  // App bootstrap
+  `${ROOT}/js/app.js`,
+  `${ROOT}/js/sw-register.js`,
+
+  // Compat: opzionale (puoi anche toglierlo dal precache)
+  `${ROOT}/js/turnazione.js`,
+
 
   // Favicon
   `${ROOT}/favicon.ico`,
