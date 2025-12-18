@@ -1,7 +1,7 @@
-// config.js
 
 // ============================
 // Config globale app Turni PdS
+// config.js v 1.0
 // ============================
 
 // ===================== SPLIT iife-wrapper : START =====================

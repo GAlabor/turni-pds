@@ -1,8 +1,8 @@
 // ============================
 // Icone SVG:
-// icons.js
-// - Tabbar (Calendario / InsPag / Riepilogo / Impostazioni)
-// - Icona stato / login (in alto a destra)
+// Tabbar (Calendario / InsPag / Riepilogo / Impostazioni)
+// Icona stato / login (in alto a destra)
+// icons.js v 1.0
 // ============================
 
 (function () {

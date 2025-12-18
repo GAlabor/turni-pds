@@ -1,9 +1,9 @@
 // ============================
-// theme.js
 // Tema: system / light / dark
-// - Salvataggio preferenza in localStorage
-// - Attributo data-theme su <html>
-// - Sincronizzazione con pannello Impostazioni → Tema
+// Salvataggio preferenza in localStorage
+// Attributo data-theme su <html>
+// Sincronizzazione con pannello Impostazioni → Tema
+// theme.js v 1.0
 // ============================
 
 (function () {

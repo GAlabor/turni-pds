@@ -1,11 +1,11 @@
 // ============================
-// status.js
 // Icona stato / salvataggio
 // Usa l’elemento #statusIcon con classi:
 // - status-idle
 // - status-saving
 // - status-ok
 // I CSS gestiscono cerchi / omino / animazione
+// status.js v 1.0
 // ============================
 
 (function () {

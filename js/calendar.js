@@ -1,8 +1,8 @@
-// calendar.js
-
+// 
 // ============================
 // Calendario con viste:
 // giorni / mesi / anni
+// calendar.js v 1.0
 // ============================
 
 (function () {

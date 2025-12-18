@@ -1,9 +1,9 @@
 // ============================
-// turni-start.js
 // Feature "Turno iniziale" (separata da turni.js)
 // - summary in card
 // - pannelli turni-start e turni-start-pick
 // - gating: richiede turnazione preferita
+// turni-start.js v 1.0
 // ============================
 
 (function () {

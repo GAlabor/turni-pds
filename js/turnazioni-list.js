@@ -1,6 +1,6 @@
 // ============================
-// turnazioni-list.js
 // Rendering lista turnazioni (mini-card) + preferita + hint
+// turnazioni-list.js v 1.0
 // ============================
 
 (function () {

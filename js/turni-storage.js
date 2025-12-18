@@ -1,6 +1,6 @@
 // ============================
-// turni-storage.js
 // Storage e validazione turni
+// turni-storage.js v 1.0
 // ============================
 
 (function () {

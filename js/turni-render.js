@@ -1,6 +1,6 @@
 // ============================
-// turni-render.js
 // Render lista turni + font sigla
+// turni-render.js v 1.0
 // ============================
 
 (function () {

@@ -1,7 +1,6 @@
-// sw-register.js
-
 // ============================
 // Service worker + versione
+// sw-register.js v 1.0
 // ============================
 
 // ===================== SPLIT bootstrap : START =====================

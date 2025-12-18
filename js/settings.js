@@ -1,8 +1,8 @@
 // ============================
-// settings.js
 // Navigazione schermate Impostazioni
-// + "internal nav" centralizzata qui (niente flag globali sparsi)
-// + eventi di cambio pannello (SettingsUI.onChange)
+// "internal nav" centralizzata qui (niente flag globali sparsi)
+// eventi di cambio pannello (SettingsUI.onChange)
+// settings.js v 1.0
 // ============================
 
 (function () {

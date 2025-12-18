@@ -1,6 +1,6 @@
 // ============================
-// ui-feedback.js
 // Helper UI condiviso: errori temporizzati (show/hide)
+// ui-feedback.js v 1.0
 // ============================
 
 (function () {

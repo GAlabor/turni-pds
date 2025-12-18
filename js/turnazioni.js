@@ -1,9 +1,9 @@
 // ============================
-// turnazioni.js
 // Orchestratore Turnazioni:
-// - collapse card
-// - open pannello add
-// - init lista + init add/picker
+// collapse card
+// open pannello add
+// init lista + init add/picker
+// turnazioni.js v 1.0
 // ============================
 
 (function () {

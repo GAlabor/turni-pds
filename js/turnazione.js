@@ -1,7 +1,7 @@
 // ============================
-// turnazione.js
 // Wrapper di compatibilità: delega al nuovo modulo Turnazioni
 // (così non devi cambiare subito i tuoi <script> se non vuoi)
+// turnazione.js v 1.0
 // ============================
 
 (function () {

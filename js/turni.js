@@ -1,11 +1,11 @@
 // ============================
-// turni.js
 // Orchestratore Pannello Turni
 // - Usa TurniStorage per storage/validazione
 // - Usa TurniRender per render lista
 // - Usa TurniInteractions per interazioni (edit, drag, collapse, reset on exit)
 // - Deleghe Turnazioni a turnazioni.js
 // - Deleghe Turno Iniziale a turni-start.js
+// turni.js v 1.0
 // ============================
 
 // ===================== SPLIT bootstrap_guard : START =====================

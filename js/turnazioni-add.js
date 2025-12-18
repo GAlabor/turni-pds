@@ -1,6 +1,6 @@
 // ============================
-// turnazioni-add.js
 // UI "Aggiungi turnazione" + picker turni + riposi + reset/dirty + salvataggio
+// turnazioni-add.js v 1.0
 // ============================
 
 (function () {

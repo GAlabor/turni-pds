@@ -1,5 +1,4 @@
 // ============================
-// turni-interactions.js
 // Interazioni UI condivise per Turni/Turnazioni:
 // - collapse card (header + freccia)
 // - modalità Modifica (toggle)
@@ -7,6 +6,7 @@
 // - drag & drop (pointer) con FLIP
 // - reset stato quando esci dal pannello "turni"
 //   (ora: preferisce SettingsUI.onChange, fallback MutationObserver)
+// turni-interactions.js v 1.0
 // ============================
 
 (function () {
