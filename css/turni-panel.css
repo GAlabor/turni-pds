@@ -3,6 +3,7 @@
    PANNELLO TURNI — LISTA + CARD
    ========================= */
 
+/* ===================== SPLIT lista-turni-salvati : START ===================== */
 /* =========================
    LISTA TURNI SALVATI
    ========================= */
@@ -78,7 +79,10 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+/* ===================== SPLIT lista-turni-salvati : END ======================= */
 
+
+/* ===================== SPLIT modifica-cancellazione-ios : START ===================== */
 /* =========================
    MODIFICA / CANCELLAZIONE (stile iOS)
    ========================= */
@@ -121,7 +125,10 @@
 .turno-delete-btn:active {
   transform: scale(0.9);
 }
+/* ===================== SPLIT modifica-cancellazione-ios : END ======================= */
 
+
+/* ===================== SPLIT handle-drag-riordino : START ===================== */
 /* =========================
    HANDLE DRAG / RIORDINO
    ========================= */
@@ -176,7 +183,10 @@ body.turni-no-select * {
   transform: scale(1.02);
   z-index: 5;
 }
+/* ===================== SPLIT handle-drag-riordino : END ======================= */
 
+
+/* ===================== SPLIT card-header-pannello-turni : START ===================== */
 /* =========================
    CARD / HEADER PANNELLO TURNI
    ========================= */
@@ -264,7 +274,10 @@ body.turni-no-select * {
   opacity: 0;
   pointer-events: none;
 }
+/* ===================== SPLIT card-header-pannello-turni : END ======================= */
 
+
+/* ===================== SPLIT blocco-visualizza-turnazione : START ===================== */
 /* =========================
    BLOCCO "VISUALIZZA TURNAZIONE" (ORA IN CARD)
    ========================= */
@@ -352,7 +365,10 @@ body.turni-no-select * {
 .turni-inline-row.is-disabled .turni-inline-row-chevron {
   display: none;
 }
+/* ===================== SPLIT blocco-visualizza-turnazione : END ======================= */
 
+
+/* ===================== SPLIT responsive-turni-panel : START ===================== */
 /* =========================
    RESPONSIVE (Turni panel)
    ========================= */
@@ -370,3 +386,4 @@ body.turni-no-select * {
     gap: 6px;
   }
 }
+/* ===================== SPLIT responsive-turni-panel : END ======================= */

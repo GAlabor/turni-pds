@@ -4,20 +4,31 @@
 // Config globale app Turni PdS
 // ============================
 
+// ===================== SPLIT iife-wrapper : START =====================
 (function () {
+
+  // ===================== SPLIT guard-duplicated-load : START =====================
   // Evita di sovrascrivere se per qualche motivo venisse richiamato due volte
   if (window.AppConfig) {
     return;
   }
+  // ===================== SPLIT guard-duplicated-load : END =====================
 
+
+  // ===================== SPLIT base-path : START =====================
   // ============================
   // PATH / BASE URL
   // ============================
   // In locale: base vuota
   // In produzione: /turni-pds
   const BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
+  // ===================== SPLIT base-path : END =====================
 
+
+  // ===================== SPLIT app-config-root : START =====================
   window.AppConfig = {
+
+    // ===================== SPLIT paths-pwa : START =====================
     // ============================
     // PERCORSI / PWA
     // ============================
@@ -27,7 +38,10 @@
       swScope: `${BASE}/`,
       swFile: `${BASE}/service-worker.js`
     },
+    // ===================== SPLIT paths-pwa : END =====================
 
+
+    // ===================== SPLIT storage-keys : START =====================
     // ============================
     // STORAGE KEYS (localStorage)
     // ============================
@@ -53,7 +67,10 @@
       inspag: "turnipds-inspag",
       preferenze: "turnipds-preferenze"
     },
+    // ===================== SPLIT storage-keys : END =====================
 
+
+    // ===================== SPLIT ui-texts : START =====================
     // ============================
     // TESTI UI GLOBALI (usati dai JS)
     // ============================
@@ -64,7 +81,10 @@
         dark: "Scuro"
       }
     },
+    // ===================== SPLIT ui-texts : END =====================
 
+
+    // ===================== SPLIT status-config : START =====================
     // ============================
     // STATO / ANIMAZIONI (Status.js)
     // ============================
@@ -72,12 +92,20 @@
       savedDelay: 1200,
       spinnerVisibleMs: 800
     },
+    // ===================== SPLIT status-config : END =====================
 
+
+    // ===================== SPLIT version-label : START =====================
     // ============================
     // VERSIONE / LABEL
     // ============================
     VERSION: {
       labelElementId: "versionLabel"
     }
+    // ===================== SPLIT version-label : END =====================
+
   };
+  // ===================== SPLIT app-config-root : END =====================
+
 })();
+// ===================== SPLIT iife-wrapper : END =====================

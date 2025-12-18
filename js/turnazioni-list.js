@@ -4,6 +4,7 @@
 // ============================
 
 (function () {
+// ===================== SPLIT helpers_formatting : START =====================
   function formatSigle(turnazione) {
     const n = Number(turnazione && turnazione.days) || 0;
     const slots = Array.isArray(turnazione && turnazione.slots) ? turnazione.slots : [];
@@ -30,7 +31,9 @@
     if (!pick) pick = savedTurnazioni[savedTurnazioni.length - 1];
     return pick;
   }
+// ===================== SPLIT helpers_formatting : END   =====================
 
+// ===================== SPLIT api_state_and_init : START =====================
   const api = {
     panelTurni: null,
     listEl: null,
@@ -48,7 +51,9 @@
 
       this.refresh();
     },
+// ===================== SPLIT api_state_and_init : END   =====================
 
+// ===================== SPLIT api_refresh_rendering : START =====================
     refresh() {
       if (!window.TurniStorage) return;
 
@@ -115,7 +120,9 @@
       this.syncVisualHint();
       this.notifyTurnoIniziale();
     },
+// ===================== SPLIT api_refresh_rendering : END   =====================
 
+// ===================== SPLIT api_visual_hint : START =====================
     syncVisualHint() {
       if (!this.visualHintEl) return;
 
@@ -128,7 +135,9 @@
       const pick = getPreferred(this.saved, this.preferredId);
       this.visualHintEl.textContent = (pick && pick.name) ? pick.name : "Turnazione";
     },
+// ===================== SPLIT api_visual_hint : END   =====================
 
+// ===================== SPLIT api_notify_and_export : START =====================
     notifyTurnoIniziale() {
       if (window.Turni && typeof Turni.syncTurnoInizialeUI === "function") {
         Turni.syncTurnoInizialeUI();
@@ -140,4 +149,5 @@
   };
 
   window.TurnazioniList = api;
+// ===================== SPLIT api_notify_and_export : END   =====================
 })();

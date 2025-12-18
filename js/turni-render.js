@@ -4,6 +4,7 @@
 // ============================
 
 (function () {
+// ===================== SPLIT font-sigla : START =====================
   // ============================
   // Font sigla: gestione dimensione
   // ============================
@@ -21,7 +22,10 @@
     const sizePx = getSiglaFontSizeValue(siglaText);
     el.style.fontSize = `${sizePx}px`;
   }
+// ===================== SPLIT font-sigla : END =====================
 
+
+// ===================== SPLIT render-lista-turni : START =====================
   // ============================
   // Render lista turni
   // options:
@@ -155,7 +159,10 @@
       listEl.appendChild(row);
     });
   }
+// ===================== SPLIT render-lista-turni : END =====================
 
+
+// ===================== SPLIT api-pubblica : START =====================
   // ============================
   // API pubblica
   // ============================
@@ -164,4 +171,5 @@
     applySiglaFontSize,
     renderTurni
   };
+// ===================== SPLIT api-pubblica : END =====================
 })();

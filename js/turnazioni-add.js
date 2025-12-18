@@ -4,6 +4,8 @@
 // ============================
 
 (function () {
+
+// ===================== SPLIT helpers_base : START =====================
   function sameTurno(a, b) {
     if (!a || !b) return false;
     const an = (a.nome || "").trim();
@@ -12,11 +14,15 @@
     const bs = (b.sigla || "").trim();
     return an === bn && as === bs;
   }
+// ===================== SPLIT helpers_base : END =======================
 
+// ===================== SPLIT init_entrypoint : START =====================
   function initTurnazioniAddUI(ctx) {
     if (!window.TurniStorage) return;
     if (!window.TurniRender) return;
+// ===================== SPLIT init_entrypoint : END =======================
 
+// ===================== SPLIT dom_refs_panels : START =====================
     const panelAdd = document.querySelector(
       '.settings-panel.settings-turnazioni-add[data-settings-id="turnazioni-add"]'
     );
@@ -29,7 +35,9 @@
     const panelTurni = (ctx && ctx.panelTurni)
       ? ctx.panelTurni
       : document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"]');
+// ===================== SPLIT dom_refs_panels : END =======================
 
+// ===================== SPLIT dom_refs_list_hint : START =====================
     const turnazioniListEl = (ctx && ctx.turnazioniListEl)
       ? ctx.turnazioniListEl
       : (panelTurni ? panelTurni.querySelector("[data-turnazioni-list]") : null);
@@ -41,7 +49,9 @@
     const visualHintEl = (ctx && ctx.visualHintEl)
       ? ctx.visualHintEl
       : (panelTurni ? panelTurni.querySelector("[data-turni-visual-hint]") : null);
+// ===================== SPLIT dom_refs_list_hint : END =======================
 
+// ===================== SPLIT dom_refs_toolbar_days_name : START =====================
     // toolbar Salva
     const btnSave = panelAdd.querySelector("[data-turnazioni-save]");
     const errEl   = panelAdd.querySelector("[data-turnazioni-error]");
@@ -59,7 +69,9 @@
 
     // Nome turnazione
     const nameInput = panelAdd.querySelector("#turnazioniNome");
+// ===================== SPLIT dom_refs_toolbar_days_name : END =======================
 
+// ===================== SPLIT dom_refs_picker_rest : START =====================
     // picker list
     const pickListEl = panelPick ? panelPick.querySelector("#turnazioniPickList") : null;
     const pickEmpty  = panelPick ? panelPick.querySelector("#turnazioniPickEmpty") : null;
@@ -71,7 +83,9 @@
 
     // card "Giorni di Riposo" (1/2)
     const restDaysBtns = panelAdd.querySelectorAll('[data-turnazioni-rest-days]');
+// ===================== SPLIT dom_refs_picker_rest : END =======================
 
+// ===================== SPLIT state_dirty_rotation_rest : START =====================
     // ----------------------------
     // Dirty + reset
     // ----------------------------
@@ -87,7 +101,9 @@
     // riposi
     let restDaysAllowed = 1; // 1 o 2
     let restDayIndices = [];
+// ===================== SPLIT state_dirty_rotation_rest : END =======================
 
+// ===================== SPLIT storage_load_initial : START =====================
     const hasStorage =
       window.TurniStorage &&
       typeof TurniStorage.loadTurnazioni === "function" &&
@@ -97,7 +113,9 @@
 
     let savedTurnazioni = hasStorage ? TurniStorage.loadTurnazioni() : [];
     let preferredId     = hasStorage ? TurniStorage.loadPreferredTurnazioneId() : null;
+// ===================== SPLIT storage_load_initial : END =======================
 
+// ===================== SPLIT errors_ui : START =====================
     // ----------------------------
     // Errori
     // ----------------------------
@@ -115,7 +133,9 @@
         setTimeout(() => { errEl.hidden = true; }, 2000);
       }
     }
+// ===================== SPLIT errors_ui : END =======================
 
+// ===================== SPLIT helpers_days_ui : START =====================
     // ----------------------------
     // Helpers UI giorni
     // ----------------------------
@@ -166,7 +186,9 @@
         TurniRender.applySiglaFontSize(el, txt);
       }
     }
+// ===================== SPLIT helpers_days_ui : END =======================
 
+// ===================== SPLIT rest_days_card_1_2 : START =====================
     // ----------------------------
     // Card "Giorni di Riposo" (1 / 2)
     // ----------------------------
@@ -199,7 +221,9 @@
         });
       });
     }
+// ===================== SPLIT rest_days_card_1_2 : END =======================
 
+// ===================== SPLIT rest_toggle_picker : START =====================
     // ----------------------------
     // Riposo: toggle nel picker
     // ----------------------------
@@ -237,7 +261,9 @@
         setRestForActiveDay(!isOn);
       });
     }
+// ===================== SPLIT rest_toggle_picker : END =======================
 
+// ===================== SPLIT picker_open_setslot : START =====================
     function openPickPanelForDay(index) {
       activePickIndex = index;
 
@@ -258,7 +284,9 @@
       renderDaysGrid(rotationDaysCount);
       markDirty();
     }
+// ===================== SPLIT picker_open_setslot : END =======================
 
+// ===================== SPLIT render_pick_list : START =====================
     function renderPickList() {
       if (!pickListEl) return;
 
@@ -301,7 +329,9 @@
         pickListEl.appendChild(row);
       });
     }
+// ===================== SPLIT render_pick_list : END =======================
 
+// ===================== SPLIT render_days_grid : START =====================
     function renderDaysGrid(n) {
       if (!grid) return;
 
@@ -361,7 +391,9 @@
 
       applyDaysUIState(n);
     }
+// ===================== SPLIT render_days_grid : END =======================
 
+// ===================== SPLIT riposo_cards_component : START =====================
     // ----------------------------
     // Riposo cards component (riuso del tuo componente)
     // ----------------------------
@@ -508,7 +540,9 @@
 
     riposo1Reset = riposo1 && typeof riposo1.reset === "function" ? riposo1.reset : null;
     riposo2Reset = riposo2 && typeof riposo2.reset === "function" ? riposo2.reset : null;
+// ===================== SPLIT riposo_cards_component : END =======================
 
+// ===================== SPLIT reset_form : START =====================
     // ----------------------------
     // Reset form
     // ----------------------------
@@ -532,7 +566,9 @@
 
       isDirty = false;
     }
+// ===================== SPLIT reset_form : END =======================
 
+// ===================== SPLIT validate_and_payload : START =====================
     // ----------------------------
     // Validazione + payload
     // ----------------------------
@@ -570,7 +606,9 @@
         restIndices: restDayIndices.slice(0, restDaysAllowed)
       };
     }
+// ===================== SPLIT validate_and_payload : END =======================
 
+// ===================== SPLIT save_click_handler : START =====================
     if (btnSave) {
       btnSave.addEventListener("click", () => {
         clearError();
@@ -610,7 +648,9 @@
         }
       });
     }
+// ===================== SPLIT save_click_handler : END =======================
 
+// ===================== SPLIT init_add_ui_bindings : START =====================
     // ----------------------------
     // Stato iniziale UI add
     // ----------------------------
@@ -667,7 +707,9 @@
         renderDaysGrid(v);
       });
     }
+// ===================== SPLIT init_add_ui_bindings : END =======================
 
+// ===================== SPLIT settings_onchange_reset_guard : START =====================
     // ----------------------------
     // RESET quando esci da "turnazioni-add" senza salvare
     // (usiamo SettingsUI.onChange invece di MutationObserver)
@@ -686,7 +728,9 @@
         }
       });
     }
+// ===================== SPLIT settings_onchange_reset_guard : END =======================
 
+// ===================== SPLIT turnazioni_list_init_fallback : START =====================
     // init lista turnazioni se esiste modulo list (così non dipende dall’ordine)
     if (window.TurnazioniList && typeof TurnazioniList.init === "function") {
       TurnazioniList.init({
@@ -698,9 +742,13 @@
     } else {
       // fallback: almeno niente crash
     }
-  }
+// ===================== SPLIT turnazioni_list_init_fallback : END =======================
 
+  }
+// ===================== SPLIT initTurnazioniAddUI_close : START =====================
   window.TurnazioniAdd = {
     init: initTurnazioniAddUI
   };
+// ===================== SPLIT initTurnazioniAddUI_close : END =======================
+
 })();

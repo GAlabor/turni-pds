@@ -1,13 +1,17 @@
+// ===================== SPLIT meta : START =====================
 // ==============================
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-12-15 V1.4';
+const VERSION    = '2025-12-15 V1.5';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
 const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
+// ===================== SPLIT meta : END   =====================
 
+
+// ===================== SPLIT precache : START =====================
 // ==============================
 // PRECACHE COMPLETO (APP READY)
 // ==============================
@@ -88,7 +92,10 @@ const PRECACHE_URLS = [
   `${ROOT}/svg/settings.svg`,
   `${ROOT}/svg/login.svg`
 ];
+// ===================== SPLIT precache : END   =====================
 
+
+// ===================== SPLIT normalize-html : START =====================
 // ==============================
 // NORMALIZZAZIONE HTML
 // ==============================
@@ -111,7 +118,10 @@ function normalizeHTMLRequest(req) {
 
   return req;
 }
+// ===================== SPLIT normalize-html : END   =====================
 
+
+// ===================== SPLIT handler-html : START =====================
 // ==============================
 // HANDLER HTML (network-first)
 // ==============================
@@ -149,7 +159,10 @@ async function handleHtmlFetch(event, req) {
     );
   }
 }
+// ===================== SPLIT handler-html : END   =====================
 
+
+// ===================== SPLIT handler-svg : START =====================
 // ==============================
 // HANDLER SVG (network-first, match ignoring search)
 // ==============================
@@ -169,7 +182,10 @@ async function handleSvgFetch(req) {
     return new Response('', { status: 504 });
   }
 }
+// ===================== SPLIT handler-svg : END   =====================
 
+
+// ===================== SPLIT handler-static : START =====================
 // ==============================
 // HANDLER STATICI (SWR coerente + ignoreSearch)
 // ==============================
@@ -202,7 +218,10 @@ async function handleStaticFetch(event, req) {
     return new Response('', { status: 504 });
   }
 }
+// ===================== SPLIT handler-static : END   =====================
 
+
+// ===================== SPLIT lifecycle-install : START =====================
 // ==============================
 // INSTALL (robusto: non fallisce se manca 1 asset)
 // ==============================
@@ -218,7 +237,10 @@ self.addEventListener('install', event => {
     await self.skipWaiting();
   })());
 });
+// ===================== SPLIT lifecycle-install : END   =====================
 
+
+// ===================== SPLIT lifecycle-activate : START =====================
 // ==============================
 // ACTIVATE
 // ==============================
@@ -236,7 +258,10 @@ self.addEventListener('activate', event => {
     await self.clients.claim();
   })());
 });
+// ===================== SPLIT lifecycle-activate : END   =====================
 
+
+// ===================== SPLIT messages : START =====================
 // ==============================
 // MESSAGGI
 // ==============================
@@ -245,7 +270,10 @@ self.addEventListener('message', ev => {
     self.skipWaiting();
   }
 });
+// ===================== SPLIT messages : END   =====================
 
+
+// ===================== SPLIT fetch : START =====================
 // ==============================
 // FETCH
 // ==============================
@@ -273,3 +301,4 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(handleStaticFetch(event, req));
 });
+// ===================== SPLIT fetch : END   =====================

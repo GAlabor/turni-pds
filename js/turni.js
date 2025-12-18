@@ -8,13 +8,16 @@
 // - Deleghe Turno Iniziale a turni-start.js
 // ============================
 
+// ===================== SPLIT bootstrap_guard : START =====================
 (function () {
   if (!window.AppConfig) {
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (turni.js)");
   }
 
   let exitEditModeImpl = function () {};
+// ===================== SPLIT bootstrap_guard : END   =====================
 
+// ===================== SPLIT init_panel_entry : START =====================
   function initTurniPanel() {
     const settingsView = document.querySelector(".view-settings");
     if (!settingsView) return;
@@ -23,7 +26,9 @@
       console.error("Turni: TurniStorage o TurniRender non disponibili");
       return;
     }
+// ===================== SPLIT init_panel_entry : END   =====================
 
+// ===================== SPLIT storage_render_deps : START =====================
     const {
       loadTurni,
       saveTurni,
@@ -33,7 +38,9 @@
     } = window.TurniStorage;
 
     const { renderTurni, applySiglaFontSize } = window.TurniRender;
+// ===================== SPLIT storage_render_deps : END   =====================
 
+// ===================== SPLIT panel_refs : START =====================
     const panelTurni = settingsView.querySelector('.settings-panel.settings-turni[data-settings-id="turni"]');
     const panelAdd   = settingsView.querySelector('.settings-panel.settings-turni-add[data-settings-id="turni-add"]');
     if (!panelTurni || !panelAdd) return;
@@ -84,7 +91,9 @@
 
     const defaultAddTitle = panelAdd.dataset.settingsTitle || "Aggiungi turno";
     const editTitle       = "Modifica turno";
+// ===================== SPLIT panel_refs : END   =====================
 
+// ===================== SPLIT state_and_helpers : START =====================
     let turni = loadTurni();
     let isEditing = false;
     let isCollapsed = cardEl.classList.contains("is-collapsed");
@@ -123,7 +132,9 @@
 
     refreshList();
     applyCollapsedState();
+// ===================== SPLIT state_and_helpers : END   =====================
 
+// ===================== SPLIT visualizza_turnazione_toggle : START =====================
     // ----------------------------
     // Toggle visualizza turnazione
     // ----------------------------
@@ -154,7 +165,9 @@
         }
       });
     }
+// ===================== SPLIT visualizza_turnazione_toggle : END   =====================
 
+// ===================== SPLIT no_time_toggle_helper : START =====================
     // ----------------------------
     // Helper: turno senza orario
     // ----------------------------
@@ -170,7 +183,9 @@
 
       panelAdd.classList.toggle("turni-no-time-on", isNoTime);
     }
+// ===================== SPLIT no_time_toggle_helper : END   =====================
 
+// ===================== SPLIT form_errors : START =====================
     // ----------------------------
     // Errori form
     // ----------------------------
@@ -204,7 +219,9 @@
     [inputNome, inputInizio, inputFine].forEach(inp => {
       inp.addEventListener("input", () => inp.classList.remove("is-invalid"));
     });
+// ===================== SPLIT form_errors : END   =====================
 
+// ===================== SPLIT color_and_sigla_preview : START =====================
     // ----------------------------
     // Colore sigla + anteprima
     // ----------------------------
@@ -227,7 +244,9 @@
       inputSigla.classList.remove("is-invalid");
       updateSiglaPreview();
     });
+// ===================== SPLIT color_and_sigla_preview : END   =====================
 
+// ===================== SPLIT form_reset_and_open : START =====================
     // ----------------------------
     // Form: reset / open new / open edit
     // ----------------------------
@@ -292,7 +311,9 @@
         SettingsUI.openPanel("turni-add", { internal: true });
       }
     }
+// ===================== SPLIT form_reset_and_open : END   =====================
 
+// ===================== SPLIT no_time_toggle_events : START =====================
     // ----------------------------
     // Toggle "Turno senza orario"
     // ----------------------------
@@ -302,7 +323,9 @@
       isNoTime = !isNoTime;
       applyNoTimeState();
     });
+// ===================== SPLIT no_time_toggle_events : END   =====================
 
+// ===================== SPLIT open_add_panel_event : START =====================
     // ----------------------------
     // Apertura pannello "Aggiungi turno"
     // ----------------------------
@@ -310,7 +333,9 @@
       e.stopPropagation();
       openNewTurnoPanel();
     });
+// ===================== SPLIT open_add_panel_event : END   =====================
 
+// ===================== SPLIT save_turno_handler : START =====================
     // ----------------------------
     // Salvataggio nuovo turno / modifica turno
     // ----------------------------
@@ -360,7 +385,9 @@
         SettingsUI.openPanel("turni", { internal: true });
       }
     });
+// ===================== SPLIT save_turno_handler : END   =====================
 
+// ===================== SPLIT interactions_module_attach : START =====================
     // ----------------------------
     // Interactions: collapse / edit / row click / drag / reset on exit
     // ----------------------------
@@ -426,7 +453,9 @@
         }
       });
     }
+// ===================== SPLIT interactions_module_attach : END   =====================
 
+// ===================== SPLIT init_turnazioni_module : START =====================
     // ----------------------------
     // Init Turnazioni (modulo separato)
     // ----------------------------
@@ -441,14 +470,18 @@
         visualHintEl: visualHint
       });
     }
+// ===================== SPLIT init_turnazioni_module : END   =====================
 
+// ===================== SPLIT init_turni_start_module : START =====================
     // ----------------------------
     // Init Turno Iniziale (modulo separato)
     // ----------------------------
     if (window.TurniStart && typeof TurniStart.init === "function") {
       TurniStart.init({ panelTurni });
     }
+// ===================== SPLIT init_turni_start_module : END   =====================
 
+// ===================== SPLIT api_exit_edit_mode : START =====================
     // ----------------------------
     // API: uscita forzata modalità Modifica
     // ----------------------------
@@ -458,7 +491,9 @@
       refreshList();
     };
   }
+// ===================== SPLIT api_exit_edit_mode : END   =====================
 
+// ===================== SPLIT export_public_api : START =====================
   window.Turni = {
     init: initTurniPanel,
     getTurni: function () {
@@ -474,3 +509,4 @@
     syncTurnoInizialeUI: function () {}
   };
 })();
+// ===================== SPLIT export_public_api : END   =====================

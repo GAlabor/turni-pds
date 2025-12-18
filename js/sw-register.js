@@ -4,6 +4,7 @@
 // Service worker + versione
 // ============================
 
+// ===================== SPLIT bootstrap : START =====================
 (function () {
   if (!("serviceWorker" in navigator)) return;
   if (!window.AppConfig) {
@@ -14,7 +15,9 @@
   const BASE       = PATHS.base;
   const SCOPE      = PATHS.swScope || `${BASE}/`;
   const SW_URL_RAW = PATHS.swFile;
+// ===================== SPLIT bootstrap : END =====================
 
+  // ===================== SPLIT get_sw_version : START =====================
   // ----------------------------
   // Lettura versione dal file SW
   // ----------------------------
@@ -38,7 +41,9 @@
       return null;
     }
   }
+  // ===================== SPLIT get_sw_version : END =====================
 
+  // ===================== SPLIT version_label : START =====================
   // ----------------------------
   // Gestione label versione
   // ----------------------------
@@ -56,7 +61,9 @@
     const label = m ? m[1] : "";
     el.textContent = label;
   }
+  // ===================== SPLIT version_label : END =====================
 
+  // ===================== SPLIT register_sw : START =====================
   // ----------------------------
   // Registrazione SW
   // ----------------------------
@@ -109,7 +116,9 @@
       setVersionLabel("");
     }
   }
+  // ===================== SPLIT register_sw : END =====================
 
+  // ===================== SPLIT schedule_registration : START =====================
   // ----------------------------
   // Wrapper che RISPETTA l’offline
   // ----------------------------
@@ -127,10 +136,13 @@
     // Online → procedi normalmente
     registerSW();
   }
+  // ===================== SPLIT schedule_registration : END =====================
 
+  // ===================== SPLIT dom_ready_hook : START =====================
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", scheduleSWRegistration);
   } else {
     scheduleSWRegistration();
   }
 })();
+  // ===================== SPLIT dom_ready_hook : END =====================

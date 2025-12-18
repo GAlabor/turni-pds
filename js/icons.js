@@ -6,13 +6,17 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT bootstrap_guard_config : START =====================
   if (!window.AppConfig) {
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (icons.js)");
   }
 
   const { PATHS } = window.AppConfig;
   const SVG_BASE = PATHS.svgBase;
+  // ===================== SPLIT bootstrap_guard_config : END   =====================
 
+  // ===================== SPLIT util_load_svg_into_host : START =====================
   // ============================
   // Util: inietta un file SVG in un elemento con id dato
   // ============================
@@ -34,7 +38,9 @@
       console.error("Errore icona:", file, err);
     }
   }
+  // ===================== SPLIT util_load_svg_into_host : END   =====================
 
+  // ===================== SPLIT calendar_icon_dynamic_date : START =====================
   // ============================
   // Calendario: mese/giorno dinamici dentro calendar.svg
   // ============================
@@ -51,7 +57,9 @@
     if (monthEl) monthEl.textContent = months[now.getMonth()];
     if (dayEl)   dayEl.textContent   = now.getDate();
   }
+  // ===================== SPLIT calendar_icon_dynamic_date : END   =====================
 
+  // ===================== SPLIT tabbar_icons_loader : START =====================
   // ============================
   // Tabbar: 4 icone principali
   // (chiamato da app.js → Icons.initTabbar())
@@ -76,7 +84,9 @@
       tabbar.classList.add("tabbar-icons-ready");
     }
   }
+  // ===================== SPLIT tabbar_icons_loader : END   =====================
 
+  // ===================== SPLIT status_icon_loader : START =====================
   // ============================
   // Icona stato / login:
   // - SVG login.svg dentro #icoStatus
@@ -85,7 +95,9 @@
   async function loadStatusIcon() {
     await loadSVGInto("icoStatus", "login.svg");
   }
+  // ===================== SPLIT status_icon_loader : END   =====================
 
+  // ===================== SPLIT public_api_exports : START =====================
   // ============================
   // API pubblica
   // ============================
@@ -93,4 +105,6 @@
     initTabbar: loadTabbarIcons,
     loadStatusIcon
   };
+  // ===================== SPLIT public_api_exports : END   =====================
+
 })();

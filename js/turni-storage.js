@@ -4,6 +4,8 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT bootstrap_config : START =====================
   if (!window.AppConfig) {
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (turni-storage.js)");
   }
@@ -19,7 +21,9 @@
 
   // ✅ Turno iniziale
   const TURNI_START_KEY = STORAGE_KEYS.turniStart;
+  // ===================== SPLIT bootstrap_config : END   =====================
 
+  // ===================== SPLIT storage_turni_personalizzati : START =====================
   // ============================
   // Storage: turni personalizzati
   // ============================
@@ -46,7 +50,9 @@
       console.warn("Salvataggio turni fallito:", e);
     }
   }
+  // ===================== SPLIT storage_turni_personalizzati : END   =====================
 
+  // ===================== SPLIT storage_toggle_visualizzazione_turnazione : START =====================
   // ============================
   // Storage: toggle visualizzazione turnazione
   // ============================
@@ -73,7 +79,9 @@
       console.warn("Salvataggio toggle turnazione fallito:", e);
     }
   }
+  // ===================== SPLIT storage_toggle_visualizzazione_turnazione : END   =====================
 
+  // ===================== SPLIT storage_turnazioni : START =====================
   // ============================
   // ✅ Storage: turnazioni
   // ============================
@@ -125,7 +133,9 @@
       console.warn("Salvataggio preferita fallito:", e);
     }
   }
+  // ===================== SPLIT storage_turnazioni : END   =====================
 
+  // ===================== SPLIT storage_turno_iniziale : START =====================
   // ============================
   // ✅ Storage: turno iniziale
   // payload:
@@ -163,7 +173,9 @@
       console.warn("Salvataggio turno iniziale fallito:", e);
     }
   }
+  // ===================== SPLIT storage_turno_iniziale : END   =====================
 
+  // ===================== SPLIT util_validazione_orario : START =====================
   // ============================
   // Util: parsing / validazione orario
   // Accetta 00:00 .. 23:59 e 24:00
@@ -185,7 +197,9 @@
 
     return true;
   }
+  // ===================== SPLIT util_validazione_orario : END   =====================
 
+  // ===================== SPLIT export_api_pubblica : START =====================
   // ============================
   // API pubblica
   // ============================
@@ -207,4 +221,6 @@
     loadTurnoIniziale,
     saveTurnoIniziale
   };
+  // ===================== SPLIT export_api_pubblica : END   =====================
+
 })();

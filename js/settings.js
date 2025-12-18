@@ -6,16 +6,22 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT settings_api_container : START =====================
   // contenitore interno per esporre le funzioni reali
   const settingsApi = {
     showMainFn: null,
     showPanelFn: null
   };
+  // ===================== SPLIT settings_api_container : END   =====================
 
+  // ===================== SPLIT navigation_state : START =====================
   // Stato navigazione centralizzato
   let activePanelId = null; // null = main
   let pendingInternalNav = false;
+  // ===================== SPLIT navigation_state : END   =====================
 
+  // ===================== SPLIT change_listeners : START =====================
   // listeners cambio pannello
   const changeListeners = new Set();
 
@@ -24,13 +30,17 @@
       try { cb(prevId, nextId, meta || {}); } catch {}
     });
   }
+  // ===================== SPLIT change_listeners : END   =====================
 
+  // ===================== SPLIT internal_nav_flag : START =====================
   function consumeInternalNav() {
     const v = pendingInternalNav;
     pendingInternalNav = false;
     return v;
   }
+  // ===================== SPLIT internal_nav_flag : END   =====================
 
+  // ===================== SPLIT init_settings_navigation : START =====================
   function initSettingsNavigation() {
     const settingsView = document.querySelector(".view-settings");
     if (!settingsView) return;
@@ -45,6 +55,7 @@
 
     if (!main || !titleEl || !backBtn) return;
 
+    // ===================== SPLIT back_button_utils : START =====================
     // ----------------------------
     // Util: gestione pulsante back
     // ----------------------------
@@ -57,7 +68,9 @@
       backBtn.hidden = false;
       backBtn.style.display = "inline-flex";
     }
+    // ===================== SPLIT back_button_utils : END   =====================
 
+    // ===================== SPLIT header_title_logic : START =====================
     // ----------------------------
     // Header: titolo per main e pannelli
     // ----------------------------
@@ -87,7 +100,9 @@
       titleEl.textContent = `Impostazioni - ${label}`;
       showBackBtn();
     }
+    // ===================== SPLIT header_title_logic : END   =====================
 
+    // ===================== SPLIT view_switch_main_panel : START =====================
     // ----------------------------
     // Switch vista: main / pannelli
     // ----------------------------
@@ -135,14 +150,20 @@
 
       emitChange(prev, id, meta);
     }
+    // ===================== SPLIT view_switch_main_panel : END   =====================
 
+    // ===================== SPLIT expose_internal_functions : START =====================
     // esponi le funzioni interne all’API globale
     settingsApi.showMainFn  = showMain;
     settingsApi.showPanelFn = showPanel;
+    // ===================== SPLIT expose_internal_functions : END   =====================
 
+    // ===================== SPLIT initial_state : START =====================
     // stato iniziale → schermata principale senza freccia
     showMain({ reason: "init" });
+    // ===================== SPLIT initial_state : END   =====================
 
+    // ===================== SPLIT ui_events_rows_back : START =====================
     // ----------------------------
     // Eventi UI
     // ----------------------------
@@ -180,8 +201,11 @@
 
       showMain({ reason: "back" });
     });
+    // ===================== SPLIT ui_events_rows_back : END   =====================
   }
+  // ===================== SPLIT init_settings_navigation : END   =====================
 
+  // ===================== SPLIT global_api_settingsui : START =====================
   // ============================
   // API globale SettingsUI
   // ============================
@@ -222,4 +246,5 @@
       return function () { changeListeners.delete(cb); };
     }
   };
+  // ===================== SPLIT global_api_settingsui : END   =====================
 })();

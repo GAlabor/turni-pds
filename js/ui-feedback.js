@@ -4,6 +4,8 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT helper-create-temp-error : START =====================
   function createTempError(el, ms) {
     const duration = Number(ms) > 0 ? Number(ms) : 2000;
     let t = null;
@@ -29,6 +31,11 @@
 
     return { show, clear };
   }
+  // ===================== SPLIT helper-create-temp-error : END =======================
 
+
+  // ===================== SPLIT export-global : START =====================
   window.UIFeedback = { createTempError };
+  // ===================== SPLIT export-global : END =======================
+
 })();

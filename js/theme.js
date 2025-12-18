@@ -7,6 +7,8 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT guard_config : START =====================
   if (!window.AppConfig) {
     throw new Error("CONFIG.MISSING: AppConfig non disponibile (theme.js)");
   }
@@ -14,7 +16,10 @@
   const { STORAGE_KEYS, UI } = window.AppConfig;
   const THEME_KEY    = STORAGE_KEYS.theme;
   const THEME_LABELS = UI.themeLabels || {};
+  // ===================== SPLIT guard_config : END   =====================
 
+
+  // ===================== SPLIT apply_theme_html : START =====================
   // ============================
   // Applicazione tema a <html>
   // ============================
@@ -31,7 +36,10 @@
       root.removeAttribute("data-theme");
     }
   }
+  // ===================== SPLIT apply_theme_html : END   =====================
 
+
+  // ===================== SPLIT sync_ui_panel : START =====================
   // ============================
   // Sincronizzazione UI (pannello Tema)
   // ============================
@@ -68,7 +76,10 @@
       }
     });
   }
+  // ===================== SPLIT sync_ui_panel : END   =====================
 
+
+  // ===================== SPLIT storage_load_save : START =====================
   // ============================
   // Caricamento / salvataggio tema
   // ============================
@@ -102,7 +113,10 @@
       });
     });
   }
+  // ===================== SPLIT storage_load_save : END   =====================
 
+
+  // ===================== SPLIT public_init_export : START =====================
   // ============================
   // Init pubblico
   // ============================
@@ -119,4 +133,6 @@
   window.Theme = {
     init: initTheme
   };
+  // ===================== SPLIT public_init_export : END   =====================
+
 })();

@@ -7,6 +7,8 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT util_format_date : START =====================
   function formatDateShortISO(iso) {
     if (!iso || typeof iso !== "string") return "";
     const d = new Date(iso + "T00:00:00");
@@ -20,7 +22,9 @@
       return `${dd}/${mm}/${yy}`;
     }
   }
+  // ===================== SPLIT util_format_date : END   =====================
 
+  // ===================== SPLIT storage_preferred_turnazione : START =====================
   function getPreferredTurnazione() {
     if (!window.TurniStorage) return null;
     const { loadTurnazioni, loadPreferredTurnazioneId } = TurniStorage;
@@ -43,7 +47,9 @@
   function canUse() {
     return !!getPreferredTurnazione();
   }
+  // ===================== SPLIT storage_preferred_turnazione : END   =====================
 
+  // ===================== SPLIT dom_refs_state : START =====================
   let startRowBtn = null;
   let startSummaryEl = null;
   let startChevronEl = null;
@@ -60,14 +66,18 @@
 
   // visibilità condizionata dal toggle “visualizza turnazione”
   let visibleByToggle = true;
+  // ===================== SPLIT dom_refs_state : END   =====================
 
+  // ===================== SPLIT ui_enable_row : START =====================
   function setStartRowEnabled(enabled) {
     if (!startRowBtn) return;
     startRowBtn.classList.toggle("is-disabled", !enabled);
     startRowBtn.setAttribute("aria-disabled", enabled ? "false" : "true");
     if (startChevronEl) startChevronEl.style.display = enabled ? "" : "none";
   }
+  // ===================== SPLIT ui_enable_row : END   =====================
 
+  // ===================== SPLIT summary_builders : START =====================
   function buildStartSummaryText() {
     if (!window.TurniStorage) return "";
     const { loadTurnoIniziale } = TurniStorage;
@@ -132,7 +142,9 @@
 
     setStartRowEnabled(ok);
   }
+  // ===================== SPLIT summary_builders : END   =====================
 
+  // ===================== SPLIT navigation_open_panel : START =====================
   function openPanelStart() {
     if (!panelStart) return;
     if (!canUse()) return;
@@ -145,7 +157,9 @@
       SettingsUI.openPanel("turni-start", { internal: true });
     }
   }
+  // ===================== SPLIT navigation_open_panel : END   =====================
 
+  // ===================== SPLIT pick_list_render : START =====================
   function renderPickList() {
     if (!startPickList) return;
 
@@ -199,7 +213,9 @@
       startPickList.appendChild(row);
     }
   }
+  // ===================== SPLIT pick_list_render : END   =====================
 
+  // ===================== SPLIT visibility_sync : START =====================
   function syncVisibility(visualOn) {
     visibleByToggle = !!visualOn;
     if (startRowBtn) startRowBtn.hidden = !visibleByToggle;
@@ -207,7 +223,9 @@
     // anche se nascosta, allineiamo summary/abilitazione per coerenza
     syncSummaryUI();
   }
+  // ===================== SPLIT visibility_sync : END   =====================
 
+  // ===================== SPLIT external_hooks_sync : START =====================
   function syncFromTurnazioniChange() {
     // chiamata quando cambia preferita/lista turnazioni
     syncSummaryUI();
@@ -216,7 +234,9 @@
       renderPickList();
     }
   }
+  // ===================== SPLIT external_hooks_sync : END   =====================
 
+  // ===================== SPLIT init_bindings : START =====================
   function init(ctx) {
     if (!window.TurniStorage) return;
 
@@ -273,10 +293,14 @@
       window.Turni.syncTurnoInizialeUI = syncFromTurnazioniChange;
     }
   }
+  // ===================== SPLIT init_bindings : END   =====================
 
+  // ===================== SPLIT public_api : START =====================
   window.TurniStart = {
     init,
     syncVisibility,
     syncFromTurnazioniChange
   };
+  // ===================== SPLIT public_api : END   =====================
+
 })();

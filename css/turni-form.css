@@ -3,6 +3,8 @@
    FORM "AGGIUNGI TURNO"
    ========================= */
 
+/* ===================== SPLIT struttura_form : START ===================== */
+
 .turni-form {
   margin-top: 18px;
   display: flex;
@@ -76,9 +78,13 @@
   box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
 }
 
+/* ===================== SPLIT struttura_form : END ======================= */
+
 /* =========================
    CONTROLLI COLORE / PREVIEW SIGLA
    ========================= */
+
+/* ===================== SPLIT colore_preview_sigla : START ===================== */
 
 .turni-color-dot {
   margin-left: 4px;
@@ -132,9 +138,13 @@
   color: var(--text);
 }
 
+/* ===================== SPLIT colore_preview_sigla : END ======================= */
+
 /* =========================
    TOOLBAR "AGGIUNGI TURNO"
    ========================= */
+
+/* ===================== SPLIT toolbar_aggiungi_turno : START ===================== */
 
 .turni-add-toolbar {
   display: flex;
@@ -172,9 +182,13 @@
   display: none;
 }
 
+/* ===================== SPLIT toolbar_aggiungi_turno : END ======================= */
+
 /* =========================
    "TURNO SENZA ORARIO"
    ========================= */
+
+/* ===================== SPLIT turno_senza_orario : START ===================== */
 
 .turni-field-row-notime .turni-label {
   flex: 0 0 16ch;
@@ -204,9 +218,13 @@
   opacity: 0;
 }
 
+/* ===================== SPLIT turno_senza_orario : END ======================= */
+
 /* =========================
    RESPONSIVE (Turni form)
    ========================= */
+
+/* ===================== SPLIT responsive_turni_form : START ===================== */
 
 @media (max-width: 900px) {
   .turni-field-row {
@@ -225,3 +243,5 @@
     max-width: 9ch;
   }
 }
+
+/* ===================== SPLIT responsive_turni_form : END ======================= */

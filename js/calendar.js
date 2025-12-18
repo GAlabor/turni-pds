@@ -6,6 +6,9 @@
 // ============================
 
 (function () {
+
+// ===================== SPLIT costanti-e-stato : START =====================
+
   const monthNames = [
     "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
     "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
@@ -42,6 +45,11 @@
   let nextBtn = null;
   let calendarContainer = null;
 
+// ===================== SPLIT costanti-e-stato : END =====================
+
+
+// ===================== SPLIT util-day-cell-size : START =====================
+
   // ============================
   // Util: misura larghezza cella giorno → variabile CSS
   // ============================
@@ -58,6 +66,11 @@
 
     document.documentElement.style.setProperty("--cal-day-size", rect.width + "px");
   }
+
+// ===================== SPLIT util-day-cell-size : END =====================
+
+
+// ===================== SPLIT header-e-classi-mode : START =====================
 
   // ============================
   // Render header
@@ -93,6 +106,11 @@
       calendarContainer.classList.add("mode-years");
     }
   }
+
+// ===================== SPLIT header-e-classi-mode : END =====================
+
+
+// ===================== SPLIT render-giorni : START =====================
 
   // ============================
   // Render giorni
@@ -148,6 +166,11 @@
     updateDayCellSize();
   }
 
+// ===================== SPLIT render-giorni : END =====================
+
+
+// ===================== SPLIT render-mesi : START =====================
+
   // ============================
   // Render mesi
   // ============================
@@ -183,6 +206,11 @@
 
     updateHeader();
   }
+
+// ===================== SPLIT render-mesi : END =====================
+
+
+// ===================== SPLIT render-anni : START =====================
 
   // ============================
   // Render anni
@@ -220,6 +248,11 @@
     updateHeader();
   }
 
+// ===================== SPLIT render-anni : END =====================
+
+
+// ===================== SPLIT switch-modalita : START =====================
+
   // ============================
   // Switch modalità
   // ============================
@@ -246,6 +279,11 @@
       renderYears();
     }
   }
+
+// ===================== SPLIT switch-modalita : END =====================
+
+
+// ===================== SPLIT navigazione-frecce : START =====================
 
   // ============================
   // Navigazione frecce
@@ -297,6 +335,11 @@
     }
   }
 
+// ===================== SPLIT navigazione-frecce : END =====================
+
+
+// ===================== SPLIT click-fuori-calendario : START =====================
+
   // ============================
   // Click fuori dal calendario
   // ============================
@@ -325,6 +368,11 @@
       renderDays();
     });
   }
+
+// ===================== SPLIT click-fuori-calendario : END =====================
+
+
+// ===================== SPLIT api-pubblica-e-init : START =====================
 
   // ============================
   // API pubblica calendario
@@ -401,4 +449,7 @@
     getState,
     setState
   };
+
+// ===================== SPLIT api-pubblica-e-init : END =====================
+
 })();

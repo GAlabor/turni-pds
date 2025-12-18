@@ -3,11 +3,18 @@
    TURNAZIONI — PANNELLO "AGGIUNGI TURNAZIONE"
    ========================= */
 
+/* ===================== SPLIT layout-wrap : START ===================== */
+
 .turnazioni-add-wrap{
   display:flex;
   flex-direction:column;
   gap:10px;
 }
+
+/* ===================== SPLIT layout-wrap : END   ===================== */
+
+
+/* ===================== SPLIT pannello-add-scroll : START ===================== */
 
 /* =========================
    Scroll pannello "Aggiungi turnazione"
@@ -18,6 +25,11 @@
   -webkit-overflow-scrolling: touch;
   padding-bottom: calc(90px + env(safe-area-inset-bottom));
 }
+
+/* ===================== SPLIT pannello-add-scroll : END   ===================== */
+
+
+/* ===================== SPLIT card-nome : START ===================== */
 
 /* =========================
    CARD 0 — "Nome" (come "Aggiungi turno")
@@ -32,6 +44,11 @@
   width: 100%;
   max-width: 100%;
 }
+
+/* ===================== SPLIT card-nome : END   ===================== */
+
+
+/* ===================== SPLIT card-giorni-rotazione : START ===================== */
 
 /* =========================
    CARD 1 — "Giorni Rotazione"
@@ -67,6 +84,11 @@
   color: var(--subtext);
   font-weight: 500;
 }
+
+/* ===================== SPLIT card-giorni-rotazione : END   ===================== */
+
+
+/* ===================== SPLIT card-rotazione-contenitore : START ===================== */
 
 /* =========================
    CARD 2 — Rotazione (contenitore)
@@ -111,6 +133,11 @@
   color: var(--subtext);
   font-size: var(--fs-row-subtext);
 }
+
+/* ===================== SPLIT card-rotazione-contenitore : END   ===================== */
+
+
+/* ===================== SPLIT grid-pill-rotazione : START ===================== */
 
 /* =========================
    GRID pill rotazione (1..7)
@@ -202,6 +229,11 @@
   line-height: 1;         /* evita differenze verticali */
 }
 
+/* ===================== SPLIT grid-pill-rotazione : END   ===================== */
+
+
+/* ===================== SPLIT card-giorni-riposo : START ===================== */
+
 /* =========================
    ✅ NUOVA CARD — "Giorni di Riposo" (1 / 2)
    ========================= */
@@ -266,6 +298,11 @@
   box-shadow: 0 0 0 2px rgba(10,132,255,0.25);
 }
 
+/* ===================== SPLIT card-giorni-riposo : END   ===================== */
+
+
+/* ===================== SPLIT card-riposo-espandibile : START ===================== */
+
 /* =========================
    CARD 3/4 — "Riposo" (espandibile via .is-on)
    ========================= */
@@ -312,6 +349,11 @@
   max-width: 9ch;
   text-align: center;
 }
+
+/* ===================== SPLIT card-riposo-espandibile : END   ===================== */
+
+
+/* ===================== SPLIT help-riposo : START ===================== */
 
 /* =========================
    HELP "?" + TOAST (Riposo)
@@ -378,6 +420,11 @@
   font-size: var(--fs-row-subtext);
   box-shadow: var(--shadow-soft);
 }
+
+/* ===================== SPLIT help-riposo : END   ===================== */
+
+
+/* ===================== SPLIT pannello-pick-turno : START ===================== */
 
 /* =========================
    PANNELLO PICK TURNO (pagina)
@@ -490,6 +537,11 @@
   color: var(--subtext);
 }
 
+/* ===================== SPLIT pannello-pick-turno : END   ===================== */
+
+
+/* ===================== SPLIT lista-turnazioni-card : START ===================== */
+
 /* =========================
    TURNAZIONI — LISTA CARD (nel pannello Turni)
    ========================= */
@@ -564,3 +616,4 @@
   text-align: left;
 }
 
+/* ===================== SPLIT lista-turnazioni-card : END   ===================== */

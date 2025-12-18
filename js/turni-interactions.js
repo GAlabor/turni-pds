@@ -10,11 +10,16 @@
 // ============================
 
 (function () {
+
+// ===================== SPLIT helpers : START =====================
   function safeClosest(target, selector) {
     try { return target && target.closest ? target.closest(selector) : null; }
     catch { return null; }
   }
+// ===================== SPLIT helpers : END =====================
 
+
+// ===================== SPLIT collapsible-card : START =====================
   function attachCollapsibleCard(opts) {
     const {
       cardEl,
@@ -60,7 +65,10 @@
     apply();
     return { apply };
   }
+// ===================== SPLIT collapsible-card : END =====================
 
+
+// ===================== SPLIT edit-toggle : START =====================
   function attachEditToggle(opts) {
     const { btnEdit, canEdit, getEditing, setEditing, refresh } = opts || {};
     if (!btnEdit) return;
@@ -75,7 +83,10 @@
       if (typeof refresh === "function") refresh();
     });
   }
+// ===================== SPLIT edit-toggle : END =====================
 
+
+// ===================== SPLIT row-edit-click : START =====================
   function attachRowEditClick(opts) {
     const {
       listEl,
@@ -103,7 +114,10 @@
       if (typeof onEditRow === "function") onEditRow(idx);
     });
   }
+// ===================== SPLIT row-edit-click : END =====================
 
+
+// ===================== SPLIT drag-sort : START =====================
   function attachDragSort(opts) {
     const { listEl, getEditing, getItems, setItems, saveItems, refresh } = opts || {};
     if (!listEl) return;
@@ -225,12 +239,16 @@
       document.addEventListener("pointerup", onPointerUp);
     });
   }
+// ===================== SPLIT drag-sort : END =====================
+
 
   // ----------------------------
   // Reset quando esci dal pannello "turni"
   // Ora preferisce SettingsUI.onChange per capire prev/next,
   // e usa SettingsUI.consumeInternalNav() per distinguere nav interne.
   // ----------------------------
+
+// ===================== SPLIT panel-exit-reset : START =====================
   function attachPanelExitReset(opts) {
     const { panelEl, onExit } = opts || {};
     if (!panelEl) return;
@@ -275,7 +293,10 @@
     obs.observe(panelEl, { attributes: true, attributeFilter: ["class"] });
     return { disconnect: () => obs.disconnect() };
   }
+// ===================== SPLIT panel-exit-reset : END =====================
 
+
+// ===================== SPLIT exports : START =====================
   window.TurniInteractions = {
     attachCollapsibleCard,
     attachEditToggle,
@@ -283,4 +304,6 @@
     attachDragSort,
     attachPanelExitReset
   };
+// ===================== SPLIT exports : END =====================
+
 })();

@@ -6,6 +6,8 @@
 // ============================
 
 (function () {
+
+  // ===================== SPLIT tabbar_switch_viste : START =====================
   // ============================
   // Tabbar: switch viste principali
   // ============================
@@ -79,7 +81,10 @@
       });
     });
   }
+  // ===================== SPLIT tabbar_switch_viste : END   =====================
 
+
+  // ===================== SPLIT bootstrap_domcontentloaded : START =====================
   // ============================
   // Bootstrap all’avvio
   // ============================
@@ -121,4 +126,6 @@
       Turni.init();
     }
   });
+  // ===================== SPLIT bootstrap_domcontentloaded : END   =====================
+
 })();
