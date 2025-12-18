@@ -418,6 +418,12 @@
       visualHintEl.textContent = (pick && pick.name) ? pick.name : "Turnazione";
     }
 
+    function notifyTurniStartUI() {
+      if (window.Turni && typeof Turni.syncTurnoInizialeUI === "function") {
+        Turni.syncTurnoInizialeUI();
+      }
+    }
+
     function renderTurnazioniCards() {
       if (!turnazioniListEl) return;
 
@@ -439,6 +445,7 @@
 
       if (!has) {
         syncVisualizzaTurnazioneHint();
+        notifyTurniStartUI();
         return;
       }
 
@@ -478,12 +485,14 @@
           if (hasStorage) TurniStorage.savePreferredTurnazioneId(preferredId);
           renderTurnazioniCards();
           syncVisualizzaTurnazioneHint();
+          notifyTurniStartUI();
         });
 
         turnazioniListEl.appendChild(btn);
       });
 
       syncVisualizzaTurnazioneHint();
+      notifyTurniStartUI();
     }
 
     // ----------------------------

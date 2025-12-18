@@ -44,6 +44,9 @@
       turnazioni: "turnipds-turnazioni",
       turnazioniPreferred: "turnipds-turnazioni-preferred",
 
+      // ✅ Imposta turno iniziale (data + indice turno rotazione)
+      turniStart: "turnipds-turni-start",
+
       // Chiavi future (NON usate al momento)
       indennita: "turnipds-indennita",
       festivita: "turnipds-festivita",

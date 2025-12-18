@@ -17,6 +17,9 @@
   const TURNAZIONI_KEY = STORAGE_KEYS.turnazioni;
   const TURNAZIONI_PREF_KEY = STORAGE_KEYS.turnazioniPreferred;
 
+  // ✅ Turno iniziale
+  const TURNI_START_KEY = STORAGE_KEYS.turniStart;
+
   // ============================
   // Storage: turni personalizzati
   // ============================
@@ -124,6 +127,44 @@
   }
 
   // ============================
+  // ✅ Storage: turno iniziale
+  // payload:
+  // { date: "YYYY-MM-DD" | "", slotIndex: number | null }
+  // ============================
+
+  function loadTurnoIniziale() {
+    try {
+      const raw = localStorage.getItem(TURNI_START_KEY);
+      if (!raw) return { date: "", slotIndex: null };
+      const parsed = JSON.parse(raw) || {};
+      return {
+        date: (typeof parsed.date === "string") ? parsed.date : "",
+        slotIndex: (Number.isInteger(parsed.slotIndex) ? parsed.slotIndex : null)
+      };
+    } catch {
+      return { date: "", slotIndex: null };
+    }
+  }
+
+  function saveTurnoIniziale(obj) {
+    try {
+      const payload = obj && typeof obj === "object" ? obj : {};
+      const out = {
+        date: (typeof payload.date === "string") ? payload.date : "",
+        slotIndex: (Number.isInteger(payload.slotIndex) ? payload.slotIndex : null)
+      };
+
+      localStorage.setItem(TURNI_START_KEY, JSON.stringify(out));
+
+      if (window.Status && typeof Status.markSaved === "function") {
+        Status.markSaved();
+      }
+    } catch (e) {
+      console.warn("Salvataggio turno iniziale fallito:", e);
+    }
+  }
+
+  // ============================
   // Util: parsing / validazione orario
   // Accetta 00:00 .. 23:59 e 24:00
   // ============================
@@ -160,6 +201,10 @@
     loadTurnazioni,
     saveTurnazioni,
     loadPreferredTurnazioneId,
-    savePreferredTurnazioneId
+    savePreferredTurnazioneId,
+
+    // ✅ Turno iniziale
+    loadTurnoIniziale,
+    saveTurnoIniziale
   };
 })();

@@ -152,6 +152,18 @@
         return;
       }
 
+      // ✅ Caso speciale 1b: turno iniziale -> torna a Turni
+      if (activePanelId === "turni-start") {
+        showPanel("turni");
+        return;
+      }
+
+      // ✅ Caso speciale 1c: picker turno iniziale -> torna a turno iniziale
+      if (activePanelId === "turni-start-pick") {
+        showPanel("turni-start");
+        return;
+      }
+
       // Caso speciale 2: se siamo nel pannello "Aggiungi turnazione",
       // stesso comportamento: si torna a "Turni".
       if (activePanelId === "turnazioni-add") {
@@ -184,7 +196,7 @@
       }
     },
 
-    // usato da turni.js per aprire pannelli specifici (es. "turni-add", "turnazioni-add")
+    // usato da turni.js per aprire pannelli specifici
     openPanel: function (id) {
       if (typeof settingsApi.showPanelFn === "function") {
         settingsApi.showPanelFn(id);

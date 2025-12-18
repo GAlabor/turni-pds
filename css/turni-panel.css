@@ -270,7 +270,6 @@ body.turni-no-select * {
    ========================= */
 
 .turni-visual-card {
-  /* separazione leggermente più evidente dal blocco sotto */
   margin-top: 0;
   margin-bottom: 10px;
 }
@@ -279,6 +278,79 @@ body.turni-no-select * {
   margin: 6px 2px 0 2px;
   font-size: var(--fs-turni-form-hint);
   color: var(--subtext);
+}
+
+/* ✅ Riga inline dentro la card "Visualizza Turnazione" */
+.turni-inline-row {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 12px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.turni-inline-row-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.turni-inline-row-label {
+  font-size: var(--fs-turni-form-label);
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.turni-inline-row-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.turni-inline-row-summary {
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+  white-space: nowrap;
+}
+
+.turni-inline-row-chevron svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--subtext);
+}
+
+/* Stato disabilitato (come "Modifica" quando è spento) */
+.turni-inline-row.is-disabled {
+  background: transparent;
+  color: var(--subtext);
+  border-color: rgba(148,163,184,0.35);
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+
+.turni-inline-row.is-disabled .turni-inline-row-label {
+  color: var(--subtext);
+}
+
+.turni-inline-row.is-disabled .turni-inline-row-chevron {
+  display: none;
 }
 
 /* =========================
