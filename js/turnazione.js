@@ -8,6 +8,7 @@
 //   - "Imposta come giorno di riposo" nel picker + badge "R" nella pill
 //   - ✅ Card "Giorni di Riposo" (1 / 2) che limita quanti giorni riposo puoi impostare
 //   - ✅ Salvataggio turnazione + lista card selezionabili come preferita
+//   - ✅ RESET form quando esci da "Aggiungi turnazione" senza salvare
 // ============================
 
 (function () {
@@ -64,6 +65,19 @@
 
     // card "Giorni di Riposo" (1/2)
     const restDaysBtns = panelAdd.querySelectorAll('[data-turnazioni-rest-days]');
+
+    // ============================
+    // ✅ Dirty tracking + anti-reset-after-save
+    // ============================
+    let isDirty = false;
+    let lastSaveTs = 0;
+
+    function markDirty() { isDirty = true; }
+
+    function isGoingToPickPanel() {
+      // quando passi da add -> pick NON devi resettare
+      return !!(panelPick && panelPick.classList.contains("is-active"));
+    }
 
     // stato rotazione
     let rotationDaysCount = null;                // 1..7 o null
@@ -196,6 +210,7 @@
       syncRestDaysCardUI();
       syncRestToggleUI();
       renderDaysGrid(rotationDaysCount);
+      markDirty();
     }
 
     if (restDaysBtns && restDaysBtns.length) {
@@ -236,6 +251,7 @@
 
       syncRestToggleUI();
       renderDaysGrid(rotationDaysCount);
+      markDirty();
     }
 
     if (restToggleEl) {
@@ -269,6 +285,7 @@
       if (index == null || index < 0 || index > 6) return;
       rotationSlots[index] = turnoObj || null;
       renderDaysGrid(rotationDaysCount);
+      markDirty();
     }
 
     function renderPickList() {
@@ -498,6 +515,11 @@
     // ----------------------------
     // ✅ Salvataggio turnazione
     // ----------------------------
+
+    // ✅ refs per reset riposi (Lun/Mar)
+    let riposo1Reset = null;
+    let riposo2Reset = null;
+
     function resetTurnazioneForm() {
       clearError();
 
@@ -512,6 +534,13 @@
       syncRestDaysCardUI();
 
       renderDaysGrid(null);
+
+      // ✅ reset riposi lunedì/martedì (toggle OFF + campi vuoti + body chiuso)
+      if (typeof riposo1Reset === "function") riposo1Reset();
+      if (typeof riposo2Reset === "function") riposo2Reset();
+
+      // ✅ reset dirty
+      isDirty = false;
     }
 
     function validateTurnazione() {
@@ -573,6 +602,10 @@
         preferredId = String(payload.id);
         TurniStorage.savePreferredTurnazioneId(preferredId);
 
+        // ✅ segna salvataggio (anti reset immediato)
+        lastSaveTs = Date.now();
+        isDirty = false;
+
         // aggiorna UI pannello Turni
         renderTurnazioniCards();
         syncVisualizzaTurnazioneHint();
@@ -593,8 +626,14 @@
     if (select && input && grid) {
       renderDaysGrid(null);
 
+      if (nameInput) {
+        nameInput.addEventListener("input", markDirty);
+      }
+
       // Desktop select
       select.addEventListener("change", () => {
+        markDirty();
+
         const v = Number(select.value) || null;
         input.value = select.value;
 
@@ -617,6 +656,8 @@
         const v = Number(last);
 
         if (!v || v < 1 || v > 7) {
+          markDirty();
+
           input.value = "";
           if (select) select.value = "";
           rotationSlots = new Array(7).fill(null);
@@ -624,6 +665,8 @@
           renderDaysGrid(null);
           return;
         }
+
+        markDirty();
 
         input.value = last;
         if (select) select.value = last;
@@ -667,7 +710,7 @@
       const colorPrev  = panelAdd.querySelector(colorPrevSel);
       const siglaPrev  = panelAdd.querySelector(siglaPrevSel);
 
-      if (!cardEl || !toggleBtn || !bodyEl) return;
+      if (!cardEl || !toggleBtn || !bodyEl) return { reset: function () {} };
 
       let on = false;
 
@@ -702,25 +745,37 @@
         bodyEl.hidden = !on;
       }
 
+      // ✅ aggiunto: reset completo per questa card (usato da resetTurnazioneForm)
+      function reset() {
+        on = false;
+        clearFields();
+        applyState();
+      }
+
       bodyEl.hidden = true;
-      clearFields();
-      applyState();
+      reset();
 
       toggleBtn.addEventListener("click", () => {
         on = !on;
+        markDirty();
         if (!on) clearFields();
         applyState();
       });
 
       if (colorInput) {
-        colorInput.addEventListener("input", applyColorPreview);
-        colorInput.addEventListener("change", applyColorPreview);
+        colorInput.addEventListener("input", () => { markDirty(); applyColorPreview(); });
+        colorInput.addEventListener("change", () => { markDirty(); applyColorPreview(); });
       }
 
       if (inputSigla) {
         inputSigla.addEventListener("input", () => {
+          markDirty();
           updateSiglaPreview();
         });
+      }
+
+      if (inputNome) {
+        inputNome.addEventListener("input", markDirty);
       }
 
       if (helpBtn && helpToast) {
@@ -741,9 +796,11 @@
           showToast();
         });
       }
+
+      return { reset };
     }
 
-    initRiposoCard({
+    const riposo1 = initRiposoCard({
       cardSel:      "[data-turnazioni-riposo-card]",
       toggleSel:    "[data-turnazioni-riposo-toggle]",
       bodySel:      "[data-turnazioni-riposo-body]",
@@ -756,7 +813,7 @@
       siglaPrevSel: "[data-turnazioni-riposo-sigla-preview]"
     });
 
-    initRiposoCard({
+    const riposo2 = initRiposoCard({
       cardSel:      "[data-turnazioni-riposo2-card]",
       toggleSel:    "[data-turnazioni-riposo2-toggle]",
       bodySel:      "[data-turnazioni-riposo2-body]",
@@ -769,9 +826,48 @@
       siglaPrevSel: "[data-turnazioni-riposo2-sigla-preview]"
     });
 
+    // ✅ collega i reset locali (senza cambiare altro)
+    riposo1Reset = riposo1 && typeof riposo1.reset === "function" ? riposo1.reset : null;
+    riposo2Reset = riposo2 && typeof riposo2.reset === "function" ? riposo2.reset : null;
+
     // ✅ render iniziale lista turnazioni
     renderTurnazioniCards();
     syncVisualizzaTurnazioneHint();
+
+    // =====================================================
+    // ✅ RESET quando esci da "Aggiungi turnazione" SENZA salvare
+    //    MA: non resettare quando vai su "turnazioni-pick"
+    // =====================================================
+    if (panelAdd) {
+      let wasActive = panelAdd.classList.contains("is-active");
+
+      const obs = new MutationObserver(() => {
+        const isActiveNow = panelAdd.classList.contains("is-active");
+
+        // transizione: active -> not active
+        if (wasActive && !isActiveNow) {
+          const justSaved = (Date.now() - lastSaveTs) < 800;
+
+          // se stiamo andando al picker: NON resettare
+          if (isGoingToPickPanel()) {
+            wasActive = isActiveNow;
+            return;
+          }
+
+          // se non ho salvato e ho toccato qualcosa: reset
+          if (!justSaved && isDirty) {
+            resetTurnazioneForm();
+          } else if (!justSaved && !isDirty) {
+            // comunque: se esci, meglio lasciare pulito per la prossima apertura
+            resetTurnazioneForm();
+          }
+        }
+
+        wasActive = isActiveNow;
+      });
+
+      obs.observe(panelAdd, { attributes: true, attributeFilter: ["class"] });
+    }
   }
 
   const Turnazione = {
