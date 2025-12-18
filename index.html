@@ -3,6 +3,7 @@
 
 <head>
   
+  <!-- ===================== SPLIT head-meta-pwa : START ===================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
@@ -18,7 +19,9 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
   <title>Turni PDS</title>
+  <!-- ===================== SPLIT head-meta-pwa : END ======================= -->
 
+  <!-- ===================== SPLIT head-css : START ========================== -->
   <!-- CSS -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/calendar.css">
@@ -30,11 +33,13 @@
 
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/tabbar.css">
+  <!-- ===================== SPLIT head-css : END ============================ -->
 
 </head>
 
 <body>
   
+  <!-- ===================== SPLIT svg-icon-sprite : START =================== -->
   <!-- ===================================================== -->
   <!-- SVG ICON SPRITE (famiglie separate, niente forzature) -->
   <!-- ===================================================== -->
@@ -73,14 +78,19 @@
 
     </defs>
   </svg>
+  <!-- ===================== SPLIT svg-icon-sprite : END ===================== -->
 
+  <!-- ===================== SPLIT status-icon : START ======================= -->
   <!-- ICONA STATO / SALVATAGGIO -->
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
   </div>
+  <!-- ===================== SPLIT status-icon : END ========================= -->
 
+  <!-- ===================== SPLIT app-shell : START ========================= -->
   <main class="app-shell">
 
+    <!-- ===================== SPLIT view-calendar : START =================== -->
     <!-- VISTA CALENDARIO -->
     <section class="view view-calendar is-active" data-view="calendar">
       <header class="app-header">
@@ -132,7 +142,9 @@
         </div>
       </div>
     </section>
+    <!-- ===================== SPLIT view-calendar : END ===================== -->
 
+    <!-- ===================== SPLIT view-inspag : START ===================== -->
     <!-- VISTA INSERIMENTI / PAGAMENTI -->
     <section class="view view-inspag" data-view="inspag">
       <header class="app-header">
@@ -145,7 +157,9 @@
         </p>
       </div>
     </section>
+    <!-- ===================== SPLIT view-inspag : END ======================= -->
 
+    <!-- ===================== SPLIT view-riepilogo : START ================== -->
     <!-- VISTA RIEPILOGO -->
     <section class="view view-riepilogo" data-view="riepilogo">
       <header class="app-header">
@@ -158,11 +172,14 @@
         </p>
       </div>
     </section>
+    <!-- ===================== SPLIT view-riepilogo : END ==================== -->
 
+    <!-- ===================== SPLIT view-settings : START =================== -->
     <!-- VISTA IMPOSTAZIONI -->
     <section class="view view-settings" data-view="settings">
 
 
+      <!-- ===================== SPLIT settings-header : START =============== -->
       <header class="app-header">
         <!-- Freccia BACK principale, visibile solo dentro i pannelli -->
         <button
@@ -179,11 +196,13 @@
         <!-- Titolo principale dinamico -->
         <h1 class="app-title" id="settingsTitle">Impostazioni</h1>
       </header>
-      
+      <!-- ===================== SPLIT settings-header : END ================= -->
 
+      <!-- ===================== SPLIT settings-container : START ============ -->
       <div class="settings-container">
 
         
+        <!-- ===================== SPLIT settings-main : START ================ -->
         <!-- Schermata principale impostazioni -->
         <div class="settings-main is-active">
 
@@ -283,7 +302,9 @@
           </div>
 
         </div>
+        <!-- ===================== SPLIT settings-main : END ================== -->
 
+        <!-- ===================== SPLIT panel-theme : START =================== -->
         <!-- PANNELLO TEMA -->
         <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-group">
@@ -304,19 +325,29 @@
             <span class="settings-choice-label" data-theme-label="dark"></span>
           </button>
         </div>
+        <!-- ===================== SPLIT panel-theme : END ===================== -->
 
+        <!-- ===================== SPLIT panel-indennita : START ============== -->
         <!-- PANNELLO INDENNITÀ -->
         <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
+        <!-- ===================== SPLIT panel-indennita : END ================ -->
 
+        <!-- ===================== SPLIT panel-festivita : START ============== -->
         <!-- PANNELLO FESTIVITÀ -->
         <div class="settings-panel settings-festivita" data-settings-id="festivita"></div>
+        <!-- ===================== SPLIT panel-festivita : END ================ -->
 
+        <!-- ===================== SPLIT panel-info : START ==================== -->
         <!-- PANNELLO INFO -->
         <div class="settings-panel settings-info" data-settings-id="info"></div>
+        <!-- ===================== SPLIT panel-info : END ====================== -->
 
+        <!-- ===================== SPLIT panel-updates : START ================= -->
         <!-- PANNELLO VERSIONE -->
         <div class="settings-panel settings-updates" data-settings-id="updates"></div>
+        <!-- ===================== SPLIT panel-updates : END =================== -->
 
+        <!-- ===================== SPLIT panel-turni : START =================== -->
         <!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
@@ -430,7 +461,9 @@
             </p>
           </div>
         </div>
+        <!-- ===================== SPLIT panel-turni : END ===================== -->
 
+        <!-- ===================== SPLIT panel-turni-add : START ============== -->
         <!-- PANNELLO AGGIUNGI TURNO -->
         <div
           class="settings-panel settings-turni-add"
@@ -528,7 +561,9 @@
             </div>
           </div>
         </div>
+        <!-- ===================== SPLIT panel-turni-add : END ================ -->
 
+        <!-- ===================== SPLIT panel-turni-start : START ============ -->
         <!-- ✅ AGGIUNTO: PANNELLO "IMPOSTA TURNO INIZIALE" -->
         <div
           class="settings-panel settings-turni-start"
@@ -573,7 +608,9 @@
 
           </div>
         </div>
+        <!-- ===================== SPLIT panel-turni-start : END ============== -->
 
+        <!-- ===================== SPLIT panel-turni-start-pick : START ======= -->
         <!-- ✅ AGGIUNTO: PANNELLO "SELEZIONA TURNO INIZIALE" -->
         <div
           class="settings-panel settings-turni-start-pick"
@@ -592,7 +629,9 @@
             </p>
           </div>
         </div>
+        <!-- ===================== SPLIT panel-turni-start-pick : END ========= -->
 
+        <!-- ===================== SPLIT panel-turnazioni-add : START ========= -->
         <!-- PANNELLO AGGIUNGI TURNAZIONE -->
         <div
           class="settings-panel settings-turnazioni-add"
@@ -858,7 +897,9 @@
 
           </div>
         </div>
+        <!-- ===================== SPLIT panel-turnazioni-add : END =========== -->
 
+        <!-- ===================== SPLIT panel-turnazioni-pick : START ======== -->
         <!-- NUOVO PANNELLO: SELEZIONA TURNO PER ROTAZIONE -->
         <div
           class="settings-panel settings-turnazioni-pick"
@@ -890,13 +931,18 @@
             </p>
           </div>
         </div>
+        <!-- ===================== SPLIT panel-turnazioni-pick : END ========== -->
 
       </div>
+      <!-- ===================== SPLIT settings-container : END ============== -->
 
     </section>
+    <!-- ===================== SPLIT view-settings : END ===================== -->
 
   </main>
+  <!-- ===================== SPLIT app-shell : END =========================== -->
 
+  <!-- ===================== SPLIT tabbar : START ============================ -->
   <!-- TABBAR IN BASSO -->
   <nav class="tabbar" aria-label="Barra schede">
     <button class="tab active" data-tab="calendar" aria-label="Calendario">
@@ -927,10 +973,14 @@
       <span class="tab-label">Impostazioni</span>
     </button>
   </nav>
+  <!-- ===================== SPLIT tabbar : END ============================== -->
   
 
+  <!-- ===================== SPLIT version-label : START ===================== -->
   <div id="versionLabel" class="version-label"></div>
+  <!-- ===================== SPLIT version-label : END ======================= -->
    
+  <!-- ===================== SPLIT scripts : START =========================== -->
   <!-- JS -->
   <script src="js/config.js" defer></script>
 
@@ -966,6 +1016,7 @@
 
   <!-- Compat: puoi anche toglierlo, ma se lo lasci non rompe -->
   <script src="js/turnazione.js" defer></script>
+  <!-- ===================== SPLIT scripts : END ============================= -->
 
 </body>
 </html>
