@@ -13,6 +13,9 @@
 // ============================
 
 (function () {
+	// espongo funzioni dopo init
+	let openEditTurnazioneImpl = null;
+	let clearEditTurnazioneImpl = null;
 // ===================== SPLIT helpers_formatting : START =====================
   function formatSigle(turnazione) {
     const n = Number(turnazione && turnazione.days) || 0;
@@ -42,6 +45,137 @@
   }
 // ===================== SPLIT helpers_formatting : END   =====================
 
+  // ===================== SPLIT render-lista-turnazioni : START =====================
+  // Render lista turnazioni con UI identica a Turni:
+  // - pulsante Modifica gestito come in TurniRender.renderTurni
+  // - in edit: pallino rosso (-) + handle drag
+  // - selezione: solo testo blu (accent)
+  function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
+    if (!listEl) return;
+
+    const opts = options || {};
+    const isEditing = !!opts.isEditing;
+    const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
+    const onSelect = typeof opts.onSelect === "function" ? opts.onSelect : null;
+    const preferredId = opts.preferredId != null ? String(opts.preferredId) : null;
+
+    listEl.innerHTML = "";
+
+    const has = Array.isArray(turnazioni) && turnazioni.length > 0;
+
+    if (!has) {
+      listEl.classList.remove("editing");
+
+      if (emptyHintEl) emptyHintEl.hidden = false;
+      if (editBtn) {
+        editBtn.disabled = true;
+        editBtn.classList.remove("icon-circle-btn");
+        editBtn.textContent = "Modifica";
+        editBtn.removeAttribute("aria-pressed");
+      }
+      return;
+    }
+
+    listEl.classList.toggle("editing", isEditing);
+
+    if (emptyHintEl) emptyHintEl.hidden = true;
+
+    if (editBtn) {
+      editBtn.disabled = false;
+
+      if (isEditing) {
+        editBtn.setAttribute("aria-pressed", "true");
+        editBtn.classList.add("icon-circle-btn");
+        editBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 12.5 L10 16.5 L18 7.5" />
+          </svg>
+        `;
+      } else {
+        editBtn.removeAttribute("aria-pressed");
+        editBtn.classList.remove("icon-circle-btn");
+        editBtn.textContent = "Modifica";
+      }
+    }
+
+    turnazioni.forEach((t, index) => {
+      const row = document.createElement("div");
+      row.className = "turno-item";
+      row.dataset.index = String(index);
+      row.dataset.turnazioneId = t && t.id != null ? String(t.id) : "";
+
+      const isSel = preferredId && t && String(t.id) === preferredId;
+      row.classList.toggle("is-selected", !!isSel);
+
+      if (isEditing && onDelete) {
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "turno-delete-btn";
+        delBtn.setAttribute("aria-label", "Elimina turnazione");
+
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "turno-delete-icon";
+        iconSpan.textContent = "−";
+        delBtn.appendChild(iconSpan);
+
+        delBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          onDelete(index);
+        });
+
+        row.appendChild(delBtn);
+      }
+
+      // Pill a sinistra: numero giorni (solo per coerenza layout)
+      const siglaPill = document.createElement("span");
+      siglaPill.className = "turno-sigla-pill";
+
+      const siglaEl = document.createElement("span");
+      siglaEl.className = "turno-sigla";
+      const days = Number(t && t.days) || 0;
+      siglaEl.textContent = days ? String(days) : "";
+      // stessa logica font-size dinamico dei Turni, se disponibile
+      if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
+        TurniRender.applySiglaFontSize(siglaEl, siglaEl.textContent);
+      }
+      siglaPill.appendChild(siglaEl);
+
+      const nameEl = document.createElement("span");
+      nameEl.className = "turno-name";
+      nameEl.textContent = (t && t.name) ? String(t.name) : "";
+
+      const metaEl = document.createElement("span");
+      metaEl.className = "turno-orario";
+      metaEl.textContent = formatSigle(t);
+
+      const handle = document.createElement("div");
+      handle.className = "turni-handle";
+      handle.setAttribute("aria-hidden", "true");
+      handle.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 7 H18" />
+          <path d="M6 12 H18" />
+          <path d="M6 17 H18" />
+        </svg>
+      `;
+
+      row.appendChild(siglaPill);
+      row.appendChild(nameEl);
+      row.appendChild(metaEl);
+      row.appendChild(handle);
+
+      // click normale: seleziona preferita (in edit mode ci pensa TurniInteractions.attachRowEditClick)
+      row.addEventListener("click", () => {
+        if (isEditing) return;
+        if (onSelect) onSelect(index);
+      });
+
+      listEl.appendChild(row);
+    });
+  }
+  // ===================== SPLIT render-lista-turnazioni : END =====================
+
 // ===================== SPLIT api_state_and_init : START =====================
   const api = {
     panelTurni: null,
@@ -58,12 +192,15 @@
       this.emptyEl = ctx && ctx.turnazioniEmptyEl ? ctx.turnazioniEmptyEl : null;
       this.visualHintEl = ctx && ctx.visualHintEl ? ctx.visualHintEl : null;
 
+      // opzionale: bottone modifica, per render identico a Turni
+      this.editBtn = ctx && ctx.turnazioniEditBtn ? ctx.turnazioniEditBtn : null;
+
       this.refresh();
     },
 // ===================== SPLIT api_state_and_init : END   =====================
 
 // ===================== SPLIT api_refresh_rendering : START =====================
-    refresh() {
+    refresh(options) {
       if (!window.TurniStorage) return;
 
       const hasStorage =
@@ -76,10 +213,7 @@
       this.saved = hasStorage ? TurniStorage.loadTurnazioni() : [];
       this.preferredId = hasStorage ? TurniStorage.loadPreferredTurnazioneId() : null;
 
-      if (this.listEl) this.listEl.innerHTML = "";
-
       const has = Array.isArray(this.saved) && this.saved.length > 0;
-      if (this.emptyEl) this.emptyEl.hidden = has;
 
       // preferita valida?
       if (this.preferredId && has) {
@@ -93,38 +227,29 @@
         TurniStorage.savePreferredTurnazioneId(this.preferredId);
       }
 
-      if (has && this.listEl) {
-        this.saved.forEach((t) => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "turnazione-mini-card";
+      const opts = options || {};
 
-          const isSel = this.preferredId && String(t.id) === String(this.preferredId);
-          btn.classList.toggle("is-selected", !!isSel);
-
-          const name = document.createElement("span");
-          name.className = "turnazione-mini-name";
-          name.textContent = t.name || "";
-
-          const sigle = document.createElement("span");
-          sigle.className = "turnazione-mini-sigle";
-          sigle.textContent = formatSigle(t);
-
-          btn.appendChild(name);
-          btn.appendChild(sigle);
-
-          btn.addEventListener("click", () => {
+      renderTurnazioni(
+        this.listEl,
+        this.saved,
+        this.emptyEl,
+        this.editBtn,
+        {
+          isEditing: !!opts.isEditing,
+          preferredId: this.preferredId,
+          onDelete: opts.onDelete,
+          onSelect: (idx) => {
+            const t = this.saved && this.saved[idx] ? this.saved[idx] : null;
+            if (!t) return;
             this.preferredId = String(t.id);
             if (hasStorage) TurniStorage.savePreferredTurnazioneId(this.preferredId);
-
-            this.refresh();
+            // re-render per highlight
+            this.refresh(options);
             this.syncVisualHint();
             this.notifyTurnoIniziale();
-          });
-
-          this.listEl.appendChild(btn);
-        });
-      }
+          }
+        }
+      );
 
       this.syncVisualHint();
       this.notifyTurnoIniziale();
@@ -276,6 +401,13 @@
 
     let savedTurnazioni = hasStorage ? TurniStorage.loadTurnazioni() : [];
     let preferredId     = hasStorage ? TurniStorage.loadPreferredTurnazioneId() : null;
+
+	    // ----------------------------
+	    // Modifica turnazione (stato edit)
+	    // ----------------------------
+	    let editingIndex = null; // number | null
+	    let editingId = null;    // string | null
+	    const originalPanelTitle = panelAdd.dataset.settingsTitle || "Aggiungi turnazione";
 // ===================== SPLIT storage_load_initial : END =======================
 
 // ===================== SPLIT errors_ui : START =====================
@@ -729,6 +861,67 @@
 
       isDirty = false;
     }
+
+	    function clearEditContext() {
+	      editingIndex = null;
+	      editingId = null;
+	      // ripristina titolo pannello
+	      panelAdd.dataset.settingsTitle = originalPanelTitle;
+	    }
+
+	    function enterEditTurnazione(turnazione, index) {
+	      if (!turnazione) return;
+	      editingIndex = (typeof index === "number") ? index : null;
+	      editingId = turnazione && turnazione.id != null ? String(turnazione.id) : null;
+	      panelAdd.dataset.settingsTitle = "Modifica turnazione";
+
+	      clearError();
+
+	      // nome
+	      if (nameInput) nameInput.value = (turnazione.name || "");
+
+	      // giorni
+	      const days = Number(turnazione.days) || null;
+	      rotationDaysCount = days;
+	      if (select) select.value = days ? String(days) : "";
+	      if (input) input.value = days ? String(days) : "";
+
+	      // slots
+	      rotationSlots = new Array(7).fill(null);
+	      const slots = Array.isArray(turnazione.slots) ? turnazione.slots : [];
+	      for (let i = 0; i < (days || 0); i++) {
+	        const s = slots[i];
+	        rotationSlots[i] = s ? {
+	          nome: s.nome || "",
+	          sigla: s.sigla || "",
+	          colore: s.colore || ""
+	        } : null;
+	      }
+
+	      // riposi
+	      restDaysAllowed = clampRestDaysAllowed(turnazione.restDaysAllowed);
+	      restDayIndices = Array.isArray(turnazione.restIndices)
+	        ? turnazione.restIndices.slice(0, restDaysAllowed)
+	        : [];
+	      normalizeRestIndicesToAllowed();
+	      syncRestDaysCardUI();
+
+	      renderDaysGrid(days);
+	      isDirty = false;
+	    }
+
+	    // funzioni esportate (dopo init)
+	    openEditTurnazioneImpl = function (turnazione, index) {
+	      enterEditTurnazione(turnazione, index);
+	      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+	        SettingsUI.openPanel("turnazioni-add", { internal: true });
+	      }
+	    };
+	    clearEditTurnazioneImpl = function () {
+	      clearEditContext();
+	    };
+
+
 // ===================== SPLIT reset_form : END =======================
 
 // ===================== SPLIT validate_and_payload : START =====================
@@ -749,7 +942,7 @@
       return { ok: true, name, days };
     }
 
-    function buildPayload(name, days) {
+	    function buildPayload(name, days, idOverride) {
       const slots = [];
       for (let i = 0; i < days; i++) {
         const s = rotationSlots[i];
@@ -760,8 +953,8 @@
         });
       }
 
-      return {
-        id: String(Date.now()),
+	      return {
+	        id: (idOverride != null) ? String(idOverride) : String(Date.now()),
         name,
         days,
         slots,
@@ -787,24 +980,35 @@
           return;
         }
 
-        const payload = buildPayload(v.name, v.days);
+	        // Se sto modificando: sovrascrivi l'elemento (stesso id)
+	        const payload = buildPayload(v.name, v.days, editingId);
 
-        savedTurnazioni = TurniStorage.loadTurnazioni();
-        savedTurnazioni.push(payload);
-        TurniStorage.saveTurnazioni(savedTurnazioni);
+	        savedTurnazioni = TurniStorage.loadTurnazioni();
+	        if (editingIndex !== null && editingIndex >= 0 && editingIndex < savedTurnazioni.length) {
+	          savedTurnazioni[editingIndex] = payload;
+	        } else {
+	          savedTurnazioni.push(payload);
+	        }
+	        TurniStorage.saveTurnazioni(savedTurnazioni);
 
-        preferredId = String(payload.id);
-        TurniStorage.savePreferredTurnazioneId(preferredId);
+	        // preferita: resta quella modificata/aggiunta
+	        preferredId = String(payload.id);
+	        TurniStorage.savePreferredTurnazioneId(preferredId);
 
         lastSaveTs = Date.now();
         isDirty = false;
 
-        // aggiorna lista e hint via modulo list
-        if (window.TurnazioniList) {
-          TurnazioniList.refresh();
-        }
+	        // aggiorna lista e hint (preserva modalità modifica lista se serve)
+	        if (window.TurnazioniList) {
+	          TurnazioniList.refresh();
+	        }
 
-        resetTurnazioneForm();
+	        // dopo salvataggio: esci da Modifica (lista) e resetta contesto edit
+	        if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+	          Turnazioni.exitEditMode();
+	        }
+	        clearEditContext();
+	        resetTurnazioneForm();
 
         if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
           SettingsUI.openPanel("turni", { internal: true });
@@ -885,9 +1089,14 @@
           // se vai al picker: non resettare
           if (nextId === "turnazioni-pick") return;
 
-          if (!justSaved) {
-            resetTurnazioneForm();
-          }
+	          if (!justSaved) {
+	            // Nessun salvataggio: nessuna modifica, esco dalla modalità Modifica
+	            resetTurnazioneForm();
+	            clearEditContext();
+	            if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+	              Turnazioni.exitEditMode();
+	            }
+	          }
         }
       });
     }
@@ -900,7 +1109,10 @@
         panelTurni,
         turnazioniListEl,
         turnazioniEmptyEl,
-        visualHintEl
+        visualHintEl,
+        // Se Turnazioni.init non viene chiamato (ordine init / cache / ecc.),
+        // senza passare questo ref il render non può abilitare il pulsante.
+        turnazioniEditBtn: panelTurni ? panelTurni.querySelector("[data-turnazioni-edit]") : null
       });
     } else {
       // fallback: almeno niente crash
@@ -909,9 +1121,19 @@
 
   }
 // ===================== SPLIT initTurnazioniAddUI_close : START =====================
-  window.TurnazioniAdd = {
-    init: initTurnazioniAddUI
-  };
+	  window.TurnazioniAdd = {
+	    init: initTurnazioniAddUI,
+	    openEdit: function (turnazione, index) {
+	      if (typeof openEditTurnazioneImpl === "function") {
+	        openEditTurnazioneImpl(turnazione, index);
+	      }
+	    },
+	    clearEdit: function () {
+	      if (typeof clearEditTurnazioneImpl === "function") {
+	        clearEditTurnazioneImpl();
+	      }
+	    }
+	  };
 // ===================== SPLIT initTurnazioniAddUI_close : END =======================
 
 })();
@@ -928,6 +1150,10 @@
   // ===================== SPLIT module-shell : START =====================
   const Turnazioni = {
     _setCollapsed: null,
+	  _exitEditMode: null,
+	  exitEditMode() {
+	    if (typeof this._exitEditMode === "function") this._exitEditMode();
+	  },
 
     init(ctx) {
       // ===================== SPLIT init-context : START =====================
@@ -1006,23 +1232,70 @@
       }
       // ===================== SPLIT open-add-panel : END   =====================
 
-      // ===================== SPLIT edit-disabled : START =====================
-      if (turnazioniEditBtn) turnazioniEditBtn.disabled = true;
-      // ===================== SPLIT edit-disabled : END   =====================
+	      // ===================== SPLIT edit-mode-state : START =====================
+	      let isEditing = false;
+	      const getEditing = () => isEditing;
+	      const setEditing = (v) => { isEditing = !!v; };
 
-      // ===================== SPLIT init-list-and-add : START =====================
-      // Init lista + add
-      if (window.TurnazioniList && typeof TurnazioniList.init === "function") {
-        TurnazioniList.init({
-          panelTurni,
-          turnazioniListEl,
-          turnazioniEmptyEl: turnazioniEmpty,
-          visualHintEl
-        });
-      }
+	      const loadTurnazioni = () => (
+	        window.TurniStorage && typeof TurniStorage.loadTurnazioni === "function"
+	          ? TurniStorage.loadTurnazioni()
+	          : []
+	      );
 
-      if (window.TurnazioniAdd && typeof TurnazioniAdd.init === "function") {
-        TurnazioniAdd.init({
+	      const saveTurnazioni = (next) => {
+	        if (window.TurniStorage && typeof TurniStorage.saveTurnazioni === "function") {
+	          TurniStorage.saveTurnazioni(next);
+	        }
+	      };
+
+	      const normalizePreferredAfterDelete = (nextList) => {
+	        if (!window.TurniStorage || typeof TurniStorage.loadPreferredTurnazioneId !== "function") return;
+	        if (typeof TurniStorage.savePreferredTurnazioneId !== "function") return;
+
+	        const preferredId = TurniStorage.loadPreferredTurnazioneId();
+	        const has = Array.isArray(nextList) && nextList.length > 0;
+	        if (!has) {
+	          TurniStorage.savePreferredTurnazioneId(null);
+	          return;
+	        }
+
+	        if (preferredId && nextList.some(t => String(t.id) === String(preferredId))) return;
+	        TurniStorage.savePreferredTurnazioneId(String(nextList[nextList.length - 1].id));
+	      };
+
+	      const refreshList = () => {
+	        if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
+	          TurnazioniList.refresh({
+	            isEditing,
+	            onDelete: (index) => {
+	              const list = loadTurnazioni();
+	              if (!Array.isArray(list) || !list[index]) return;
+	              list.splice(index, 1);
+	              saveTurnazioni(list);
+	              normalizePreferredAfterDelete(list);
+	              if (!list.length) setEditing(false);
+	              refreshList();
+	            }
+	          });
+	        }
+	      };
+	      // ===================== SPLIT edit-mode-state : END   =====================
+
+	      // ===================== SPLIT init-list-and-add : START =====================
+	      // Init lista + add
+	      if (window.TurnazioniList && typeof TurnazioniList.init === "function") {
+	        TurnazioniList.init({
+	          panelTurni,
+	          turnazioniListEl,
+	          turnazioniEmptyEl: turnazioniEmpty,
+	          visualHintEl,
+	          turnazioniEditBtn
+	        });
+	      }
+
+	      if (window.TurnazioniAdd && typeof TurnazioniAdd.init === "function") {
+	        TurnazioniAdd.init({
           panelTurni,
           turnazioniListEl,
           turnazioniEmptyEl: turnazioniEmpty,
@@ -1030,6 +1303,84 @@
         });
       }
       // ===================== SPLIT init-list-and-add : END   =====================
+
+	      // ===================== SPLIT interactions-edit-drag : START =====================
+	      // Toggle Modifica
+	      if (turnazioniEditBtn && window.TurniInteractions && typeof TurniInteractions.attachEditToggle === "function") {
+	        TurniInteractions.attachEditToggle({
+	          btnEdit: turnazioniEditBtn,
+	          getEditing,
+	          setEditing,
+	          canEdit: () => {
+	            const list = loadTurnazioni();
+	            return Array.isArray(list) && list.length > 0;
+	          },
+	          refresh: refreshList
+	        });
+	      } else if (turnazioniEditBtn) {
+	        // fallback minimale
+	        turnazioniEditBtn.addEventListener("click", (e) => {
+	          e.stopPropagation();
+	          const list = loadTurnazioni();
+	          if (!Array.isArray(list) || !list.length) return;
+	          isEditing = !isEditing;
+	          refreshList();
+	        });
+	      }
+
+	      // Click riga in modalità Modifica = apri pannello Modifica turnazione
+	      if (turnazioniListEl && window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === "function") {
+	        TurniInteractions.attachRowEditClick({
+	          listEl: turnazioniListEl,
+	          getEditing,
+	          onEditRow: (index) => {
+	            const list = loadTurnazioni();
+	            const t = list && list[index] ? list[index] : null;
+	            if (!t) return;
+	            if (window.TurnazioniAdd && typeof TurnazioniAdd.openEdit === "function") {
+	              TurnazioniAdd.openEdit(t, index);
+	            }
+	          }
+	        });
+	      }
+
+	      // Drag sort (solo in Modifica)
+	      if (turnazioniListEl && window.TurniInteractions && typeof TurniInteractions.attachDragSort === "function") {
+	        TurniInteractions.attachDragSort({
+	          listEl: turnazioniListEl,
+	          getEditing,
+	          getItems: () => loadTurnazioni(),
+	          setItems: () => {},
+	          saveItems: (next) => {
+	            saveTurnazioni(next);
+	          },
+	          refresh: refreshList
+	        });
+	      }
+	
+	      // Uscita automatica da Modifica quando esci dal pannello Turni o cambi sezione
+	      if (window.SettingsUI && typeof SettingsUI.onChange === "function") {
+	        SettingsUI.onChange((prevId, nextId) => {
+	          // se esco dal pannello turni o entro in qualsiasi altra cosa non-interna, tolgo Modifica
+	          if (prevId === "turni" && nextId !== "turni") {
+	            if (isEditing) {
+	              isEditing = false;
+	              refreshList();
+	            }
+	          }
+	        });
+	      }
+	      // ===================== SPLIT interactions-edit-drag : END   =====================
+
+	      // render iniziale coerente con Turni (pulsante Modifica + selezione)
+	      refreshList();
+
+	      // espongo uscita da Modifica (usata quando cambi tab o torni indietro)
+	      this._exitEditMode = () => {
+	        if (!isEditing) return;
+	        isEditing = false;
+	        refreshList();
+	      };
 
       // ===================== SPLIT api-set-collapsed : START =====================
       this._setCollapsed = (v) => {

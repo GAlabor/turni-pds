@@ -799,6 +799,11 @@
       if (!isEditing) return;
       isEditing = false;
       refreshList();
+
+	    // Turnazioni usa la stessa logica: se cambio sezione, devo spegnere pure quella
+	    if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+	      Turnazioni.exitEditMode();
+	    }
     };
   }
 // ===================== SPLIT api_exit_edit_mode : END   =====================

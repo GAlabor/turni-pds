@@ -618,3 +618,19 @@
 }
 
 /* ===================== SPLIT lista-turnazioni-card : END   ===================== */
+
+
+/* ===================== SPLIT turnazioni_list_selection : START ===================== */
+/*
+  Lista Turnazioni nel pannello Turni:
+  - stile identico a Turni (righi nella stessa card)
+  - selezione: solo testo in accent
+*/
+[data-turnazioni-list] .turno-item.is-selected .turno-name{
+  color: var(--accent);
+}
+
+[data-turnazioni-list] .turno-item.is-selected .turno-orario{
+  color: color-mix(in srgb, var(--accent) 70%, var(--subtext));
+}
+/* ===================== SPLIT turnazioni_list_selection : END   ===================== */
