@@ -121,7 +121,7 @@
 
 /* Celle giorno:
    - classi aggiunte da calendar.js:
-     .weekend, .today, .empty
+     .sunday, .today, .empty
 */
 .day {
   background: var(--surface-strong);
@@ -166,11 +166,11 @@
   opacity: 1;
 }
 
-/* Weekend e oggi
+/* Domenica e oggi
    (classi aggiunte da calendar.js)
 */
-.weekend {
-  color: var(--weekend);
+.sunday {
+  color: var(--sunday);
 }
 
 .today {

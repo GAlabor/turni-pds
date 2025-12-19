@@ -149,9 +149,9 @@
       // Colonna (0 = Lun, ... 6 = Dom)
       const colIndex = (startIndex + d - 1) % 7;
 
-      // Sabato / Domenica
-      if (colIndex === 5 || colIndex === 6) {
-        cell.classList.add("weekend");
+      // Solo Domenica (colIndex: 0 = Lun ... 6 = Dom)
+      if (colIndex === 6) {
+        cell.classList.add("sunday");
       }
 
       // Oggi

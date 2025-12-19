@@ -33,7 +33,7 @@
 
   /* Colori specifici calendario */
   --dow-muted: #6b7280;     /* intestazione giorni settimana (.dow) */
-  --weekend: #e25555;       /* sabato/domenica in calendario */
+  --sunday: #FF2D55;        /* solo domenica in calendario */
   --today-border: var(--accent); /* bordo giorno corrente */
 
   /* Colore etichetta versione (in basso a sinistra) */
@@ -267,7 +267,7 @@
     --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
 
     --dow-muted: #9ca3af;
-    --weekend: #ff8f8f;
+    --sunday: #FF2D55;
     --today-border: var(--accent);
     --version-color: rgba(226,232,240,0.8);
 
@@ -304,7 +304,7 @@
   --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
 
   --dow-muted: #9ca3af;
-  --weekend: #ff8f8f;
+  --sunday: #FF2D55;
   --today-border: var(--accent);
   --version-color: rgba(226,232,240,0.8);
 
