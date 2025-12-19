@@ -310,81 +310,90 @@
 
 (function () {
 
-  // ===================== SPLIT tabbar_switch_viste : START =====================
-  // ============================
-  // Tabbar: switch viste principali
-  // ============================
-  function initTabs() {
-    const tabs  = document.querySelectorAll(".tab");
-    const views = document.querySelectorAll(".view");
+// ===================== SPLIT tabbar_switch_viste : START =====================
+// ============================
+// Tabbar: switch viste principali
+// ============================
+function initTabs() {
+  const tabs  = document.querySelectorAll(".tab");
+  const views = document.querySelectorAll(".view");
 
-    if (!tabs.length || !views.length) return;
+  if (!tabs.length || !views.length) return;
 
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.tab;
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.tab;
 
-        // vista attiva PRIMA del cambio
-        const activeView = document.querySelector(".view.is-active");
-        const activeViewId = activeView ? activeView.dataset.view : null;
+      // vista attiva PRIMA del cambio
+      const activeView = document.querySelector(".view.is-active");
+      const activeViewId = activeView ? activeView.dataset.view : null;
 
-        // TAB CALENDARIO:
-        // se è già attiva → torna al mese/giorno corrente (resetToToday)
-        if (target === "calendar") {
-          const calendarView = document.querySelector(".view-calendar");
-          const isCalendarActive =
-            calendarView && calendarView.classList.contains("is-active");
+      // TAB CALENDARIO:
+      // se è già attiva → torna al mese/giorno corrente (resetToToday)
+      if (target === "calendar") {
+        const calendarView = document.querySelector(".view-calendar");
+        const isCalendarActive =
+          calendarView && calendarView.classList.contains("is-active");
 
-          if (
-            isCalendarActive &&
-            window.Calendar &&
-            typeof Calendar.resetToToday === "function"
-          ) {
-            Calendar.resetToToday();
-            return;
-          }
+        if (
+          isCalendarActive &&
+          window.Calendar &&
+          typeof Calendar.resetToToday === "function"
+        ) {
+          Calendar.resetToToday();
+          return;
         }
+      }
 
-        // TAB IMPOSTAZIONI:
-        // se la vista settings è già attiva → torna al menu principale Impostazioni
-        if (target === "settings") {
-          const settingsView = document.querySelector(".view-settings");
-          const isSettingsActive =
-            settingsView && settingsView.classList.contains("is-active");
+      // TAB IMPOSTAZIONI:
+      // se la vista settings è già attiva → torna al menu principale Impostazioni
+      if (target === "settings") {
+        const settingsView = document.querySelector(".view-settings");
+        const isSettingsActive =
+          settingsView && settingsView.classList.contains("is-active");
 
-          if (isSettingsActive) {
-            // uscendo / resettando Impostazioni → esci dalla modalità Modifica Turni
-            if (window.Turni && typeof Turni.exitEditMode === "function") {
-              Turni.exitEditMode();
-            }
-
-            if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
-              // siamo già su settings → resetta solo il pannello
-              SettingsUI.showMain();
-            }
-            return;
-          }
-        }
-
-        // Se stiamo uscendo da Impostazioni verso un'altra vista,
-        // assicuriamoci di uscire dalla modalità Modifica Turni
-        if (activeViewId === "settings" && target !== "settings") {
+        if (isSettingsActive) {
+          // uscendo / resettando Impostazioni → esci dalla modalità Modifica Turni
           if (window.Turni && typeof Turni.exitEditMode === "function") {
             Turni.exitEditMode();
           }
-        }
+          // ✅ e anche Turnazioni (indipendente da Turni)
+          if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+            Turnazioni.exitEditMode();
+          }
 
-        // Comportamento standard delle tab:
-        // - aggiorna stato .active sui bottoni
-        // - mostra/nasconde le viste con .is-active
-        tabs.forEach(t => t.classList.toggle("active", t === tab));
-        views.forEach(v => {
-          v.classList.toggle("is-active", v.dataset.view === target);
-        });
+          if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
+            // siamo già su settings → resetta solo il pannello
+            SettingsUI.showMain();
+          }
+          return;
+        }
+      }
+
+      // Se stiamo uscendo da Impostazioni verso un'altra vista,
+      // assicuriamoci di uscire dalla modalità Modifica Turni
+      if (activeViewId === "settings" && target !== "settings") {
+        if (window.Turni && typeof Turni.exitEditMode === "function") {
+          Turni.exitEditMode();
+        }
+        // ✅ e anche Turnazioni (indipendente da Turni)
+        if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+          Turnazioni.exitEditMode();
+        }
+      }
+
+      // Comportamento standard delle tab:
+      // - aggiorna stato .active sui bottoni
+      // - mostra/nasconde le viste con .is-active
+      tabs.forEach(t => t.classList.toggle("active", t === tab));
+      views.forEach(v => {
+        v.classList.toggle("is-active", v.dataset.view === target);
       });
     });
-  }
-  // ===================== SPLIT tabbar_switch_viste : END   =====================
+  });
+}
+// ===================== SPLIT tabbar_switch_viste : END   =====================
+
 
 
   // ===================== SPLIT bootstrap_domcontentloaded : START =====================
