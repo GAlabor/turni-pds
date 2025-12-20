@@ -388,3 +388,15 @@ body.turni-no-select * {
   }
 }
 /* ===================== SPLIT responsive-turni-panel : END ======================= */
+
+/* ===================== SPLIT pannello-turni-scroll : START ===================== */
+/* =========================
+   Scroll pannello "Impostazioni → Turni"
+   ========================= */
+
+.settings-panel.settings-turni.is-active{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+/* ===================== SPLIT pannello-turni-scroll : END ======================= */
