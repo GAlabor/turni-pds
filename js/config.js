@@ -58,7 +58,7 @@
       turnazioni: "turnipds-turnazioni",
       turnazioniPreferred: "turnipds-turnazioni-preferred",
 
-      // ✅ Imposta Inizio (data + indice turno rotazione)
+      // ✅ Inizio Turnazione (data + indice turno rotazione)
       turniStart: "turnipds-turni-start",
 
       // Chiavi future (NON usate al momento)
