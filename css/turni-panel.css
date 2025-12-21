@@ -301,7 +301,8 @@ body.turni-no-select * {
 .turni-inline-row {
   width: 100%;
   margin-top: 10px;
-  padding: 12px 12px;
+  padding: 10px 12px;
+  min-height: calc(var(--turni-sigla-size) + 20px);
   border-radius: 16px;
   background: var(--surface-strong);
   border: 1px solid var(--border);
