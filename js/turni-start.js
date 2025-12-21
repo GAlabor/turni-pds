@@ -91,16 +91,14 @@
     const t = getPreferredTurnazione();
     const slotIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
 
-    let turnoTxt = "";
-    if (t && slotIndex !== null && slotIndex >= 0) {
-      const n = Number(t.days) || 0;
-      const slots = Array.isArray(t.slots) ? t.slots : [];
-      if (slotIndex < n) {
-        const s = slots[slotIndex] || null;
-        const sigla = s && s.sigla ? String(s.sigla).trim() : "";
-        turnoTxt = `Giorno ${slotIndex + 1}${sigla ? ` (${sigla})` : ""}`;
-      }
-    }
+let turnoTxt = "";
+if (t && slotIndex !== null && slotIndex >= 0) {
+  const slots = Array.isArray(t.slots) ? t.slots : [];
+  const s = slots[slotIndex] || null;
+  const sigla = s && s.sigla ? String(s.sigla).trim() : "";
+  turnoTxt = sigla;
+}
+
 
     if (dateTxt && turnoTxt) return `${dateTxt} · ${turnoTxt}`;
     if (dateTxt) return dateTxt;
@@ -123,20 +121,14 @@
         const t = getPreferredTurnazione();
 
         let turnoTxt = "";
-        if (t && Number.isInteger(cfg.slotIndex)) {
-          const n = Number(t.days) || 0;
-          const slots = Array.isArray(t.slots) ? t.slots : [];
-          const i = cfg.slotIndex;
-          if (i >= 0 && i < n) {
-            const s = slots[i] || null;
-            const sigla = s && s.sigla ? String(s.sigla).trim() : "";
-            const nome  = s && s.nome  ? String(s.nome).trim()  : "";
-            turnoTxt = sigla ? sigla : (nome || "");
-            if (sigla && nome) turnoTxt = `${sigla} — ${nome}`;
-            turnoTxt = `Giorno ${i + 1}${turnoTxt ? ` · ${turnoTxt}` : ""}`;
-          }
-        }
-        startTurnoSummary.textContent = turnoTxt;
+if (t && Number.isInteger(cfg.slotIndex)) {
+  const slots = Array.isArray(t.slots) ? t.slots : [];
+  const s = slots[cfg.slotIndex] || null;
+  const nome = s && s.nome ? String(s.nome).trim() : "";
+  turnoTxt = nome;
+}
+startTurnoSummary.textContent = turnoTxt;
+
       }
     }
 
@@ -190,11 +182,7 @@
       const nameEl = document.createElement("span");
       nameEl.className = "turnazioni-pick-name";
 
-      let label = `Giorno ${i + 1}`;
-      if (sigla && nome) label += ` — ${sigla} ${nome}`;
-      else if (sigla)    label += ` — ${sigla}`;
-      else if (nome)     label += ` — ${nome}`;
-
+      let label = nome || sigla || "";
       nameEl.textContent = label;
       row.appendChild(nameEl);
 
