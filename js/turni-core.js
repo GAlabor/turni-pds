@@ -452,18 +452,25 @@
       let visualOn = loadVisualToggle();
 
       function applyVisualState() {
-        visualToggleBtn.classList.toggle("is-on", visualOn);
-        visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
+  visualToggleBtn.classList.toggle("is-on", visualOn);
+  visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
 
-        if (visualHint) {
-          visualHint.hidden = !visualOn;
-        }
+  // ✅ chiudi/apri la card intera
+  const visualCard = visualToggleBtn.closest(".turni-card");
+  if (visualCard) {
+    visualCard.classList.toggle("is-collapsed", !visualOn);
+  }
 
-        // se esiste TurniStart, allinea visibilità riga “turno iniziale”
-        if (window.TurniStart && typeof TurniStart.syncVisibility === "function") {
-          TurniStart.syncVisibility(visualOn);
-        }
-      }
+  if (visualHint) {
+    visualHint.hidden = !visualOn;
+  }
+
+  // se esiste TurniStart, allinea visibilità riga “turno iniziale”
+  if (window.TurniStart && typeof TurniStart.syncVisibility === "function") {
+    TurniStart.syncVisibility(visualOn);
+  }
+}
+
 
       applyVisualState();
 

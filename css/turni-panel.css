@@ -266,9 +266,12 @@ body.turni-no-select * {
 }
 
 .turni-card.is-collapsed .turni-list,
-.turni-card.is-collapsed .turni-empty-hint {
+.turni-card.is-collapsed .turni-empty-hint,
+.turni-card.is-collapsed .turni-visual-hint,
+.turni-card.is-collapsed .turni-inline-row {
   display: none;
 }
+
 
 .turni-card.is-collapsed .turni-card-actions .pill-btn,
 .turni-card.is-collapsed .turni-card-actions .icon-circle-btn {
