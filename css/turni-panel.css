@@ -314,6 +314,26 @@ body.turni-no-select * {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ✅ Variante "lista" per: Inizio Turnazione (niente rettangolo, linea sotto) */
+.turni-inline-row[data-turni-start-row]{
+  margin-top: 8px;
+  padding: 10px 2px;
+  min-height: calc(var(--turni-sigla-size) + 6px);
+
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.turni-inline-row[data-turni-start-row] .turni-inline-row-right{
+  gap: 8px;
+}
+
+.turni-inline-row[data-turni-start-row] .turni-inline-row-summary{
+  font-variant-numeric: tabular-nums;
+}
+
 .turni-inline-row-left {
   display: flex;
   align-items: center;
@@ -370,7 +390,13 @@ body.turni-no-select * {
 .turni-inline-row.is-disabled .turni-inline-row-chevron {
   display: none;
 }
+
+/* coerente anche quando disabilitato, per la variante "lista" */
+.turni-inline-row.is-disabled[data-turni-start-row]{
+  border-bottom-color: rgba(148,163,184,0.35);
+}
 /* ===================== SPLIT blocco-visualizza-turnazione : END ======================= */
+
 
 
 /* ===================== SPLIT responsive-turni-panel : START ===================== */
