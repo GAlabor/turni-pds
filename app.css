@@ -1,0 +1,3121 @@
+/* ==========================================================
+   SPLIT TOKENS_ROOT : START
+   ========================================================== */
+:root {
+  /* =========================
+     PALETTE / LAYOUT BASE base.css v. 1.0
+     ========================= */
+
+  /* Sfondo app (usato da body) */
+  --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+
+  /* Superfici (card, contenitori principali) */
+  --surface: rgba(255,255,255,0.88);      /* .calendar-container, .settings-container, .turni-card, ecc. */
+  --surface-strong: rgba(255,255,255,0.96);
+
+  /* Bordi / linee di separazione */
+  --border: rgba(120,130,170,0.18);
+
+  /* Testo principale / secondario */
+  --text: #111827;     /* body, label, titoli secondari, ecc. */
+  --subtext: #6b7280;  /* hint, meta, sottotitoli, icone status, ecc. */
+
+  /* Colore accento / azioni principali */
+  --accent: #0a84ff;   /* hover, focus, today-border, bottoni, status, ecc. */
+
+  /* Raggi angoli card / componenti principali */
+  --radius-xl: 20px;   /* card grandi: .calendar-container, .settings-group-card, .turni-card */
+  --radius: 14px;      /* blocchi più piccoli / secondari */
+
+  /* Ombre globali per card / elementi sollevati */
+  --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);  /* card principali */
+  --shadow-light: 0 10px 26px rgba(15,23,42,0.12); /* celle giorno, elementi minori */
+  /* Accents / focus (evita rgba sparsi ovunque) */
+  --shadow-accent-hover: var(--shadow-accent-hover);
+  --shadow-accent-press: var(--shadow-accent-press);
+  --shadow-accent-lift: var(--shadow-accent-lift);
+  --shadow-accent-lift-strong: var(--shadow-accent-lift-strong);
+  --focus-ring-1: var(--focus-ring-1);
+  --focus-ring-2: var(--focus-ring-2);
+
+  /* Colori specifici calendario */
+  --dow-muted: #6b7280;     /* intestazione giorni settimana (.dow) */
+  --sunday: #FF2D55;        /* solo domenica in calendario */
+  --today-border: var(--accent); /* bordo giorno corrente */
+
+  /* Colore etichetta versione (in basso a sinistra) */
+  --version-color: rgba(15,23,42,0.65);
+
+  /* Distanza standard sopra ai contenitori settings (Impostazioni, Inspag, Riepilogo, ecc.) */
+  --settings-top-gap: 4px;
+
+  /* Frecce mese calendario (.nav-btn in components.css, usate anche in Turni) */
+  --nav-fg: #111827;
+
+  /* =========================
+     TABBAR (MOBILE / DESKTOP)
+     ========================= */
+
+  /* Altezza logica tabbar (per padding body su mobile) */
+  --tabbar-h: 78px;
+
+  /* Sfondo / bordo tabbar */
+  --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
+  --tabbar-border: rgba(148,163,184,0.4);
+
+  /* Dimensioni / stile tab (usati in tabbar.css) */
+  --tabH: 54px;
+  --tabIcon: 38px;   /* icone tabbar più grandi */
+  --tabMaxW: 120px;
+  --tabColor: #9ca3af;        /* colore base icone/tab non attive */
+  --tabActiveColor: #0a84ff;  /* colore tab attiva */
+
+  /* Effetti interazione tab (hover / active) */
+  --active-bright: 1.12;
+  --active-contrast: 1.03;
+  --icon-pop: 1.08;
+  --lift: -1px;
+  --press: 1px;
+  --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
+
+  /* =========================
+     ICON / CONTROL SIZES
+     (cerchi, frecce, status, pallini colore)
+     ========================= */
+
+  /* Cerchi bottoni icona:
+     - FONT 15/16 come dimensione contenitore frecce/back
+       (icone vere gestite sotto) */
+  --icon-circle-lg: 48px;  /* frecce mese calendario (.nav-btn, desktop) */
+  --icon-circle-lg-mobile: 44px; /* frecce mese calendario (.nav-btn, mobile) */
+  --icon-circle-md: 34px;  /* back impostazioni (.settings-back), slot icona stato (.app-status) */
+  --icon-circle-sm: 32px;  /* "+" Turni (.icon-circle-btn) */
+
+  /* Pallino colore sigla Turni:
+     agganciato alla stessa misura dell’anteprima sigla turni */
+  --color-dot-size: 24px; /*var(--turni-sigla-size); */  /* .turni-color-preview */ 
+
+  /* Icona omino stato (SVG interno) */
+  --status-icon-size: 48px; /* #icoStatus svg */
+
+  /* Frecce mese calendario (icone SVG) */
+  --icon-arrow-size: 22px;     /* FONT 15 — dimensione SVG dentro .nav-btn */
+  --icon-arrow-stroke: 2.4;
+  --color-arrow-month: var(--nav-fg); /* colore frecce mese */
+
+  /* Freccia BACK impostazioni (icone SVG) */
+  --icon-back-size: 22px;      /* FONT 16 — dimensione SVG dentro .settings-back */
+  --color-back-icon: var(--text); /* colore freccia back */
+
+  /* =========================
+     CALENDARIO / TURNI: MISURE CELLE
+     ========================= */
+
+  /* Larghezza cella giorno calendario (impostata da calendar.js; fallback 40px) */
+  --cal-day-size: 40px;
+
+  /* Scala in percentuale l'anteprima sigla dei turni rispetto alla cella giorno */
+  --turni-sigla-scale: 0.7;
+
+  /* Lato quadrato anteprima sigla turni (clampato per non diventare enorme su desktop) */
+  --turni-sigla-size: min(40px, calc(var(--cal-day-size) * var(--turni-sigla-scale)));
+
+  /* =========================
+     TIPO / TESTI GLOBALI (SCALA BASE)
+     ========================= */
+
+  /* Font UI principale (usato da body) */
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+
+  /* Titolo grande di pagina (es: "Turni" in .app-title) */
+  --fs-page-title: 34px;
+  --fw-page-title: 700;
+
+  /* Sottotitolo di pagina (placeholder futuro, nessuna classe dedicata attuale) */
+  --fs-page-subtitle: 14px;
+
+  /* Titoli secondari / barre (es: label impostazioni, intestazioni pannelli come "Turni") */
+  --fs-section-title: 24px; /* alias per header calendario di default */
+
+  /* Label di riga (impostazioni, righe elenco, ecc.) */
+  --fs-row-label: 15px;
+  --fw-row-label: 500;
+
+  /* Testi secondari / summary / hint (es. .settings-hint, descrizioni brevi) */
+  --fs-row-subtext: 13px;
+
+  /* Riepilogo a destra nelle righe impostazioni
+   (es. "Sistema" nella riga Tema) */
+  --fs-settings-summary: 15px;  
+  --fw-settings-summary: 400;
+  --col-settings-summary: var(--subtext);
+  --ls-settings-summary: -0.00em;
+
+  /* Testi meta / micro (sigle, orari, badge piccoli) */
+  --fs-meta: 12px;
+
+  /* Label tabbar desktop (testo sotto le icone) */
+  --fs-tab-label: 11px;
+
+  /* =========================
+     TIPO / TOKENS SPECIFICI (MAPPATI AI "FONT N")
+     ========================= */
+
+  /* FONT 1 — Titolo grande pagina:
+     - .app-title (Turni, Riepilogo, Inserimenti e Pagamenti, Impostazioni)
+     - header Impostazioni (id="settingsTitle" anche quando mostra sottovoci)
+  */
+  --fs-title-lg: 34px;
+  --ls-title-lg: -0.035em;        /* desktop */
+  --ls-title-lg-mobile: -0.025em; /* mobile */
+
+  /* FONT 2 — Intestazione calendario:
+     - .month-label ("Novembre 2025", "2025", "2020 - 2031")
+  */
+  --fs-cal-header: 24px;
+
+  /* FONT 3 — Giorni settimana calendario:
+     - .dow (Lun, Mar, ... Dom)
+  */
+  --fs-cal-dow-desktop: 13px;
+  --fs-cal-dow-mobile: 11px;
+
+  /* Numero giorno nelle celle calendario (grid) */
+  --fs-cal-day-desktop: 18px;
+  --fs-cal-day-mobile: 14px;
+
+  /* FONT 4 — Celle selezione mesi / anni:
+     - .month-cell (Gen, Feb, ...)
+     - .year-cell  (2024, 2025, ...)
+  */
+  --fs-cal-month-cell: 17px;
+  --fs-cal-year-cell: 16px;
+
+  /* FONT 5 / 6 — Icona calendario (gestiti in SVG, qui solo token):
+     - #calDay   → giorno (es. "24")
+     - #calMonth → mese corto (es. "NOV")
+  */
+  --fs-cal-icon-day: 10px;
+  --fs-cal-icon-month: 7px;
+
+  /* FONT 7 — Voci menu principali Impostazioni:
+     - .settings-row-label in .view-settings
+       (Turni, Indennità, Festività, Tema, Versione, Info)
+  */
+  --fs-settings-menu-desktop: 18px;
+  --fs-settings-menu-mobile: 17px;
+  --ls-settings-menu: -0.015em; /* letter-spacing per le voci menu impostazioni */
+
+  /* FONT 8 — Voci secondarie menu:
+     - testo interno .settings-choice (Sistema, Chiaro, Scuro)
+  */
+  --fs-settings-choice: var(--fs-turni-nome);
+
+  /* FONT 9 — Titolo pannello Turni (e futuri pannelli interni):
+     - .turni-panel-title ("Turni" nella card Turni)
+  */
+  --fs-turni-panel-title-desktop: 19px;
+  --fs-turni-panel-title-mobile: 18px;
+  --ls-turni-panel-title: -0.02em;
+
+  /* FONT 10 — Bottoni pillola:
+     - .pill-btn (es. "Modifica" nel pannello Turni)
+  */
+  --fs-pill-btn: 15px;
+
+  /* FONT 11 — Sigla turno nel quadrato / preview:
+     - .turno-sigla
+     - .turni-sigla-preview-text
+     15px è il valore utilizzato per 1 o 2 caratteri;
+     tramite turni.js, 3 caratteri = 14px e 4 caratteri = 12px.
+  */
+  --fs-turni-sigla: 15px;
+
+  /* FONT 12 — Nome turno (lista) / testi principali pannello Turni:
+     - .turno-name
+  */
+  --fs-turni-nome: 15px;
+
+  /* FONT 13 — Orario turno (grigio) / testi meta pannello Turni:
+     - .turno-orario
+  */
+  --fs-turni-orario: 13px;
+
+  /* FONT 14 — Form "Aggiungi turno":
+     - .turni-label (etichette)
+     - .turni-input (campi testo/ora)
+     - hint / error del form
+  */
+  --fs-turni-form-label: 15px;
+  --fs-turni-form-input: 15px;
+  --fs-turni-form-hint: 13px;
+
+  /* (FONT 15/16 sono già coperti nelle variabili ICON / CONTROL SIZES in alto) */
+}
+/* ==========================================================
+   SPLIT TOKENS_ROOT : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT THEME_SYSTEM_DARK_MEDIA : START
+   ========================================================== */
+/* Tema “system” scuro, solo se NON è forzato un tema via data-theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+    --surface: rgba(15,23,42,0.94);
+    --surface-strong: rgba(15,23,42,0.98);
+    --border: rgba(148,163,184,0.26);
+    --text: #e5e7eb;
+    --subtext: #9ca3af;
+    --accent: #4b8dff;
+    --shadow-soft: 0 22px 60px rgba(0,0,0,0.7);
+    --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
+
+    --dow-muted: #9ca3af;
+    --sunday: #FF2D55;
+    --today-border: var(--accent);
+    --version-color: rgba(226,232,240,0.8);
+
+    --nav-fg: #e5e7eb;
+
+    --tabbar-bg: linear-gradient(180deg, rgba(15,23,42,0.3), rgba(15,23,42,0.92));
+    --tabbar-border: rgba(30,64,175,0.7);
+
+    --tabColor: #6b7280;
+    --tabActiveColor: #4b8dff;
+
+    --color-arrow-month: var(--nav-fg);
+    --color-back-icon: var(--text);
+  }
+}
+/* ==========================================================
+   SPLIT THEME_SYSTEM_DARK_MEDIA : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT THEME_FORCED_DARK_ROOT : START
+   ========================================================== */
+/* Forzatura tema scuro (imposta data-theme="dark" sul <html>) */
+:root[data-theme="dark"] {
+  --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+  --surface: rgba(15,23,42,0.94);
+  --surface-strong: rgba(15,23,42,0.98);
+  --border: rgba(148,163,184,0.26);
+  --text: #e5e7eb;
+  --subtext: #9ca3af;
+  --accent: #4b8dff;
+  --shadow-soft: 0 22px 60px rgba(0,0,0,0.7);
+  --shadow-light: 0 16px 40px rgba(0,0,0,0.55);
+
+  --dow-muted: #9ca3af;
+  --sunday: #FF2D55;
+  --today-border: var(--accent);
+  --version-color: rgba(226,232,240,0.8);
+
+  --nav-fg: #e5e7eb;
+
+  --tabbar-bg: linear-gradient(180deg, rgba(15,23,42,0.3), rgba(15,23,42,0.92));
+  --tabbar-border: rgba(30,64,175,0.7);
+
+  --tabColor: #6b7280;
+  --tabActiveColor: #4b8dff;
+
+  --color-arrow-month: var(--nav-fg);
+  --color-back-icon: var(--text);
+}
+/* ==========================================================
+   SPLIT THEME_FORCED_DARK_ROOT : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT RESET_BASE : START
+   ========================================================== */
+/* =========================
+   Reset / base
+   ========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-attachment: fixed;
+  font-family: var(--font-ui);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+/* ==========================================================
+   SPLIT RESET_BASE : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT SHELL_VIEWS_HEADER : START
+   ========================================================== */
+/* Shell & viste */
+
+.app-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* Ogni .view corrisponde a una tab (Calendario, Inspag, Riepilogo, Impostazioni) */
+.view {
+  display: none;
+}
+
+.view.is-active {
+  display: block;
+}
+
+/* Header stile iOS */
+
+.app-header {
+  padding: 10px 6px 14px 6px; /* titolo più giù */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Titolo principale di pagina */
+.app-title {
+  margin: 0;
+  font-size: var(--fs-title-lg);
+  font-weight: var(--fw-page-title);
+  letter-spacing: var(--ls-title-lg);
+}
+/* ==========================================================
+   SPLIT SHELL_VIEWS_HEADER : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT RESPONSIVE_GLOBAL : START
+   ========================================================== */
+/* =========================
+   RESPONSIVE GLOBAL
+   ========================= */
+
+@media (max-width: 900px) {
+  body {
+    /* meno padding laterale per dare più larghezza al calendario,
+       spazio sotto per la tabbar (usa --tabbar-h) */
+    padding: calc(env(safe-area-inset-top) + 26px) 4px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
+  }
+
+  .app-header {
+    padding: 10px 4px 8px 4px; /* il 3° valore cambia lo spazio tra titolo e frecce mese */
+  }
+
+  .app-title {
+    font-size: 24px;                /* valore storico mobile */
+    font-weight: 600;               /* più leggero rispetto al 700 desktop */
+    letter-spacing: var(--ls-title-lg-mobile);
+  }
+}
+
+@media (min-width: 901px) {
+  body {
+    padding-bottom: 20px;
+  }
+}
+/* ==========================================================
+   SPLIT RESPONSIVE_GLOBAL : END
+   ========================================================== */
+/* 
+===========================================
+ Turni PdS — calendar.css
+ Vista calendario: giorni / mesi / anni
+ calendar.css v 1.0
+===========================================
+*/
+
+
+/* ==========================================================
+   SPLIT HEADER_MESE : START
+   ========================================================== */
+/* =========================
+   HEADER MESE (barra sopra il calendario)
+   ========================= */
+
+/* Barra con:
+   - titolo mese/anno (.month-label)
+   - frecce mese (.nav-btn da components.css)
+*/
+.monthbar {
+  margin: 14px 0 20px 0; /* distacco dal titolo e dal calendario */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Etichetta mese/anno:
+   testo cliccabile che cambia modalità:
+   - giorni → mesi → anni (gestito da calendar.js)
+*/
+.month-label {
+  font-size: var(--fs-cal-header); /* FONT 2 */
+  font-weight: 600;
+  cursor: pointer;
+}
+/* ==========================================================
+   SPLIT HEADER_MESE : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT CONTENITORE_CALENDARIO : START
+   ========================================================== */
+/* =========================
+   CONTENITORE CALENDARIO
+   ========================= */
+
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* Contenitore principale calendario:
+   - classi di modalità aggiunte da calendar.js:
+     .mode-days / .mode-months / .mode-years
+*/
+.calendar-container {
+  margin-top: 6px; /* contenitore giorni più giù */
+  padding: 22px 18px 26px; /* meno padding laterale → più larghezza utile */
+  width: 100%;
+  max-width: 1280px;       /* più largo su desktop */
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+/* ==========================================================
+   SPLIT CONTENITORE_CALENDARIO : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT INTESTAZIONI_SETTIMANA : START
+   ========================================================== */
+/* =========================
+   INTESTAZIONI GIORNI SETTIMANA
+   ========================= */
+
+/* Riga abbreviata:
+   Lun / Mar / ... / Dom
+*/
+.dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Singola label giorno:
+   usata solo in modalità giorni
+*/
+.dow {
+  padding: 6px 0;
+  text-align: center;
+  font-weight: 600;
+  color: var(--dow-muted);
+  font-size: var(--fs-cal-dow-desktop); /* FONT 3 */
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+/* ==========================================================
+   SPLIT INTESTAZIONI_SETTIMANA : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT GRIGLIA_GIORNI : START
+   ========================================================== */
+/* =========================
+   GRIGLIA GIORNI
+   ========================= */
+
+/* Griglia principale per i giorni del mese:
+   celle .day create da calendar.js
+*/
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px; /* tiene un po’ respiro ma lascia più spazio alle celle */
+}
+
+/* Celle giorno:
+   - classi aggiunte da calendar.js:
+     .sunday, .today, .empty
+*/
+.day {
+  background: var(--surface-strong);
+  padding: 12px 12px 16px;
+  text-align: right;
+  font-size: var(--fs-cal-day-desktop); /* numero giorno, FONT dedicato */
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  transition: 0.16s ease;
+  min-height: 86px; /* altezza maggiore */
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+/* Highlight hover desktop (alone blu) */
+.day::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at top, rgba(10,132,255,0.22), transparent 55%);
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+/* Celle vuote (prima del giorno 1, dopo la fine mese) */
+.day.empty {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Hover cella giorno */
+.day:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.day:hover::before {
+  opacity: 1;
+}
+
+/* Domenica e oggi
+   (classi aggiunte da calendar.js)
+*/
+.sunday {
+  color: var(--sunday);
+}
+
+.today {
+  border: 2px solid var(--today-border);
+  font-weight: 700;
+}
+/* ==========================================================
+   SPLIT GRIGLIA_GIORNI : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT MODE_SWITCH_DAYS_MONTHS_YEARS : START
+   ========================================================== */
+/* ===================================
+   MODALITÀ: GIORNI / MESI / ANNI
+   (gestite da calendar.js)
+   =================================== */
+
+/* Griglie alternative per viste:
+   - .month-grid → vista mesi
+   - .year-grid  → vista anni
+*/
+.month-grid,
+.year-grid {
+  display: none;
+}
+
+/* Modalità giorni (default) */
+.calendar-container.mode-days .calendar-grid {
+  display: grid;
+}
+
+.calendar-container.mode-days .month-grid,
+.calendar-container.mode-days .year-grid {
+  display: none;
+}
+
+/* Modalità mesi:
+   - nasconde intestazione giorni
+   - mostra solo la griglia mesi
+*/
+.calendar-container.mode-months .dow-row {
+  display: none;
+}
+
+.calendar-container.mode-months .calendar-grid,
+.calendar-container.mode-months .year-grid {
+  display: none;
+}
+
+.calendar-container.mode-months .month-grid {
+  display: grid;
+}
+
+/* Modalità anni:
+   - nasconde intestazione giorni e griglia mesi
+   - mostra griglia anni
+*/
+.calendar-container.mode-years .dow-row {
+  display: none;
+}
+
+.calendar-container.mode-years .calendar-grid,
+.calendar-container.mode-years .month-grid {
+  display: none;
+}
+
+.calendar-container.mode-years .year-grid {
+  display: grid;
+}
+/* ==========================================================
+   SPLIT MODE_SWITCH_DAYS_MONTHS_YEARS : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT VISTA_MESI : START
+   ========================================================== */
+/* =========================
+   VISTA MESI (mode-months)
+   ========================= */
+
+.month-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 8px;
+}
+
+/* Singolo mese:
+   - etichetta breve (Gen, Feb, ...), testo inserito da calendar.js
+   - .is-current evidenzia il mese reale di oggi nello stesso anno
+*/
+.month-cell {
+  background: var(--surface-strong);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  padding: 16px 10px;
+  text-align: center;
+  font-size: var(--fs-cal-month-cell); /* FONT 4 */
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  box-shadow: var(--shadow-light);
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.08s ease,
+    box-shadow 0.16s ease;
+}
+
+.month-cell:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent-lift);
+}
+
+/* Mese corrispondente a oggi (stesso anno) */
+.month-cell.is-current {
+  border: 2px solid var(--today-border);
+  font-weight: 700;
+}
+/* ==========================================================
+   SPLIT VISTA_MESI : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT VISTA_ANNI : START
+   ========================================================== */
+/* =========================
+   VISTA ANNI (mode-years)
+   ========================= */
+
+.year-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 10px;
+}
+
+/* Singolo anno:
+   - range centrato su yearRangeStart (gestito da calendar.js)
+   - .is-current evidenzia l’anno reale di oggi
+*/
+.year-cell {
+  background: var(--surface-strong);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  padding: 14px 10px;
+  text-align: center;
+  font-size: var(--fs-cal-year-cell); /* FONT 4 */
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  box-shadow: var(--shadow-light);
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.08s ease,
+    box-shadow 0.16s ease;
+}
+
+.year-cell:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.year-cell.is-current {
+  border: 2px solid var(--today-border);
+  font-weight: 700;
+  box-shadow: var(--shadow-accent-lift-strong);
+}
+/* ==========================================================
+   SPLIT VISTA_ANNI : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT RESPONSIVE_CALENDARIO : START
+   ========================================================== */
+/* =========================
+   RESPONSIVE CALENDARIO
+   ========================= */
+
+@media (max-width: 900px) {
+  .monthbar {
+    margin: 10px 0 16px 0;
+  }
+
+  .month-label {
+    font-size: 20px; /* manteniamo il valore storico mobile */
+  }
+
+  .calendar-container {
+    margin-top: 8px;
+    padding: 10px 2px 10px; /* quasi a filo per dare più larghezza alle celle */
+  }
+
+  .dow-row {
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+
+  .dow {
+    font-size: var(--fs-cal-dow-mobile); /* FONT 3 mobile */
+    padding: 4px 0;
+  }
+
+  .calendar-grid {
+    gap: 2px; /* meno gap = celle più larghe */
+  }
+
+  .day {
+    border-radius: 14px;
+    padding: 6px 6px 10px;
+    min-height: 58px; /* altezza celle giorni */
+    font-size: var(--fs-cal-day-mobile); /* numero giorno mobile */
+    box-shadow: none;
+  }
+
+  .day::before {
+    display: none;
+  }
+
+  .month-grid {
+    gap: 10px;
+    padding-top: 6px;
+  }
+
+  .month-cell {
+    font-size: 13px;
+    padding: 12px 6px;
+    min-height: 60px;
+  }
+
+  .year-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding-top: 6px;
+  }
+
+  .year-cell {
+    font-size: 12px;
+    padding: 10px 6px;
+    min-height: 52px;
+  }
+}
+
+@media (min-width: 901px) {
+  .calendar-container {
+    padding-bottom: 16px;
+  }
+}
+/* ==========================================================
+   SPLIT RESPONSIVE_CALENDARIO : END
+   ========================================================== */
+/* 
+===========================================
+ Turni PdS — 
+ Layout vista Impostazioni + contenitori
+ settings.css v 1.0
+===========================================
+*/
+
+/* ===================== SPLIT containers-base : START ===================== */
+/* =========================
+   CONTENITORI SETTINGS
+   ========================= */
+
+/* Base per tutti i contenitori settings:
+   - vista Inspag
+   - vista Riepilogo
+   - pannelli Impostazioni (interni)
+*/
+.settings-container {
+  margin-top: var(--settings-top-gap);
+  padding: 22px 22px 26px;
+}
+/* ===================== SPLIT containers-base : END ======================= */
+
+
+/* ===================== SPLIT containers-view-settings : START ===================== */
+/* Vista Impostazioni:
+   in .view-settings il contenitore principale fa solo da layout,
+   le card vere sono .settings-group-card
+*/
+.view-settings .settings-container {
+  padding: 30px 26px 36px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+/* ===================== SPLIT containers-view-settings : END ======================= */
+
+
+/* ===================== SPLIT containers-group-and-hint : START ===================== */
+/* blocchi interni (es. pannello tema, blocchi spiegazione) */
+.settings-group {
+  margin-bottom: 22px;
+}
+
+/* Testo di spiegazione / hint in pannelli Impostazioni
+   (es. testo in Inspag, Riepilogo, pannello Tema) */
+.settings-hint {
+  margin: 0;
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+}
+/* ===================== SPLIT containers-group-and-hint : END ======================= */
+
+
+/* ===================== SPLIT list-and-panels-card : START ===================== */
+/* =========================
+   SETTINGS: LISTA + PANNELLI
+   ========================= */
+
+/* Card che raggruppano le righe della lista Impostazioni
+   (Turni, Indennità, Festività, Tema, Versione, Info) */
+.settings-group-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  padding: 10px 14px 4px;
+  margin-bottom: 26px;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+/* ===================== SPLIT list-and-panels-card : END ======================= */
+
+
+/* ===================== SPLIT list-and-panels-visibility : START ===================== */
+/* Contenuto principale (lista) vs pannelli secondari */
+.settings-main,
+.settings-panel {
+  display: none;
+}
+
+.settings-main.is-active,
+.settings-panel.is-active {
+  display: block;
+}
+/* ===================== SPLIT list-and-panels-visibility : END ======================= */
+
+
+/* ===================== SPLIT settings-row-layout : START ===================== */
+/* Riga della lista Impostazioni:
+   - Turni
+   - Indennità
+   - Festività
+   - Tema
+   - Versione
+   - Info
+*/
+.settings-row {
+  width: 100%;
+  padding: 22px 8px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Lato sinistro riga (label e icone opzionali) */
+.settings-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Lato destro riga (summary + chevron > a destra) */
+.settings-row-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+/* ===================== SPLIT settings-row-layout : END ======================= */
+
+
+/* ===================== SPLIT settings-row-typography : START ===================== */
+/* Label riga Impostazioni (FONT 7)
+   usa token dedicati per dimensione + letter-spacing */
+.view-settings .settings-row-label {
+  font-size: var(--fs-settings-menu-desktop);
+  letter-spacing: var(--ls-settings-menu);
+}
+
+/* Testo riassuntivo a destra (es. "Sistema", "Chiaro", "Scuro") */
+.settings-row-summary {
+  font-size: var(--fs-settings-summary);
+  font-weight: var(--fw-settings-summary);
+  color: var(--col-settings-summary);
+  letter-spacing: var(--ls-settings-summary);
+}
+/* ===================== SPLIT settings-row-typography : END ======================= */
+
+
+/* ===================== SPLIT settings-row-chevron : START ===================== */
+/* Chevron riga impostazioni → icona laterale */
+.settings-row-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+}
+
+.settings-row-chevron svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: none;
+  stroke: var(--subtext);
+  stroke-width: 2.0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    opacity 0.16s ease,
+    transform 0.12s ease;
+}
+
+/* Solo feed di pressione/hover, niente riempimento blu del rigo */
+@media (hover:hover) {
+  .settings-row:hover .settings-row-chevron svg {
+    opacity: 1;
+    transform: translateX(1px);
+  }
+}
+
+.settings-row:active .settings-row-chevron svg {
+  transform: translateX(1px);
+}
+/* ===================== SPLIT settings-row-chevron : END ======================= */
+
+
+/* ===================== SPLIT settings-row-separator : START ===================== */
+/* Separatore tra righe nella stessa card */
+.settings-separator {
+  margin: 2px 0 0 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148,163,184,0.35);
+}
+/* ===================== SPLIT settings-row-separator : END ======================= */
+
+
+/* ===================== SPLIT panels-secondary-back : START ===================== */
+/* =========================
+   PANNELLI SECONDARI
+   ========================= */
+
+/* usa la base comune dei bottoni icona da components.css
+   (classe .settings-back usata nell’header principale Impostazioni) */
+.settings-back {
+  width: var(--icon-circle-md);
+  height: var(--icon-circle-md);
+  color: var(--color-back-icon);
+  display: flex;
+}
+/* ===================== SPLIT panels-secondary-back : END ======================= */
+
+
+/* ===================== SPLIT theme-choices : START ===================== */
+/* =========================
+   SCELTE TEMA
+   ========================= */
+/* Buttons nel pannello Tema:
+   - "Sistema"
+   - "Chiaro"
+   - "Scuro"
+*/
+.settings-choice {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  font-size: var(--fs-settings-choice); /* FONT 8 */
+  margin-bottom: 10px;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.06s ease;
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .settings-choice {
+  background: rgba(15,23,42,0.55);
+}
+
+/* Contenuto testuale interno al bottone tema */
+.settings-choice-label {
+  display: inline-block;
+}
+
+/* Stato attivo: bordo accent + leggero alone */
+.settings-choice.is-active {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring-1);
+}
+/* ===================== SPLIT theme-choices : END ======================= */
+
+
+/* ===================== SPLIT responsive-settings : START ===================== */
+/* =========================
+   RESPONSIVE UI (settings)
+   ========================= */
+
+@media (max-width: 900px) {
+  .settings-container {
+    padding: 18px 12px 22px;
+  }
+
+  .view-settings .settings-container {
+    padding: 22px 14px 26px;
+  }
+
+  .settings-row {
+    padding: 20px 6px;
+  }
+
+  .view-settings .settings-row-label {
+    font-size: var(--fs-settings-menu-mobile);
+  }
+
+  .settings-choice {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+}
+/* ===================== SPLIT responsive-settings : END ======================= */
+/* 
+   =========================
+   PANNELLO TURNI — LISTA + CARD
+   turni-panel.css v 1.0
+   ========================= */
+
+/* ===================== SPLIT lista-turni-salvati : START ===================== */
+/* =========================
+   LISTA TURNI SALVATI
+   ========================= */
+
+/* Contenitore lista turni nel pannello "Turni" */
+.turni-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hint mostrato quando non ci sono turni salvati */
+.turni-empty-hint {
+  margin: 8px 2px 0 2px;
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+}
+
+/* Singola riga turno:
+   [SIGLA]  Nome turno   06:55 - 13:08   [handle]
+*/
+.turno-item {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* RIDOTTO (prima 10px) → riga più compatta */
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.turno-item:last-child {
+  border-bottom: none;
+}
+
+/* Pill quadrata per la sigla */
+.turno-sigla-pill {
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  flex-shrink: 0;
+}
+
+.turno-sigla {
+  font-size: var(--fs-turni-sigla);
+  font-weight: 600;
+  color: var(--text); /* sovrascritto inline con il colore scelto */
+}
+
+/* Nome turno: singola riga, ellissi, prende lo spazio centrale */
+.turno-name {
+  font-size: var(--fs-turni-nome);
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Orario allineato verso destra, prima della maniglia */
+.turno-orario {
+  margin-left: auto;
+  margin-right: 2px;
+  font-size: var(--fs-turni-orario);
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* ===================== SPLIT lista-turni-salvati : END ======================= */
+
+
+/* ===================== SPLIT modifica-cancellazione-ios : START ===================== */
+/* =========================
+   MODIFICA / CANCELLAZIONE (stile iOS)
+   ========================= */
+
+.turno-delete-btn {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  margin-right: 4px;
+
+  background: #d31a1a;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  padding: 6px;
+
+  box-shadow: 0 1px 3px rgba(220,38,38,0.30);
+}
+
+.turno-delete-icon {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1;
+  transform: translateY(-0.4px);
+  pointer-events: none;
+}
+
+@media (hover:hover) {
+  .turno-delete-btn:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.turno-delete-btn:active {
+  transform: scale(0.9);
+}
+/* ===================== SPLIT modifica-cancellazione-ios : END ======================= */
+
+
+/* ===================== SPLIT handle-drag-riordino : START ===================== */
+/* =========================
+   HANDLE DRAG / RIORDINO
+   ========================= */
+
+.turni-handle {
+  width: 24px;
+  height: 24px;
+  margin-left: 2px;
+  display: none;
+  flex-shrink: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.turni-handle svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.turni-list.editing .turni-handle {
+  display: flex;
+  color: var(--nav-fg);
+}
+
+.turni-list.editing .turno-item {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html.turni-no-select,
+body.turni-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+html.turni-no-select * ,
+body.turni-no-select * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.turno-item.dragging {
+  background: var(--surface-strong);
+  box-shadow: 0 12px 28px rgba(15,23,42,0.4);
+  transform: scale(1.02);
+  z-index: 5;
+}
+/* ===================== SPLIT handle-drag-riordino : END ======================= */
+
+
+/* ===================== SPLIT card-header-pannello-turni : START ===================== */
+/* =========================
+   CARD / HEADER PANNELLO TURNI
+   ========================= */
+
+.turni-card {
+  margin-top: 8px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  padding: 18px 16px 16px;
+}
+
+.turni-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turni-panel-title {
+  margin: 0;
+  font-size: var(--fs-turni-panel-title-desktop);
+  font-weight: 600;
+  letter-spacing: var(--ls-turni-panel-title);
+}
+
+.turni-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-panel.settings-turni .pill-btn,
+.settings-panel.settings-turni .icon-circle-btn {
+  color: var(--nav-fg);
+}
+
+.settings-panel.settings-turni .pill-btn[disabled] {
+  background: transparent;
+  color: var(--subtext);
+  border-color: rgba(148,163,184,0.35);
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+
+.turni-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--subtext);
+}
+
+.turni-toggle-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: center;
+  transition: transform 0.16s ease;
+}
+
+.turni-card.is-collapsed .turni-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+.turni-card.is-collapsed .turni-list,
+.turni-card.is-collapsed .turni-empty-hint,
+.turni-card.is-collapsed .turni-visual-hint,
+.turni-card.is-collapsed .turni-inline-row {
+  display: none;
+}
+
+
+.turni-card.is-collapsed .turni-card-actions .pill-btn,
+.turni-card.is-collapsed .turni-card-actions .icon-circle-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+/* ===================== SPLIT card-header-pannello-turni : END ======================= */
+
+
+/* ===================== SPLIT blocco-visualizza-turnazione : START ===================== */
+/* =========================
+   BLOCCO "VISUALIZZA TURNAZIONE" (ORA IN CARD)
+   ========================= */
+
+.turni-visual-card {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.turni-visual-hint {
+  margin: 6px 2px 0 2px;
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+}
+
+/* ✅ Riga inline dentro la card "Visualizza Turnazione" */
+.turni-inline-row {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  min-height: calc(var(--turni-sigla-size) + 20px);
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ✅ Variante "lista" per: Inizio Turnazione (niente rettangolo, linea sotto) */
+.turni-inline-row[data-turni-start-row]{
+  margin-top: 8px;
+  padding: 10px 2px;
+  min-height: calc(var(--turni-sigla-size) + 6px);
+
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.turni-inline-row[data-turni-start-row] .turni-inline-row-right{
+  gap: 8px;
+}
+
+.turni-inline-row[data-turni-start-row] .turni-inline-row-summary{
+  font-variant-numeric: tabular-nums;
+}
+
+.turni-inline-row-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.turni-inline-row-label {
+  font-size: var(--fs-turni-form-label);
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.turni-inline-row-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.turni-inline-row-summary {
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+  white-space: nowrap;
+}
+
+.turni-inline-row-chevron svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--subtext);
+}
+
+/* Stato disabilitato (come "Modifica" quando è spento) */
+.turni-inline-row.is-disabled {
+  background: transparent;
+  color: var(--subtext);
+  border-color: rgba(148,163,184,0.35);
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+
+.turni-inline-row.is-disabled .turni-inline-row-label {
+  color: var(--subtext);
+}
+
+.turni-inline-row.is-disabled .turni-inline-row-chevron {
+  display: none;
+}
+
+/* coerente anche quando disabilitato, per la variante "lista" */
+.turni-inline-row.is-disabled[data-turni-start-row]{
+  border-bottom-color: rgba(148,163,184,0.35);
+}
+/* ===================== SPLIT blocco-visualizza-turnazione : END ======================= */
+
+
+
+/* ===================== SPLIT responsive-turni-panel : START ===================== */
+/* =========================
+   RESPONSIVE (Turni panel)
+   ========================= */
+
+@media (max-width: 900px) {
+  .turni-card {
+    padding: 14px 12px 12px;
+  }
+
+  .turni-panel-title {
+    font-size: var(--fs-turni-panel-title-mobile);
+  }
+
+  .turni-card-actions {
+    gap: 6px;
+  }
+}
+/* ===================== SPLIT responsive-turni-panel : END ======================= */
+
+/* ===================== SPLIT pannello-turni-scroll : START ===================== */
+/* =========================
+   Scroll pannello "Impostazioni → Turni"
+   ========================= */
+
+.settings-panel.settings-turni.is-active{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+/* ===================== SPLIT pannello-turni-scroll : END ======================= */
+/* 
+   =========================
+   FORM "AGGIUNGI TURNO"
+   turni-form.css v 1.0
+   ========================= */
+
+/* ===================== SPLIT struttura_form : START ===================== */
+
+.turni-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.turni-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+}
+
+.turni-label {
+  font-size: var(--fs-turni-form-label);
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+  flex-shrink: 0;
+  flex: 0 0 9ch;
+}
+
+.turni-field-control {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.turni-field-control-sigla {
+  gap: 12px;
+}
+
+.turni-input {
+  width: 100%;
+  max-width: 220px;
+  height: var(--turni-sigla-size);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.08);
+  padding: 0 12px;
+  font-size: var(--fs-turni-form-input);
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#addTurnoSigla.turni-input {
+  max-width: 9ch;
+  text-align: center;
+}
+
+:root[data-theme="dark"] .turni-input {
+  background: rgba(15,23,42,0.7);
+}
+
+.turni-input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring-1);
+}
+
+.turni-input.is-invalid {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px rgba(220,38,38,0.7) !important;
+}
+
+/* ===================== SPLIT struttura_form : END ======================= */
+
+/* =========================
+   CONTROLLI COLORE / PREVIEW SIGLA
+   ========================= */
+
+/* ===================== SPLIT colore_preview_sigla : START ===================== */
+
+.turni-color-dot {
+  margin-left: 4px;
+  border: none;
+  background: transparent;
+  padding: 2px;
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.turni-color-preview {
+  width: var(--color-dot-size);
+  height: var(--color-dot-size);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px rgba(15,23,42,0.25);
+  background: var(--accent);
+}
+
+.turni-color-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.turni-sigla-preview-pill {
+  width: var(--turni-sigla-size);
+  height: var(--turni-sigla-size);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.turni-sigla-preview-text {
+  font-size: var(--fs-turni-sigla);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ===================== SPLIT colore_preview_sigla : END ======================= */
+
+/* =========================
+   TOOLBAR "AGGIUNGI TURNO"
+   ========================= */
+
+/* ===================== SPLIT toolbar_aggiungi_turno : START ===================== */
+
+.turni-add-toolbar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.turni-save-btn {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.pill-btn.turni-save-btn {
+  height: 40px;
+  padding: 0 20px;
+}
+
+.turni-save-btn:active {
+  transform: translateY(1px);
+}
+
+.turni-error {
+  margin: 0 2px 4px;
+  font-size: var(--fs-turni-form-hint);
+  color: #dc2626;
+}
+
+.turni-error[hidden] {
+  display: none;
+}
+
+/* ===================== SPLIT toolbar_aggiungi_turno : END ======================= */
+
+/* =========================
+   "TURNO SENZA ORARIO"
+   ========================= */
+
+/* ===================== SPLIT turno_senza_orario : START ===================== */
+
+.turni-field-row-notime .turni-label {
+  flex: 0 0 16ch;
+  display: flex;
+  align-items: center;
+  height: var(--turni-sigla-size);
+}
+
+.turni-field-row-notime .turni-field-control {
+  justify-content: flex-end;
+}
+
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-input {
+  background: transparent;
+  border-color: rgba(148,163,184,0.25);
+  color: var(--subtext);
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-label {
+  opacity: 0.55;
+}
+
+.turni-no-time-on .turni-field-row[data-type="ora"] .turni-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+/* ===================== SPLIT turno_senza_orario : END ======================= */
+
+/* =========================
+   RESPONSIVE (Turni form)
+   ========================= */
+
+/* ===================== SPLIT responsive_turni_form : START ===================== */
+
+@media (max-width: 900px) {
+  .turni-field-row {
+    padding: 10px 10px;
+  }
+
+  .turni-input {
+    max-width: 180px;
+  }
+
+  .turni-label {
+    flex: 0 0 9ch;
+  }
+
+  #addTurnoSigla.turni-input {
+    max-width: 9ch;
+  }
+}
+
+/* ===================== SPLIT responsive_turni_form : END ======================= */
+/* 
+   =========================
+   TURNAZIONI — PANNELLO "AGGIUNGI TURNAZIONE"
+   turnazioni.css v 1.0
+   ========================= */
+
+/* ===================== SPLIT layout-wrap : START ===================== */
+
+.turnazioni-add-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* ===================== SPLIT layout-wrap : END   ===================== */
+
+
+/* ===================== SPLIT pannello-add-scroll : START ===================== */
+
+/* =========================
+   Scroll pannello "Aggiungi turnazione"
+   ========================= */
+
+.settings-panel.settings-turnazioni-add.is-active{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
+/* ===================== SPLIT pannello-add-scroll : END   ===================== */
+
+
+/* ===================== SPLIT card-nome : START ===================== */
+
+/* =========================
+   CARD 0 — "Nome" (come "Aggiungi turno")
+   ========================= */
+
+.turnazioni-name-row .turni-field-control{
+  justify-content: flex-end;
+}
+
+/* Nome turnazione: più lungo (toglie il limite dei 220px di .turni-input) */
+.turnazioni-name-input{
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===================== SPLIT card-nome : END   ===================== */
+
+
+/* ===================== SPLIT card-giorni-rotazione : START ===================== */
+
+/* =========================
+   CARD 1 — "Giorni Rotazione"
+   ========================= */
+
+/* rendilo coerente con gli altri label (9ch) */
+.turnazioni-days-label{
+  flex: 0 0 23ch;
+  display: flex;
+  align-items: center;
+  height: var(--turni-sigla-size);
+}
+
+/* PRIMA era flex-end: lo portiamo a sinistra */
+.turnazioni-days-control{
+  justify-content: flex-end;
+}
+
+/* nascondi definitivamente lo select desktop (per ora) */
+.turnazioni-desktop-select{ display:none !important; }
+
+/* input giorni: piccolo e leggibile */
+.turnazioni-days-input{
+  display:block;
+  width: 100%;
+  max-width: 7ch;
+  text-align: center;
+  font-weight: 700;
+}
+.turnazioni-days-range{
+  margin-left: 6px;
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+  font-weight: 500;
+}
+
+/* ===================== SPLIT card-giorni-rotazione : END   ===================== */
+
+
+/* ===================== SPLIT card-rotazione-contenitore : START ===================== */
+
+/* =========================
+   CARD 2 — Rotazione (contenitore)
+   ========================= */
+
+.turnazioni-days-card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.turnazioni-days-card-header{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin-bottom: 10px;
+}
+
+.turnazioni-days-card-title{
+  font-size: var(--fs-row-label);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.turnazioni-days-card-subtitle{
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+  line-height: 1.2;
+}
+
+.turnazioni-days-placeholder{
+  display:none; /* lo accende il JS quando n non è impostato */
+  margin-top: 2px;
+  margin-bottom: 8px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--subtext);
+  font-size: var(--fs-row-subtext);
+}
+
+/* ===================== SPLIT card-rotazione-contenitore : END   ===================== */
+
+
+/* ===================== SPLIT grid-pill-rotazione : START ===================== */
+
+/* =========================
+   GRID pill rotazione (1..7)
+   ========================= */
+
+.turnazioni-days-grid{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  width:100%;
+}
+
+/* Le pill sono la "sigla preview" (stesse classi) ma cliccabili */
+.turnazioni-day-pill{
+  /* reset button */
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  /* per evitare stretching su Safari */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  aspect-ratio: 1;
+  width: 100%;
+
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+/* riusiamo ESATTAMENTE lo stile pill preview già definito in turni-form.css:
+   .turni-sigla-preview-pill + .turni-sigla-preview-text
+   qui aggiungiamo solo piccoli ritocchi di interazione */
+.turnazioni-day-pill .turni-sigla-preview-pill{
+  width: 100%;
+  height: 100%;
+  border-radius: 10px; /* un pelo più morbido qui */
+  position: relative;  /* ✅ per badge "R" */
+}
+
+.turnazioni-day-pill.is-empty .turni-sigla-preview-text{
+  color: var(--subtext);
+  opacity: 0.85;
+}
+
+/* ✅ Badge "R" in alto a destra */
+.turnazioni-rest-badge{
+  position: absolute;
+  top: 3.5px;
+  right: 3.5px;
+
+  background: none;
+  border: none;
+  padding: 0;
+
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+
+  text-shadow: 0 1px 1px rgba(0,0,0,0.18);
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* feedback hover/press senza inventare nuovi componenti */
+@media (hover:hover){
+  .turnazioni-day-pill:hover .turni-sigla-preview-pill{
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(10,132,255,0.16);
+    transform: translateY(-1px);
+    transition: 0.12s ease;
+  }
+}
+
+.turnazioni-day-pill:active .turni-sigla-preview-pill{
+  transform: scale(0.96);
+}
+
+/* Forza i text della rotazione a usare ESATTAMENTE lo stesso font del contesto */
+.turnazioni-day-pill .turni-sigla-preview-text{
+  font: inherit;          /* mantiene font-family/weight */
+  line-height: 1;         /* evita differenze verticali */
+}
+
+/* ===================== SPLIT grid-pill-rotazione : END   ===================== */
+
+
+/* ===================== SPLIT card-giorni-riposo : START ===================== */
+
+/* =========================
+   ✅ NUOVA CARD — "Giorni di Riposo" (1 / 2)
+   ========================= */
+
+.turnazioni-restdays-label{
+  flex: 0 0 21ch;
+  display:flex;
+  align-items:center;
+  height: var(--turni-sigla-size);
+}
+
+.turnazioni-restdays-control{
+  justify-content: flex-end;
+}
+
+.turnazioni-restdays-pills{
+  display:flex;
+  gap: 8px;
+  align-items:center;
+  justify-content: flex-end;
+}
+
+.turnazioni-restdays-pill{
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+
+  height: 30px;
+  min-width: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.08s ease-out;
+}
+
+.turnazioni-restdays-pill.is-active{
+  border-color: var(--accent);
+  background: rgba(10,132,255,0.08);
+}
+
+.turnazioni-restdays-pill:active{
+  transform: scale(0.97);
+}
+
+.turnazioni-restdays-pill:focus-visible{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(10,132,255,0.25);
+}
+
+/* ===================== SPLIT card-giorni-riposo : END   ===================== */
+
+
+/* ===================== SPLIT card-riposo-espandibile : START ===================== */
+
+/* =========================
+   CARD 3/4 — "Riposo" (espandibile via .is-on)
+   ========================= */
+
+.turnazioni-riposo-card{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.turnazioni-riposo-header{
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.turnazioni-riposo-label{
+  flex: 0 0 21ch;
+  display:flex;
+  align-items:center;
+  height: var(--turni-sigla-size);
+}
+
+.turnazioni-riposo-control{
+  justify-content: flex-end;
+}
+
+.turnazioni-riposo-body{
+  display:none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.turnazioni-riposo-card.is-on .turnazioni-riposo-body{
+  display:flex;
+}
+
+/* Sigla RIPOSO: stretta come "Aggiungi turno" */
+#turnazioniRiposoSigla.turni-input,
+#turnazioniRiposo2Sigla.turni-input{
+  max-width: 9ch;
+  text-align: center;
+}
+
+/* ===================== SPLIT card-riposo-espandibile : END   ===================== */
+
+
+/* ===================== SPLIT help-riposo : START ===================== */
+
+/* =========================
+   HELP "?" + TOAST (Riposo)
+   ========================= */
+
+.turnazioni-help-btn{
+  margin-left: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--subtext);
+
+  opacity: 0.85;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.08s ease-out,
+    opacity 0.16s ease;
+}
+
+@media (hover:hover){
+  .turnazioni-help-btn:hover{
+    color: var(--accent);
+    border-color: rgba(10,132,255,0.45);
+    background: rgba(10,132,255,0.08);
+    opacity: 1;
+  }
+}
+
+.turnazioni-help-btn:active{
+  transform: scale(0.95);
+  color: var(--accent);
+  border-color: rgba(10,132,255,0.55);
+  background: rgba(10,132,255,0.10);
+  opacity: 1;
+}
+
+.turnazioni-help-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(10,132,255,0.35);
+}
+
+.turnazioni-help-toast{
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-row-subtext);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ===================== SPLIT help-riposo : END   ===================== */
+
+
+/* ===================== SPLIT pannello-pick-turno : START ===================== */
+
+/* =========================
+   PANNELLO PICK TURNO (pagina)
+   ========================= */
+
+.settings-panel.settings-turnazioni-pick.is-active{
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
+.turnazioni-pick-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* ✅ Riga toggle "giorno di riposo" */
+.turnazioni-pick-rest-row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+
+  padding: 12px 12px;
+  border-radius: 16px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow-soft);
+}
+
+.turnazioni-pick-rest-label{
+  font-size: var(--fs-row-label);
+  font-weight: 500;
+  color: var(--text);
+  min-width: 0;
+}
+
+/* ✅ LISTA nel tuo stile: una sola “card” + righe con separatori */
+.turnazioni-pick-list{
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  box-shadow: var(--shadow-soft);
+}
+
+/* Riga — stile lista (no pill) */
+.turnazioni-pick-row{
+  width: 100%;
+
+  /* reset button */
+  border: none;
+  border-radius: 0;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding: 12px 12px;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  color: var(--text);
+  text-align: left;
+
+  border-bottom: 1px solid var(--border);
+
+  transition: background-color 0.16s ease;
+}
+
+.turnazioni-pick-row:last-child{
+  border-bottom: none;
+}
+
+/* nome */
+.turnazioni-pick-name{
+  font-size: var(--fs-row-label);
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* selezionata — SOLO blu (niente fondo/contorno “da card”) */
+.turnazioni-pick-row.is-selected{
+  background: transparent;
+}
+
+.turnazioni-pick-row.is-selected .turnazioni-pick-name{
+  color: var(--accent);
+}
+
+/* hover coerente */
+@media (hover:hover){
+  .turnazioni-pick-row:hover{
+    background: rgba(10,132,255,0.06);
+  }
+}
+
+/* focus accessibilità */
+.turnazioni-pick-row:focus-visible{
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(10,132,255,0.25);
+}
+
+/* vuoto */
+.turnazioni-pick-empty{
+  margin: 6px 2px 0 2px;
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+}
+
+/* ===================== SPLIT pannello-pick-turno : END   ===================== */
+
+
+
+/* ===================== SPLIT lista-turnazioni-card : START ===================== */
+
+/* =========================
+   TURNAZIONI — LISTA CARD (nel pannello Turni)
+   ========================= */
+
+.turnazioni-card [data-turnazioni-list]{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.turnazione-mini-card{
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  border-radius: 16px;
+  padding: 12px 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  box-shadow: var(--shadow-soft);
+
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.turnazione-mini-card.is-selected{
+  border-color: var(--accent);
+  background: rgba(10,132,255,0.08);
+}
+
+@media (hover:hover){
+  .turnazione-mini-card:hover{
+    background: rgba(10,132,255,0.06);
+  }
+}
+
+.turnazione-mini-name{
+  font-size: var(--fs-row-label);
+  font-weight: 500;
+  color: var(--text);
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.turnazione-mini-sigle{
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* evita che elementi vuoti vengano “disegnati” come card */
+.turnazione-mini-card:empty { display: none; }
+
+/* ===================== SPLIT lista-turnazioni-card : END   ===================== */
+
+
+/* ===================== SPLIT turnazioni_list_selection : START ===================== */
+/*
+  Lista Turnazioni nel pannello Turni:
+  - stile identico a Turni (righi nella stessa card)
+  - selezione: solo testo in accent
+*/
+[data-turnazioni-list] .turno-item.is-selected .turno-name{
+  color: var(--accent);
+}
+
+[data-turnazioni-list] .turno-item.is-selected .turno-orario{
+  color: color-mix(in srgb, var(--accent) 70%, var(--subtext));
+}
+/* ===================== SPLIT turnazioni_list_selection : END   ===================== */
+/* 
+===========================================
+ Turni PdS — 
+ Componenti UI condivisi (card, bottoni, stato)
+ components.css v 1.0
+===========================================
+*/
+
+
+/* ==========================================================
+   SPLIT CARD_PRINCIPALI : START
+   ========================================================== */
+/* =========================
+   CARD PRINCIPALI
+   ========================= */
+
+/* Contenitori principali:
+   - calendario: .calendar-container
+   - viste semplici (Inspag, Riepilogo): .settings-container
+   (in .view-settings lo stile viene sovrascritto in settings.css)
+*/
+.calendar-container,
+.settings-container {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+}
+/* ==========================================================
+   SPLIT CARD_PRINCIPALI : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT LABEL_TESTI_RIGA : START
+   ========================================================== */
+/* =========================
+   LABEL / TESTI DI RIGA
+   ========================= */
+
+/* Titoli delle righe (impostazioni, turni, ecc.)
+   usato da:
+   - <span class="settings-row-label"> nelle righe impostazioni
+*/
+.settings-row-label {
+  font-size: var(--fs-row-label);
+  font-weight: var(--fw-row-label);
+  color: var(--text);
+}
+/* ==========================================================
+   SPLIT LABEL_TESTI_RIGA : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT BOTTONI_ICONA : START
+   ========================================================== */
+/* =========================
+   PULSANTI / BOTTONI ICONA
+   ========================= */
+
+/* Base comune per bottoni tondi con icona:
+   - .nav-btn        → frecce mese calendario
+   - .settings-back  → freccia back in Impostazioni
+   - .icon-circle-btn→ cerchio "+" in Turni e altri bottoni tondi
+*/
+.nav-btn,
+.settings-back,
+.icon-circle-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease-out;
+}
+
+/* Pulsanti frecce mese (calendario) */
+.nav-btn {
+  width: var(--icon-circle-lg);
+  height: var(--icon-circle-lg);
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+  color: var(--color-arrow-month);
+}
+
+/* SVG frecce mese calendario */
+.nav-btn svg {
+  width: var(--icon-arrow-size);
+  height: var(--icon-arrow-size);
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-arrow-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* SVG icona BACK impostazioni */
+.settings-back svg {
+  width: var(--icon-back-size);
+  height: var(--icon-back-size);
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-arrow-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* SVG interni dei bottoni icona tondi generici (es. "+") */
+.icon-circle-btn svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Hover desktop: cerchio blu pieno */
+@media (hover:hover) {
+  .nav-btn:hover,
+  .settings-back:hover,
+  .icon-circle-btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: var(--shadow-accent-hover);
+  }
+}
+
+/* Pressione: scalatura */
+.nav-btn:active,
+.settings-back:active,
+.icon-circle-btn:active {
+  transform: scale(0.9);
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent-press);
+}
+
+/* Focus tastiera */
+.nav-btn:focus-visible,
+.settings-back:focus-visible,
+.icon-circle-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    var(--focus-ring-2),
+    0 4px 10px rgba(15,23,42,0.25);
+}
+
+@media (max-width: 900px) {
+  .nav-btn {
+    width: var(--icon-circle-lg-mobile);
+    height: var(--icon-circle-lg-mobile);
+    border-radius: 50%;
+  }
+}
+/* ==========================================================
+   SPLIT BOTTONI_ICONA : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT TOGGLE_SWITCH_IOS26 : START
+   ========================================================== */
+/* =========================
+   TOGGLE SWITCH (Visualizza Turnazione) — iOS 26
+   Altezza IDENTICA (28px), più allungato, thumb ovale
+   ========================= */
+
+.toggle-switch {
+  /* “token” locali */
+  --sw-w: 60px;   /* allungamento */
+  --sw-h: 28px;   /* NON cambiare */
+  --sw-pad: 3px;  /* spazio interno sx/dx */
+  --knob-w: 30px; /* thumb ovale */
+  --knob-h: 22px; /* 28 - 3 - 3 */
+  --knob-shift: calc(var(--sw-w) - var(--knob-w) - (var(--sw-pad) * 2));
+
+  position: relative;
+  border: none;
+  width: var(--sw-w);
+  height: var(--sw-h);
+  border-radius: 999px;
+  background: rgba(148,163,184,0.55);
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+/* Thumb NON tondo: ovale, stile iOS26 */
+.toggle-switch::before {
+  content: "";
+  position: absolute;
+  left: var(--sw-pad);
+  top: calc((var(--sw-h) - var(--knob-h)) / 2);
+
+  width: var(--knob-w);
+  height: var(--knob-h);
+  border-radius: 12px;
+
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.35);
+  transition: transform 0.16s ease;
+}
+
+.toggle-switch.is-on {
+  background: var(--accent);
+}
+
+.toggle-switch.is-on::before {
+  transform: translateX(var(--knob-shift));
+}
+/* ==========================================================
+   SPLIT TOGGLE_SWITCH_IOS26 : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT PILL_BTN : START
+   ========================================================== */
+/* =========================
+   PULSANTE "PILLOLA" GENERICO
+   ========================= */
+
+/* Bottone pillola generico:
+   usato come base anche per il "Modifica" in Turni (poi
+   ulteriormente rifinito in turni.css)
+*/
+.pill-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* altezza allineata al cerchio */
+  height: 32px;
+  padding: 0 14px;
+  font-size: var(--fs-pill-btn);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.08s ease-out;
+}
+
+@media (hover:hover) {
+  .pill-btn:hover {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: var(--shadow-accent-hover);
+  }
+}
+
+.pill-btn:active {
+  transform: scale(0.96);
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent-press);
+}
+/* ==========================================================
+   SPLIT PILL_BTN : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT ICON_CIRCLE_BTN : START
+   ========================================================== */
+/* =========================
+   BOTTONE ICONA TONDO COMPATTO
+   ========================= */
+
+/* Cerchio con icona (es. "+" nel pannello Turni) */
+.icon-circle-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-circle-sm);
+  height: var(--icon-circle-sm);
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--accent);
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+}
+/* ==========================================================
+   SPLIT ICON_CIRCLE_BTN : END
+   ========================================================== */
+
+
+/* ==========================================================
+   SPLIT STATUS_ICON_SALVATAGGIO : START
+   ========================================================== */
+/* =========================
+   ICONA STATO / SALVATAGGIO
+   ========================= */
+
+/* Contenitore fisso in alto a destra:
+   <div id="statusIcon" class="app-status status-idle"><div id="icoStatus"></div></div>
+*/
+.app-status {
+  position: fixed;
+  top: 20px;   /* più giù */
+  right: 16px;
+  z-index: 9999;
+  width: var(--icon-circle-md);
+  height: var(--icon-circle-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* SVG login.svg iniettato in #icoStatus da Icons.loadStatusIcon() */
+#icoStatus svg {
+  width: var(--status-icon-size);   /* icona più grande */
+  height: var(--status-icon-size);
+  display: block;
+}
+
+/* Omino: colore sottotitoli */
+#icoStatus #loginUser {
+  fill: var(--subtext);
+}
+
+/* Cerchio base: sempre presente, mai animato */
+#icoStatus #loginCircleBase {
+  stroke: var(--accent);
+  fill: none;
+  transform-origin: center;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+
+/* Cerchio spinning: solo il segmento, già dashed da SVG */
+#icoStatus #loginCircle {
+  stroke: var(--accent);
+  fill: none;
+  transform-origin: center;
+  transform: rotate(0deg);
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* IDLE → cerchio pieno tenue, nessun segmento */
+.status-idle #icoStatus #loginCircleBase {
+  opacity: 0.35;
+}
+
+.status-idle #icoStatus #loginCircle {
+  opacity: 0;
+  animation: none;
+}
+
+/* SAVING → cerchio pieno leggero + segmento acceso che gira */
+.status-saving #icoStatus #loginCircleBase {
+  opacity: 0.35;
+}
+
+.status-saving #icoStatus #loginCircle {
+  opacity: 1;
+  animation: statusSpin 0.3s linear infinite;
+}
+
+/* OK → cerchio pieno più acceso, nessun segmento */
+.status-ok #icoStatus #loginCircleBase {
+  opacity: 1;
+}
+
+.status-ok #icoStatus #loginCircle {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes statusSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* ==========================================================
+   SPLIT STATUS_ICON_SALVATAGGIO : END
+   ========================================================== */
+/* 
+===========================================
+ Turni PdS
+ Tabbar inferiore + label versione
+ tabbar.css v 1.0
+===========================================
+*/
+
+/* ===================== SPLIT tabbar-layout : START ===================== */
+
+/* =========================
+   TABBAR INFERIORE
+   ========================= */
+
+/* Barra inferiore fissa:
+   contiene i 4 tab:
+   - Calendario
+   - Riepilogo
+   - Ins/Pag
+   - Impostazioni
+*/
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tabbar-bg);
+  border-top: 1px solid var(--tabbar-border);
+  display: flex;
+  justify-content: space-around;
+  gap: 18px;
+  padding: 6px 18px calc(8px + env(safe-area-inset-bottom));
+  z-index: 10;
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Singolo tab:
+   - icona (SVG iniettato da icons.js)
+   - label (desktop)
+*/
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  max-width: var(--tabMaxW);
+  min-width: 0;
+  height: var(--tabH);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--tabColor);
+  font-size: var(--fs-tab-label);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  padding: 0;
+  transition:
+    color .16s ease,
+    transform .06s ease,
+    filter .12s ease;
+}
+
+/* evita overlay strani: tutto il contenuto sopra eventuali effetti futuri */
+.tab > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Label sotto l’icona (solo desktop, vedi media query) */
+.tab-label {
+  font-size: var(--fs-tab-label);
+  line-height: 1;
+}
+
+/* Hover desktop: piccolo lift */
+@media (hover:hover) {
+  .tab:hover {
+    transform: translateY(var(--lift));
+    filter: brightness(var(--active-bright)) contrast(var(--active-contrast));
+  }
+}
+
+/* Pressione (touch/mouse) */
+.tab:active {
+  transform: translateY(var(--press));
+}
+
+/* Focus tastiera */
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Stato attivo:
+   - colore accent
+   - font leggermente più marcato
+*/
+.tab.active {
+  color: var(--tabActiveColor);
+  font-weight: 600;
+  filter: none;
+}
+
+/* Icone tab:
+   - inizialmente invisibili
+   - resi visibili quando icons.js ha iniettato gli SVG
+*/
+.tab svg {
+  width: var(--tabIcon);
+  height: var(--tabIcon);
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    stroke-width .16s ease,
+    transform .12s ease,
+    color .16s ease;
+  visibility: hidden;
+}
+
+/* Icona nel tab attivo: leggermente più “piena” e pop */
+.tab.active svg {
+  stroke-width: 1.6;
+  transform: scale(var(--icon-pop));
+}
+
+/* touch-only: leggero feedback luminosità */
+@media (hover:none) {
+  .tab:active {
+    filter: brightness(1.08) contrast(1.02);
+  }
+}
+
+/* Quando le icone SVG sono state caricate da icons.js:
+   Icons.initTabbar() aggiunge .tabbar-icons-ready
+*/
+.tabbar.tabbar-icons-ready .tab svg {
+  visibility: visible;
+}
+
+/* ===================== SPLIT tabbar-layout : END   ===================== */
+
+
+/* ===================== SPLIT tabbar-icon-calendar : START ===================== */
+
+/* =========================
+   ICONA CALENDARIO (tabbar)
+   Testi interni:
+   - FONT 5 → giorno (#calDay)
+   - FONT 6 → mese (#calMonth)
+   ========================= */
+
+#icoCalendar #calDay {
+  font-family: var(--font-ui);
+  font-size: var(--fs-cal-icon-day);   /* FONT 5 */
+  font-weight: 760;
+  fill: currentColor;
+  stroke: none;
+}
+
+#icoCalendar #calMonth {
+  font-family: var(--font-ui);
+  font-size: var(--fs-cal-icon-month); /* FONT 6 */
+  font-weight: 650;
+  fill: currentColor;
+  stroke: none;
+}
+
+/* ===================== SPLIT tabbar-icon-calendar : END   ===================== */
+
+
+/* ===================== SPLIT version-label : START ===================== */
+
+/* =========================
+   VERSION LABEL (in basso a sinistra)
+   ========================= */
+
+/* Etichetta versione:
+   popolata da sw-register.js tramite #versionLabel
+*/
+.version-label {
+  position: fixed;
+  bottom: 6px;
+  left: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--version-color);
+  opacity: 0.9;
+  pointer-events: none;
+  user-select: none;
+  z-index: 9999;
+  text-shadow: 0 1px 2px rgba(15,23,42,0.35);
+}
+
+/* ===================== SPLIT version-label : END   ===================== */
+
+
+/* ===================== SPLIT responsive : START ===================== */
+
+/* =========================
+   RESPONSIVE UI (tabbar)
+   ========================= */
+
+@media (max-width: 900px) {
+  .tabbar {
+    padding-inline: 10px;
+  }
+
+  /* MOBILE: niente scritte sotto le icone, solo i simboli */
+  .tab-label {
+    display: none;
+  }
+}
+
+@media (min-width: 901px) {
+  .tab-label {
+    display: block;
+  }
+}
+
+/* ===================== SPLIT responsive : END   ===================== */
