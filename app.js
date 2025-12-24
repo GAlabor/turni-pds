@@ -1349,21 +1349,56 @@
 	let openEditTurnazioneImpl = null;
 	let clearEditTurnazioneImpl = null;
 // ===================== SPLIT helpers_formatting : START =====================
-  function formatSigle(turnazione) {
-    const n = Number(turnazione && turnazione.days) || 0;
-    const slots = Array.isArray(turnazione && turnazione.slots) ? turnazione.slots : [];
-    const restIdx = Array.isArray(turnazione && turnazione.restIndices) ? turnazione.restIndices : [];
+  // split start
+function formatSigle(turnazione) {
+  const n = Number(turnazione && turnazione.days) || 0;
+  const slots = Array.isArray(turnazione && turnazione.slots) ? turnazione.slots : [];
+  const restIdx = Array.isArray(turnazione && turnazione.restIndices) ? turnazione.restIndices : [];
 
-    const out = [];
-    for (let i = 0; i < n; i++) {
-      if (restIdx.includes(i)) out.push("R");
-      else {
-        const s = (slots[i] && slots[i].sigla) ? String(slots[i].sigla).trim() : "";
-        out.push(s || "?");
+  const out = [];
+  let prevWasRest = false;
+
+  for (let i = 0; i < n; i++) {
+    const slot = slots[i] || null;
+    const sigla = slot && slot.sigla ? String(slot.sigla).trim() : "";
+
+    const isRest = restIdx.includes(i);
+
+    if (isRest) {
+      const s = sigla || "R";
+
+      // Se due (o più) riposi sono consecutivi, li unisco tipo R/RF
+      if (prevWasRest && out.length) {
+        out[out.length - 1] = out[out.length - 1] + "/" + s;
+      } else {
+        out.push(s);
       }
+      prevWasRest = true;
+    } else {
+      out.push(sigla || "?");
+      prevWasRest = false;
     }
-    return out.join(" - ");
   }
+
+  // Riposi fissi (Lun/Mar) -> append "(GL/AP)"
+  const riposiFissi = (turnazione && turnazione.riposiFissi) ? turnazione.riposiFissi : null;
+  if (riposiFissi && typeof riposiFissi === "object") {
+    const sigLun = riposiFissi.lunedi && riposiFissi.lunedi.sigla ? String(riposiFissi.lunedi.sigla).trim() : "";
+    const sigMar = riposiFissi.martedi && riposiFissi.martedi.sigla ? String(riposiFissi.martedi.sigla).trim() : "";
+
+    const extra = [];
+    if (sigLun) extra.push(sigLun);
+    if (sigMar) extra.push(sigMar);
+
+    if (extra.length) {
+      return out.join(" - ") + " (" + extra.join("/") + ")";
+    }
+  }
+
+  return out.join(" - ");
+}
+// split end
+
 
   function getPreferred(savedTurnazioni, preferredId) {
     if (!Array.isArray(savedTurnazioni) || savedTurnazioni.length === 0) return null;
@@ -1375,7 +1410,8 @@
     if (!pick) pick = savedTurnazioni[savedTurnazioni.length - 1];
     return pick;
   }
-// ===================== SPLIT helpers_formatting : END   =====================
+// ===================== SPLIT helpers_formatting : END =======================
+
 
 // ===================== SPLIT render-lista-turnazioni : START =====================
 function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
@@ -1993,6 +2029,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     // ----------------------------
     let riposo1Reset = null;
     let riposo2Reset = null;
+    let riposo1GetData = null;
+    let riposo2GetData = null;
 
     function initRiposoCard(opts) {
       const {
@@ -2022,7 +2060,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       const colorPrev  = panelAdd.querySelector(colorPrevSel);
       const siglaPrev  = panelAdd.querySelector(siglaPrevSel);
 
-      if (!cardEl || !toggleBtn || !bodyEl) return { reset: function () {} };
+      if (!cardEl || !toggleBtn || !bodyEl) return { reset: function () {}, getData: function () { return null; } };
 
       let on = false;
 
@@ -2061,6 +2099,19 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         on = false;
         clearFields();
         applyState();
+      }
+
+      function getData() {
+        if (!on) return null;
+
+        const nome = (inputNome && inputNome.value ? inputNome.value : "").trim();
+        const sigla = (inputSigla && inputSigla.value ? inputSigla.value : "").trim();
+        const colore = (colorInput && colorInput.value ? colorInput.value : "").trim();
+
+        // Se non c’è almeno la sigla, non ha senso salvarlo/mostrarlo
+        if (!sigla) return null;
+
+        return { nome, sigla, colore };
       }
 
       bodyEl.hidden = true;
@@ -2103,7 +2154,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         });
       }
 
-      return { reset };
+      return { reset, getData };
     }
 
     const riposo1 = initRiposoCard({
@@ -2134,7 +2185,11 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
     riposo1Reset = riposo1 && typeof riposo1.reset === "function" ? riposo1.reset : null;
     riposo2Reset = riposo2 && typeof riposo2.reset === "function" ? riposo2.reset : null;
+
+    riposo1GetData = riposo1 && typeof riposo1.getData === "function" ? riposo1.getData : null;
+    riposo2GetData = riposo2 && typeof riposo2.getData === "function" ? riposo2.getData : null;
 // ===================== SPLIT riposo_cards_component : END =======================
+
 
 // ===================== SPLIT reset_form : START =====================
     // ----------------------------
@@ -2252,16 +2307,25 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         });
       }
 
+      const lun = (typeof riposo1GetData === "function") ? riposo1GetData() : null;
+      const mar = (typeof riposo2GetData === "function") ? riposo2GetData() : null;
+
+      const riposiFissi = {};
+      if (lun) riposiFissi.lunedi = lun;
+      if (mar) riposiFissi.martedi = mar;
+
 	      return {
 	        id: (idOverride != null) ? String(idOverride) : String(Date.now()),
         name,
         days,
         slots,
         restDaysAllowed,
-        restIndices: restDayIndices.slice(0, restDaysAllowed)
+        restIndices: restDayIndices.slice(0, restDaysAllowed),
+        riposiFissi: (Object.keys(riposiFissi).length ? riposiFissi : null)
       };
     }
 // ===================== SPLIT validate_and_payload : END =======================
+
 
 // ===================== SPLIT save_click_handler : START =====================
     if (btnSave) {
