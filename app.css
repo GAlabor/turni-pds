@@ -27,16 +27,48 @@
   --radius-xl: 20px;   /* card grandi: .calendar-container, .settings-group-card, .turni-card */
   --radius: 14px;      /* blocchi più piccoli / secondari */
 
+
+  /* =========================
+     SPACING SCALE — ENTERPRISE
+     (tokenizza padding/margin/gap senza cambiare l'aspetto)
+     ========================= */
+  --space-0: 0px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-22: 22px;
+  --space-24: 24px;
+  --space-26: 26px;
+  --space-28: 28px;
+  --space-30: 30px;
+  --space-32: 32px;
+  --space-36: 36px;
+  --space-40: 40px;
+  --space-48: 48px;
+
+  /* Alias più usati (così smetti di ricordarti i numeri) */
+  --space-xs: var(--space-8);
+  --space-sm: var(--space-12);
+  --space-md: var(--space-16);
+  --space-lg: var(--space-20);
+  --space-xl: var(--space-24);
   /* Ombre globali per card / elementi sollevati */
   --shadow-soft: 0 18px 45px rgba(15,23,42,0.18);  /* card principali */
   --shadow-light: 0 10px 26px rgba(15,23,42,0.12); /* celle giorno, elementi minori */
   /* Accents / focus (evita rgba sparsi ovunque) */
-  --shadow-accent-hover: var(--shadow-accent-hover);
-  --shadow-accent-press: var(--shadow-accent-press);
-  --shadow-accent-lift: var(--shadow-accent-lift);
-  --shadow-accent-lift-strong: var(--shadow-accent-lift-strong);
-  --focus-ring-1: var(--focus-ring-1);
-  --focus-ring-2: var(--focus-ring-2);
+  --shadow-accent-hover: 0 8px 18px rgba(10,132,255,0.25);
+  --shadow-accent-press: 0 2px 6px rgba(10,132,255,0.35);
+  --shadow-accent-lift: 0 4px 10px rgba(10,132,255,0.25);
+  --shadow-accent-lift-strong: 0 8px 18px rgba(10,132,255,0.25);
+  --focus-ring-1: 0 0 0 1px rgba(10,132,255,0.40);
+  --focus-ring-2: 0 0 0 2px rgba(10,132,255,0.40);
 
   /* Colori specifici calendario */
   --dow-muted: #6b7280;     /* intestazione giorni settimana (.dow) */
@@ -201,24 +233,6 @@
   --fs-turni-form-input: var(--t-body);
   --fs-turni-form-hint: var(--t-caption);
 
-
-  /* Titolo grande di pagina (es: "Turni" in .app-title) */
-  --fs-page-title: 34px;
-  --fw-page-title: 700;
-
-  /* Sottotitolo di pagina (placeholder futuro, nessuna classe dedicata attuale) */
-  --fs-page-subtitle: 14px;
-
-  /* Titoli secondari / barre (es: label impostazioni, intestazioni pannelli come "Turni") */
-  --fs-section-title: 24px; /* alias per header calendario di default */
-
-  /* Label di riga (impostazioni, righe elenco, ecc.) */
-  --fs-row-label: 15px;
-  --fw-row-label: 500;
-
-  /* Testi secondari / summary / hint (es. .settings-hint, descrizioni brevi) */
-  --fs-row-subtext: 13px;
-
   /* Riepilogo a destra nelle righe impostazioni
    (es. "Sistema" nella riga Tema) */
   --fs-settings-summary: 15px;  
@@ -240,31 +254,31 @@
      - .app-title (Turni, Riepilogo, Inserimenti e Pagamenti, Impostazioni)
      - header Impostazioni (id="settingsTitle" anche quando mostra sottovoci)
   */
-  --fs-title-lg: 34px;
+  --fs-title-lg: var(--t-h1);
   --ls-title-lg: -0.035em;        /* desktop */
   --ls-title-lg-mobile: -0.025em; /* mobile */
 
   /* FONT 2 — Intestazione calendario:
      - .month-label ("Novembre 2025", "2025", "2020 - 2031")
   */
-  --fs-cal-header: 24px;
+  --fs-cal-header: var(--t-h2);
 
   /* FONT 3 — Giorni settimana calendario:
      - .dow (Lun, Mar, ... Dom)
   */
-  --fs-cal-dow-desktop: 13px;
-  --fs-cal-dow-mobile: 11px;
+  --fs-cal-dow-desktop: var(--fs-sm);
+  --fs-cal-dow-mobile: var(--fs-xxs);
 
   /* Numero giorno nelle celle calendario (grid) */
-  --fs-cal-day-desktop: 18px;
-  --fs-cal-day-mobile: 14px;
+  --fs-cal-day-desktop: var(--fs-xl);
+  --fs-cal-day-mobile: var(--fs-md);
 
   /* FONT 4 — Celle selezione mesi / anni:
      - .month-cell (Gen, Feb, ...)
      - .year-cell  (2024, 2025, ...)
   */
-  --fs-cal-month-cell: 17px;
-  --fs-cal-year-cell: 16px;
+  --fs-cal-month-cell: var(--fs-lg);
+  --fs-cal-year-cell: var(--fs-base);
 
   /* FONT 5 / 6 — Icona calendario (gestiti in SVG, qui solo token):
      - #calDay   → giorno (es. "24")
@@ -277,8 +291,8 @@
      - .settings-row-label in .view-settings
        (Turni, Indennità, Festività, Tema, Versione, Info)
   */
-  --fs-settings-menu-desktop: 18px;
-  --fs-settings-menu-mobile: 17px;
+  --fs-settings-menu-desktop: var(--fs-xl);
+  --fs-settings-menu-mobile: var(--fs-lg);
   --ls-settings-menu: -0.015em; /* letter-spacing per le voci menu impostazioni */
 
   /* FONT 8 — Voci secondarie menu:
@@ -344,7 +358,7 @@
   --ui-card-border: 1px solid var(--border);
   --ui-card-radius: var(--radius-xl);
   --ui-card-shadow: var(--shadow-soft);
-  --ui-card-padding: 16px;
+  --ui-card-padding: var(--space-16);
 
   /* Focus / accent shadow (evita rgba ripetuti ovunque) */
   --ui-focus-ring: 0 0 0 2px rgba(10,132,255,0.35);
@@ -526,10 +540,10 @@ body {
 /* Header stile iOS */
 
 .app-header {
-  padding: 10px 6px 14px 6px; /* titolo più giù */
+  padding: var(--space-10) var(--space-6) var(--space-14) var(--space-6);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 /* Titolo principale di pagina */
@@ -557,11 +571,11 @@ body {
   body {
     /* meno padding laterale per dare più larghezza al calendario,
        spazio sotto per la tabbar (usa --tabbar-h) */
-    padding: calc(env(safe-area-inset-top) + 26px) 4px calc(10px + env(safe-area-inset-bottom) + var(--tabbar-h));
+    padding: calc(env(safe-area-inset-top) + var(--space-26)) var(--space-4) calc(var(--space-10) + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
 
   .app-header {
-    padding: 10px 4px 8px 4px; /* il 3° valore cambia lo spazio tra titolo e frecce mese */
+    padding: var(--space-10) var(--space-4) var(--space-8) var(--space-4);
   }
 
   .app-title {
@@ -573,7 +587,7 @@ body {
 
 @media (min-width: 901px) {
   body {
-    padding-bottom: 20px;
+    padding-bottom: var(--space-20);
   }
 }
 /* ==========================================================
@@ -600,11 +614,11 @@ body {
    - frecce mese (.nav-btn da components.css)
 */
 .monthbar {
-  margin: 14px 0 20px 0; /* distacco dal titolo e dal calendario */
+  margin: var(--space-14) 0 var(--space-20) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 /* Etichetta mese/anno:
@@ -638,8 +652,8 @@ body {
      .mode-days / .mode-months / .mode-years
 */
 .calendar-container {
-  margin-top: 6px; /* contenitore giorni più giù */
-  padding: 22px 18px 26px; /* meno padding laterale → più larghezza utile */
+  margin-top: var(--space-6);
+  padding: var(--space-22) var(--space-18) var(--space-26);
   width: 100%;
   max-width: 1280px;       /* più largo su desktop */
   backdrop-filter: blur(22px);
@@ -663,15 +677,15 @@ body {
 .dow-row {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
 }
 
 /* Singola label giorno:
    usata solo in modalità giorni
 */
 .dow {
-  padding: 6px 0;
+  padding: var(--space-6) 0;
   text-align: center;
   font-weight: 600;
   color: var(--dow-muted);
@@ -697,7 +711,7 @@ body {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px; /* tiene un po’ respiro ma lascia più spazio alle celle */
+  gap: var(--space-10);
 }
 
 /* Celle giorno:
@@ -706,7 +720,7 @@ body {
 */
 .day {
   background: var(--surface-strong);
-  padding: 12px 12px 16px;
+  padding: var(--space-12) var(--space-12) var(--space-16);
   text-align: right;
   font-size: var(--fs-cal-day-desktop); /* numero giorno, FONT dedicato */
   border-radius: 18px;
@@ -837,8 +851,8 @@ body {
 
 .month-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  padding-top: 8px;
+  gap: var(--space-16);
+  padding-top: var(--space-8);
 }
 
 /* Singolo mese:
@@ -849,7 +863,7 @@ body {
   background: var(--surface-strong);
   border-radius: 18px;
   border: 1px solid var(--border);
-  padding: 16px 10px;
+  padding: var(--space-16) var(--space-10);
   text-align: center;
   font-size: var(--fs-cal-month-cell); /* FONT 4 */
   font-weight: 600;
@@ -892,8 +906,8 @@ body {
 
 .year-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  padding-top: 10px;
+  gap: var(--space-14);
+  padding-top: var(--space-10);
 }
 
 /* Singolo anno:
@@ -904,7 +918,7 @@ body {
   background: var(--surface-strong);
   border-radius: 18px;
   border: 1px solid var(--border);
-  padding: 14px 10px;
+  padding: var(--space-14) var(--space-10);
   text-align: center;
   font-size: var(--fs-cal-year-cell); /* FONT 4 */
   font-weight: 600;
@@ -946,7 +960,7 @@ body {
 
 @media (max-width: 900px) {
   .monthbar {
-    margin: 10px 0 16px 0;
+    margin: var(--space-10) 0 var(--space-16) 0;
   }
 
   .month-label {
@@ -954,27 +968,27 @@ body {
   }
 
   .calendar-container {
-    margin-top: 8px;
-    padding: 10px 2px 10px; /* quasi a filo per dare più larghezza alle celle */
+    margin-top: var(--space-8);
+    padding: var(--space-10) var(--space-2) var(--space-10);
   }
 
   .dow-row {
-    gap: 2px;
-    margin-bottom: 4px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
   }
 
   .dow {
     font-size: var(--fs-cal-dow-mobile); /* FONT 3 mobile */
-    padding: 4px 0;
+    padding: var(--space-4) 0;
   }
 
   .calendar-grid {
-    gap: 2px; /* meno gap = celle più larghe */
+    gap: var(--space-2);
   }
 
   .day {
     border-radius: 14px;
-    padding: 6px 6px 10px;
+    padding: var(--space-6) var(--space-6) var(--space-10);
     min-height: 58px; /* altezza celle giorni */
     font-size: var(--fs-cal-day-mobile); /* numero giorno mobile */
     box-shadow: none;
@@ -985,32 +999,32 @@ body {
   }
 
   .month-grid {
-    gap: 10px;
-    padding-top: 6px;
+    gap: var(--space-10);
+    padding-top: var(--space-6);
   }
 
   .month-cell {
     font-size: var(--t-cal-month-cell-mobile);
-    padding: 12px 6px;
+    padding: var(--space-12) var(--space-6);
     min-height: 60px;
   }
 
   .year-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    padding-top: 6px;
+    gap: var(--space-8);
+    padding-top: var(--space-6);
   }
 
   .year-cell {
     font-size: var(--t-cal-year-cell-mobile);
-    padding: 10px 6px;
+    padding: var(--space-10) var(--space-6);
     min-height: 52px;
   }
 }
 
 @media (min-width: 901px) {
   .calendar-container {
-    padding-bottom: 16px;
+    padding-bottom: var(--space-16);
   }
 }
 /* ==========================================================
@@ -1036,7 +1050,7 @@ body {
 */
 .settings-container {
   margin-top: var(--settings-top-gap);
-  padding: 22px 22px 26px;
+  padding: var(--space-22) var(--space-22) var(--space-26);
 }
 /* ===================== SPLIT containers-base : END ======================= */
 
@@ -1047,7 +1061,7 @@ body {
    le card vere sono .settings-group-card
 */
 .view-settings .settings-container {
-  padding: 30px 26px 36px;
+  padding: var(--space-30) var(--space-26) var(--space-36);
   background: transparent;
   border: none;
   box-shadow: none;
@@ -1060,7 +1074,7 @@ body {
 /* ===================== SPLIT containers-group-and-hint : START ===================== */
 /* blocchi interni (es. pannello tema, blocchi spiegazione) */
 .settings-group {
-  margin-bottom: 22px;
+  margin-bottom: var(--space-22);
 }
 
 /* Testo di spiegazione / hint in pannelli Impostazioni
@@ -1085,7 +1099,7 @@ body {
   --_card-radius: var(--radius-xl);
   --_card-shadow: var(--shadow-soft);
   --_card-padding: 10px 14px 4px;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-10);
 }
 
 /* ===================== SPLIT list-and-panels-card : END ======================= */
@@ -1116,7 +1130,7 @@ body {
 */
 .settings-row {
   width: 100%;
-  padding: 22px 8px;
+  padding: var(--space-22) var(--space-8);
   border: none;
   background: transparent;
   display: flex;
@@ -1130,7 +1144,7 @@ body {
 .settings-row-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   min-width: 0;
 }
 
@@ -1138,7 +1152,7 @@ body {
 .settings-row-right {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 /* ===================== SPLIT settings-row-layout : END ======================= */
 
@@ -1201,7 +1215,7 @@ body {
 /* ===================== SPLIT settings-row-separator : START ===================== */
 /* Separatore tra righe nella stessa card */
 .settings-separator {
-  margin: 2px 0 0 0;
+  margin: var(--space-2) 0 0 0;
   border: 0;
   border-bottom: 1px solid rgba(148,163,184,0.35);
 }
@@ -1236,13 +1250,13 @@ body {
 .settings-choice {
   width: 100%;
   text-align: left;
-  padding: 12px 14px;
+  padding: var(--space-12) var(--space-14);
   border-radius: 16px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.04);
   cursor: pointer;
   font-size: var(--fs-settings-choice); /* FONT 8 */
-  margin-bottom: 10px;
+  margin-bottom: var(--space-10);
   -webkit-tap-highlight-color: transparent;
   transition:
     border-color 0.16s ease,
@@ -1275,15 +1289,15 @@ body {
 
 @media (max-width: 900px) {
   .settings-container {
-    padding: 18px 12px 22px;
+    padding: var(--space-18) var(--space-12) var(--space-22);
   }
 
   .view-settings .settings-container {
-    padding: 22px 14px 26px;
+    padding: var(--space-22) var(--space-14) var(--space-26);
   }
 
   .settings-row {
-    padding: 20px 6px;
+    padding: var(--space-20) var(--space-6);
   }
 
   .view-settings .settings-row-label {
@@ -1291,7 +1305,7 @@ body {
   }
 
   .settings-choice {
-    padding: 10px 12px;
+    padding: var(--space-10) var(--space-12);
     border-radius: 14px;
   }
 }
@@ -1309,14 +1323,14 @@ body {
 
 /* Contenitore lista turni nel pannello "Turni" */
 .turni-list {
-  margin-top: 10px;
+  margin-top: var(--space-10);
   display: flex;
   flex-direction: column;
 }
 
 /* Hint mostrato quando non ci sono turni salvati */
 .turni-empty-hint {
-  margin: 8px 2px 0 2px;
+  margin: var(--space-8) var(--space-2) 0 var(--space-2);
   font-size: var(--fs-turni-form-hint);
   color: var(--subtext);
 }
@@ -1327,8 +1341,8 @@ body {
 .turno-item {
   display: flex;
   align-items: center;
-  gap: 6px; /* RIDOTTO (prima 10px) → riga più compatta */
-  padding: 6px 2px;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-2);
   border-bottom: 1px solid var(--border);
   position: relative;
 }
@@ -1372,7 +1386,7 @@ body {
 /* Orario allineato verso destra, prima della maniglia */
 .turno-orario {
   margin-left: auto;
-  margin-right: 2px;
+  margin-right: var(--space-2);
   font-size: var(--fs-turni-orario);
   color: var(--subtext);
   font-variant-numeric: tabular-nums;
@@ -1392,7 +1406,7 @@ body {
   height: 22px;
   border-radius: 999px;
   border: none;
-  margin-right: 4px;
+  margin-right: var(--space-4);
 
   background: #d31a1a;
 
@@ -1402,7 +1416,7 @@ body {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
-  padding: 6px;
+  padding: var(--space-6);
 
   box-shadow: 0 1px 3px rgba(220,38,38,0.30);
 }
@@ -1435,7 +1449,7 @@ body {
 .turni-handle {
   width: 24px;
   height: 24px;
-  margin-left: 2px;
+  margin-left: var(--space-2);
   display: none;
   flex-shrink: 0;
   cursor: grab;
@@ -1491,7 +1505,7 @@ body.turni-no-select * {
    ========================= */
 
 .turni-card{
-  margin-top: 8px;
+  margin-top: var(--space-8);
   --_card-bg: var(--surface);
   --_card-radius: var(--radius-xl);
   --_card-shadow: var(--shadow-soft);
@@ -1502,7 +1516,7 @@ body.turni-no-select * {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .turni-panel-title {
@@ -1515,7 +1529,7 @@ body.turni-no-select * {
 .turni-card-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .settings-panel.settings-turni .pill-btn,
@@ -1585,11 +1599,11 @@ body.turni-no-select * {
 
 .turni-visual-card {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-10);
 }
 
 .turni-visual-hint {
-  margin: 6px 2px 0 2px;
+  margin: var(--space-6) var(--space-2) 0 var(--space-2);
   font-size: var(--fs-turni-form-hint);
   color: var(--subtext);
 }
@@ -1597,8 +1611,8 @@ body.turni-no-select * {
 /* ✅ Riga inline dentro la card "Visualizza Turnazione" */
 .turni-inline-row {
   width: 100%;
-  margin-top: 10px;
-  padding: 10px 12px;
+  margin-top: var(--space-10);
+  padding: var(--space-10) var(--space-12);
   min-height: calc(var(--turni-sigla-size) + 20px);
   border-radius: 16px;
   background: var(--surface-strong);
@@ -1606,15 +1620,15 @@ body.turni-no-select * {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--space-10);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 /* ✅ Variante "lista" per: Inizio Turnazione (niente rettangolo, linea sotto) */
 .turni-inline-row[data-turni-start-row]{
-  margin-top: 8px;
-  padding: 10px 2px;
+  margin-top: var(--space-8);
+  padding: var(--space-10) var(--space-2);
   min-height: calc(var(--turni-sigla-size) + 6px);
 
   border-radius: 0;
@@ -1624,7 +1638,7 @@ body.turni-no-select * {
 }
 
 .turni-inline-row[data-turni-start-row] .turni-inline-row-right{
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .turni-inline-row[data-turni-start-row] .turni-inline-row-summary{
@@ -1649,7 +1663,7 @@ body.turni-no-select * {
 .turni-inline-row-right {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   flex-shrink: 0;
 }
 
@@ -1711,7 +1725,7 @@ body.turni-no-select * {
   }
 
   .turni-card-actions {
-    gap: 6px;
+    gap: var(--space-6);
   }
 }
 /* ===================== SPLIT responsive-turni-panel : END ======================= */
@@ -1736,17 +1750,17 @@ body.turni-no-select * {
 /* ===================== SPLIT struttura_form : START ===================== */
 
 .turni-form {
-  margin-top: 18px;
+  margin-top: var(--space-18);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .turni-field-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: var(--space-10);
+  padding: var(--space-10) var(--space-12);
   border-radius: 16px;
   background: var(--surface-strong);
   border: 1px solid var(--border);
@@ -1766,12 +1780,12 @@ body.turni-no-select * {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   justify-content: flex-start;
 }
 
 .turni-field-control-sigla {
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .turni-input {
@@ -1781,7 +1795,7 @@ body.turni-no-select * {
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
-  padding: 0 12px;
+  padding: 0 var(--space-12);
   font-size: var(--fs-turni-form-input);
   color: var(--text);
   outline: none;
@@ -1817,10 +1831,10 @@ body.turni-no-select * {
 /* ===================== SPLIT colore_preview_sigla : START ===================== */
 
 .turni-color-dot {
-  margin-left: 4px;
+  margin-left: var(--space-4);
   border: none;
   background: transparent;
-  padding: 2px;
+  padding: var(--space-2);
   width: var(--turni-sigla-size);
   height: var(--turni-sigla-size);
   border-radius: 999px;
@@ -1881,9 +1895,9 @@ body.turni-no-select * {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-end;
-  gap: 4px;
-  margin-top: 4px;
-  margin-bottom: 6px;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
 .turni-save-btn {
@@ -1895,7 +1909,7 @@ body.turni-no-select * {
 
 .pill-btn.turni-save-btn {
   height: 40px;
-  padding: 0 20px;
+  padding: 0 var(--space-20);
 }
 
 .turni-save-btn:active {
@@ -1903,7 +1917,7 @@ body.turni-no-select * {
 }
 
 .turni-error {
-  margin: 0 2px 4px;
+  margin: 0 var(--space-2) var(--space-4);
   font-size: var(--fs-turni-form-hint);
   color: #dc2626;
 }
@@ -1958,7 +1972,7 @@ body.turni-no-select * {
 
 @media (max-width: 900px) {
   .turni-field-row {
-    padding: 10px 10px;
+    padding: var(--space-10) var(--space-10);
   }
 
   .turni-input {
@@ -1986,7 +2000,7 @@ body.turni-no-select * {
 .turnazioni-add-wrap{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap: var(--space-10);
 }
 
 /* ===================== SPLIT layout-wrap : END   ===================== */
@@ -2057,7 +2071,7 @@ body.turni-no-select * {
   font-weight: 700;
 }
 .turnazioni-days-range{
-  margin-left: 6px;
+  margin-left: var(--space-6);
   font-size: var(--fs-row-subtext);
   color: var(--subtext);
   font-weight: 500;
@@ -2082,8 +2096,8 @@ body.turni-no-select * {
 .turnazioni-days-card-header{
   display:flex;
   flex-direction:column;
-  gap:4px;
-  margin-bottom: 10px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
 }
 
 .turnazioni-days-card-title{
@@ -2102,9 +2116,9 @@ body.turni-no-select * {
 
 .turnazioni-days-placeholder{
   display:none; /* lo accende il JS quando n non è impostato */
-  margin-top: 2px;
-  margin-bottom: 8px;
-  padding: 10px 10px;
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-8);
+  padding: var(--space-10) var(--space-10);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.04);
@@ -2124,7 +2138,7 @@ body.turni-no-select * {
 .turnazioni-days-grid{
   display:grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: var(--space-8);
   width:100%;
 }
 
@@ -2229,7 +2243,7 @@ body.turni-no-select * {
 
 .turnazioni-restdays-pills{
   display:flex;
-  gap: 8px;
+  gap: var(--space-8);
   align-items:center;
   justify-content: flex-end;
 }
@@ -2241,7 +2255,7 @@ body.turni-no-select * {
 
   height: 30px;
   min-width: 34px;
-  padding: 0 10px;
+  padding: 0 var(--space-10);
   border-radius: 999px;
 
   display:inline-flex;
@@ -2313,8 +2327,8 @@ body.turni-no-select * {
 .turnazioni-riposo-body{
   display:none;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: var(--space-10);
+  margin-top: var(--space-10);
 }
 
 .turnazioni-riposo-card.is-on .turnazioni-riposo-body{
@@ -2338,7 +2352,7 @@ body.turni-no-select * {
    ========================= */
 
 .turnazioni-help-btn{
-  margin-left: 8px;
+  margin-left: var(--space-8);
   width: 18px;
   height: 18px;
   border-radius: 999px;
@@ -2389,8 +2403,8 @@ body.turni-no-select * {
 }
 
 .turnazioni-help-toast{
-  margin-top: 8px;
-  padding: 10px 12px;
+  margin-top: var(--space-8);
+  padding: var(--space-10) var(--space-12);
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -2417,7 +2431,7 @@ body.turni-no-select * {
 .turnazioni-pick-wrap{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap: var(--space-10);
 }
 
 /* ✅ Riga toggle "giorno di riposo" */
@@ -2426,7 +2440,7 @@ body.turni-no-select * {
   align-items:center;
   justify-content: space-between;
 
-  padding: 12px 12px;
+  padding: var(--space-12) var(--space-12);
   border-radius: 16px;
 
   background: var(--surface);
@@ -2469,7 +2483,7 @@ body.turni-no-select * {
   align-items: center;
   justify-content: flex-start;
 
-  padding: 12px 12px;
+  padding: var(--space-12) var(--space-12);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -2521,7 +2535,7 @@ body.turni-no-select * {
 
 /* vuoto */
 .turnazioni-pick-empty{
-  margin: 6px 2px 0 2px;
+  margin: var(--space-6) var(--space-2) 0 var(--space-2);
   font-size: var(--fs-row-subtext);
   color: var(--subtext);
 }
@@ -2537,10 +2551,10 @@ body.turni-no-select * {
    ========================= */
 
 .turnazioni-card [data-turnazioni-list]{
-  margin-top: 10px;
+  margin-top: var(--space-10);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .turnazione-mini-card{
@@ -2553,7 +2567,7 @@ body.turni-no-select * {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-12);
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -2863,7 +2877,7 @@ body.turni-no-select * {
   justify-content: center;
   /* altezza allineata al cerchio */
   height: 32px;
-  padding: 0 14px;
+  padding: 0 var(--space-14);
   font-size: var(--fs-pill-btn);
   font-weight: 600;
   color: var(--text);
@@ -3049,8 +3063,8 @@ body.turni-no-select * {
   border-top: 1px solid var(--tabbar-border);
   display: flex;
   justify-content: space-around;
-  gap: 18px;
-  padding: 6px 18px calc(8px + env(safe-area-inset-bottom));
+  gap: var(--space-18);
+  padding: var(--space-6) var(--space-18) calc(var(--space-8) + env(safe-area-inset-bottom));
   z-index: 10;
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
@@ -3069,7 +3083,7 @@ body.turni-no-select * {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: var(--space-2);
   flex: 1;
   max-width: var(--tabMaxW);
   min-width: 0;
