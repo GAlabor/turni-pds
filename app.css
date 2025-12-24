@@ -252,6 +252,57 @@
 
   /* (FONT 15/16 sono già coperti nelle variabili ICON / CONTROL SIZES in alto) */
 }
+
+/* ====================================
+   UI PRIMITIVES (PRO MODE)
+   Obiettivo: coerenza senza riscrivere HTML
+   ==================================== */
+
+:root{
+  /* Radius coerenti (usa questi invece di numeri sparsi) */
+  --radius-md: 16px;
+  --radius-lg: 18px;
+
+  /* Card system */
+  --ui-card-bg: var(--surface);
+  --ui-card-bg-strong: var(--surface-strong);
+  --ui-card-border: 1px solid var(--border);
+  --ui-card-radius: var(--radius-xl);
+  --ui-card-shadow: var(--shadow-soft);
+  --ui-card-padding: 16px;
+
+  /* Focus / accent shadow (evita rgba ripetuti ovunque) */
+  --ui-focus-ring: 0 0 0 2px rgba(10,132,255,0.35);
+  --ui-shadow-accent-sm: 0 4px 10px rgba(10,132,255,0.20);
+  --ui-shadow-accent-md: 0 8px 18px rgba(10,132,255,0.22);
+  --ui-shadow-accent-press: 0 2px 6px rgba(10,132,255,0.30);
+}
+
+/* Base class (se vuoi usarla in futuro anche in HTML) */
+.ui-card{
+  background: var(--ui-card-bg);
+  border: var(--ui-card-border);
+  border-radius: var(--ui-card-radius);
+  box-shadow: var(--ui-card-shadow);
+  padding: var(--ui-card-padding);
+}
+.ui-card--strong{ background: var(--ui-card-bg-strong); }
+.ui-card--flat{ box-shadow: none; }
+.ui-focus-ring:focus,
+.ui-focus-ring:focus-visible{
+  outline: none;
+  box-shadow: var(--ui-focus-ring);
+}
+
+/* Mappa delle card esistenti verso lo stesso “sistema” */
+:is(.turni-card, .settings-group-card, .turni-visual-card, .turnazioni-days-card, .turnazioni-riposo-card, .turnazione-mini-card){
+  background: var(--_card-bg, var(--ui-card-bg));
+  border: var(--_card-border, var(--ui-card-border));
+  border-radius: var(--_card-radius, var(--ui-card-radius));
+  box-shadow: var(--_card-shadow, var(--ui-card-shadow));
+  padding: var(--_card-padding, var(--ui-card-padding));
+}
+
 /* ==========================================================
    SPLIT TOKENS_ROOT : END
    ========================================================== */
@@ -938,16 +989,14 @@ body {
 
 /* Card che raggruppano le righe della lista Impostazioni
    (Turni, Indennità, Festività, Tema, Versione, Info) */
-.settings-group-card {
-  background: var(--surface);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
-  padding: 10px 14px 4px;
-  margin-bottom: 26px;
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+.settings-group-card{
+  --_card-bg: var(--surface);
+  --_card-radius: var(--radius-xl);
+  --_card-shadow: var(--shadow-soft);
+  --_card-padding: 10px 14px 4px;
+  margin-bottom: 10px;
 }
+
 /* ===================== SPLIT list-and-panels-card : END ======================= */
 
 
@@ -1350,13 +1399,12 @@ body.turni-no-select * {
    CARD / HEADER PANNELLO TURNI
    ========================= */
 
-.turni-card {
+.turni-card{
   margin-top: 8px;
-  background: var(--surface);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
-  padding: 18px 16px 16px;
+  --_card-bg: var(--surface);
+  --_card-radius: var(--radius-xl);
+  --_card-shadow: var(--shadow-soft);
+  --_card-padding: 18px 16px 16px;
 }
 
 .turni-card-header {
@@ -1564,7 +1612,7 @@ body.turni-no-select * {
 
 @media (max-width: 900px) {
   .turni-card {
-    padding: 14px 12px 12px;
+    --_card-padding: 14px 12px 12px;
   }
 
   .turni-panel-title {
@@ -1934,10 +1982,10 @@ body.turni-no-select * {
    ========================= */
 
 .turnazioni-days-card{
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 12px;
+  --_card-bg: var(--surface-strong);
+  --_card-radius: var(--radius-md);
+  --_card-shadow: none;
+  --_card-padding: 12px;
 }
 
 .turnazioni-days-card-header{
@@ -2147,10 +2195,10 @@ body.turni-no-select * {
    ========================= */
 
 .turnazioni-riposo-card{
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 12px;
+  --_card-bg: var(--surface-strong);
+  --_card-radius: var(--radius-md);
+  --_card-shadow: none;
+  --_card-padding: 12px;
 }
 
 .turnazioni-riposo-header{
@@ -2406,10 +2454,10 @@ body.turni-no-select * {
 
 .turnazione-mini-card{
   width: 100%;
-  border: 1px solid var(--border);
-  background: var(--surface-strong);
-  border-radius: 16px;
-  padding: 12px 12px;
+  --_card-bg: var(--surface-strong);
+  --_card-radius: var(--radius-md);
+  --_card-shadow: none;
+  --_card-padding: 12px;
 
   display: flex;
   align-items: center;
@@ -2418,12 +2466,6 @@ body.turni-no-select * {
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-
-  box-shadow: var(--shadow-soft);
-
-  transition:
-    border-color 0.16s ease,
-    background-color 0.16s ease;
 }
 
 .turnazione-mini-card.is-selected{
