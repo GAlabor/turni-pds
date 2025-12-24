@@ -45,136 +45,103 @@
   }
 // ===================== SPLIT helpers_formatting : END   =====================
 
-  // ===================== SPLIT render-lista-turnazioni : START =====================
-  // Render lista turnazioni con UI identica a Turni:
-  // - pulsante Modifica gestito come in TurniRender.renderTurni
-  // - in edit: pallino rosso (-) + handle drag
-  // - selezione: solo testo blu (accent)
-  function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
-    if (!listEl) return;
+// ===================== SPLIT render-lista-turnazioni : START =====================
+function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
+  if (!listEl) return;
 
-    const opts = options || {};
-    const isEditing = !!opts.isEditing;
-    const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
-    const onSelect = typeof opts.onSelect === "function" ? opts.onSelect : null;
-    const preferredId = opts.preferredId != null ? String(opts.preferredId) : null;
+  const opts = options || {};
+  const isEditing = !!opts.isEditing;
+  const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
+  const onSelect = typeof opts.onSelect === "function" ? opts.onSelect : null;
+  const preferredId = opts.preferredId != null ? String(opts.preferredId) : null;
 
-    listEl.innerHTML = "";
+  listEl.innerHTML = "";
 
-    const has = Array.isArray(turnazioni) && turnazioni.length > 0;
+  const has = Array.isArray(turnazioni) && turnazioni.length > 0;
 
-    if (!has) {
-      listEl.classList.remove("editing");
+  if (!has) {
+    listEl.classList.remove("editing");
 
-      if (emptyHintEl) emptyHintEl.hidden = false;
-      if (editBtn) {
-        editBtn.disabled = true;
-        editBtn.classList.remove("icon-circle-btn");
-        editBtn.textContent = "Modifica";
-        editBtn.removeAttribute("aria-pressed");
-      }
-      return;
-    }
-
-    listEl.classList.toggle("editing", isEditing);
-
-    if (emptyHintEl) emptyHintEl.hidden = true;
-
+    if (emptyHintEl) emptyHintEl.hidden = false;
     if (editBtn) {
-      editBtn.disabled = false;
-
-      if (isEditing) {
-        editBtn.setAttribute("aria-pressed", "true");
-        editBtn.classList.add("icon-circle-btn");
-        editBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M6 12.5 L10 16.5 L18 7.5" />
-          </svg>
-        `;
-      } else {
-        editBtn.removeAttribute("aria-pressed");
-        editBtn.classList.remove("icon-circle-btn");
-        editBtn.textContent = "Modifica";
-      }
+      editBtn.disabled = true;
+      editBtn.classList.remove("icon-circle-btn");
+      editBtn.textContent = "Modifica";
+      editBtn.removeAttribute("aria-pressed");
     }
+    return;
+  }
 
-    turnazioni.forEach((t, index) => {
-      const row = document.createElement("div");
-      row.className = "turno-item";
-      row.dataset.index = String(index);
-      row.dataset.turnazioneId = t && t.id != null ? String(t.id) : "";
+  listEl.classList.toggle("editing", isEditing);
 
-      const isSel = preferredId && t && String(t.id) === preferredId;
-      row.classList.toggle("is-selected", !!isSel);
+  if (emptyHintEl) emptyHintEl.hidden = true;
 
-      if (isEditing && onDelete) {
-        const delBtn = document.createElement("button");
-        delBtn.type = "button";
-        delBtn.className = "turno-delete-btn";
-        delBtn.setAttribute("aria-label", "Elimina turnazione");
+  if (editBtn) {
+    editBtn.disabled = false;
 
-        const iconSpan = document.createElement("span");
-        iconSpan.className = "turno-delete-icon";
-        iconSpan.textContent = "−";
-        delBtn.appendChild(iconSpan);
-
-        delBtn.addEventListener("click", (ev) => {
-          ev.stopPropagation();
-          onDelete(index);
-        });
-
-        row.appendChild(delBtn);
-      }
-
-      // Pill a sinistra: numero giorni (solo per coerenza layout)
-      const siglaPill = document.createElement("span");
-      siglaPill.className = "turno-sigla-pill";
-
-      const siglaEl = document.createElement("span");
-      siglaEl.className = "turno-sigla";
-      const days = Number(t && t.days) || 0;
-      siglaEl.textContent = days ? String(days) : "";
-      // stessa logica font-size dinamico dei Turni, se disponibile
-      if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
-        TurniRender.applySiglaFontSize(siglaEl, siglaEl.textContent);
-      }
-      siglaPill.appendChild(siglaEl);
-
-      const nameEl = document.createElement("span");
-      nameEl.className = "turno-name";
-      nameEl.textContent = (t && t.name) ? String(t.name) : "";
-
-      const metaEl = document.createElement("span");
-      metaEl.className = "turno-orario";
-      metaEl.textContent = formatSigle(t);
-
-      const handle = document.createElement("div");
-      handle.className = "turni-handle";
-      handle.setAttribute("aria-hidden", "true");
-      handle.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M6 7 H18" />
-          <path d="M6 12 H18" />
-          <path d="M6 17 H18" />
+    if (isEditing) {
+      editBtn.setAttribute("aria-pressed", "true");
+      editBtn.classList.add("icon-circle-btn");
+      editBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 12.5 L10 16.5 L18 7.5" />
         </svg>
       `;
+    } else {
+      editBtn.removeAttribute("aria-pressed");
+      editBtn.classList.remove("icon-circle-btn");
+      editBtn.textContent = "Modifica";
+    }
+  }
 
-      row.appendChild(siglaPill);
-      row.appendChild(nameEl);
-      row.appendChild(metaEl);
-      row.appendChild(handle);
+  turnazioni.forEach((t, index) => {
+    const row = document.createElement("div");
+    row.className = "turno-item";
+    row.dataset.index = String(index);
+    row.dataset.turnazioneId = t && t.id != null ? String(t.id) : "";
 
-      // click normale: seleziona preferita (in edit mode ci pensa TurniInteractions.attachRowEditClick)
-      row.addEventListener("click", () => {
-        if (isEditing) return;
-        if (onSelect) onSelect(index);
+    const isSel = preferredId && t && String(t.id) === preferredId;
+    row.classList.toggle("is-selected", !!isSel);
+
+    if (isEditing && onDelete) {
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "turno-delete-btn";
+      delBtn.setAttribute("aria-label", "Elimina turnazione");
+
+      const iconSpan = document.createElement("span");
+      iconSpan.className = "turno-delete-icon";
+      iconSpan.textContent = "−";
+      delBtn.appendChild(iconSpan);
+
+      delBtn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        onDelete(index);
       });
 
-      listEl.appendChild(row);
-    });
-  }
-  // ===================== SPLIT render-lista-turnazioni : END =====================
+      row.appendChild(delBtn);
+    }
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "turno-name";
+    nameEl.textContent = t && t.name ? String(t.name) : "";
+    row.appendChild(nameEl);
+
+    const sigleEl = document.createElement("span");
+    sigleEl.className = "turno-orario";
+    sigleEl.textContent = formatSigle(t);
+    row.appendChild(sigleEl);
+
+    if (onSelect) {
+      row.addEventListener("click", () => onSelect(index));
+    }
+
+    listEl.appendChild(row);
+  });
+}
+// ===================== SPLIT render-lista-turnazioni : END =====================
+
 
 // ===================== SPLIT api_state_and_init : START =====================
   const api = {
