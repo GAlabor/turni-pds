@@ -126,6 +126,81 @@
 
   /* Font UI principale (usato da body) */
   --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  /* =========================
+     TYPOGRAPHY — ENTERPRISE
+     Obiettivo: scala coerente + alias compatibili (nessun redesign improvviso)
+     ========================= */
+
+  /* Font families */
+  --font-sans: var(--font-ui);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Font weights */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Line heights */
+  --lh-display: 1.12;
+  --lh-heading: 1.18;
+  --lh-body: 1.34;
+  --lh-meta: 1.25;
+
+  /* Font size scale (base) */
+  --fs-xxs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-base: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 18px;
+  --fs-2xl: 20px;
+  --fs-3xl: 24px;
+  --fs-4xl: 34px;
+
+  /* Semantic aliases (nuovi) */
+  --t-display: var(--fs-4xl);
+  --t-h1: var(--fs-4xl);
+  --t-h2: var(--fs-3xl);
+  --t-h3: var(--fs-xl);
+  --t-body: var(--fs-base);
+  --t-label: var(--fs-base);
+  --t-meta: var(--fs-xs);
+  --t-caption: var(--fs-sm);
+
+  /* Mobile special cases (evita px hardcoded in giro) */
+  --t-h1-mobile: var(--fs-3xl);          /* 24px */
+  --t-cal-month-label-mobile: var(--fs-2xl); /* 20px */
+  --t-cal-month-cell-mobile: var(--fs-sm);   /* 13px */
+  --t-cal-year-cell-mobile: var(--fs-xs);    /* 12px */
+  --t-icon-delete: var(--fs-md);         /* 14px */
+
+  /* Back-compat: mappo i token "storici" sulla scala */
+  --fw-page-title: var(--fw-bold);
+  --fw-row-label: var(--fw-medium);
+  --fw-settings-summary: var(--fw-regular);
+
+  --fs-page-title: var(--t-h1);
+  --fs-section-title: var(--t-h2);
+  --fs-row-label: var(--t-label);
+  --fs-row-subtext: var(--t-caption);
+  --fs-meta: var(--t-meta);
+  --fs-tab-label: var(--fs-xxs);
+  --fs-title-lg: var(--t-h1);
+  --fs-cal-header: var(--t-h2);
+  --fs-cal-dow-desktop: var(--fs-sm);
+  --fs-cal-dow-mobile: var(--fs-xxs);
+  --fs-settings-menu-desktop: var(--fs-xl);
+  --fs-settings-menu-mobile: var(--fs-lg);
+  --fs-pill-btn: var(--t-label);
+  --fs-turni-sigla: var(--t-label);
+  --fs-turni-nome: var(--t-body);
+  --fs-turni-orario: var(--t-caption);
+  --fs-turni-form-label: var(--t-label);
+  --fs-turni-form-input: var(--t-body);
+  --fs-turni-form-hint: var(--t-caption);
+
 
   /* Titolo grande di pagina (es: "Turni" in .app-title) */
   --fs-page-title: 34px;
@@ -402,11 +477,25 @@ body {
   height: 100%;
 }
 
+/* =========================
+   TYPOGRAPHY UTILITIES
+   (opzionali: usale dove vuoi, non rompono l'HTML esistente)
+   ========================= */
+.t-display { font-size: var(--t-display); font-weight: var(--fw-bold); letter-spacing: var(--ls-title-lg); line-height: var(--lh-display); }
+.t-h1 { font-size: var(--t-h1); font-weight: var(--fw-bold); letter-spacing: var(--ls-title-lg); line-height: var(--lh-display); }
+.t-h2 { font-size: var(--t-h2); font-weight: var(--fw-semibold); letter-spacing: -0.02em; line-height: var(--lh-heading); }
+.t-h3 { font-size: var(--t-h3); font-weight: var(--fw-semibold); letter-spacing: -0.01em; line-height: var(--lh-heading); }
+.t-body { font-size: var(--t-body); font-weight: var(--fw-regular); line-height: var(--lh-body); }
+.t-label { font-size: var(--t-label); font-weight: var(--fw-medium); line-height: var(--lh-body); }
+.t-meta { font-size: var(--t-meta); font-weight: var(--fw-regular); line-height: var(--lh-meta); color: var(--muted); }
+.t-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+
 body {
   margin: 0;
   background: var(--bg);
   background-attachment: fixed;
-  font-family: var(--font-ui);
+  font-family: var(--font-sans);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
@@ -449,6 +538,8 @@ body {
   font-size: var(--fs-title-lg);
   font-weight: var(--fw-page-title);
   letter-spacing: var(--ls-title-lg);
+
+  line-height: var(--lh-display);
 }
 /* ==========================================================
    SPLIT SHELL_VIEWS_HEADER : END
@@ -474,7 +565,7 @@ body {
   }
 
   .app-title {
-    font-size: 24px;                /* valore storico mobile */
+    font-size: var(--t-h1-mobile);                /* valore storico mobile */
     font-weight: 600;               /* più leggero rispetto al 700 desktop */
     letter-spacing: var(--ls-title-lg-mobile);
   }
@@ -859,7 +950,7 @@ body {
   }
 
   .month-label {
-    font-size: 20px; /* manteniamo il valore storico mobile */
+    font-size: var(--t-cal-month-label-mobile); /* manteniamo il valore storico mobile */
   }
 
   .calendar-container {
@@ -899,7 +990,7 @@ body {
   }
 
   .month-cell {
-    font-size: 13px;
+    font-size: var(--t-cal-month-cell-mobile);
     padding: 12px 6px;
     min-height: 60px;
   }
@@ -911,7 +1002,7 @@ body {
   }
 
   .year-cell {
-    font-size: 12px;
+    font-size: var(--t-cal-year-cell-mobile);
     padding: 10px 6px;
     min-height: 52px;
   }
@@ -1318,7 +1409,7 @@ body {
 
 .turno-delete-icon {
   color: #ffffff;
-  font-size: 14px;
+  font-size: var(--t-icon-delete);
   line-height: 1;
   transform: translateY(-0.4px);
   pointer-events: none;
@@ -2086,7 +2177,7 @@ body.turni-no-select * {
   padding: 0;
 
   color: var(--accent);
-  font-size: 11px;
+  font-size: var(--fs-xxs);
   font-weight: 400;
   line-height: 1;
 
@@ -2157,7 +2248,7 @@ body.turni-no-select * {
   align-items:center;
   justify-content:center;
 
-  font-size: 14px;
+  font-size: var(--t-icon-delete);
   font-weight: 700;
   line-height: 1;
 
@@ -2258,7 +2349,7 @@ body.turni-no-select * {
   align-items: center;
   justify-content: center;
 
-  font-size: 12px;
+  font-size: var(--t-cal-year-cell-mobile);
   font-weight: 800;
   line-height: 1;
   color: var(--subtext);
@@ -3122,7 +3213,7 @@ body.turni-no-select * {
   position: fixed;
   bottom: 6px;
   left: 10px;
-  font-size: 12px;
+  font-size: var(--t-cal-year-cell-mobile);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
