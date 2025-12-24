@@ -465,30 +465,34 @@
   min-width: 0;
 }
 
-/* STILE "TEMA": pill separate, non lista con separatori */
+/* ✅ LISTA nel tuo stile: una sola “card” + righe con separatori */
 .turnazioni-pick-list{
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  overflow: visible;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
+
+  box-shadow: var(--shadow-soft);
 }
 
-/* PILL — stile IDENTICO a selezione Tema */
+/* Riga — stile lista (no pill) */
 .turnazioni-pick-row{
   width: 100%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 16px;
+
+  /* reset button */
+  border: none;
+  border-radius: 0;
+  background: transparent;
 
   display: flex;
   align-items: center;
   justify-content: flex-start;
 
-  padding: 14px 12px;
+  padding: 12px 12px;
 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -496,9 +500,13 @@
   color: var(--text);
   text-align: left;
 
-  transition:
-    border-color 0.16s ease,
-    background-color 0.16s ease;
+  border-bottom: 1px solid var(--border);
+
+  transition: background-color 0.16s ease;
+}
+
+.turnazioni-pick-row:last-child{
+  border-bottom: none;
 }
 
 /* nome */
@@ -512,10 +520,13 @@
   flex: 1;
 }
 
-/* selezionata — SOLO contorno + fondo leggero */
+/* selezionata — SOLO blu (niente fondo/contorno “da card”) */
 .turnazioni-pick-row.is-selected{
-  border-color: var(--accent);
-  background: rgba(10,132,255,0.08);
+  background: transparent;
+}
+
+.turnazioni-pick-row.is-selected .turnazioni-pick-name{
+  color: var(--accent);
 }
 
 /* hover coerente */
@@ -525,10 +536,10 @@
   }
 }
 
-/* focus accessibilità (uguale a Tema) */
+/* focus accessibilità */
 .turnazioni-pick-row:focus-visible{
   outline: none;
-  border-color: var(--accent);
+  box-shadow: inset 0 0 0 2px rgba(10,132,255,0.25);
 }
 
 /* vuoto */
@@ -539,6 +550,7 @@
 }
 
 /* ===================== SPLIT pannello-pick-turno : END   ===================== */
+
 
 
 /* ===================== SPLIT lista-turnazioni-card : START ===================== */
