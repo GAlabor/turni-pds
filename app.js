@@ -181,6 +181,128 @@
 // ===================== SPLIT util-day-cell-size : END =====================
 
 
+// ===================== SPLIT turnazione-overlay : START =====================
+// =========================================================
+// Turnazione → sigla in cella calendario (solo vista giorni)
+// =========================================================
+
+function getPreferredTurnazioneForCalendar() {
+  if (!window.TurniStorage) return null;
+
+  const turnazioni = TurniStorage.loadTurnazioni();
+  if (!Array.isArray(turnazioni) || !turnazioni.length) return null;
+
+  const preferredId = TurniStorage.loadPreferredTurnazioneId();
+  if (preferredId) {
+    const pick = turnazioni.find(t => String(t.id) === String(preferredId));
+    if (pick) return pick;
+  }
+  return turnazioni[turnazioni.length - 1] || null;
+}
+
+function toLocalMidnight(dateObj) {
+  if (!(dateObj instanceof Date)) return null;
+  return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+}
+
+function parseISODateToLocalMidnight(iso) {
+  if (!iso || typeof iso !== "string") return null;
+  // YYYY-MM-DD → data locale (evita shift UTC)
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+  if (!m) return null;
+  const y = parseInt(m[1], 10);
+  const mo = parseInt(m[2], 10) - 1;
+  const d = parseInt(m[3], 10);
+  return new Date(y, mo, d);
+}
+
+function safeMod(n, m) {
+  if (!m) return 0;
+  return ((n % m) + m) % m;
+}
+
+// Ritorna { sigla, colore } oppure null
+function getCalendarSiglaForDate(dateObj) {
+  if (!window.TurniStorage) return null;
+
+  // toggle visualizzazione
+  const show = TurniStorage.loadVisualToggle();
+  if (!show) return null;
+
+  const t = getPreferredTurnazioneForCalendar();
+  if (!t) return null;
+
+  const days = Number(t.days) || 0;
+  const slots = Array.isArray(t.slots) ? t.slots : [];
+  const restIdx = Array.isArray(t.restIndices) ? t.restIndices : [];
+
+  if (!days || slots.length < days) return null;
+
+  const cfg = TurniStorage.loadTurnoIniziale();
+  if (!cfg || !cfg.date || !Number.isInteger(cfg.slotIndex)) return null;
+
+  const startDate = parseISODateToLocalMidnight(cfg.date);
+  const target = toLocalMidnight(dateObj);
+  if (!startDate || !target) return null;
+
+  const diffDays = Math.round((target.getTime() - startDate.getTime()) / 86400000);
+
+  const idx = safeMod((cfg.slotIndex || 0) + diffDays, days);
+  const slot = slots[idx] || null;
+
+  const baseSigla = slot && slot.sigla ? String(slot.sigla).trim() : "";
+  const baseColore = slot && slot.colore ? String(slot.colore).trim() : "";
+
+  const isRest = restIdx.includes(idx);
+
+  // Riposi fissi: solo quando il giorno calcolato è un riposo.
+  if (isRest && t.riposiFissi && typeof t.riposiFissi === "object") {
+    const dow = dateObj.getDay(); // 0 Dom ... 6 Sab
+    // Lun=1, Mar=2
+    if (dow === 1 && t.riposiFissi.lunedi) {
+      const rf = t.riposiFissi.lunedi;
+      const sig = rf.sigla ? String(rf.sigla).trim() : "";
+      const col = rf.colore ? String(rf.colore).trim() : "";
+      if (sig) return { sigla: sig, colore: col };
+    }
+    if (dow === 2 && t.riposiFissi.martedi) {
+      const rf = t.riposiFissi.martedi;
+      const sig = rf.sigla ? String(rf.sigla).trim() : "";
+      const col = rf.colore ? String(rf.colore).trim() : "";
+      if (sig) return { sigla: sig, colore: col };
+    }
+  }
+
+  if (!baseSigla) return null;
+  return { sigla: baseSigla, colore: baseColore };
+}
+
+function applyTurnazioneOverlayToCell(cellEl, dateObj) {
+  if (!cellEl || !(dateObj instanceof Date)) return;
+
+  // evita doppioni quando si rerenderizza
+  const old = cellEl.querySelector(".cal-turno-sigla");
+  if (old) old.remove();
+
+  const info = getCalendarSiglaForDate(dateObj);
+  if (!info) return;
+
+  const el = document.createElement("div");
+  el.className = "cal-turno-sigla";
+  el.textContent = info.sigla;
+
+  if (info.colore) el.style.color = info.colore;
+
+  // stesso comportamento preview sigla Turni (font dinamico per lunghezza)
+  if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
+    TurniRender.applySiglaFontSize(el, info.sigla);
+  }
+
+  cellEl.appendChild(el);
+}
+// ===================== SPLIT turnazione-overlay : END =======================
+
+
 // ===================== SPLIT header-e-classi-mode : START =====================
 
   // ============================
@@ -269,6 +391,10 @@
       if (isCurrentMonth && d === today.getDate()) {
         cell.classList.add("today");
       }
+
+      // Turnazione: sigla in basso (se abilitata)
+      const dateObj = new Date(currentYear, currentMonth, d);
+      applyTurnazioneOverlayToCell(cell, dateObj);
 
       gridDays.appendChild(cell);
     }
@@ -547,6 +673,21 @@
 
     setupOutsideClickHandler();
     renderDays();
+
+// Aggiorna calendario in tempo reale quando cambi impostazioni/turnazioni/inizio turnazione
+window.addEventListener("turnipds:storage-changed", () => {
+  if (currentMode === MODES.DAYS) {
+    renderDays();
+  }
+});
+
+// Sync anche se una seconda tab cambia localStorage
+window.addEventListener("storage", (ev) => {
+  if (!ev || !ev.key) return;
+  if (currentMode === MODES.DAYS) {
+    renderDays();
+  }
+});
 
     // Aggiorna larghezza cella anche su resize
     window.addEventListener("resize", () => {
@@ -953,6 +1094,16 @@
   const TURNI_START_KEY = STORAGE_KEYS.turniStart;
   // ===================== SPLIT bootstrap_config : END   =====================
 
+  // ===================== SPLIT storage-change-events : START =====================
+// Notifica interna: utile per aggiornare UI in tempo reale (es. calendario).
+function emitStorageChange(key) {
+  try {
+    window.dispatchEvent(new CustomEvent("turnipds:storage-changed", { detail: { key: String(key || "") } }));
+  } catch {}
+}
+// ===================== SPLIT storage-change-events : END =======================
+
+
   // ===================== SPLIT storage_turni_personalizzati : START =====================
   // ============================
   // Storage: turni personalizzati
@@ -972,6 +1123,9 @@
   function saveTurni(turni) {
     try {
       localStorage.setItem(TURNI_KEY, JSON.stringify(turni));
+
+
+      emitStorageChange(TURNI_KEY);
 
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();
@@ -1002,6 +1156,9 @@
     try {
       localStorage.setItem(TURNI_VIS_KEY, isOn ? "true" : "false");
 
+
+      emitStorageChange(TURNI_VIS_KEY);
+
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();
       }
@@ -1031,6 +1188,9 @@
     try {
       localStorage.setItem(TURNAZIONI_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
 
+
+      emitStorageChange(TURNAZIONI_KEY);
+
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();
       }
@@ -1055,6 +1215,8 @@
       } else {
         localStorage.setItem(TURNAZIONI_PREF_KEY, String(id));
       }
+
+      emitStorageChange(TURNAZIONI_PREF_KEY);
 
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();
@@ -1095,6 +1257,8 @@
       };
 
       localStorage.setItem(TURNI_START_KEY, JSON.stringify(out));
+
+      emitStorageChange(TURNI_START_KEY);
 
       if (window.Status && typeof Status.markSaved === "function") {
         Status.markSaved();

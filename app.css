@@ -152,6 +152,14 @@
   /* Lato quadrato anteprima sigla turni (clampato per non diventare enorme su desktop) */
   --turni-sigla-size: min(40px, calc(var(--cal-day-size) * var(--turni-sigla-scale)));
 
+/* =========================
+   CALENDARIO: SIGLA TURNAZIONE IN CELLA
+   Modifica SOLO questo valore per ingrandire/rimpicciolire la sigla in calendario.
+   ========================= */
+--cal-turno-sigla-scale: 0.78;
+--cal-turno-sigla-font-max: 18px;
+
+
   /* =========================
      TIPO / TESTI GLOBALI (SCALA BASE)
      ========================= */
@@ -731,6 +739,31 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-light);
 }
+
+/* Sigla turnazione in basso, centrata (aggiunta da calendar.js) */
+.day .cal-turno-sigla {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+
+  /* Scala su cella: regolabile via --cal-turno-sigla-scale */
+  font-size: min(var(--cal-turno-sigla-font-max), calc(var(--cal-day-size) * var(--cal-turno-sigla-scale)));
+  max-width: calc(100% - 18px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.95;
+}
+
+/* non mostrare nella cella vuota */
+.day.empty .cal-turno-sigla { display: none; }
 
 /* Highlight hover desktop (alone blu) */
 .day::before {
