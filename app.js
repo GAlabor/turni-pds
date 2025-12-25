@@ -99,7 +99,15 @@
     // CALENDARIO (solo logica, non UI)
     // ============================
 CALENDAR: {
-  turnoSiglaFontPx: 23,               // grandezza sigla (px)
+  // grandezza sigla (px) dinamica in base alla lunghezza
+  // 1–2 char → 23
+  // 3 char   → 21
+  // 4+ char  → 19
+  turnoSiglaFontPx: {
+    short: 23,
+    medium: 17,
+    long: 13
+  },
   turnoSiglaScale: 1,                 // scala (usata solo se FontPx è null)
   turnoSiglaFontWeight: 350,          // peso font (400–600)
   turnoSiglaLetterSpacing: "0.02em",  // spazio lettere
@@ -239,12 +247,18 @@ function safeMod(n, m) {
 
 
 
-function getCalendarSiglaSizingConfig() {
+function getCalendarSiglaSizingConfig(siglaText) {
   const cal = window.AppConfig && window.AppConfig.CALENDAR ? window.AppConfig.CALENDAR : null;
 
-  const fontPx = cal && Number.isFinite(Number(cal.turnoSiglaFontPx))
-    ? Number(cal.turnoSiglaFontPx)
-    : null;
+  let fontPx = null;
+
+  if (cal && cal.turnoSiglaFontPx && typeof cal.turnoSiglaFontPx === "object") {
+    const len = (siglaText || "").length;
+
+    if (len <= 2) fontPx = cal.turnoSiglaFontPx.short;
+    else if (len === 3) fontPx = cal.turnoSiglaFontPx.medium;
+    else fontPx = cal.turnoSiglaFontPx.long;
+  }
 
   const scale = cal && Number.isFinite(Number(cal.turnoSiglaScale))
     ? Number(cal.turnoSiglaScale)
@@ -265,11 +279,12 @@ function getCalendarSiglaSizingConfig() {
   return {
     fontPx: (fontPx && fontPx > 0) ? fontPx : null,
     scale: (scale && scale > 0) ? scale : 1.0,
-    fontWeight: fontWeight,
-    letterSpacing: letterSpacing,
-    yOffsetPx: yOffsetPx
+    fontWeight,
+    letterSpacing,
+    yOffsetPx
   };
 }
+
 
 // Ritorna { sigla, colore } oppure null
 function getCalendarSiglaForDate(dateObj) {
@@ -330,7 +345,6 @@ function getCalendarSiglaForDate(dateObj) {
 function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   if (!cellEl || !(dateObj instanceof Date)) return;
 
-  // evita doppioni quando si rerenderizza
   const old = cellEl.querySelector(".cal-turno-sigla");
   if (old) old.remove();
 
@@ -343,33 +357,27 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   if (info.colore) el.style.color = info.colore;
 
-  // stesso comportamento preview sigla Turni (font dinamico per lunghezza)
   if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
     TurniRender.applySiglaFontSize(el, info.sigla);
   }
 
-  // ✅ SOLO CALENDARIO: applica dimensione configurabile (px fisso o scala)
-  const sizing = getCalendarSiglaSizingConfig();
+  const sizing = getCalendarSiglaSizingConfig(info.sigla);
 
   if (sizing.fontPx) {
-    // Evita font-size con troppi decimali: su alcuni display sembra “sfocato”.
     const px = Math.max(1, sizing.fontPx);
-    el.style.fontSize = (Math.round(px * 2) / 2) + "px"; // step 0.5px
+    el.style.fontSize = (Math.round(px * 2) / 2) + "px";
   } else if (sizing.scale !== 1.0) {
     const fs = parseFloat(getComputedStyle(el).fontSize);
     if (Number.isFinite(fs) && fs > 0) {
       const scaled = fs * sizing.scale;
-      el.style.fontSize = (Math.round(scaled * 2) / 2) + "px"; // step 0.5px
+      el.style.fontSize = (Math.round(scaled * 2) / 2) + "px";
     }
   }
 
-  // Prova a mantenere il rendering più “fine” quando aumenti molto la sigla.
-  // Non cambia la UI, solo la resa del testo.
   el.style.textRendering = "geometricPrecision";
   el.style.setProperty("-webkit-font-smoothing", "antialiased");
   el.style.setProperty("-moz-osx-font-smoothing", "grayscale");
 
-  // ✅ SOLO CALENDARIO: stile dedicato (se lo imposti)
   if (sizing.fontWeight !== null && sizing.fontWeight !== undefined && sizing.fontWeight !== "") {
     el.style.fontWeight = String(sizing.fontWeight);
   }
@@ -377,8 +385,6 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     el.style.letterSpacing = String(sizing.letterSpacing);
   }
 
-  // ✅ SOLO CALENDARIO: offset verticale (positivo = giù, negativo = su)
-  // Usa CSS var così NON rompiamo il translateX(-50%) già definito in CSS.
   const yOff = Number(sizing.yOffsetPx);
   if (Number.isFinite(yOff) && yOff !== 0) {
     el.style.setProperty("--cal-turno-sigla-y", `${yOff}px`);
@@ -388,6 +394,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   cellEl.appendChild(el);
 }
+
 
 // ===================== SPLIT turnazione-overlay : END =======================
 
