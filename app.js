@@ -1414,13 +1414,17 @@ function formatSigle(turnazione) {
 
 
 // ===================== SPLIT render-lista-turnazioni : START =====================
+  // split start
 function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   if (!listEl) return;
 
   const opts = options || {};
   const isEditing = !!opts.isEditing;
   const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
-  const onSelect = typeof opts.onSelect === "function" ? opts.onSelect : null;
+
+  // ✅ In modalità Modifica NON deve esistere il click “seleziona preferita”
+  const onSelect = (!isEditing && typeof opts.onSelect === "function") ? opts.onSelect : null;
+
   const preferredId = opts.preferredId != null ? String(opts.preferredId) : null;
 
   listEl.innerHTML = "";
@@ -1501,6 +1505,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     sigleEl.textContent = formatSigle(t);
     row.appendChild(sigleEl);
 
+    // ✅ click selezione SOLO fuori dalla modalità Modifica
     if (onSelect) {
       row.addEventListener("click", () => onSelect(index));
     }
@@ -1508,7 +1513,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     listEl.appendChild(row);
   });
 }
+  // split end
 // ===================== SPLIT render-lista-turnazioni : END =====================
+
 
 
 // ===================== SPLIT api_state_and_init : START =====================
@@ -2031,6 +2038,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     let riposo2Reset = null;
     let riposo1GetData = null;
     let riposo2GetData = null;
+    let riposo1SetData = null;
+    let riposo2SetData = null;
 
     function initRiposoCard(opts) {
       const {
@@ -2060,7 +2069,13 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       const colorPrev  = panelAdd.querySelector(colorPrevSel);
       const siglaPrev  = panelAdd.querySelector(siglaPrevSel);
 
-      if (!cardEl || !toggleBtn || !bodyEl) return { reset: function () {}, getData: function () { return null; } };
+      if (!cardEl || !toggleBtn || !bodyEl) {
+        return {
+          reset: function () {},
+          getData: function () { return null; },
+          setData: function () {}
+        };
+      }
 
       let on = false;
 
@@ -2114,6 +2129,28 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         return { nome, sigla, colore };
       }
 
+      // Serve per ricaricare lo stato quando entri in "Modifica turnazione"
+      function setData(data) {
+        if (!data) {
+          reset();
+          return;
+        }
+
+        on = true;
+
+        const nome = (data && typeof data.nome === "string") ? data.nome : "";
+        const sigla = (data && typeof data.sigla === "string") ? data.sigla : "";
+        const colore = (data && typeof data.colore === "string") ? data.colore : "";
+
+        if (inputNome) inputNome.value = nome;
+        if (inputSigla) inputSigla.value = sigla;
+
+        if (colorInput) colorInput.value = colore || "#0a84ff";
+        applyColorPreview();
+        updateSiglaPreview();
+        applyState();
+      }
+
       bodyEl.hidden = true;
       reset();
 
@@ -2154,7 +2191,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         });
       }
 
-      return { reset, getData };
+      return { reset, getData, setData };
     }
 
     const riposo1 = initRiposoCard({
@@ -2188,6 +2225,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
     riposo1GetData = riposo1 && typeof riposo1.getData === "function" ? riposo1.getData : null;
     riposo2GetData = riposo2 && typeof riposo2.getData === "function" ? riposo2.getData : null;
+
+    riposo1SetData = riposo1 && typeof riposo1.setData === "function" ? riposo1.setData : null;
+    riposo2SetData = riposo2 && typeof riposo2.setData === "function" ? riposo2.setData : null;
 // ===================== SPLIT riposo_cards_component : END =======================
 
 
@@ -2259,6 +2299,23 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	        : [];
 	      normalizeRestIndicesToAllowed();
 	      syncRestDaysCardUI();
+
+        // riposi fissi (Lun/Mar): NON resettare, ricarica da storage
+        const rf = (turnazione && turnazione.riposiFissi && typeof turnazione.riposiFissi === "object")
+          ? turnazione.riposiFissi
+          : null;
+
+        if (typeof riposo1SetData === "function") {
+          riposo1SetData(rf && rf.lunedi ? rf.lunedi : null);
+        } else if (typeof riposo1Reset === "function") {
+          riposo1Reset();
+        }
+
+        if (typeof riposo2SetData === "function") {
+          riposo2SetData(rf && rf.martedi ? rf.martedi : null);
+        } else if (typeof riposo2Reset === "function") {
+          riposo2Reset();
+        }
 
 	      renderDaysGrid(days);
 	      isDirty = false;
