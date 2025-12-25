@@ -1776,6 +1776,10 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     // ----------------------------
     // Helpers UI giorni
     // ----------------------------
+    // Hook: serve a sincronizzare (abilitare/disabilitare) i "Riposi fissi" (Lun/Mar).
+    // Viene riassegnato quando i componenti riposo vengono creati.
+    let syncRiposiFissiEnabled = function () {};
+
     function clampRestDaysAllowed(v) {
       const n = Number(v);
       return (n === 2) ? 2 : 1;
@@ -1789,6 +1793,14 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
     function isRestIndex(idx) {
       return restDayIndices.includes(idx);
+    }
+
+    function hasAnyRotationRest() {
+      // Considera "riposo" valido solo se:
+      // - l'indice è marcato come riposo
+      // - esiste davvero un turno assegnato a quel giorno
+      return Array.isArray(restDayIndices)
+        && restDayIndices.some(i => i != null && i >= 0 && i <= 6 && !!rotationSlots[i]);
     }
 
     function applyDaysUIState(n) {
@@ -2027,6 +2039,10 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       }
 
       applyDaysUIState(n);
+
+      // Se non esiste nessun giorno marcato come "Riposo" nella rotazione,
+      // i riposi fissi (Lun/Mar) devono essere bloccati.
+      if (typeof syncRiposiFissiEnabled === "function") syncRiposiFissiEnabled();
     }
 // ===================== SPLIT render_days_grid : END =======================
 
@@ -2052,7 +2068,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         inputSiglaSel,
         colorInputSel,
         colorPrevSel,
-        siglaPrevSel
+        siglaPrevSel,
+        isEnabledFn
       } = opts || {};
 
       const cardEl    = panelAdd.querySelector(cardSel);
@@ -2073,11 +2090,16 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         return {
           reset: function () {},
           getData: function () { return null; },
-          setData: function () {}
+          setData: function () {},
+          syncEnabled: function () {}
         };
       }
 
       let on = false;
+
+      function isEnabled() {
+        return (typeof isEnabledFn === "function") ? !!isEnabledFn() : true;
+      }
 
       function applyColorPreview() {
         if (!colorInput || !colorPrev || !siglaPrev) return;
@@ -2104,10 +2126,28 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       }
 
       function applyState() {
+        const enabled = isEnabled();
+
+        // Se disabilitato, forziamo OFF (così non rimangono stati "fantasma")
+        if (!enabled && on) {
+          on = false;
+          clearFields();
+        }
+
         toggleBtn.classList.toggle("is-on", on);
         toggleBtn.setAttribute("aria-checked", on ? "true" : "false");
+        toggleBtn.setAttribute("aria-disabled", enabled ? "false" : "true");
+        toggleBtn.disabled = !enabled;
+        toggleBtn.classList.toggle("is-disabled", !enabled);
+
         cardEl.classList.toggle("is-on", on);
+        cardEl.classList.toggle("is-disabled", !enabled);
+
         bodyEl.hidden = !on;
+      }
+
+      function syncEnabled() {
+        applyState();
       }
 
       function reset() {
@@ -2136,6 +2176,12 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
           return;
         }
 
+        // Se al momento non è consentito usare i riposi fissi, ignora (forza OFF)
+        if (!isEnabled()) {
+          reset();
+          return;
+        }
+
         on = true;
 
         const nome = (data && typeof data.nome === "string") ? data.nome : "";
@@ -2155,6 +2201,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       reset();
 
       toggleBtn.addEventListener("click", () => {
+        if (!isEnabled()) return;
         on = !on;
         markDirty();
         if (!on) clearFields();
@@ -2191,7 +2238,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         });
       }
 
-      return { reset, getData, setData };
+      return { reset, getData, setData, syncEnabled };
     }
 
     const riposo1 = initRiposoCard({
@@ -2204,7 +2251,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       inputSiglaSel:"#turnazioniRiposoSigla",
       colorInputSel:"[data-turnazioni-riposo-color]",
       colorPrevSel: "[data-turnazioni-riposo-color-preview]",
-      siglaPrevSel: "[data-turnazioni-riposo-sigla-preview]"
+      siglaPrevSel: "[data-turnazioni-riposo-sigla-preview]",
+      isEnabledFn:  hasAnyRotationRest
     });
 
     const riposo2 = initRiposoCard({
@@ -2217,8 +2265,18 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       inputSiglaSel:"#turnazioniRiposo2Sigla",
       colorInputSel:"[data-turnazioni-riposo2-color]",
       colorPrevSel: "[data-turnazioni-riposo2-color-preview]",
-      siglaPrevSel: "[data-turnazioni-riposo2-sigla-preview]"
+      siglaPrevSel: "[data-turnazioni-riposo2-sigla-preview]",
+      isEnabledFn:  hasAnyRotationRest
     });
+
+    // Aggancia hook globale usato da renderDaysGrid()
+    syncRiposiFissiEnabled = function () {
+      if (riposo1 && typeof riposo1.syncEnabled === "function") riposo1.syncEnabled();
+      if (riposo2 && typeof riposo2.syncEnabled === "function") riposo2.syncEnabled();
+    };
+
+    // Prima sync (utile in apertura pannello / reset)
+    if (typeof syncRiposiFissiEnabled === "function") syncRiposiFissiEnabled();
 
     riposo1Reset = riposo1 && typeof riposo1.reset === "function" ? riposo1.reset : null;
     riposo2Reset = riposo2 && typeof riposo2.reset === "function" ? riposo2.reset : null;
