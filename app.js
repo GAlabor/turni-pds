@@ -103,7 +103,7 @@ CALENDAR: {
   turnoSiglaScale: 1,                 // scala (usata solo se FontPx è null)
   turnoSiglaFontWeight: 350,          // peso font (400–600)
   turnoSiglaLetterSpacing: "0.02em",  // spazio lettere
-  turnoSiglaYOffsetPx: 3              // + giù / − su (px)
+  turnoSiglaYOffsetPx: 6              // + giù / − su (px)
 },
 
     // ===================== SPLIT calendar-config : END =======================
@@ -258,11 +258,16 @@ function getCalendarSiglaSizingConfig() {
     ? cal.turnoSiglaLetterSpacing
     : null;
 
+  const yOffsetPx = cal && Number.isFinite(Number(cal.turnoSiglaYOffsetPx))
+    ? Number(cal.turnoSiglaYOffsetPx)
+    : 0;
+
   return {
     fontPx: (fontPx && fontPx > 0) ? fontPx : null,
     scale: (scale && scale > 0) ? scale : 1.0,
     fontWeight: fontWeight,
-    letterSpacing: letterSpacing
+    letterSpacing: letterSpacing,
+    yOffsetPx: yOffsetPx
   };
 }
 
@@ -373,12 +378,12 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   }
 
   // ✅ SOLO CALENDARIO: offset verticale (positivo = giù, negativo = su)
+  // Usa CSS var così NON rompiamo il translateX(-50%) già definito in CSS.
   const yOff = Number(sizing.yOffsetPx);
   if (Number.isFinite(yOff) && yOff !== 0) {
-    // Se un domani aggiungi altre transform, non le distruggiamo.
-    const existing = el.style.transform ? el.style.transform.trim() : "";
-    const add = `translateY(${yOff}px)`;
-    el.style.transform = existing ? `${existing} ${add}` : add;
+    el.style.setProperty("--cal-turno-sigla-y", `${yOff}px`);
+  } else {
+    el.style.removeProperty("--cal-turno-sigla-y");
   }
 
   cellEl.appendChild(el);
