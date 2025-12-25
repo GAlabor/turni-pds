@@ -94,6 +94,22 @@
     },
     // ===================== SPLIT status-config : END =====================
 
+    // ===================== SPLIT calendar-config : START =====================
+    // ============================
+    // CALENDARIO (solo logica, non UI)
+    // ============================
+CALENDAR: {
+  turnoSiglaFontPx: 23,               // grandezza sigla (px)
+  turnoSiglaScale: 1,                 // scala (usata solo se FontPx è null)
+  turnoSiglaFontWeight: 350,          // peso font (400–600)
+  turnoSiglaLetterSpacing: "0.02em",  // spazio lettere
+  turnoSiglaYOffsetPx: 3              // + giù / − su (px)
+},
+
+    // ===================== SPLIT calendar-config : END =======================
+
+
+
 
     // ===================== SPLIT version-label : START =====================
     // ============================
@@ -221,6 +237,35 @@ function safeMod(n, m) {
   return ((n % m) + m) % m;
 }
 
+
+
+function getCalendarSiglaSizingConfig() {
+  const cal = window.AppConfig && window.AppConfig.CALENDAR ? window.AppConfig.CALENDAR : null;
+
+  const fontPx = cal && Number.isFinite(Number(cal.turnoSiglaFontPx))
+    ? Number(cal.turnoSiglaFontPx)
+    : null;
+
+  const scale = cal && Number.isFinite(Number(cal.turnoSiglaScale))
+    ? Number(cal.turnoSiglaScale)
+    : 1.0;
+
+  const fontWeight = cal && (Number.isFinite(Number(cal.turnoSiglaFontWeight)) || typeof cal.turnoSiglaFontWeight === "string")
+    ? cal.turnoSiglaFontWeight
+    : null;
+
+  const letterSpacing = cal && (typeof cal.turnoSiglaLetterSpacing === "string")
+    ? cal.turnoSiglaLetterSpacing
+    : null;
+
+  return {
+    fontPx: (fontPx && fontPx > 0) ? fontPx : null,
+    scale: (scale && scale > 0) ? scale : 1.0,
+    fontWeight: fontWeight,
+    letterSpacing: letterSpacing
+  };
+}
+
 // Ritorna { sigla, colore } oppure null
 function getCalendarSiglaForDate(dateObj) {
   if (!window.TurniStorage) return null;
@@ -298,8 +343,47 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     TurniRender.applySiglaFontSize(el, info.sigla);
   }
 
+  // ✅ SOLO CALENDARIO: applica dimensione configurabile (px fisso o scala)
+  const sizing = getCalendarSiglaSizingConfig();
+
+  if (sizing.fontPx) {
+    // Evita font-size con troppi decimali: su alcuni display sembra “sfocato”.
+    const px = Math.max(1, sizing.fontPx);
+    el.style.fontSize = (Math.round(px * 2) / 2) + "px"; // step 0.5px
+  } else if (sizing.scale !== 1.0) {
+    const fs = parseFloat(getComputedStyle(el).fontSize);
+    if (Number.isFinite(fs) && fs > 0) {
+      const scaled = fs * sizing.scale;
+      el.style.fontSize = (Math.round(scaled * 2) / 2) + "px"; // step 0.5px
+    }
+  }
+
+  // Prova a mantenere il rendering più “fine” quando aumenti molto la sigla.
+  // Non cambia la UI, solo la resa del testo.
+  el.style.textRendering = "geometricPrecision";
+  el.style.setProperty("-webkit-font-smoothing", "antialiased");
+  el.style.setProperty("-moz-osx-font-smoothing", "grayscale");
+
+  // ✅ SOLO CALENDARIO: stile dedicato (se lo imposti)
+  if (sizing.fontWeight !== null && sizing.fontWeight !== undefined && sizing.fontWeight !== "") {
+    el.style.fontWeight = String(sizing.fontWeight);
+  }
+  if (sizing.letterSpacing !== null && sizing.letterSpacing !== undefined && sizing.letterSpacing !== "") {
+    el.style.letterSpacing = String(sizing.letterSpacing);
+  }
+
+  // ✅ SOLO CALENDARIO: offset verticale (positivo = giù, negativo = su)
+  const yOff = Number(sizing.yOffsetPx);
+  if (Number.isFinite(yOff) && yOff !== 0) {
+    // Se un domani aggiungi altre transform, non le distruggiamo.
+    const existing = el.style.transform ? el.style.transform.trim() : "";
+    const add = `translateY(${yOff}px)`;
+    el.style.transform = existing ? `${existing} ${add}` : add;
+  }
+
   cellEl.appendChild(el);
 }
+
 // ===================== SPLIT turnazione-overlay : END =======================
 
 
