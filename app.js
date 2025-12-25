@@ -105,8 +105,8 @@ CALENDAR: {
   // 4+ char  → 19
   turnoSiglaFontPx: {
     short: 23,
-    medium: 17,
-    long: 13
+    medium: 16,
+    long: 12
   },
   turnoSiglaScale: 1,                 // scala (usata solo se FontPx è null)
   turnoSiglaFontWeight: 350,          // peso font (400–600)
