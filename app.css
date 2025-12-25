@@ -2320,6 +2320,26 @@ body.turni-no-select * {
   height: var(--turni-sigla-size);
 }
 
+/* Evidenziazione stato disabilitato (come "Modifica" quando non è selezionabile) */
+.turnazioni-riposo-card.is-disabled .turnazioni-riposo-label{
+  color: var(--subtext);
+  opacity: 0.55;
+}
+
+/* Messaggio sotto al titolo quando disabilitato */
+.turnazioni-riposo-disabled-hint{
+  margin: 6px 0 0;
+  font-size: var(--fs-turni-form-hint);
+  color: var(--subtext);
+  line-height: 1.25;
+  display: none;
+}
+
+.turnazioni-riposo-card.is-disabled .turnazioni-riposo-disabled-hint{
+  display: block;
+  opacity: 0.85;
+}
+
 .turnazioni-riposo-control{
   justify-content: flex-end;
 }

@@ -2069,7 +2069,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         colorInputSel,
         colorPrevSel,
         siglaPrevSel,
-        isEnabledFn
+        isEnabledFn,
+        disabledHintText
       } = opts || {};
 
       const cardEl    = panelAdd.querySelector(cardSel);
@@ -2094,6 +2095,22 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
           syncEnabled: function () {}
         };
       }
+
+      // Hint visibile solo quando disabilitato (mancano "Riposi" nella rotazione)
+      const headerEl = cardEl.querySelector(".turnazioni-riposo-header");
+      let disabledHintEl = cardEl.querySelector("[data-turnazioni-riposo-disabled-hint]");
+      if (!disabledHintEl) {
+        disabledHintEl = document.createElement("p");
+        disabledHintEl.className = "turnazioni-riposo-disabled-hint";
+        disabledHintEl.setAttribute("data-turnazioni-riposo-disabled-hint", "");
+        // Inseriscilo subito sotto l'header, prima del body (così sta "sotto il titolo")
+        if (headerEl && headerEl.parentNode) {
+          headerEl.insertAdjacentElement("afterend", disabledHintEl);
+        } else {
+          cardEl.insertBefore(disabledHintEl, bodyEl);
+        }
+      }
+      disabledHintEl.textContent = disabledHintText || "Nessun turno impostato come Riposo in Turni Rotazione";
 
       let on = false;
 
@@ -2142,6 +2159,11 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
         cardEl.classList.toggle("is-on", on);
         cardEl.classList.toggle("is-disabled", !enabled);
+
+        // Il testo lo fa vedere/nascondere la CSS via .is-disabled
+        if (disabledHintEl) {
+          disabledHintEl.textContent = disabledHintText || "Nessun turno impostato come Riposo in Turni Rotazione";
+        }
 
         bodyEl.hidden = !on;
       }
@@ -2252,7 +2274,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       colorInputSel:"[data-turnazioni-riposo-color]",
       colorPrevSel: "[data-turnazioni-riposo-color-preview]",
       siglaPrevSel: "[data-turnazioni-riposo-sigla-preview]",
-      isEnabledFn:  hasAnyRotationRest
+      isEnabledFn:  hasAnyRotationRest,
+      disabledHintText: "Nessun turno impostato come Riposo in Turni Rotazione"
     });
 
     const riposo2 = initRiposoCard({
@@ -2266,7 +2289,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       colorInputSel:"[data-turnazioni-riposo2-color]",
       colorPrevSel: "[data-turnazioni-riposo2-color-preview]",
       siglaPrevSel: "[data-turnazioni-riposo2-sigla-preview]",
-      isEnabledFn:  hasAnyRotationRest
+      isEnabledFn:  hasAnyRotationRest,
+      disabledHintText: "Nessun turno impostato come Riposo in Turni Rotazione"
     });
 
     // Aggancia hook globale usato da renderDaysGrid()
