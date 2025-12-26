@@ -415,7 +415,7 @@ function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
 
   const ratio = avail / need;
   let fitted = startingFs * ratio;
-  fitted *= 1.06;
+  fitted *= 1.05;
 
   // guardrail (non una soglia "logica": evita font a 0)
   if (!Number.isFinite(fitted) || fitted <= 0) return;
