@@ -755,7 +755,7 @@ body {
 
   /* Scala su cella: regolabile via --cal-turno-sigla-scale */
   font-size: min(var(--cal-turno-sigla-font-max), calc(var(--cal-day-size) * var(--cal-turno-sigla-scale)));
-  max-width: calc(100% - 18px);
+  max-width: calc(100% - 8px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -808,6 +808,7 @@ body {
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : END
    ========================================================== */
+
 
 
 /* ==========================================================
