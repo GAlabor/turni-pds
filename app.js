@@ -100,19 +100,24 @@
     // ============================
 CALENDAR: {
   // grandezza sigla (px) dinamica in base alla lunghezza
-  // 1–2 char → 23
-  // 3 char   → 21
-  // 4+ char  → 19
   turnoSiglaFontPx: {
-    short: 23,
-    medium: 15,
-    long: 11
+    short: 23,        // 1–2 char
+    medium: 16,       // 3 char
+    long: 12          // 4+ char
   },
-  turnoSiglaScale: 1,                 // scala (usata solo se FontPx è null)
-  turnoSiglaFontWeight: 350,          // peso font (400–600)
-  turnoSiglaLetterSpacing: "0.02em",  // spazio lettere
-  turnoSiglaYOffsetPx: 6              // + giù / − su (px)
+
+  // offset Y per lunghezza sigla
+  turnoSiglaYOffsetPx: {
+    short: 6,         // 1–2 char → più giù
+    medium: 3,        // 3 char
+    long: 1           // 4+ char → più su
+  },
+
+  turnoSiglaScale: 1,                 // usata solo se fontPx è null
+  turnoSiglaFontWeight: 350,
+  turnoSiglaLetterSpacing: "0.02em"
 },
+
 
     // ===================== SPLIT calendar-config : END =======================
 
@@ -248,42 +253,78 @@ function safeMod(n, m) {
 
 
 function getCalendarSiglaSizingConfig(siglaText) {
-  const cal = window.AppConfig && window.AppConfig.CALENDAR ? window.AppConfig.CALENDAR : null;
+  const cal =
+    window.AppConfig &&
+    window.AppConfig.CALENDAR
+      ? window.AppConfig.CALENDAR
+      : null;
 
+  const len = (siglaText || "").length;
+
+  // -----------------------------
+  // FONT SIZE (per lunghezza)
+  // -----------------------------
   let fontPx = null;
 
   if (cal && cal.turnoSiglaFontPx && typeof cal.turnoSiglaFontPx === "object") {
-    const len = (siglaText || "").length;
-
     if (len <= 2) fontPx = cal.turnoSiglaFontPx.short;
     else if (len === 3) fontPx = cal.turnoSiglaFontPx.medium;
     else fontPx = cal.turnoSiglaFontPx.long;
   }
 
-  const scale = cal && Number.isFinite(Number(cal.turnoSiglaScale))
-    ? Number(cal.turnoSiglaScale)
-    : 1.0;
+  // -----------------------------
+  // SCALE
+  // -----------------------------
+  const scale =
+    cal && Number.isFinite(Number(cal.turnoSiglaScale))
+      ? Number(cal.turnoSiglaScale)
+      : 1.0;
 
-  const fontWeight = cal && (Number.isFinite(Number(cal.turnoSiglaFontWeight)) || typeof cal.turnoSiglaFontWeight === "string")
-    ? cal.turnoSiglaFontWeight
-    : null;
+  // -----------------------------
+  // FONT WEIGHT
+  // -----------------------------
+  const fontWeight =
+    cal &&
+    (Number.isFinite(Number(cal.turnoSiglaFontWeight)) ||
+      typeof cal.turnoSiglaFontWeight === "string")
+      ? cal.turnoSiglaFontWeight
+      : null;
 
-  const letterSpacing = cal && (typeof cal.turnoSiglaLetterSpacing === "string")
-    ? cal.turnoSiglaLetterSpacing
-    : null;
+  // -----------------------------
+  // LETTER SPACING
+  // -----------------------------
+  const letterSpacing =
+    cal && typeof cal.turnoSiglaLetterSpacing === "string"
+      ? cal.turnoSiglaLetterSpacing
+      : null;
 
-  const yOffsetPx = cal && Number.isFinite(Number(cal.turnoSiglaYOffsetPx))
-    ? Number(cal.turnoSiglaYOffsetPx)
-    : 0;
+  // -----------------------------
+  // Y OFFSET (per lunghezza)
+  // -----------------------------
+  let yOffsetPx = 0;
+
+  if (cal && cal.turnoSiglaYOffsetPx) {
+    const yCfg = cal.turnoSiglaYOffsetPx;
+
+    if (typeof yCfg === "object") {
+      if (len <= 2) yOffsetPx = Number(yCfg.short);
+      else if (len === 3) yOffsetPx = Number(yCfg.medium);
+      else yOffsetPx = Number(yCfg.long);
+    } else if (Number.isFinite(Number(yCfg))) {
+      // fallback: vecchio valore unico
+      yOffsetPx = Number(yCfg);
+    }
+  }
 
   return {
-    fontPx: (fontPx && fontPx > 0) ? fontPx : null,
-    scale: (scale && scale > 0) ? scale : 1.0,
+    fontPx: Number.isFinite(fontPx) && fontPx > 0 ? fontPx : null,
+    scale: Number.isFinite(scale) && scale > 0 ? scale : 1.0,
     fontWeight,
     letterSpacing,
-    yOffsetPx
+    yOffsetPx: Number.isFinite(yOffsetPx) ? yOffsetPx : 0
   };
 }
+
 
 
 // Ritorna { sigla, colore } oppure null
