@@ -399,7 +399,9 @@ function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
   if (!startingFs) return;
 
   // serve essere già nel DOM per misure affidabili
-  const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
+  const parent = el.parentElement;
+  const parentW = parent ? (parent.clientWidth || Math.round(parent.getBoundingClientRect().width)) : 0;
+  const avail = Math.max(0, Math.round((parentW || el.clientWidth || Math.round(el.getBoundingClientRect().width)) - 8));
   const need = el.scrollWidth;
 
   if (!avail || !need) return;
@@ -415,7 +417,6 @@ function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
 
   const ratio = avail / need;
   let fitted = startingFs * ratio;
-  fitted *= 1.03; //scala sigla calendario
 
   // guardrail (non una soglia "logica": evita font a 0)
   if (!Number.isFinite(fitted) || fitted <= 0) return;
@@ -447,6 +448,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   const el = document.createElement("div");
   el.className = "cal-turno-sigla";
   el.textContent = info.sigla;
+
+  // deve prendere la larghezza reale della cella (evita tagli prematuri)
+  el.style.width = "100%";
 
   if (info.colore) el.style.color = info.colore;
 
@@ -499,6 +503,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
 
 // ===================== SPLIT turnazione-overlay : END =======================
+
 
 
 
