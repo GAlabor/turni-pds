@@ -99,21 +99,12 @@
     // CALENDARIO (solo logica, non UI)
     // ============================
 CALENDAR: {
-  // grandezza sigla (px) dinamica in base alla lunghezza
-  turnoSiglaFontPx: {
-    short: 23,        // 1–2 char
-    medium: 15,       // 3 char
-    long: 11          // 4+ char
-  },
+  // riferimento visivo ideale (1–2 char)
+  turnoSiglaFontPx: 23,
+  turnoSiglaYOffsetPx: 6,
 
-  // offset Y per lunghezza sigla
-  turnoSiglaYOffsetPx: {
-    short: 6,         // 1–2 char → più giù
-    medium: 3,        // 3 char
-    long: 1           // 4+ char → più su
-  },
-
-  turnoSiglaScale: 1,                 // usata solo se fontPx è null
+  // compat: se fontPx è null, usa scale (qui resta 1)
+  turnoSiglaScale: 1,
   turnoSiglaFontWeight: 350,
   turnoSiglaLetterSpacing: "0.02em"
 },
@@ -210,6 +201,7 @@ CALENDAR: {
 // =========================================================
 // Turnazione → sigla in cella calendario (solo vista giorni)
 // =========================================================
+  // split start
 
 function getPreferredTurnazioneForCalendar() {
   if (!window.TurniStorage) return null;
@@ -232,12 +224,16 @@ function toLocalMidnight(dateObj) {
 
 function parseISODateToLocalMidnight(iso) {
   if (!iso || typeof iso !== "string") return null;
-  // YYYY-MM-DD → data locale (evita shift UTC)
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
-  if (!m) return null;
-  const y = parseInt(m[1], 10);
-  const mo = parseInt(m[2], 10) - 1;
-  const d = parseInt(m[3], 10);
+
+  const parts = iso.split("-");
+  if (parts.length < 3) return null;
+
+  const y = Number(parts[0]);
+  const mo = Number(parts[1]) - 1;
+  const d = Number(parts[2]);
+
+  if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return null;
+
   return new Date(y, mo, d);
 }
 
@@ -258,14 +254,22 @@ function getCalendarSiglaSizingConfig(siglaText) {
   const len = (siglaText || "").length;
 
   // -----------------------------
-  // FONT SIZE (per lunghezza)
+  // FONT SIZE (base, deterministico)
   // -----------------------------
   let fontPx = null;
 
-  if (cal && cal.turnoSiglaFontPx && typeof cal.turnoSiglaFontPx === "object") {
-    if (len <= 2) fontPx = cal.turnoSiglaFontPx.short;
-    else if (len === 3) fontPx = cal.turnoSiglaFontPx.medium;
-    else fontPx = cal.turnoSiglaFontPx.long;
+  if (cal && cal.turnoSiglaFontPx != null) {
+    const fCfg = cal.turnoSiglaFontPx;
+
+    if (typeof fCfg === "object") {
+      // compat vecchia config (short/medium/long)
+      if (len <= 2) fontPx = fCfg.short;
+      else if (len === 3) fontPx = fCfg.medium;
+      else fontPx = fCfg.long;
+    } else if (Number.isFinite(Number(fCfg))) {
+      // nuova config: valore unico (base)
+      fontPx = Number(fCfg);
+    }
   }
 
   // -----------------------------
@@ -295,19 +299,19 @@ function getCalendarSiglaSizingConfig(siglaText) {
       : null;
 
   // -----------------------------
-  // Y OFFSET (per lunghezza)
+  // Y OFFSET (base)
   // -----------------------------
   let yOffsetPx = 0;
 
-  if (cal && cal.turnoSiglaYOffsetPx) {
+  if (cal && cal.turnoSiglaYOffsetPx != null) {
     const yCfg = cal.turnoSiglaYOffsetPx;
 
     if (typeof yCfg === "object") {
+      // compat vecchia config (short/medium/long)
       if (len <= 2) yOffsetPx = Number(yCfg.short);
       else if (len === 3) yOffsetPx = Number(yCfg.medium);
       else yOffsetPx = Number(yCfg.long);
     } else if (Number.isFinite(Number(yCfg))) {
-      // fallback: vecchio valore unico
       yOffsetPx = Number(yCfg);
     }
   }
@@ -379,6 +383,58 @@ function getCalendarSiglaForDate(dateObj) {
   return { sigla: baseSigla, colore: baseColore };
 }
 
+function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
+  if (!el) return;
+
+  const baseFont = Number(baseFontPx);
+  const baseY = Number(baseYOffsetPx);
+
+  const css = getComputedStyle(el);
+  const curFs = parseFloat(css.fontSize);
+
+  const startingFs = (Number.isFinite(baseFont) && baseFont > 0)
+    ? baseFont
+    : (Number.isFinite(curFs) && curFs > 0 ? curFs : 0);
+
+  if (!startingFs) return;
+
+  // serve essere già nel DOM per misure affidabili
+  const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
+  const need = el.scrollWidth;
+
+  if (!avail || !need) return;
+
+  if (need <= avail + 0.5) {
+    if (Number.isFinite(baseY) && baseY !== 0) {
+      el.style.setProperty("--cal-turno-sigla-y", `${baseY}px`);
+    } else {
+      el.style.removeProperty("--cal-turno-sigla-y");
+    }
+    return;
+  }
+
+  const ratio = avail / need;
+  let fitted = startingFs * ratio;
+  fitted *= 1.06;
+
+  // guardrail (non una soglia "logica": evita font a 0)
+  if (!Number.isFinite(fitted) || fitted <= 0) return;
+  fitted = Math.max(8, fitted);
+
+  const fittedRounded = (Math.round(fitted * 2) / 2);
+  el.style.fontSize = fittedRounded + "px";
+
+  if (Number.isFinite(baseY)) {
+    const delta = (startingFs - fittedRounded) / 2;
+    const y = baseY - delta;
+    if (Number.isFinite(y) && y !== 0) {
+      el.style.setProperty("--cal-turno-sigla-y", `${y}px`);
+    } else {
+      el.style.removeProperty("--cal-turno-sigla-y");
+    }
+  }
+}
+
 function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   if (!cellEl || !(dateObj instanceof Date)) return;
 
@@ -394,12 +450,12 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   if (info.colore) el.style.color = info.colore;
 
-  if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
-    TurniRender.applySiglaFontSize(el, info.sigla);
-  }
+  // no ellissi (gestiamo noi il fit dopo il render)
+  el.style.textOverflow = "clip";
 
   const sizing = getCalendarSiglaSizingConfig(info.sigla);
 
+  // base: riferimento estetico (es. 23px / 6px)
   if (sizing.fontPx) {
     const px = Math.max(1, sizing.fontPx);
     el.style.fontSize = (Math.round(px * 2) / 2) + "px";
@@ -422,6 +478,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     el.style.letterSpacing = String(sizing.letterSpacing);
   }
 
+  // base offset prima del fit
   const yOff = Number(sizing.yOffsetPx);
   if (Number.isFinite(yOff) && yOff !== 0) {
     el.style.setProperty("--cal-turno-sigla-y", `${yOff}px`);
@@ -430,10 +487,19 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   }
 
   cellEl.appendChild(el);
+
+  // fit reale post-render (misura layout, riduce solo se serve, compensa Y)
+  requestAnimationFrame(() => {
+    const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
+    autoFitCalendarSigla(el, baseFs, yOff);
+  });
 }
+
+  // split end
 
 
 // ===================== SPLIT turnazione-overlay : END =======================
+
 
 
 // ===================== SPLIT header-e-classi-mode : START =====================
