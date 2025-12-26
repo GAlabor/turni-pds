@@ -102,8 +102,8 @@ CALENDAR: {
   // grandezza sigla (px) dinamica in base alla lunghezza
   turnoSiglaFontPx: {
     short: 23,        // 1–2 char
-    medium: 16,       // 3 char
-    long: 12          // 4+ char
+    medium: 15,       // 3 char
+    long: 11          // 4+ char
   },
 
   // offset Y per lunghezza sigla
@@ -118,11 +118,7 @@ CALENDAR: {
   turnoSiglaLetterSpacing: "0.02em"
 },
 
-
     // ===================== SPLIT calendar-config : END =======================
-
-
-
 
     // ===================== SPLIT version-label : START =====================
     // ============================
