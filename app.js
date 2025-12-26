@@ -401,7 +401,7 @@ function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
   // serve essere già nel DOM per misure affidabili
   const parent = el.parentElement;
   const parentW = parent ? (parent.clientWidth || Math.round(parent.getBoundingClientRect().width)) : 0;
-  const avail = Math.max(0, Math.round((parentW || el.clientWidth || Math.round(el.getBoundingClientRect().width)) - 4));
+  const avail = Math.max(0, Math.round((parentW || el.clientWidth || Math.round(el.getBoundingClientRect().width)) - 8));
   const need = el.scrollWidth;
 
   if (!avail || !need) return;
