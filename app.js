@@ -830,6 +830,29 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     renderDays();
   }
 
+  function reflowTurnoSigle() {
+    if (currentMode !== MODES.DAYS) return;
+
+    const sigle = document.querySelectorAll(".view-calendar.is-active .cal-turno-sigla");
+    if (!sigle || !sigle.length) return;
+
+    sigle.forEach((el) => {
+      if (!el) return;
+
+      const txt = el.textContent ? String(el.textContent) : "";
+      const sizing = getCalendarSiglaSizingConfig(txt);
+
+      const baseFs = sizing && sizing.fontPx
+        ? Number(sizing.fontPx)
+        : parseFloat(getComputedStyle(el).fontSize);
+
+      autoFitCalendarSigla(el, baseFs);
+
+      // centraggio ottico dopo il fit
+      autoCenterCalendarSigla(el);
+    });
+  }
+
   function init() {
     gridDays = document.getElementById("calendar-grid");
     gridMonths = document.getElementById("month-grid");
@@ -889,10 +912,12 @@ window.addEventListener("storage", (ev) => {
     init,
     resetToToday,
     getState,
-    setState
+    setState,
+    reflowTurnoSigle
   };
 
 // ===================== SPLIT api-pubblica-e-init : END =====================
+
 
 })();
 // =====================================================
@@ -4774,10 +4799,24 @@ function initTabs() {
       views.forEach(v => {
         v.classList.toggle("is-active", v.dataset.view === target);
       });
+
+      // Reflow sigle calendario quando entri nella vista (serve layout visibile)
+      if (
+        target === "calendar" &&
+        window.Calendar &&
+        typeof Calendar.reflowTurnoSigle === "function"
+      ) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            Calendar.reflowTurnoSigle();
+          });
+        });
+      }
     });
   });
 }
 // ===================== SPLIT tabbar_switch_viste : END   =====================
+
 
 
 
