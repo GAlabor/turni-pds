@@ -853,6 +853,19 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     });
   }
 
+  function onEnterCalendarView() {
+    if (currentMode !== MODES.DAYS) return;
+
+    if (_calendarDirty) {
+      _calendarDirty = false;
+      renderDays(); // qui il fit post-render funziona perché ora è visibile
+      return;
+    }
+
+    // se non è dirty, basta il reflow
+    reflowTurnoSigle();
+  }
+
   function init() {
     gridDays = document.getElementById("calendar-grid");
     gridMonths = document.getElementById("month-grid");
@@ -887,18 +900,36 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     setupOutsideClickHandler();
     renderDays();
 
+
+// ===================== calendar-dirty-guard : START =====================
+let _calendarDirty = false;
+
+function isCalendarViewActive() {
+  const v = document.querySelector(".view-calendar");
+  return !!(v && v.classList.contains("is-active"));
+}
+// ===================== calendar-dirty-guard : END =======================
+
 // Aggiorna calendario in tempo reale quando cambi impostazioni/turnazioni/inizio turnazione
 window.addEventListener("turnipds:storage-changed", () => {
-  if (currentMode === MODES.DAYS) {
+  if (currentMode !== MODES.DAYS) return;
+
+  if (isCalendarViewActive()) {
     renderDays();
+  } else {
+    _calendarDirty = true;
   }
 });
 
 // Sync anche se una seconda tab cambia localStorage
 window.addEventListener("storage", (ev) => {
   if (!ev || !ev.key) return;
-  if (currentMode === MODES.DAYS) {
+  if (currentMode !== MODES.DAYS) return;
+
+  if (isCalendarViewActive()) {
     renderDays();
+  } else {
+    _calendarDirty = true;
   }
 });
 
@@ -913,7 +944,8 @@ window.addEventListener("storage", (ev) => {
     resetToToday,
     getState,
     setState,
-    reflowTurnoSigle
+    reflowTurnoSigle,
+    onEnterCalendarView
   };
 
 // ===================== SPLIT api-pubblica-e-init : END =====================
@@ -4800,15 +4832,15 @@ function initTabs() {
         v.classList.toggle("is-active", v.dataset.view === target);
       });
 
-      // Reflow sigle calendario quando entri nella vista (serve layout visibile)
+      // Reflow calendario quando entri nella vista (serve layout visibile)
       if (
         target === "calendar" &&
         window.Calendar &&
-        typeof Calendar.reflowTurnoSigle === "function"
+        typeof Calendar.onEnterCalendarView === "function"
       ) {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            Calendar.reflowTurnoSigle();
+            Calendar.onEnterCalendarView();
           });
         });
       }
