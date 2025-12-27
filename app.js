@@ -94,14 +94,13 @@
     },
     // ===================== SPLIT status-config : END =====================
 
-    // ===================== SPLIT calendar-config : START =====================
-    // ============================
-    // CALENDARIO (solo logica, non UI)
-    // ============================
+// ===================== SPLIT calendar-config : START =====================
+// ============================
+// CALENDARIO (solo logica, non UI)
+// ============================
 CALENDAR: {
   // riferimento visivo ideale (1–2 char)
   turnoSiglaFontPx: 23,
-  turnoSiglaYOffsetPx: 6,
 
   // compat: se fontPx è null, usa scale (qui resta 1)
   turnoSiglaScale: 1,
@@ -109,7 +108,8 @@ CALENDAR: {
   turnoSiglaLetterSpacing: "0.02em"
 },
 
-    // ===================== SPLIT calendar-config : END =======================
+// ===================== SPLIT calendar-config : END =======================
+
 
     // ===================== SPLIT version-label : START =====================
     // ============================
@@ -298,30 +298,11 @@ function getCalendarSiglaSizingConfig(siglaText) {
       ? cal.turnoSiglaLetterSpacing
       : null;
 
-  // -----------------------------
-  // Y OFFSET (base)
-  // -----------------------------
-  let yOffsetPx = 0;
-
-  if (cal && cal.turnoSiglaYOffsetPx != null) {
-    const yCfg = cal.turnoSiglaYOffsetPx;
-
-    if (typeof yCfg === "object") {
-      // compat vecchia config (short/medium/long)
-      if (len <= 2) yOffsetPx = Number(yCfg.short);
-      else if (len === 3) yOffsetPx = Number(yCfg.medium);
-      else yOffsetPx = Number(yCfg.long);
-    } else if (Number.isFinite(Number(yCfg))) {
-      yOffsetPx = Number(yCfg);
-    }
-  }
-
   return {
     fontPx: Number.isFinite(fontPx) && fontPx > 0 ? fontPx : null,
     scale: Number.isFinite(scale) && scale > 0 ? scale : 1.0,
     fontWeight,
-    letterSpacing,
-    yOffsetPx: Number.isFinite(yOffsetPx) ? yOffsetPx : 0
+    letterSpacing
   };
 }
 
@@ -383,11 +364,10 @@ function getCalendarSiglaForDate(dateObj) {
   return { sigla: baseSigla, colore: baseColore };
 }
 
-function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
+function autoFitCalendarSigla(el, baseFontPx) {
   if (!el) return;
 
   const baseFont = Number(baseFontPx);
-  const baseY = Number(baseYOffsetPx);
 
   const css = getComputedStyle(el);
   const curFs = parseFloat(css.fontSize);
@@ -399,24 +379,16 @@ function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
   if (!startingFs) return;
 
   // serve essere già nel DOM per misure affidabili
-  const parent = el.parentElement;
-  const parentW = parent ? (parent.clientWidth || Math.round(parent.getBoundingClientRect().width)) : 0;
-  const avail = Math.max(0, Math.round((parentW || el.clientWidth || Math.round(el.getBoundingClientRect().width)) - 8));
+  const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
   const need = el.scrollWidth;
 
   if (!avail || !need) return;
 
-  if (need <= avail + 0.5) {
-    if (Number.isFinite(baseY) && baseY !== 0) {
-      el.style.setProperty("--cal-turno-sigla-y", `${baseY}px`);
-    } else {
-      el.style.removeProperty("--cal-turno-sigla-y");
-    }
-    return;
-  }
+  if (need <= avail + 0.5) return;
 
   const ratio = avail / need;
   let fitted = startingFs * ratio;
+  fitted *= 1.06;
 
   // guardrail (non una soglia "logica": evita font a 0)
   if (!Number.isFinite(fitted) || fitted <= 0) return;
@@ -424,16 +396,6 @@ function autoFitCalendarSigla(el, baseFontPx, baseYOffsetPx) {
 
   const fittedRounded = (Math.round(fitted * 2) / 2);
   el.style.fontSize = fittedRounded + "px";
-
-  if (Number.isFinite(baseY)) {
-    const delta = (startingFs - fittedRounded) / 2;
-    const y = baseY - delta;
-    if (Number.isFinite(y) && y !== 0) {
-      el.style.setProperty("--cal-turno-sigla-y", `${y}px`);
-    } else {
-      el.style.removeProperty("--cal-turno-sigla-y");
-    }
-  }
 }
 
 function applyTurnazioneOverlayToCell(cellEl, dateObj) {
@@ -449,9 +411,6 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   el.className = "cal-turno-sigla";
   el.textContent = info.sigla;
 
-  // deve prendere la larghezza reale della cella (evita tagli prematuri)
-  el.style.width = "100%";
-
   if (info.colore) el.style.color = info.colore;
 
   // no ellissi (gestiamo noi il fit dopo il render)
@@ -459,7 +418,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   const sizing = getCalendarSiglaSizingConfig(info.sigla);
 
-  // base: riferimento estetico (es. 23px / 6px)
+  // base: riferimento estetico (es. 23px)
   if (sizing.fontPx) {
     const px = Math.max(1, sizing.fontPx);
     el.style.fontSize = (Math.round(px * 2) / 2) + "px";
@@ -482,20 +441,12 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     el.style.letterSpacing = String(sizing.letterSpacing);
   }
 
-  // base offset prima del fit
-  const yOff = Number(sizing.yOffsetPx);
-  if (Number.isFinite(yOff) && yOff !== 0) {
-    el.style.setProperty("--cal-turno-sigla-y", `${yOff}px`);
-  } else {
-    el.style.removeProperty("--cal-turno-sigla-y");
-  }
-
   cellEl.appendChild(el);
 
-  // fit reale post-render (misura layout, riduce solo se serve, compensa Y)
+  // fit reale post-render (misura layout, riduce solo se serve)
   requestAnimationFrame(() => {
     const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
-    autoFitCalendarSigla(el, baseFs, yOff);
+    autoFitCalendarSigla(el, baseFs);
   });
 }
 
@@ -503,6 +454,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
 
 // ===================== SPLIT turnazione-overlay : END =======================
+
 
 
 

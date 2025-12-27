@@ -728,7 +728,7 @@ body {
 */
 .day {
   background: var(--surface-strong);
-  padding: var(--space-12) var(--space-12) var(--space-16);
+  padding: var(--space-4);
   text-align: right;
   font-size: var(--fs-cal-day-desktop); /* numero giorno, FONT dedicato */
   border-radius: 18px;
@@ -743,9 +743,10 @@ body {
 /* Sigla turnazione in basso, centrata (aggiunta da calendar.js) */
 .day .cal-turno-sigla {
   position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%) translateY(var(--cal-turno-sigla-y, 0px));
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: var(--space-4);
+  transform: none;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.02em;
@@ -753,12 +754,11 @@ body {
   user-select: none;
   text-align: center;
 
-  /* Scala su cella: regolabile via --cal-turno-sigla-scale */
-  font-size: min(var(--cal-turno-sigla-font-max), calc(var(--cal-day-size) * var(--cal-turno-sigla-scale)));
-  max-width: calc(100% - 8px);
+  /* Base stabile: il fit reale lo fa il JS (riduce solo se serve) */
+  font-size: 23px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   opacity: 0.95;
 }
 
@@ -808,6 +808,7 @@ body {
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : END
    ========================================================== */
+
 
 
 
@@ -1022,7 +1023,7 @@ body {
 
   .day {
     border-radius: 14px;
-    padding: var(--space-6) var(--space-6) var(--space-10);
+    padding: var(--space-4);
     min-height: 58px; /* altezza celle giorni */
     font-size: var(--fs-cal-day-mobile); /* numero giorno mobile */
     box-shadow: none;
@@ -1064,6 +1065,7 @@ body {
 /* ==========================================================
    SPLIT RESPONSIVE_CALENDARIO : END
    ========================================================== */
+
 /* 
 ===========================================
  Turni PdS — 
