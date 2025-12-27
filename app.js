@@ -398,6 +398,34 @@ function autoFitCalendarSigla(el, baseFontPx) {
   el.style.fontSize = fittedRounded + "px";
 }
 
+function autoCenterCalendarSigla(el) {
+  if (!el) return;
+
+  // reset per misure pulite
+  el.style.transform = "";
+
+  if (!document.createRange) return;
+
+  const range = document.createRange();
+  range.selectNodeContents(el);
+
+  const textRect = range.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+
+  if (!textRect.width || !elRect.width) return;
+
+  const textCx = textRect.left + (textRect.width / 2);
+  const elCx = elRect.left + (elRect.width / 2);
+
+  const dx = elCx - textCx;
+  if (!Number.isFinite(dx)) return;
+
+  // ignora micro-subpixel inutili
+  if (Math.abs(dx) < 0.25) return;
+
+  el.style.transform = `translateX(${dx}px)`;
+}
+
 function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   if (!cellEl || !(dateObj instanceof Date)) return;
 
@@ -447,6 +475,11 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   requestAnimationFrame(() => {
     const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
     autoFitCalendarSigla(el, baseFs);
+
+    // centraggio ottico: dopo che eventuale fit ha modificato il font-size
+    requestAnimationFrame(() => {
+      autoCenterCalendarSigla(el);
+    });
   });
 }
 
@@ -454,6 +487,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
 
 // ===================== SPLIT turnazione-overlay : END =======================
+
 
 
 
