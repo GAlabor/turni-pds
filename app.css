@@ -743,9 +743,9 @@ body {
 /* Sigla turnazione in basso, centrata (aggiunta da calendar.js) */
 .day .cal-turno-sigla {
   position: absolute;
-  left: var(--space-4);
-  right: var(--space-4);
-  bottom: var(--space-4);
+  left: var(--space-6);
+  right: var(--space-6);
+  bottom: var(--space-6); /*altezza sigla calendario dal basso*/
   transform: none;
   font-weight: 600;
   line-height: 1;
@@ -808,6 +808,7 @@ body {
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : END
    ========================================================== */
+
 
 
 
