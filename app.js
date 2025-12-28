@@ -4832,15 +4832,22 @@ function initTabs() {
         v.classList.toggle("is-active", v.dataset.view === target);
       });
 
-      // Reflow calendario quando entri nella vista (serve layout visibile)
-      if (
-        target === "calendar" &&
-        window.Calendar &&
-        typeof Calendar.onEnterCalendarView === "function"
-      ) {
+      // Calendario:
+      // quando RIENTRI nella vista (da un'altra tab) → torna ad oggi.
+      // Poi reflow/dirty-guard quando la vista è visibile.
+      if (target === "calendar" && window.Calendar) {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            Calendar.onEnterCalendarView();
+            if (
+              activeViewId !== "calendar" &&
+              typeof Calendar.resetToToday === "function"
+            ) {
+              Calendar.resetToToday();
+            }
+
+            if (typeof Calendar.onEnterCalendarView === "function") {
+              Calendar.onEnterCalendarView();
+            }
           });
         });
       }
@@ -4848,6 +4855,7 @@ function initTabs() {
   });
 }
 // ===================== SPLIT tabbar_switch_viste : END   =====================
+
 
 
 
