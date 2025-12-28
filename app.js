@@ -486,11 +486,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   // split end
 
 
-// ===================== SPLIT turnazione-overlay : END =======================
-
-
-
-
+// ===================== SPLIT turnazione-overlay : END =======================z
 
 
 // ===================== SPLIT header-e-classi-mode : START =====================
