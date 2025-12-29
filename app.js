@@ -204,7 +204,6 @@ CALENDAR: {
 // =========================================================
 // Turnazione → sigla in cella calendario (solo vista giorni)
 // =========================================================
-  // split start
 
 function getPreferredTurnazioneForCalendar() {
   if (!window.TurniStorage) return null;
@@ -238,6 +237,17 @@ function parseISODateToLocalMidnight(iso) {
   if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return null;
 
   return new Date(y, mo, d);
+}
+
+// ✅ DST-safe: numero di giorni assoluti (UTC) indipendente da mezzanotte locale / 23h/25h
+function toUTCDayNumber(dateObj) {
+  if (!(dateObj instanceof Date)) return null;
+  const y = dateObj.getFullYear();
+  const m = dateObj.getMonth();
+  const d = dateObj.getDate();
+  const t = Date.UTC(y, m, d);
+  if (!Number.isFinite(t)) return null;
+  return Math.trunc(t / 86400000);
 }
 
 function safeMod(n, m) {
@@ -335,7 +345,12 @@ function getCalendarSiglaForDate(dateObj) {
   const target = toLocalMidnight(dateObj);
   if (!startDate || !target) return null;
 
-  const diffDays = Math.round((target.getTime() - startDate.getTime()) / 86400000);
+  // ✅ DST-safe diff: confronto su "day number" UTC, non su millisecondi/24h
+  const startDayNum = toUTCDayNumber(startDate);
+  const targetDayNum = toUTCDayNumber(target);
+  if (startDayNum === null || targetDayNum === null) return null;
+
+  const diffDays = targetDayNum - startDayNum;
 
   const idx = safeMod((cfg.slotIndex || 0) + diffDays, days);
   const slot = slots[idx] || null;
@@ -486,10 +501,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   });
 }
 
-  // split end
-
 
 // ===================== SPLIT turnazione-overlay : END =======================z
+
 
 
 // ===================== SPLIT header-e-classi-mode : START =====================
