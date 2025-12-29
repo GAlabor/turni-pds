@@ -28,6 +28,9 @@
   // ===================== SPLIT app-config-root : START =====================
   window.AppConfig = {
 
+    // Debug (true su localhost)
+    DEBUG: (location.hostname === "localhost"),
+
     // ===================== SPLIT paths-pwa : START =====================
     // ============================
     // PERCORSI / PWA
@@ -485,7 +488,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   // split end
 
-// ===================== SPLIT turnazione-overlay : END =======================
+
+// ===================== SPLIT turnazione-overlay : END =======================z
+
 
 // ===================== SPLIT header-e-classi-mode : START =====================
 
@@ -5047,3 +5052,27 @@ function initTabs() {
   }
 })();
   // ===================== SPLIT dom_ready_hook : END =====================
+
+
+// ============================
+// Namespace unico (compat): App.*
+// Evita collisioni globali senza rompere il codice esistente.
+// ============================
+(function () {
+  window.App = window.App || {};
+  const keys = [
+    "AppConfig",
+    "Calendar",
+    "Theme",
+    "Icons",
+    "TurniStorage",
+    "TurniRender",
+    "TurniStart",
+    "TurniInteractions",
+    "Turni",
+    "SettingsUI"
+  ];
+  for (const k of keys) {
+    if (window[k]) window.App[k] = window[k];
+  }
+})();

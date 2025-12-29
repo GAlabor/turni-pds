@@ -3,11 +3,23 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-12-15 V1.1';
+const VERSION    = '2025-12-15 V1.3';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
 const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
+
+// ==============================
+// Cache key normalizzata: ignora ?query e #hash
+// (evita duplicati e rende coerente match/put)
+// ==============================
+function cacheKeyFor(req) {
+  const url = new URL(req.url);
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
+
 // ===================== SPLIT meta : END   =====================
 
 
@@ -130,16 +142,17 @@ async function handleHtmlFetch(event, req) {
 // ==============================
 async function handleSvgFetch(req) {
   const cache = await caches.open(CACHE_NAME);
+  const key = cacheKeyFor(req);
 
   try {
     const fresh = await fetch(req, {
       cache: 'no-store',
       credentials: 'same-origin'
     });
-    try { await cache.put(req, fresh.clone()); } catch {}
+    try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    const cached = await cache.match(req, { ignoreSearch: true });
+    const cached = await cache.match(key);
     if (cached) return cached;
     return new Response('', { status: 504 });
   }
@@ -153,8 +166,9 @@ async function handleSvgFetch(req) {
 // ==============================
 async function handleStaticFetch(event, req) {
   const cache = await caches.open(CACHE_NAME);
+  const key = cacheKeyFor(req);
 
-  const cached = await cache.match(req, { ignoreSearch: true });
+  const cached = await cache.match(key);
 
   if (cached) {
     event.waitUntil((async () => {
@@ -163,7 +177,7 @@ async function handleStaticFetch(event, req) {
           cache: 'no-store',
           credentials: 'same-origin'
         });
-        try { await cache.put(req, fresh.clone()); } catch {}
+        try { await cache.put(key, fresh.clone()); } catch {}
       } catch {}
     })());
     return cached;
@@ -174,7 +188,7 @@ async function handleStaticFetch(event, req) {
       cache: 'no-store',
       credentials: 'same-origin'
     });
-    try { await cache.put(req, fresh.clone()); } catch {}
+    try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
     return new Response('', { status: 504 });
