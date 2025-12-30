@@ -382,6 +382,86 @@ function getCalendarSiglaForDate(dateObj) {
   return { sigla: baseSigla, colore: baseColore };
 }
 
+// =====================================================
+// Sigle calendario: batch + cache fitting (A + C)
+// - A: le sigle restano invisibili finché fit+centraggio non è completato,
+//      poi diventano visibili tutte insieme.
+// - C: caching del font-size finale per evitare ricalcoli e "flash".
+// =====================================================
+
+const _siglaFitCache = new Map();
+let _siglaBatchPending = [];
+let _siglaBatchScheduled = false;
+
+function _siglaCacheKey(el, siglaText, baseFs) {
+  if (!el) return null;
+
+  const rectW = el.clientWidth || Math.round(el.getBoundingClientRect().width);
+  if (!rectW) return null;
+
+  const css = getComputedStyle(el);
+  const fam = css.fontFamily || "";
+  const wgt = css.fontWeight || "";
+  const ls  = css.letterSpacing || "";
+
+  const w = Math.round(rectW * 2) / 2;
+  const b = Number.isFinite(Number(baseFs)) ? (Math.round(Number(baseFs) * 2) / 2) : "";
+
+  // Chiave: testo + larghezza disponibile + contesto tipografico rilevante
+  return `${String(siglaText || "")}::w${w}::b${b}::${fam}::${wgt}::${ls}`;
+}
+
+function _applyFitWithCache(el, siglaText, baseFs) {
+  if (!el) return;
+
+  const key = _siglaCacheKey(el, siglaText, baseFs);
+  if (!key) return;
+
+  const cached = _siglaFitCache.get(key);
+  if (cached != null) {
+    el.style.fontSize = cached + "px";
+    return;
+  }
+
+  // Miss: calcolo una volta sola, poi memorizzo.
+  autoFitCalendarSigla(el, baseFs);
+
+  const finalFs = parseFloat(getComputedStyle(el).fontSize);
+  if (Number.isFinite(finalFs) && finalFs > 0) {
+    _siglaFitCache.set(key, Math.round(finalFs * 2) / 2);
+  }
+}
+
+function _scheduleSiglaBatch() {
+  if (_siglaBatchScheduled) return;
+  _siglaBatchScheduled = true;
+
+  requestAnimationFrame(() => {
+    _siglaBatchScheduled = false;
+    const batch = _siglaBatchPending;
+    _siglaBatchPending = [];
+    if (!batch.length) return;
+
+    // 1) Fit (da cache o misura) su tutte le sigle del batch
+    batch.forEach((it) => {
+      if (!it || !it.el) return;
+      _applyFitWithCache(it.el, it.txt, it.baseFs);
+    });
+
+    // 2) Centraggio ottico, poi sblocco visibilità tutte insieme
+    requestAnimationFrame(() => {
+      batch.forEach((it) => {
+        if (!it || !it.el) return;
+        autoCenterCalendarSigla(it.el);
+      });
+      batch.forEach((it) => {
+        if (!it || !it.el) return;
+        it.el.classList.add("sigla-ready");
+      });
+    });
+  });
+}
+
 function autoFitCalendarSigla(el, baseFontPx) {
   if (!el) return;
 
@@ -489,20 +569,15 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   cellEl.appendChild(el);
 
-  // fit reale post-render (misura layout, riduce solo se serve)
-  requestAnimationFrame(() => {
-    const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
-    autoFitCalendarSigla(el, baseFs);
-
-    // centraggio ottico: dopo che eventuale fit ha modificato il font-size
-    requestAnimationFrame(() => {
-      autoCenterCalendarSigla(el);
-    });
-  });
+  // Batch: fit + centraggio su tutte le sigle, poi visibili insieme
+  const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
+  _siglaBatchPending.push({ el, txt: info.sigla, baseFs });
+  _scheduleSiglaBatch();
 }
 
 
 // ===================== SPLIT turnazione-overlay : END =======================
+
 
 
 
@@ -859,10 +934,14 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
         ? Number(sizing.fontPx)
         : parseFloat(getComputedStyle(el).fontSize);
 
-      autoFitCalendarSigla(el, baseFs);
+      // Applica da cache se possibile, altrimenti misura e memorizza
+      _applyFitWithCache(el, txt, baseFs);
 
       // centraggio ottico dopo il fit
       autoCenterCalendarSigla(el);
+
+      // assicura visibilità (nei reflow le sigle esistono già)
+      el.classList.add("sigla-ready");
     });
   }
 
@@ -897,7 +976,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     }
 
     if (nextBtn) {
-      nextBtn.addEventListener("click", goNext);
+      prevBtn.addEventListener("click", goNext);
     }
 
     // Click sul titolo: Giorni → Mesi → Anni
@@ -962,6 +1041,7 @@ window.addEventListener("storage", (ev) => {
   };
 
 // ===================== SPLIT api-pubblica-e-init : END =====================
+
 
 
 })();

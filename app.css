@@ -706,6 +706,7 @@ body {
    ========================================================== */
 
 
+
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : START
    ========================================================== */
@@ -759,6 +760,13 @@ body {
   white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
+
+  /* Mostra le sigle tutte insieme solo quando il JS ha finito fit+centraggio */
+  opacity: 0;
+  transition: opacity 0.08s linear;
+}
+
+.day .cal-turno-sigla.sigla-ready {
   opacity: 0.95;
 }
 
@@ -808,8 +816,6 @@ body {
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : END
    ========================================================== */
-
-
 
 
 
