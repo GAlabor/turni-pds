@@ -502,7 +502,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 }
 
 
-// ===================== SPLIT turnazione-overlay : END =======================z
+// ===================== SPLIT turnazione-overlay : END =======================
 
 
 
