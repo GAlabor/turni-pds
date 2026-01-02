@@ -1002,13 +1002,15 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
     updateContainerModeClass();
 
-    if (prevBtn) {
-      prevBtn.addEventListener("click", goPrev);
-    }
+if (prevBtn) {
+  prevBtn.addEventListener("click", goPrev);
+}
 
-    if (nextBtn) {
-      prevBtn.addEventListener("click", goNext);
-    }
+if (nextBtn) {
+  nextBtn.addEventListener("click", goNext);
+}
+
+
 
     // Click sul titolo: Giorni → Mesi → Anni
     monthLabel.addEventListener("click", () => {
