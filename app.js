@@ -271,7 +271,13 @@ function getCalendarSiglaSizingConfig(siglaText) {
   // -----------------------------
   let fontPx = null;
 
-  if (cal && cal.turnoSiglaFontPx != null) {
+  // 3.1 Regole semplici:
+  // 1–2 caratteri → sempre 23px (zero calcoli, indipendente da config)
+  if (len > 0 && len <= 2) {
+    fontPx = 23;
+  }
+
+  if (fontPx === null && cal && cal.turnoSiglaFontPx != null) {
     const fCfg = cal.turnoSiglaFontPx;
 
     if (typeof fCfg === "object") {
@@ -283,6 +289,11 @@ function getCalendarSiglaSizingConfig(siglaText) {
       // nuova config: valore unico (base)
       fontPx = Number(fCfg);
     }
+  }
+
+  // fallback sensato se non c'è config
+  if (fontPx === null) {
+    fontPx = 23;
   }
 
   // -----------------------------
@@ -414,7 +425,26 @@ function _siglaCacheKey(el, siglaText, baseFs) {
 function _applyFitWithCache(el, siglaText, baseFs) {
   if (!el) return;
 
-  const key = _siglaCacheKey(el, siglaText, baseFs);
+  const txt = (siglaText != null) ? String(siglaText) : "";
+  const len = txt.length;
+
+  // 3.1 Regole semplici: 1–2 caratteri → sempre 23px, zero misure/cache.
+  if (len > 0 && len <= 2) {
+    el.style.fontSize = "23px";
+    return;
+  }
+
+  // 3.1 Regole semplici: 3–4 caratteri → fitting solo se serve.
+  // Se già ci sta, non faccio cache-key, non faccio fit.
+  if (len >= 3 && len <= 4) {
+    const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
+    const need = el.scrollWidth;
+    if (avail && need && need <= avail + 0.5) {
+      return;
+    }
+  }
+
+  const key = _siglaCacheKey(el, txt, baseFs);
   if (!key) return;
 
   const cached = _siglaFitCache.get(key);
@@ -577,6 +607,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
 
 // ===================== SPLIT turnazione-overlay : END =======================
+
 
 
 
