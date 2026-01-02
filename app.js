@@ -4916,6 +4916,11 @@ function initTabs() {
       // TAB IMPOSTAZIONI:
       // se la vista settings è già attiva → torna al menu principale Impostazioni
       if (target === "settings") {
+        // Lazy init: inizializza i moduli Settings SOLO quando apri la tab
+        if (typeof window.__bootSettingsOnce === "function") {
+          window.__bootSettingsOnce();
+        }
+
         const settingsView = document.querySelector(".view-settings");
         const isSettingsActive =
           settingsView && settingsView.classList.contains("is-active");
@@ -4986,6 +4991,7 @@ function initTabs() {
 
 
 
+
   // ===================== SPLIT bootstrap_domcontentloaded : START =====================
   // ============================
   // Bootstrap all’avvio
@@ -5006,6 +5012,27 @@ function initTabs() {
       Theme.init();
     }
 
+    // Lazy init Settings/Turni: definito qui, usato dalla tabbar
+    if (!window.__bootSettingsOnce) {
+      window.__bootSettingsOnce = (function () {
+        let done = false;
+        return function () {
+          if (done) return;
+          done = true;
+
+          // Navigazione Impostazioni (lista principale + pannelli)
+          if (window.SettingsUI && typeof SettingsUI.init === "function") {
+            SettingsUI.init();
+          }
+
+          // Pannello Turni (lista + form "Aggiungi turno")
+          if (window.Turni && typeof Turni.init === "function") {
+            Turni.init();
+          }
+        };
+      })();
+    }
+
     // Tabbar (switch tra le viste principali)
     initTabs();
 
@@ -5018,17 +5045,14 @@ function initTabs() {
       }
     }
 
-    // Navigazione Impostazioni (lista principale + pannelli)
-    if (window.SettingsUI && typeof SettingsUI.init === "function") {
-      SettingsUI.init();
-    }
-
-    // Pannello Turni (lista + form "Aggiungi turno")
-    if (window.Turni && typeof Turni.init === "function") {
-      Turni.init();
+    // Se per qualche motivo l'app parte già su Impostazioni, inizializza subito
+    const settingsActive = document.querySelector(".view-settings.is-active");
+    if (settingsActive && typeof window.__bootSettingsOnce === "function") {
+      window.__bootSettingsOnce();
     }
   });
   // ===================== SPLIT bootstrap_domcontentloaded : END   =====================
+
 
 })();
 
