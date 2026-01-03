@@ -184,20 +184,33 @@ CALENDAR: {
   // Util: misura larghezza cella giorno → variabile CSS
   // ============================
 
+  // cache locale: aggiorno la CSS var solo se la larghezza cambia davvero
+  let _lastCalDaySize = null;
+
   function updateDayCellSize() {
-    if (!gridDays || !calendarContainer) return;
-    if (currentMode !== MODES.DAYS) return;
+    if (!gridDays || !calendarContainer) return false;
+    if (currentMode !== MODES.DAYS) return false;
 
     const dayEl = gridDays.querySelector(".day:not(.empty)");
-    if (!dayEl) return;
+    if (!dayEl) return false;
 
     const rect = dayEl.getBoundingClientRect();
-    if (!rect.width) return;
+    if (!rect.width) return false;
 
-    document.documentElement.style.setProperty("--cal-day-size", rect.width + "px");
+    // stabilizzo a mezzo pixel per evitare invalidazioni inutili
+    const w = Math.round(rect.width * 2) / 2;
+
+    if (_lastCalDaySize != null && Math.abs(w - _lastCalDaySize) < 0.25) {
+      return false;
+    }
+
+    _lastCalDaySize = w;
+    document.documentElement.style.setProperty("--cal-day-size", w + "px");
+    return true;
   }
 
 // ===================== SPLIT util-day-cell-size : END =====================
+
 
 
 // ===================== SPLIT turnazione-overlay : START =====================
@@ -941,39 +954,42 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     };
   }
 
-  function setState(year, month) {
-    currentYear = year;
-    currentMonth = month;
-    currentMode = MODES.DAYS;
+  function setState(state) {
+    if (!state) return;
+
+    const y = parseInt(state.year, 10);
+    const m = parseInt(state.month, 10);
+    const mode = state.mode;
+
+    if (!Number.isNaN(y)) currentYear = y;
+    if (!Number.isNaN(m)) currentMonth = m;
+
+    if (mode === MODES.DAYS || mode === MODES.MONTHS || mode === MODES.YEARS) {
+      currentMode = mode;
+    }
+
     updateContainerModeClass();
-    renderDays();
+
+    if (currentMode === MODES.DAYS) renderDays();
+    if (currentMode === MODES.MONTHS) renderMonths();
+    if (currentMode === MODES.YEARS) renderYears();
   }
+
+  // =====================================================
+  // Reflow sigle turnazione (senza ricostruire tutto)
+  // =====================================================
 
   function reflowTurnoSigle() {
     if (currentMode !== MODES.DAYS) return;
 
-    const sigle = document.querySelectorAll(".view-calendar.is-active .cal-turno-sigla");
-    if (!sigle || !sigle.length) return;
-
-    sigle.forEach((el) => {
-      if (!el) return;
-
-      const txt = el.textContent ? String(el.textContent) : "";
-      const sizing = getCalendarSiglaSizingConfig(txt);
-
-      const baseFs = sizing && sizing.fontPx
-        ? Number(sizing.fontPx)
-        : parseFloat(getComputedStyle(el).fontSize);
-
-      // Applica da cache se possibile, altrimenti misura e memorizza
-      _applyFitWithCache(el, txt, baseFs);
-
-      // centraggio ottico dopo il fit
-      autoCenterCalendarSigla(el);
-
-      // assicura visibilità (nei reflow le sigle esistono già)
-      el.classList.add("sigla-ready");
-    });
+    // assicura visibilità (nei reflow le sigle esistono già)
+    const all = gridDays ? gridDays.querySelectorAll(".turno-sigla") : [];
+    if (all && all.length) {
+      all.forEach(el => {
+        // assicura visibilità (nei reflow le sigle esistono già)
+        el.classList.add("sigla-ready");
+      });
+    }
   }
 
   function onEnterCalendarView() {
@@ -1057,11 +1073,50 @@ window.addEventListener("storage", (ev) => {
     _calendarDirty = true;
   }
 });
+    // Aggiorna larghezza cella su resize/orientamento (senza raffiche)
+    let _calResizeRaf = 0;
+    let _calResizeTimer = 0;
 
-    // Aggiorna larghezza cella anche su resize
-    window.addEventListener("resize", () => {
-      updateDayCellSize();
-    });
+    function scheduleCalendarResizeUpdate() {
+      if (currentMode !== MODES.DAYS) return;
+
+      // 1) throttle su rAF (massimo 1 per frame)
+      if (!_calResizeRaf) {
+        _calResizeRaf = requestAnimationFrame(() => {
+          _calResizeRaf = 0;
+
+          const changed = updateDayCellSize();
+          if (changed) {
+            // invalidare cache solo se la larghezza cella cambia davvero
+            if (typeof _siglaFitCache !== "undefined" && _siglaFitCache && typeof _siglaFitCache.clear === "function") {
+              _siglaFitCache.clear();
+            }
+
+            // se la vista calendario è attiva, riallineo le sigle senza ricostruire
+            if (isCalendarViewActive()) {
+              reflowTurnoSigle();
+            }
+          }
+        });
+      }
+
+      // 2) debounce: un ultimo pass quando l'utente ha finito di ridimensionare
+      if (_calResizeTimer) clearTimeout(_calResizeTimer);
+      _calResizeTimer = setTimeout(() => {
+        const changed = updateDayCellSize();
+        if (changed) {
+          if (typeof _siglaFitCache !== "undefined" && _siglaFitCache && typeof _siglaFitCache.clear === "function") {
+            _siglaFitCache.clear();
+          }
+          if (isCalendarViewActive()) {
+            reflowTurnoSigle();
+          }
+        }
+      }, 160);
+    }
+
+    window.addEventListener("resize", scheduleCalendarResizeUpdate);
+    window.addEventListener("orientationchange", scheduleCalendarResizeUpdate);
   }
 
   window.Calendar = {
@@ -1074,6 +1129,7 @@ window.addEventListener("storage", (ev) => {
   };
 
 // ===================== SPLIT api-pubblica-e-init : END =====================
+
 
 
 
