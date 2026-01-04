@@ -1552,7 +1552,7 @@ function emitStorageChange(key) {
       const todayISO = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
 
       const turniFactory = [
-        { nome: "Sera",        sigla: "S", colore: "#2AC3A2", inizio: "18:55", fine: "00:08", noTime: false },
+        { nome: "Sera",        sigla: "S", colore: "#30B0C7", inizio: "18:55", fine: "00:08", noTime: false },
         { nome: "Pomeriggio",  sigla: "P", colore: "#34C759", inizio: "12:55", fine: "19:08", noTime: false },
         { nome: "Mattina",     sigla: "M", colore: "#FFC83D", inizio: "06:55", fine: "13:08", noTime: false },
         { nome: "Notte",       sigla: "N", colore: "#5856D6", inizio: "23:55", fine: "07:08", noTime: false },
