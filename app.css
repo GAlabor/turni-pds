@@ -102,6 +102,10 @@
   --tabColor: #9ca3af;        /* colore base icone/tab non attive */
   --tabActiveColor: #0a84ff;  /* colore tab attiva */
 
+  /* Pill “ovetto” tab attiva (stile iOS) */
+  --ui-tab-active-pill-bg: rgba(142,142,147,0.16);
+  --ui-shadow-tab-active: 0 10px 30px rgba(15,23,42,0.14);
+
   /* Effetti interazione tab (hover / active) */
   --active-bright: 1.12;
   --active-contrast: 1.03;
@@ -405,6 +409,7 @@
    ========================================================== */
 
 
+
 /* ==========================================================
    SPLIT THEME_SYSTEM_DARK_MEDIA : START
    ========================================================== */
@@ -471,12 +476,17 @@
   --tabColor: #6b7280;
   --tabActiveColor: #4b8dff;
 
+  /* Pill “ovetto” tab attiva (stile iOS) */
+  --ui-tab-active-pill-bg: rgba(142,142,147,0.22);
+  --ui-shadow-tab-active: 0 14px 38px rgba(0,0,0,0.55);
+
   --color-arrow-month: var(--nav-fg);
   --color-back-icon: var(--text);
 }
 /* ==========================================================
    SPLIT THEME_FORCED_DARK_ROOT : END
    ========================================================== */
+
 
 
 /* ==========================================================
@@ -3171,6 +3181,27 @@ body.turni-no-select * {
   z-index: 1;
 }
 
+/* “Ovetto” stile iOS dietro la tab attiva */
+.tab::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--tabIcon) + var(--space-24));
+  height: calc(var(--tabIcon) + var(--space-8));
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--ui-tab-active-pill-bg);
+  box-shadow: var(--ui-shadow-tab-active);
+  opacity: 0;
+  transition: opacity .16s ease, transform .16s ease;
+  z-index: 0;
+}
+
+.tab.active::before {
+  opacity: 1;
+}
+
 /* Label sotto l’icona (solo desktop, vedi media query) */
 .tab-label {
   font-size: var(--fs-tab-label);
@@ -3247,6 +3278,7 @@ body.turni-no-select * {
 }
 
 /* ===================== SPLIT tabbar-layout : END   ===================== */
+
 
 
 /* ===================== SPLIT tabbar-icon-calendar : START ===================== */

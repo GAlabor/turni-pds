@@ -1538,8 +1538,66 @@ function emitStorageChange(key) {
   // Storage: turni personalizzati
   // ============================
 
+  function seedFactoryDefaultsIfNeeded() {
+    try {
+      const hasTurni = !!localStorage.getItem(TURNI_KEY);
+      const hasTurnazioni = !!localStorage.getItem(TURNAZIONI_KEY);
+      const hasStart = !!localStorage.getItem(TURNI_START_KEY);
+
+      // Seed SOLO alla primissima apertura (se manca il “pacchetto base”)
+      if (hasTurni || hasTurnazioni || hasStart) return false;
+
+      const pad2 = (n) => String(n).padStart(2, "0");
+      const now = new Date();
+      const todayISO = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+
+      const turniFactory = [
+        { nome: "Sera",        sigla: "S", colore: "#2AC3A2", inizio: "18:55", fine: "00:08", noTime: false },
+        { nome: "Pomeriggio",  sigla: "P", colore: "#34C759", inizio: "12:55", fine: "19:08", noTime: false },
+        { nome: "Mattina",     sigla: "M", colore: "#FFC83D", inizio: "06:55", fine: "13:08", noTime: false },
+        { nome: "Notte",       sigla: "N", colore: "#5856D6", inizio: "23:55", fine: "07:08", noTime: false },
+        { nome: "Riposo",      sigla: "R", colore: "#8E8E93", inizio: "",      fine: "",      noTime: true  }
+      ];
+
+      const turnazioneId = "factory-turnazione-in-quinta";
+
+      const turnazioniFactory = [
+        {
+          id: turnazioneId,
+          name: "Turnazione in quinta",
+          days: 5,
+          slots: [
+            { nome: "Sera",         sigla: "S", colore: "#2AC3A2" },
+            { nome: "Pomeriggio",   sigla: "P", colore: "#34C759" },
+            { nome: "Mattina",      sigla: "M", colore: "#FFC83D" },
+            { nome: "Notte",        sigla: "N", colore: "#5856D6" },
+            { nome: "Riposo",       sigla: "R", colore: "#8E8E93" }
+          ],
+          restDaysAllowed: 1,
+          restIndices: [4],
+          riposiFissi: {
+            lunedi:  { nome: "Giorno Libero", sigla: "GL", colore: "#E5E5EA" },
+            martedi: { nome: "Add. Prof.",    sigla: "AP", colore: "#FF9500" }
+          }
+        }
+      ];
+
+      localStorage.setItem(TURNI_KEY, JSON.stringify(turniFactory));
+      localStorage.setItem(TURNAZIONI_KEY, JSON.stringify(turnazioniFactory));
+      localStorage.setItem(TURNAZIONI_PREF_KEY, String(turnazioneId));
+      localStorage.setItem(TURNI_VIS_KEY, "true");
+      localStorage.setItem(TURNI_START_KEY, JSON.stringify({ date: todayISO, slotIndex: 0 }));
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   function loadTurni() {
     try {
+      seedFactoryDefaultsIfNeeded();
+
       const raw = localStorage.getItem(TURNI_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw);
@@ -1564,6 +1622,8 @@ function emitStorageChange(key) {
     }
   }
   // ===================== SPLIT storage_turni_personalizzati : END   =====================
+
+
 
   // ===================== SPLIT storage_toggle_visualizzazione_turnazione : START =====================
   // ============================
@@ -1722,12 +1782,13 @@ function emitStorageChange(key) {
   }
   // ===================== SPLIT util_validazione_orario : END   =====================
 
-  // ===================== SPLIT export_api_pubblica : START =====================
+    // ===================== SPLIT export_api_pubblica : START =====================
   // ============================
   // API pubblica
   // ============================
 
   window.TurniStorage = {
+    seedFactoryDefaultsIfNeeded,
     loadTurni,
     saveTurni,
     loadVisualToggle,
@@ -1745,6 +1806,7 @@ function emitStorageChange(key) {
     saveTurnoIniziale
   };
   // ===================== SPLIT export_api_pubblica : END   =====================
+
 
 })();
 
@@ -5048,7 +5110,7 @@ function initTabs() {
 
 
 
-  // ===================== SPLIT bootstrap_domcontentloaded : START =====================
+    // ===================== SPLIT bootstrap_domcontentloaded : START =====================
   // ============================
   // Bootstrap all’avvio
   // ============================
@@ -5056,6 +5118,11 @@ function initTabs() {
     // Stato prima di tutto: gli altri possono usarlo subito
     if (window.Status && typeof Status.init === "function") {
       Status.init();
+    }
+
+    // Seed dati "di fabbrica" PRIMA del primo render del calendario
+    if (window.TurniStorage && typeof TurniStorage.seedFactoryDefaultsIfNeeded === "function") {
+      TurniStorage.seedFactoryDefaultsIfNeeded();
     }
 
     // Calendario (vista principale)
@@ -5108,6 +5175,7 @@ function initTabs() {
     }
   });
   // ===================== SPLIT bootstrap_domcontentloaded : END   =====================
+
 
 
 })();
