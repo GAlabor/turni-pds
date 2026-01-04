@@ -1567,7 +1567,7 @@ function emitStorageChange(key) {
           name: "Turnazione in quinta",
           days: 5,
           slots: [
-            { nome: "Sera",         sigla: "S", colore: "#2AC3A2" },
+            { nome: "Sera",         sigla: "S", colore: "#30B0C7" },
             { nome: "Pomeriggio",   sigla: "P", colore: "#34C759" },
             { nome: "Mattina",      sigla: "M", colore: "#FFC83D" },
             { nome: "Notte",        sigla: "N", colore: "#5856D6" },
