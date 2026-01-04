@@ -331,7 +331,21 @@
 
         <!-- ===================== SPLIT panel-backup-restore : START ==================== -->
         <!-- PANNELLO BACKUP E RIPRISTINO -->
-        <div class="settings-panel settings-backup-restore" data-settings-id="backup-restore"></div>
+        <div class="settings-panel settings-backup-restore" data-settings-id="backup-restore">
+          <div class="settings-group">
+            <p class="settings-hint">
+              Ripristina i dati dell’app. Operazione irreversibile.
+            </p>
+          </div>
+
+          <button class="settings-choice" type="button" data-backup-restore-factory>
+            Ripristino di fabbrica
+          </button>
+
+          <button class="settings-choice" type="button" data-backup-restore-clean>
+            Ripristino pulito
+          </button>
+        </div>
         <!-- ===================== SPLIT panel-backup-restore : END ====================== -->
 
         <!-- ===================== SPLIT panel-updates : START ================= -->

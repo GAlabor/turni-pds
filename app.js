@@ -4946,6 +4946,136 @@ startTurnoSummary.textContent = turnoTxt;
 })();
 
 // ============================
+// Backup e Ripristino (azioni ripristino)
+// backup-restore.js v 1.0
+// ============================
+
+(function () {
+
+  // ===================== SPLIT backup-restore-init : START =====================
+  function initBackupRestorePanel() {
+    if (!window.AppConfig) return;
+
+    const panel = document.querySelector(
+      '.settings-panel.settings-backup-restore[data-settings-id="backup-restore"]'
+    );
+    if (!panel) return;
+
+    const btnFactory = panel.querySelector("[data-backup-restore-factory]");
+    const btnClean   = panel.querySelector("[data-backup-restore-clean]");
+
+    function emitStorageChange(key) {
+      try {
+        window.dispatchEvent(
+          new CustomEvent("turnipds:storage-changed", { detail: { key: String(key || "") } })
+        );
+      } catch {}
+    }
+
+    function wipeAppDataKeys() {
+      const { STORAGE_KEYS } = window.AppConfig;
+      const keys = [
+        STORAGE_KEYS.turni,
+        STORAGE_KEYS.turniVisualizza,
+        STORAGE_KEYS.turnazioni,
+        STORAGE_KEYS.turnazioniPreferred,
+        STORAGE_KEYS.turniStart,
+        STORAGE_KEYS.indennita,
+        STORAGE_KEYS.festivita,
+        STORAGE_KEYS.inspag,
+        STORAGE_KEYS.preferenze
+      ];
+
+      keys.forEach((k) => {
+        try { localStorage.removeItem(k); } catch {}
+      });
+
+      return keys;
+    }
+
+    function hardReloadSoon() {
+      try {
+        setTimeout(() => {
+          try { window.location.reload(); } catch {}
+        }, 50);
+      } catch {
+        try { window.location.reload(); } catch {}
+      }
+    }
+
+    if (btnFactory) {
+      btnFactory.addEventListener("click", () => {
+        const ok = window.confirm(
+          "Ripristino di fabbrica: cancella tutti i dati (turni, turnazioni, indennità, festività, inspag, preferenze) e ripristina la turnazione predefinita.\n\nProcedere?"
+        );
+        if (!ok) return;
+
+        const touched = wipeAppDataKeys();
+
+        // Seed dati di fabbrica (turni + turnazioni + inizio + visual)
+        if (window.TurniStorage && typeof TurniStorage.seedFactoryDefaultsIfNeeded === "function") {
+          TurniStorage.seedFactoryDefaultsIfNeeded();
+        }
+
+        touched.forEach(emitStorageChange);
+
+        if (window.Status && typeof Status.markSaved === "function") {
+          Status.markSaved();
+        }
+
+        hardReloadSoon();
+      });
+    }
+
+    if (btnClean) {
+      btnClean.addEventListener("click", () => {
+        const ok = window.confirm(
+          "Ripristino pulito: cancella tutti i dati e lascia l’app vuota (nessun turno, nessuna turnazione, visualizzazione su calendario disattivata).\n\nProcedere?"
+        );
+        if (!ok) return;
+
+        const { STORAGE_KEYS } = window.AppConfig;
+        const touched = wipeAppDataKeys();
+
+        // Impedisci il seed automatico: setta valori vuoti ma presenti
+        try { localStorage.setItem(STORAGE_KEYS.turni, "[]"); } catch {}
+        try { localStorage.setItem(STORAGE_KEYS.turnazioni, "[]"); } catch {}
+        try { localStorage.setItem(STORAGE_KEYS.turnazioniPreferred, ""); } catch {}
+        try { localStorage.setItem(STORAGE_KEYS.turniVisualizza, "false"); } catch {}
+        try { localStorage.setItem(STORAGE_KEYS.turniStart, JSON.stringify({ date: "", slotIndex: null })); } catch {}
+
+        // Notifica anche le chiavi risettate
+        [
+          STORAGE_KEYS.turni,
+          STORAGE_KEYS.turnazioni,
+          STORAGE_KEYS.turnazioniPreferred,
+          STORAGE_KEYS.turniVisualizza,
+          STORAGE_KEYS.turniStart
+        ].forEach((k) => {
+          if (!touched.includes(k)) touched.push(k);
+        });
+
+        touched.forEach(emitStorageChange);
+
+        if (window.Status && typeof Status.markSaved === "function") {
+          Status.markSaved();
+        }
+
+        hardReloadSoon();
+      });
+    }
+  }
+  // ===================== SPLIT backup-restore-init : END =======================
+
+  // ===================== SPLIT backup-restore-export : START =====================
+  window.BackupRestore = {
+    init: initBackupRestorePanel
+  };
+  // ===================== SPLIT backup-restore-export : END =======================
+
+})();
+
+// ============================
 // Helper UI condiviso: errori temporizzati (show/hide)
 // ui-feedback.js v 1.0
 // ============================
@@ -5146,6 +5276,11 @@ function initTabs() {
           // Navigazione Impostazioni (lista principale + pannelli)
           if (window.SettingsUI && typeof SettingsUI.init === "function") {
             SettingsUI.init();
+          }
+
+          // Backup e Ripristino (ripristino fabbrica / pulito)
+          if (window.BackupRestore && typeof BackupRestore.init === "function") {
+            BackupRestore.init();
           }
 
           // Pannello Turni (lista + form "Aggiungi turno")
