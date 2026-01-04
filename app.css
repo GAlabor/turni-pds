@@ -301,7 +301,7 @@
 
   /* FONT 7 — Voci menu principali Impostazioni:
      - .settings-row-label in .view-settings
-       (Turni, Indennità, Festività, Tema, Versione, Info)
+       (Turni, Indennità, Festività, Tema, Versione, Backup e Ripristino)
   */
   --fs-settings-menu-desktop: var(--fs-xl);
   --fs-settings-menu-mobile: var(--fs-lg);
@@ -1146,7 +1146,7 @@ body {
    ========================= */
 
 /* Card che raggruppano le righe della lista Impostazioni
-   (Turni, Indennità, Festività, Tema, Versione, Info) */
+   (Turni, Indennità, Festività, Tema, Versione, Backup e Ripristino) */
 .settings-group-card{
   --_card-bg: var(--surface);
   --_card-radius: var(--radius-xl);
@@ -1179,7 +1179,7 @@ body {
    - Festività
    - Tema
    - Versione
-   - Info
+   - Backup e Ripristino
 */
 .settings-row {
   width: 100%;
