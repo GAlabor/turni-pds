@@ -3129,17 +3129,15 @@ body.turni-no-select * {
 */
 .tabbar {
   position: fixed;
-  bottom: calc(var(--space-12) + env(safe-area-inset-bottom));
-  left: calc(var(--space-12) + env(safe-area-inset-left));
-  right: calc(var(--space-12) + env(safe-area-inset-right));
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: var(--tabbar-bg);
-  border: 1px solid var(--tabbar-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-light);
+  border-top: 1px solid var(--tabbar-border);
   display: flex;
   justify-content: space-around;
   gap: var(--space-18);
-  padding: var(--space-6) var(--space-18) var(--space-8);
+  padding: var(--space-6) var(--space-18) calc(var(--space-8) + env(safe-area-inset-bottom));
   z-index: 10;
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
@@ -3283,7 +3281,6 @@ body.turni-no-select * {
 
 
 
-
 /* ===================== SPLIT tabbar-icon-calendar : START ===================== */
 
 /* =========================
@@ -3323,8 +3320,8 @@ body.turni-no-select * {
 */
 .version-label {
   position: fixed;
-  bottom: var(--space-6);
-  left: var(--space-10);
+  bottom: 6px;
+  left: 10px;
   font-size: var(--t-cal-year-cell-mobile);
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -3340,7 +3337,6 @@ body.turni-no-select * {
 /* ===================== SPLIT version-label : END   ===================== */
 
 
-
 /* ===================== SPLIT responsive : START ===================== */
 
 /* =========================
@@ -3349,7 +3345,7 @@ body.turni-no-select * {
 
 @media (max-width: 900px) {
   .tabbar {
-    padding-inline: var(--space-10);
+    padding-inline: 10px;
   }
 
   /* MOBILE: niente scritte sotto le icone, solo i simboli */
