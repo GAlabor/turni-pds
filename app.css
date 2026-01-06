@@ -103,8 +103,12 @@
   --tabActiveColor: #0a84ff;  /* colore tab attiva */
 
   /* Pill “ovetto” tab attiva (stile iOS) */
-  --ui-tab-active-pill-bg: rgba(142,142,147,0.16);
-  --ui-shadow-tab-active: 0 10px 30px rgba(15,23,42,0.14);
+  --ui-tab-active-pill-bg: rgba(142,142,147,0.18);
+
+  /* Ombra tab attiva – più ampia e leggibile */
+  --ui-shadow-tab-active: 
+    0 14px 42px rgba(15,23,42,0.22),
+    0 4px 16px rgba(15,23,42,0.18);
 
   /* Effetti interazione tab (hover / active) */
   --active-bright: 1.12;
@@ -442,6 +446,14 @@
 
     --color-arrow-month: var(--nav-fg);
     --color-back-icon: var(--text);
+
+        /* Pill “ovetto” tab attiva */
+    --ui-tab-active-pill-bg: rgba(142,142,147,0.26);
+
+    /* Ombra tab attiva – dark system */
+    --ui-shadow-tab-active:
+      0 18px 48px rgba(0,0,0,0.75),
+      0 6px 20px rgba(0,0,0,0.55);
   }
 }
 /* ==========================================================
@@ -477,9 +489,12 @@
   --tabColor: #6b7280;
   --tabActiveColor: #4b8dff;
 
-  /* Pill “ovetto” tab attiva (stile iOS) */
-  --ui-tab-active-pill-bg: rgba(142,142,147,0.22);
-  --ui-shadow-tab-active: 0 14px 38px rgba(0,0,0,0.55);
+    --ui-tab-active-pill-bg: rgba(142,142,147,0.28);
+
+  /* Ombra tab attiva – forced dark */
+  --ui-shadow-tab-active:
+    0 20px 52px rgba(0,0,0,0.80),
+    0 8px 24px rgba(0,0,0,0.60);
 
   --color-arrow-month: var(--nav-fg);
   --color-back-icon: var(--text);
