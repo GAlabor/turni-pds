@@ -690,7 +690,7 @@ body {
    ========================= */
 
 /* Riga abbreviata:
-   Lun / Mar / ... / Dom
+   Lun / Mar / . / Dom
 */
 .dow-row {
   display: grid;
@@ -706,14 +706,20 @@ body {
   padding: var(--space-6) 0;
   text-align: center;
   font-weight: 600;
-  color: var(--dow-muted);
+  color: var(--text);
   font-size: var(--fs-cal-dow-desktop); /* FONT 3 */
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+/* DOM come la domenica */
+.dow-row .dow:last-child {
+  color: var(--sunday);
+}
 /* ==========================================================
    SPLIT INTESTAZIONI_SETTIMANA : END
    ========================================================== */
+
 
 
 
@@ -741,7 +747,7 @@ body {
   background: var(--surface-strong);
   padding: var(--space-4);
   text-align: right;
-  font-size: var(--fs-cal-day-desktop); /* numero giorno, FONT dedicato */
+  font-size: var(--fs-2xl); /* numero giorno, FONT dedicato */
   border-radius: 18px;
   border: 1px solid var(--border);
   transition: 0.16s ease;
@@ -826,6 +832,7 @@ body {
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : END
    ========================================================== */
+
 
 
 
