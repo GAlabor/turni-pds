@@ -761,37 +761,30 @@ body {
   background: var(--surface-strong);
   padding: var(--space-4);
   text-align: right;
-  font-size: var(--fs-cal-day-desktop); /* numero giorno, FONT dedicato */
+  font-size: var(--fs-cal-day-desktop);
   border-radius: 18px;
   border: 1px solid var(--border);
   transition: 0.16s ease;
-  min-height: 86px; /* altezza maggiore */
+  min-height: 86px;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-light);
 }
 
-/* Sigla turnazione in basso, centrata (aggiunta da calendar.js) */
+/* Sigla turnazione in basso */
 .day .cal-turno-sigla {
   position: absolute;
   left: var(--space-6);
   right: var(--space-6);
-  bottom: var(--space-6); /*altezza sigla calendario dal basso*/
-  transform: none;
+  bottom: var(--space-6);
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.02em;
   pointer-events: none;
   user-select: none;
   text-align: center;
-
-  /* Base stabile: il fit reale lo fa il JS (riduce solo se serve) */
   font-size: 23px;
   white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
-
-  /* Mostra le sigle tutte insieme solo quando il JS ha finito fit+centraggio */
   opacity: 0;
   transition: opacity 0.08s linear;
 }
@@ -800,10 +793,11 @@ body {
   opacity: 0.95;
 }
 
-/* non mostrare nella cella vuota */
-.day.empty .cal-turno-sigla { display: none; }
+.day.empty .cal-turno-sigla {
+  display: none;
+}
 
-/* Highlight hover desktop (alone blu) */
+/* Hover desktop */
 .day::before {
   content: "";
   position: absolute;
@@ -814,7 +808,6 @@ body {
   pointer-events: none;
 }
 
-/* Celle vuote (prima del giorno 1, dopo la fine mese) */
 .day.empty {
   background: transparent;
   border: none;
@@ -822,7 +815,6 @@ body {
   pointer-events: none;
 }
 
-/* Hover cella giorno */
 .day:hover {
   transform: translateY(-1px);
   border-color: var(--accent);
@@ -832,20 +824,21 @@ body {
   opacity: 1;
 }
 
-/* Domenica e oggi
-   (classi aggiunte da calendar.js)
-*/
+/* Domenica */
 .sunday {
   color: var(--sunday);
 }
 
+/* ✅ GIORNO ODIERNO — pill con stesso colore tab attiva */
 .today {
   border: 2px solid var(--today-border);
   font-weight: 700;
+  background: var(--ui-tab-active-pill-bg);
 }
 /* ==========================================================
    SPLIT GRIGLIA_GIORNI : END
    ========================================================== */
+
 
 
 
