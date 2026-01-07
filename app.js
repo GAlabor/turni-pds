@@ -343,6 +343,27 @@ function getCalendarSiglaSizingConfig(siglaText) {
   };
 }
 
+// Colore turno: fonte primaria = lista Turni (Impostazioni Turni)
+// Fallback = colore salvato nella turnazione (per compat / seed iniziale)
+function getTurniColorForSigla(sigla) {
+  if (!window.TurniStorage) return "";
+
+  const s = (sigla != null) ? String(sigla).trim().toUpperCase() : "";
+  if (!s) return "";
+
+  const list = (typeof TurniStorage.loadTurni === "function") ? TurniStorage.loadTurni() : [];
+  if (!Array.isArray(list) || !list.length) return "";
+
+  const hit = list.find(t => {
+    const ts = (t && t.sigla != null) ? String(t.sigla).trim().toUpperCase() : "";
+    return ts === s;
+  }) || null;
+
+  const col = hit && hit.colore != null ? String(hit.colore).trim() : "";
+  return col || "";
+}
+
+
 
 
 // Ritorna { sigla, colore } oppure null
@@ -403,7 +424,13 @@ function getCalendarSiglaForDate(dateObj) {
   }
 
   if (!baseSigla) return null;
-  return { sigla: baseSigla, colore: baseColore };
+
+// Se esiste un colore aggiornato in Impostazioni Turni per la stessa sigla,
+// usiamo quello.
+const fromTurni = getTurniColorForSigla(baseSigla);
+const finalColore = fromTurni || baseColore;
+return { sigla: baseSigla, colore: finalColore };
+
 }
 
 // =====================================================
