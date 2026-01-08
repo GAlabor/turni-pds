@@ -1351,10 +1351,20 @@ body {
 /* ===================== SPLIT settings-choice-variants : START ===================== */
 .settings-choice--primary{
   color: var(--accent);
+  font-weight: 500;
 }
 
 .settings-choice--danger{
   color: #ff3b30;
+  font-weight: 500;
+}
+
+.settings-choice--primary:active{
+  background: rgba(10,132,255,0.12);
+}
+
+.settings-choice--danger:active{
+  background: rgba(255,59,48,0.12);
 }
 /* ===================== SPLIT settings-choice-variants : END ======================= */
 
