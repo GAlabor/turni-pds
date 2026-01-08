@@ -3730,7 +3730,7 @@ function syncSummaryUI() {
 
   // stato pulsante Salva
   if (startSaveBtn) {
-    const canSave = ok && isDirty;
+    const canSave = ok;
     startSaveBtn.disabled = !canSave;
     startSaveBtn.classList.toggle("is-disabled", !canSave);
   }
@@ -3743,7 +3743,6 @@ function syncSummaryUI() {
 // ===================== SPLIT start_draft_helpers : START =====================
 function setDirty(v) {
   isDirty = !!v;
-  if (startSaveBtn) startSaveBtn.disabled = !isDirty;
 }
 
 function showStartError() {
@@ -3779,7 +3778,11 @@ function syncPanelDraftUI() {
     }
   }
 
-  if (startSaveBtn) startSaveBtn.disabled = !isDirty;
+  if (startSaveBtn) {
+    const canSave = canUse();
+    startSaveBtn.disabled = !canSave;
+    startSaveBtn.classList.toggle("is-disabled", !canSave);
+  }
 }
 // ===================== SPLIT start_draft_helpers : END   =====================
 
@@ -3990,7 +3993,8 @@ function init(ctx) {
     });
 
     // stato iniziale
-    startSaveBtn.disabled = true;
+    startSaveBtn.disabled = !canUse();
+    startSaveBtn.classList.toggle("is-disabled", startSaveBtn.disabled);
   }
 
   if (startTurnoRow) {
@@ -4012,8 +4016,6 @@ function init(ctx) {
   }
 }
 // ===================== SPLIT init_bindings : END   =====================
-
-
 
 
   // ===================== SPLIT public_api : START =====================
