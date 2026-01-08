@@ -3634,24 +3634,35 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   }
   // ===================== SPLIT storage_preferred_turnazione : END   =====================
 
-  // ===================== SPLIT dom_refs_state : START =====================
-  let startRowBtn = null;
-  let startSummaryEl = null;
-  let startChevronEl = null;
 
-  let panelStart = null;
-  let panelStartPick = null;
+// ===================== SPLIT dom_refs_state : START =====================
+let startRowBtn = null;
+let startSummaryEl = null;
+let startChevronEl = null;
 
-  let startDateInput = null;
-  let startTurnoRow = null;
-  let startTurnoSummary = null;
+let panelStart = null;
+let panelStartPick = null;
 
-  let startPickList = null;
-  let startPickEmpty = null;
+let startDateInput = null;
+let startTurnoRow = null;
+let startTurnoSummary = null;
 
-  // visibilità condizionata dal toggle “visualizza turnazione”
-  let visibleByToggle = true;
-  // ===================== SPLIT dom_refs_state : END   =====================
+// toolbar (Salva)
+let startSaveBtn = null;
+let startErrEl = null;
+let startErrCtl = null;
+
+// draft non salvata (diventa persistente solo con "Salva")
+let startDraft = { date: "", slotIndex: null };
+let isDirty = false;
+
+let startPickList = null;
+let startPickEmpty = null;
+
+// visibilità condizionata dal toggle “visualizza turnazione”
+let visibleByToggle = true;
+// ===================== SPLIT dom_refs_state : END   =====================
+
 
   // ===================== SPLIT ui_enable_row : START =====================
   function setStartRowEnabled(enabled) {
@@ -3662,131 +3673,191 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   }
   // ===================== SPLIT ui_enable_row : END   =====================
 
-  // ===================== SPLIT summary_builders : START =====================
-  function buildStartSummaryText() {
-    if (!window.TurniStorage) return "";
-    const { loadTurnoIniziale } = TurniStorage;
 
-    const cfg = (typeof loadTurnoIniziale === "function")
-      ? loadTurnoIniziale()
-      : { date: "", slotIndex: null };
+// ===================== SPLIT summary_builders : START =====================
+function buildStartSummaryText() {
+  if (!window.TurniStorage) return "";
+  const { loadTurnoIniziale } = TurniStorage;
 
-    const dateTxt = cfg.date ? formatDateShortISO(cfg.date) : "";
+  const cfg = (typeof loadTurnoIniziale === "function")
+    ? loadTurnoIniziale()
+    : { date: "", slotIndex: null };
 
-    const t = getPreferredTurnazione();
-    const slotIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
+  const dateTxt = cfg.date ? formatDateShortISO(cfg.date) : "";
 
-let turnoTxt = "";
-if (t && slotIndex !== null && slotIndex >= 0) {
-  const slots = Array.isArray(t.slots) ? t.slots : [];
-  const s = slots[slotIndex] || null;
-  const sigla = s && s.sigla ? String(s.sigla).trim() : "";
-  turnoTxt = sigla;
-}
+  const t = getPreferredTurnazione();
+  const slotIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
 
-
-    if (dateTxt && turnoTxt) return `${dateTxt} · ${turnoTxt}`;
-    if (dateTxt) return dateTxt;
-    if (turnoTxt) return turnoTxt;
-    return "";
-  }
-
-  function syncSummaryUI() {
-    const ok = canUse();
-
-    const txt = ok ? buildStartSummaryText() : "";
-
-    if (startSummaryEl) startSummaryEl.textContent = txt;
-
-    if (startTurnoSummary) {
-      if (!ok) {
-        startTurnoSummary.textContent = "";
-      } else {
-        const cfg = TurniStorage.loadTurnoIniziale();
-        const t = getPreferredTurnazione();
-
-        let turnoTxt = "";
-if (t && Number.isInteger(cfg.slotIndex)) {
-  const slots = Array.isArray(t.slots) ? t.slots : [];
-  const s = slots[cfg.slotIndex] || null;
-  const nome = s && s.nome ? String(s.nome).trim() : "";
-  turnoTxt = nome;
-}
-startTurnoSummary.textContent = turnoTxt;
-
-      }
-    }
-
-    setStartRowEnabled(ok);
-  }
-  // ===================== SPLIT summary_builders : END   =====================
-
-  // ===================== SPLIT navigation_open_panel : START =====================
-  function openPanelStart() {
-    if (!panelStart) return;
-    if (!canUse()) return;
-
-    const cfg = TurniStorage.loadTurnoIniziale();
-    if (startDateInput) startDateInput.value = cfg.date || "";
-    syncSummaryUI();
-
-    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-      SettingsUI.openPanel("turni-start", { internal: true });
-    }
-  }
-  // ===================== SPLIT navigation_open_panel : END   =====================
-
-  // ===================== SPLIT pick_list_render : START =====================
-  function renderPickList() {
-    if (!startPickList) return;
-
-    const t = getPreferredTurnazione();
-    startPickList.innerHTML = "";
-
-    const cfg = TurniStorage.loadTurnoIniziale();
-    const selectedIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
-
-    const has = !!t && (Number(t.days) || 0) > 0 && Array.isArray(t.slots);
-
-    if (startPickEmpty) startPickEmpty.hidden = has;
-    if (!has) return;
-
-    const days = Number(t.days) || 0;
+  let turnoTxt = "";
+  if (t && slotIndex !== null && slotIndex >= 0) {
     const slots = Array.isArray(t.slots) ? t.slots : [];
+    const s = slots[slotIndex] || null;
+    const sigla = s && s.sigla ? String(s.sigla).trim() : "";
+    turnoTxt = sigla;
+  }
 
-    for (let i = 0; i < days; i++) {
-      const s = slots[i] || {};
-      const sigla = s.sigla ? String(s.sigla).trim() : "";
-      const nome  = s.nome  ? String(s.nome).trim()  : "";
+  if (dateTxt && turnoTxt) return `${dateTxt} · ${turnoTxt}`;
+  if (dateTxt) return dateTxt;
+  if (turnoTxt) return turnoTxt;
+  return "";
+}
 
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "turnazioni-pick-row";
-      if (selectedIndex !== null && i === selectedIndex) row.classList.add("is-selected");
+function syncSummaryUI() {
+  const ok = canUse();
 
-      const nameEl = document.createElement("span");
-      nameEl.className = "turnazioni-pick-name";
+  // summary nella card "Visualizza turnazione" usa SEMPRE il valore salvato
+  const txt = ok ? buildStartSummaryText() : "";
+  if (startSummaryEl) startSummaryEl.textContent = txt;
 
-      let label = nome || sigla || "";
-      nameEl.textContent = label;
-      row.appendChild(nameEl);
+  // nel pannello "Inizio Turnazione" mostriamo il draft (anche non salvato)
+  if (startTurnoSummary) {
+    if (!ok) {
+      startTurnoSummary.textContent = "";
+    } else {
+      const t = getPreferredTurnazione();
+      const idx = Number.isInteger(startDraft.slotIndex) ? startDraft.slotIndex : null;
 
-      row.addEventListener("click", () => {
-        const next = TurniStorage.loadTurnoIniziale();
-        next.slotIndex = i;
-        TurniStorage.saveTurnoIniziale(next);
-
-        syncSummaryUI();
-
-        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-          SettingsUI.openPanel("turni-start", { internal: true });
-        }
-      });
-
-      startPickList.appendChild(row);
+      let turnoTxt = "";
+      if (t && idx !== null) {
+        const slots = Array.isArray(t.slots) ? t.slots : [];
+        const s = slots[idx] || null;
+        const nome = s && s.nome ? String(s.nome).trim() : "";
+        turnoTxt = nome;
+      }
+      startTurnoSummary.textContent = turnoTxt;
     }
   }
-  // ===================== SPLIT pick_list_render : END   =====================
+
+  // stato pulsante Salva
+  if (startSaveBtn) {
+    const canSave = ok && isDirty;
+    startSaveBtn.disabled = !canSave;
+    startSaveBtn.classList.toggle("is-disabled", !canSave);
+  }
+
+  setStartRowEnabled(ok);
+}
+// ===================== SPLIT summary_builders : END   =====================
+
+
+// ===================== SPLIT start_draft_helpers : START =====================
+function setDirty(v) {
+  isDirty = !!v;
+  if (startSaveBtn) startSaveBtn.disabled = !isDirty;
+}
+
+function showStartError() {
+  if (!startErrEl) return;
+  if (startErrCtl) startErrCtl.show();
+  else startErrEl.hidden = false;
+}
+
+function clearStartError() {
+  if (!startErrEl) return;
+  if (startErrCtl) startErrCtl.clear();
+  else startErrEl.hidden = true;
+}
+
+function syncPanelDraftUI() {
+  if (!panelStart) return;
+  if (startDateInput) startDateInput.value = startDraft.date || "";
+
+  // label turno nel pannello
+  if (startTurnoSummary) {
+    if (!canUse()) {
+      startTurnoSummary.textContent = "";
+    } else {
+      const t = getPreferredTurnazione();
+      let turnoTxt = "";
+      if (t && Number.isInteger(startDraft.slotIndex)) {
+        const slots = Array.isArray(t.slots) ? t.slots : [];
+        const s = slots[startDraft.slotIndex] || null;
+        const nome = s && s.nome ? String(s.nome).trim() : "";
+        turnoTxt = nome;
+      }
+      startTurnoSummary.textContent = turnoTxt;
+    }
+  }
+
+  if (startSaveBtn) startSaveBtn.disabled = !isDirty;
+}
+// ===================== SPLIT start_draft_helpers : END   =====================
+
+
+// ===================== SPLIT navigation_open_panel : START =====================
+function openPanelStart() {
+  if (!panelStart) return;
+  if (!canUse()) return;
+
+  // carica da storage e azzera dirty
+  startDraft = TurniStorage.loadTurnoIniziale();
+  if (!startDraft || typeof startDraft !== "object") startDraft = { date: "", slotIndex: null };
+  setDirty(false);
+  clearStartError();
+  syncPanelDraftUI();
+
+  // aggiorna anche la riga riepilogo (quella resta sul valore salvato)
+  syncSummaryUI();
+
+  if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+    SettingsUI.openPanel("turni-start", { internal: true });
+  }
+}
+// ===================== SPLIT navigation_open_panel : END   =====================
+
+
+
+// ===================== SPLIT pick_list_render : START =====================
+function renderPickList() {
+  if (!startPickList) return;
+
+  const t = getPreferredTurnazione();
+  startPickList.innerHTML = "";
+
+  // usa la draft se esiste (così la selezione resta visibile anche prima del "Salva")
+  const selectedIndex = Number.isInteger(startDraft.slotIndex) ? startDraft.slotIndex : null;
+
+  const has = !!t && (Number(t.days) || 0) > 0 && Array.isArray(t.slots);
+
+  if (startPickEmpty) startPickEmpty.hidden = has;
+  if (!has) return;
+
+  const days = Number(t.days) || 0;
+  const slots = Array.isArray(t.slots) ? t.slots : [];
+
+  for (let i = 0; i < days; i++) {
+    const s = slots[i] || {};
+    const sigla = s.sigla ? String(s.sigla).trim() : "";
+    const nome  = s.nome  ? String(s.nome).trim()  : "";
+
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "turnazioni-pick-row";
+    if (selectedIndex !== null && i === selectedIndex) row.classList.add("is-selected");
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "turnazioni-pick-name";
+
+    let label = nome || sigla || "";
+    nameEl.textContent = label;
+    row.appendChild(nameEl);
+
+    row.addEventListener("click", () => {
+      startDraft.slotIndex = i;
+      setDirty(true);
+      clearStartError();
+      syncPanelDraftUI();
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni-start", { internal: true });
+      }
+    });
+
+    startPickList.appendChild(row);
+  }
+}
+// ===================== SPLIT pick_list_render : END   =====================
+
 
   // ===================== SPLIT visibility_sync : START =====================
   function syncVisibility(visualOn) {
@@ -3809,6 +3880,7 @@ startTurnoSummary.textContent = turnoTxt;
   }
   // ===================== SPLIT external_hooks_sync : END   =====================
 
+
 // ===================== SPLIT init_bindings : START =====================
 function init(ctx) {
   if (!window.TurniStorage) return;
@@ -3829,8 +3901,18 @@ function init(ctx) {
   startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
   startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
 
+  startSaveBtn      = panelStart ? panelStart.querySelector("[data-turni-start-save]") : null;
+  startErrEl        = panelStart ? panelStart.querySelector("[data-turni-start-error]") : null;
+  startErrCtl       = (window.UIFeedback && typeof UIFeedback.createTempError === "function")
+    ? UIFeedback.createTempError(startErrEl, 2000)
+    : null;
+
   startPickList     = panelStartPick ? panelStartPick.querySelector("#turniStartPickList") : null;
   startPickEmpty    = panelStartPick ? panelStartPick.querySelector("#turniStartPickEmpty") : null;
+
+  // stato iniziale draft = salvato
+  startDraft = TurniStorage.loadTurnoIniziale();
+  if (!startDraft || typeof startDraft !== "object") startDraft = { date: "", slotIndex: null };
 
   if (startRowBtn) {
     startRowBtn.addEventListener("click", () => {
@@ -3874,11 +3956,37 @@ function init(ctx) {
       const norm = normalizeISODateYear4(before);
       if (norm !== before) startDateInput.value = norm;
 
-      const cfg = TurniStorage.loadTurnoIniziale();
-      cfg.date = startDateInput.value || "";
-      TurniStorage.saveTurnoIniziale(cfg);
+      startDraft.date = startDateInput.value || "";
+      setDirty(true);
+      clearStartError();
+      syncPanelDraftUI();
+    });
+  }
+
+  if (startSaveBtn) {
+    startSaveBtn.addEventListener("click", () => {
+      if (!canUse()) return;
+      clearStartError();
+
+      const dateOk = !!(startDraft.date && String(startDraft.date).trim());
+      const slotOk = Number.isInteger(startDraft.slotIndex);
+
+      if (!dateOk || !slotOk) {
+        showStartError();
+        return;
+      }
+
+      TurniStorage.saveTurnoIniziale({
+        date: String(startDraft.date || ""),
+        slotIndex: startDraft.slotIndex
+      });
+
+      setDirty(false);
       syncSummaryUI();
     });
+
+    // stato iniziale
+    startSaveBtn.disabled = true;
   }
 
   if (startTurnoRow) {
@@ -3900,6 +4008,7 @@ function init(ctx) {
   }
 }
 // ===================== SPLIT init_bindings : END   =====================
+
 
 
   // ===================== SPLIT public_api : START =====================
