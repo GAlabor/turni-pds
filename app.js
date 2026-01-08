@@ -3983,6 +3983,10 @@ function init(ctx) {
 
       setDirty(false);
       syncSummaryUI();
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni", { internal: true });
+      }
     });
 
     // stato iniziale
@@ -4008,6 +4012,7 @@ function init(ctx) {
   }
 }
 // ===================== SPLIT init_bindings : END   =====================
+
 
 
 
