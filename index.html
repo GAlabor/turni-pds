@@ -339,11 +339,11 @@
           </div>
 
           <button class="settings-choice" type="button" data-backup-restore-factory>
-            Ripristino di fabbrica
+            Ripristina configurazione iniziale
           </button>
 
           <button class="settings-choice" type="button" data-backup-restore-clean>
-            Ripristino pulito
+            Cancella contenuto
           </button>
         </div>
         <!-- ===================== SPLIT panel-backup-restore : END ====================== -->
@@ -1006,6 +1006,34 @@
   <script src="app.js" defer></script>
   
   <!-- ===================== SPLIT scripts : END ============================= -->
+
+  <!-- ===================== UI CONFIRM MODAL : START ===================== -->
+<div class="ui-confirm" id="uiConfirm" hidden>
+  <div class="ui-confirm-backdrop" data-ui-confirm-cancel></div>
+
+  <div
+    class="ui-confirm-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="uiConfirmTitle"
+    aria-describedby="uiConfirmText"
+  >
+    <h3 class="ui-confirm-title" id="uiConfirmTitle"></h3>
+    <p class="ui-confirm-text" id="uiConfirmText"></p>
+
+    <div class="ui-confirm-actions">
+      <button type="button" class="ui-confirm-btn ui-confirm-btn--neutral" data-ui-confirm-cancel>
+        Annulla
+      </button>
+
+      <button type="button" class="ui-confirm-btn" id="uiConfirmOk" data-ui-confirm-ok>
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ===================== UI CONFIRM MODAL : END ======================= -->
+
 
 </body>
 </html>

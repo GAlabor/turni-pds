@@ -5148,6 +5148,73 @@ function init(ctx) {
     const btnFactory = panel.querySelector("[data-backup-restore-factory]");
     const btnClean   = panel.querySelector("[data-backup-restore-clean]");
 
+        function uiConfirm(opts) {
+      const title = (opts && opts.title) ? String(opts.title) : "";
+      const text  = (opts && opts.text)  ? String(opts.text)  : "";
+      const okText = (opts && opts.okText) ? String(opts.okText) : "OK";
+      const variant = (opts && opts.variant) ? String(opts.variant) : "primary"; // primary | danger
+
+      const modal = document.getElementById("uiConfirm");
+      const titleEl = document.getElementById("uiConfirmTitle");
+      const textEl  = document.getElementById("uiConfirmText");
+      const okBtn   = document.getElementById("uiConfirmOk");
+
+      if (!modal || !titleEl || !textEl || !okBtn) {
+        // fallback brutale (se manca l'HTML del modal)
+        return Promise.resolve(window.confirm(`${title}\n\n${text}`));
+      }
+
+      const cancelTargets = modal.querySelectorAll("[data-ui-confirm-cancel]");
+      const okTarget = modal.querySelector("[data-ui-confirm-ok]");
+
+      return new Promise((resolve) => {
+        let done = false;
+
+        function cleanup() {
+          document.body.classList.remove("ui-modal-open");
+          modal.hidden = true;
+          done = true;
+          document.removeEventListener("keydown", onKeyDown, true);
+          cancelTargets.forEach(el => el.removeEventListener("click", onCancel, true));
+          if (okTarget) okTarget.removeEventListener("click", onOk, true);
+        }
+
+        function finish(v) {
+          if (done) return;
+          cleanup();
+          resolve(!!v);
+        }
+
+        function onCancel(e) { e.preventDefault(); finish(false); }
+        function onOk(e) { e.preventDefault(); finish(true); }
+
+        function onKeyDown(e) {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            finish(false);
+          }
+        }
+
+        // setup contenuti
+        titleEl.textContent = title;
+        textEl.textContent = text;
+        okBtn.textContent = okText;
+
+        okBtn.classList.remove("ui-confirm-btn--primary", "ui-confirm-btn--danger");
+        okBtn.classList.add(variant === "danger" ? "ui-confirm-btn--danger" : "ui-confirm-btn--primary");
+
+        // show
+        modal.hidden = false;
+        document.body.classList.add("ui-modal-open");
+
+        // bind
+        cancelTargets.forEach(el => el.addEventListener("click", onCancel, true));
+        if (okTarget) okTarget.addEventListener("click", onOk, true);
+        document.addEventListener("keydown", onKeyDown, true);
+      });
+    }
+
+
     function emitStorageChange(key) {
       try {
         window.dispatchEvent(
@@ -5188,10 +5255,15 @@ function init(ctx) {
     }
 
     if (btnFactory) {
-      btnFactory.addEventListener("click", () => {
-        const ok = window.confirm(
-          "Ripristino di fabbrica: cancella tutti i dati (turni, turnazioni, indennità, festività, inspag, preferenze) e ripristina la turnazione predefinita.\n\nProcedere?"
-        );
+      btnFactory.addEventListener("click", async () => {
+        const ok = await uiConfirm({
+          title: "Ripristinare la configurazione iniziale?",
+          text:
+            "Questa operazione riporta l’app alla configurazione iniziale.\n" +
+            "Tutte le modifiche apportate verranno perse.",
+          okText: "Ripristina",
+          variant: "primary"
+        });
         if (!ok) return;
 
         const touched = wipeAppDataKeys();
@@ -5211,11 +5283,15 @@ function init(ctx) {
       });
     }
 
+
     if (btnClean) {
-      btnClean.addEventListener("click", () => {
-        const ok = window.confirm(
-          "Ripristino pulito: cancella tutti i dati e lascia l’app vuota (nessun turno, nessuna turnazione, visualizzazione su calendario disattivata).\n\nProcedere?"
-        );
+      btnClean.addEventListener("click", async () => {
+        const ok = await uiConfirm({
+          title: "Cancellare il contenuto?",
+          text: "Questa operazione elimina tutti i dati dell’app.",
+          okText: "Cancella",
+          variant: "danger"
+        });
         if (!ok) return;
 
         const { STORAGE_KEYS } = window.AppConfig;
@@ -5248,6 +5324,7 @@ function init(ctx) {
         hardReloadSoon();
       });
     }
+
   }
   // ===================== SPLIT backup-restore-init : END =======================
 

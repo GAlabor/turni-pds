@@ -1348,6 +1348,109 @@ body {
 }
 /* ===================== SPLIT theme-choices : END ======================= */
 
+/* ===================== SPLIT settings-choice-variants : START ===================== */
+.settings-choice--primary{
+  color: var(--accent);
+}
+
+.settings-choice--danger{
+  color: #ff3b30;
+}
+/* ===================== SPLIT settings-choice-variants : END ======================= */
+
+
+/* ===================== SPLIT ui-confirm-modal : START ===================== */
+body.ui-modal-open{
+  overflow: hidden;
+}
+
+.ui-confirm[hidden]{
+  display: none !important;
+}
+
+.ui-confirm{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.ui-confirm-backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+}
+
+.ui-confirm-card{
+  position: relative;
+  width: min(420px, calc(100vw - 40px));
+  margin: 0 auto;
+  top: 22vh;
+
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-16);
+}
+
+:root[data-theme="dark"] .ui-confirm-card{
+  background: rgba(15,23,42,0.88);
+}
+
+.ui-confirm-title{
+  margin: 0 0 var(--space-8) 0;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.ui-confirm-text{
+  margin: 0 0 var(--space-14) 0;
+  font-size: var(--fs-row-subtext);
+  color: var(--subtext);
+  white-space: pre-line; /* per andare a capo con \n */
+}
+
+.ui-confirm-actions{
+  display: flex;
+  gap: var(--space-10);
+  justify-content: flex-end;
+}
+
+.ui-confirm-btn{
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.08);
+  padding: 10px 14px;
+  font-size: 15px;
+  cursor: pointer;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.06s ease, background 0.16s ease;
+}
+
+:root[data-theme="dark"] .ui-confirm-btn{
+  background: rgba(15,23,42,0.55);
+}
+
+.ui-confirm-btn:active{
+  transform: scale(0.97);
+}
+
+.ui-confirm-btn--neutral{
+  color: var(--subtext);
+}
+
+.ui-confirm-btn--primary{
+  color: var(--accent);
+  border-color: rgba(10,132,255,0.40);
+}
+
+.ui-confirm-btn--danger{
+  color: #ff3b30;
+  border-color: rgba(255,59,48,0.35);
+}
+/* ===================== SPLIT ui-confirm-modal : END ======================= */
+
 
 /* ===================== SPLIT responsive-settings : START ===================== */
 /* =========================
