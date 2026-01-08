@@ -569,52 +569,56 @@
         </div>
         <!-- ===================== SPLIT panel-turni-add : END ================ -->
 
-        <!-- ===================== SPLIT panel-turni-start : START ============ -->
-        <!-- ✅ AGGIUNTO: PANNELLO "Inizio Turnazione" -->
-        <div
-          class="settings-panel settings-turni-start"
-          data-settings-id="turni-start"
-          data-settings-title="Inizio Turnazione">
+<!-- ===================== SPLIT panel-turni-start : START ============ -->
+<!-- ✅ AGGIUNTO: PANNELLO "Inizio Turnazione" -->
+<div
+  class="settings-panel settings-turni-start"
+  data-settings-id="turni-start"
+  data-settings-title="Inizio Turnazione">
 
-          <div class="settings-group">
-            <p class="settings-hint">
-              Scegli il giorno e il turno iniziale della rotazione.
-            </p>
-          </div>
+  <div class="settings-group">
+    <p class="settings-hint">
+      Scegli il giorno e il turno iniziale della rotazione.
+    </p>
+  </div>
 
-          <div class="turni-form">
+  <div class="turni-form">
 
-            <div class="turni-field-row">
-              <label class="turni-label" for="turniStartDate">Giorno</label>
-              <div class="turni-field-control">
-                <input
-                  class="turni-input"
-                  id="turniStartDate"
-                  type="date">
-              </div>
-            </div>
+    <div class="turni-field-row">
+      <label class="turni-label" for="turniStartDate">Giorno</label>
+      <div class="turni-field-control">
+        <input
+          class="turni-input"
+          id="turniStartDate"
+          type="date"
+          inputmode="numeric"
+          maxlength="10"
+          pattern="\d{4}-\d{2}-\d{2}">
+      </div>
+    </div>
 
-            <button
-              class="turni-inline-row"
-              type="button"
-              data-turni-start-turno-row>
-              <div class="turni-inline-row-left">
-                <span class="turni-inline-row-label">Turno</span>
-              </div>
+    <button
+      class="turni-inline-row"
+      type="button"
+      data-turni-start-turno-row>
+      <div class="turni-inline-row-left">
+        <span class="turni-inline-row-label">Turno</span>
+      </div>
 
-              <div class="turni-inline-row-right">
-                <span class="turni-inline-row-summary" id="turniStartTurnoSummary"></span>
-                <span class="turni-inline-row-chevron" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <use href="#ico-ui-chevron-right"></use>
-                  </svg>
-                </span>
-              </div>
-            </button>
+      <div class="turni-inline-row-right">
+        <span class="turni-inline-row-summary" id="turniStartTurnoSummary"></span>
+        <span class="turni-inline-row-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <use href="#ico-ui-chevron-right"></use>
+          </svg>
+        </span>
+      </div>
+    </button>
 
-          </div>
-        </div>
-        <!-- ===================== SPLIT panel-turni-start : END ============== -->
+  </div>
+</div>
+<!-- ===================== SPLIT panel-turni-start : END ============== -->
+
 
         <!-- ===================== SPLIT panel-turni-start-pick : START ======= -->
         <!-- ✅ AGGIUNTO: PANNELLO "SELEZIONA TURNO INIZIALE" -->

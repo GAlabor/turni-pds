@@ -3809,64 +3809,98 @@ startTurnoSummary.textContent = turnoTxt;
   }
   // ===================== SPLIT external_hooks_sync : END   =====================
 
-  // ===================== SPLIT init_bindings : START =====================
-  function init(ctx) {
-    if (!window.TurniStorage) return;
+// ===================== SPLIT init_bindings : START =====================
+function init(ctx) {
+  if (!window.TurniStorage) return;
 
-    const panelTurni = ctx && ctx.panelTurni;
-    if (!panelTurni) return;
+  const panelTurni = ctx && ctx.panelTurni;
+  if (!panelTurni) return;
 
-    // riga dentro Visualizza Turnazione
-    startRowBtn     = panelTurni.querySelector("[data-turni-start-row]");
-    startSummaryEl  = panelTurni.querySelector("[data-turni-start-summary]");
-    startChevronEl  = panelTurni.querySelector("[data-turni-start-chevron]");
+  // riga dentro Visualizza Turnazione
+  startRowBtn     = panelTurni.querySelector("[data-turni-start-row]");
+  startSummaryEl  = panelTurni.querySelector("[data-turni-start-summary]");
+  startChevronEl  = panelTurni.querySelector("[data-turni-start-chevron]");
 
-    const settingsView = document.querySelector(".view-settings");
-    panelStart     = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start[data-settings-id="turni-start"]') : null;
-    panelStartPick = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start-pick[data-settings-id="turni-start-pick"]') : null;
+  const settingsView = document.querySelector(".view-settings");
+  panelStart     = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start[data-settings-id="turni-start"]') : null;
+  panelStartPick = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start-pick[data-settings-id="turni-start-pick"]') : null;
 
-    startDateInput    = panelStart ? panelStart.querySelector("#turniStartDate") : null;
-    startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
-    startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
+  startDateInput    = panelStart ? panelStart.querySelector("#turniStartDate") : null;
+  startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
+  startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
 
-    startPickList     = panelStartPick ? panelStartPick.querySelector("#turniStartPickList") : null;
-    startPickEmpty    = panelStartPick ? panelStartPick.querySelector("#turniStartPickEmpty") : null;
+  startPickList     = panelStartPick ? panelStartPick.querySelector("#turniStartPickList") : null;
+  startPickEmpty    = panelStartPick ? panelStartPick.querySelector("#turniStartPickEmpty") : null;
 
-    if (startRowBtn) {
-      startRowBtn.addEventListener("click", () => {
-        if (startRowBtn.classList.contains("is-disabled")) return;
-        openPanelStart();
-      });
-    }
-
-    if (startDateInput) {
-      startDateInput.addEventListener("change", () => {
-        const cfg = TurniStorage.loadTurnoIniziale();
-        cfg.date = startDateInput.value || "";
-        TurniStorage.saveTurnoIniziale(cfg);
-        syncSummaryUI();
-      });
-    }
-
-    if (startTurnoRow) {
-      startTurnoRow.addEventListener("click", () => {
-        if (!canUse()) return;
-        renderPickList();
-        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-          SettingsUI.openPanel("turni-start-pick", { internal: true });
-        }
-      });
-    }
-
-    // iniziale
-    syncSummaryUI();
-
-    // esponi hook per turnazioni
-    if (window.Turni) {
-      window.Turni.syncTurnoInizialeUI = syncFromTurnazioniChange;
-    }
+  if (startRowBtn) {
+    startRowBtn.addEventListener("click", () => {
+      if (startRowBtn.classList.contains("is-disabled")) return;
+      openPanelStart();
+    });
   }
-  // ===================== SPLIT init_bindings : END   =====================
+
+  // Normalizza date input: forza anno a 4 cifre (YYYY) e lunghezza ISO max 10 (YYYY-MM-DD).
+  function normalizeISODateYear4(v) {
+    if (typeof v !== "string") return "";
+    let s = v.trim();
+
+    // Se qualcuno ha infilato un anno > 4 cifre, tronca alle prime 4
+    // e conserva la parte dal primo "-" in poi (se esiste).
+    const firstDash = s.indexOf("-");
+    if (firstDash > 4) {
+      s = s.slice(0, 4) + s.slice(firstDash);
+    } else if (firstDash === -1 && /^\d{5,}$/.test(s)) {
+      // caso estremo: solo numeri e troppi (fallback strani)
+      s = s.slice(0, 4);
+    }
+
+    // Taglia qualsiasi eccesso oltre "YYYY-MM-DD"
+    if (s.length > 10) s = s.slice(0, 10);
+
+    return s;
+  }
+
+  if (startDateInput) {
+    // mentre scrivi (desktop/fallback): non far crescere l'anno oltre 4
+    startDateInput.addEventListener("input", () => {
+      const before = startDateInput.value || "";
+      const norm = normalizeISODateYear4(before);
+      if (norm !== before) startDateInput.value = norm;
+    });
+
+    // quando cambi (anche da date picker): salva sempre un valore pulito
+    startDateInput.addEventListener("change", () => {
+      const before = startDateInput.value || "";
+      const norm = normalizeISODateYear4(before);
+      if (norm !== before) startDateInput.value = norm;
+
+      const cfg = TurniStorage.loadTurnoIniziale();
+      cfg.date = startDateInput.value || "";
+      TurniStorage.saveTurnoIniziale(cfg);
+      syncSummaryUI();
+    });
+  }
+
+  if (startTurnoRow) {
+    startTurnoRow.addEventListener("click", () => {
+      if (!canUse()) return;
+      renderPickList();
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni-start-pick", { internal: true });
+      }
+    });
+  }
+
+  // iniziale
+  syncSummaryUI();
+
+  // esponi hook per turnazioni
+  if (window.Turni) {
+    window.Turni.syncTurnoInizialeUI = syncFromTurnazioniChange;
+  }
+}
+// ===================== SPLIT init_bindings : END   =====================
+
 
   // ===================== SPLIT public_api : START =====================
   window.TurniStart = {
