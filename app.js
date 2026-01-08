@@ -4947,6 +4947,12 @@ function init(ctx) {
     // ----------------------------
     // Header: titolo per main e pannelli
     // ----------------------------
+    function stripSettingsPrefix(txt) {
+      const s = (txt == null) ? "" : String(txt).trim();
+      if (!s) return "";
+      return s.replace(/^Impostazioni\s*-\s*/i, "").trim();
+    }
+
     function setHeaderForMain() {
       titleEl.textContent = "Impostazioni";
       hideBackBtn();
@@ -4957,7 +4963,7 @@ function init(ctx) {
 
       const panel = settingsView.querySelector(`.settings-panel[data-settings-id="${id}"]`);
       if (panel && panel.dataset.settingsTitle) {
-        titleEl.textContent = panel.dataset.settingsTitle;
+        titleEl.textContent = stripSettingsPrefix(panel.dataset.settingsTitle);
         showBackBtn();
         return;
       }
@@ -4970,10 +4976,11 @@ function init(ctx) {
         }
       }
 
-      titleEl.textContent = `Impostazioni - ${label}`;
+      titleEl.textContent = stripSettingsPrefix(label);
       showBackBtn();
     }
     // ===================== SPLIT header_title_logic : END   =====================
+
 
     // ===================== SPLIT view_switch_main_panel : START =====================
     // ----------------------------
