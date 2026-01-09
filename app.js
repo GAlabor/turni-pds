@@ -3623,6 +3623,40 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       return `${dd}/${mm}/${yy}`;
     }
   }
+
+    // ===================== SPLIT util_today_iso : START =====================
+  function getTodayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+  // ===================== SPLIT util_today_iso : END   =====================
+
+  // ===================== SPLIT start_defaults : START =====================
+  function applyStartDefaultsIfEmpty() {
+    if (!canUse()) return;
+
+    const dateOk = !!(startDraft.date && String(startDraft.date).trim());
+    const slotOk = Number.isInteger(startDraft.slotIndex);
+
+    // Richiesta: default SOLO se non c'è né data né turno
+    if (dateOk || slotOk) return;
+
+    const t = getPreferredTurnazione();
+    if (!t) return;
+
+    const days = Number(t.days) || 0;
+    const slots = Array.isArray(t.slots) ? t.slots : [];
+
+    if (!days || !slots.length) return;
+
+    startDraft.date = getTodayISO();
+    startDraft.slotIndex = 0; // primo turno della turnazione selezionata
+  }
+  // ===================== SPLIT start_defaults : END =====================
+
   // ===================== SPLIT util_format_date : END   =====================
 
   // ===================== SPLIT storage_preferred_turnazione : START =====================
@@ -3813,7 +3847,12 @@ function openPanelStart() {
   if (!startDraft || typeof startDraft !== "object") startDraft = { date: "", slotIndex: null };
   setDirty(false);
   clearStartError();
+
+  // ✅ default automatici: oggi + primo turno (solo se entrambi vuoti)
+  applyStartDefaultsIfEmpty();
+
   syncPanelDraftUI();
+
 
   // aggiorna anche la riga riepilogo (quella resta sul valore salvato)
   syncSummaryUI();
@@ -3893,10 +3932,20 @@ function renderPickList() {
     // chiamata quando cambia preferita/lista turnazioni
     syncSummaryUI();
 
+    // Se sono nel pannello "Inizio Turnazione" e NON sto modificando a mano,
+    // applica i default se non c'è né data né turno.
+    if (panelStart && panelStart.classList.contains("is-active") && !isDirty) {
+      applyStartDefaultsIfEmpty();
+      syncPanelDraftUI();
+    }
+
     if (panelStartPick && panelStartPick.classList.contains("is-active")) {
+      // Se sono nel picker, ricalcolo lista e selezione evidenziata
+      // (i default, se servono, vengono applicati passando dal pannello start)
       renderPickList();
     }
   }
+
   // ===================== SPLIT external_hooks_sync : END   =====================
 
 
