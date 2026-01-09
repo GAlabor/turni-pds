@@ -5613,7 +5613,7 @@ function initTabs() {
 
 // ============================
 // Service worker + versione
-// sw-register.js v 1.0
+// sw-register.js
 // ============================
 
 // ===================== SPLIT bootstrap : START =====================
