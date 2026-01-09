@@ -106,6 +106,9 @@
   /* Pill “ovetto” tab attiva (stile iOS) */
   --ui-tab-active-pill-bg: rgba(142,142,147,0.26);
 
+  /* EXTRA dimensioni ovetto (aumenta qui) */
+--ui-tab-active-pill-w-extra: 10px;
+--ui-tab-active-pill-h-extra: 6px;
 
 
   /* Effetti interazione tab (hover / active) */
@@ -3325,8 +3328,8 @@ body.turni-no-select * {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: calc(var(--tabIcon) + var(--space-24));
-  height: calc(var(--tabIcon) + var(--space-8));
+  width: calc(var(--tabIcon) + var(--space-24) + var(--ui-tab-active-pill-w-extra));
+  height: calc(var(--tabIcon) + var(--space-8) + var(--ui-tab-active-pill-h-extra));
   transform: translate(-50%, -50%);
   border-radius: 999px;
   background: var(--ui-tab-active-pill-bg);

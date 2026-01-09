@@ -1,7 +1,6 @@
 
 // ============================
 // Config globale app Turni PdS
-// config.js v 1.0
 // ============================
 
 // ===================== SPLIT iife-wrapper : START =====================
@@ -284,7 +283,6 @@ function getCalendarSiglaSizingConfig(siglaText) {
   // -----------------------------
   let fontPx = null;
 
-  // 3.1 Regole semplici:
   // 1–2 caratteri → sempre 23px (zero calcoli, indipendente da config)
   if (len > 0 && len <= 2) {
     fontPx = 23;
@@ -1603,7 +1601,7 @@ function emitStorageChange(key) {
           restDaysAllowed: 1,
           restIndices: [4],
           riposiFissi: {
-            lunedi:  { nome: "Giorno Libero", sigla: "GL", colore: "#E5E5EA" },
+            lunedi:  { nome: "Giorno Libero", sigla: "GL", colore: "#A1A1A6" },
             martedi: { nome: "Add. Prof.",    sigla: "AP", colore: "#FF9500" }
           }
         }
