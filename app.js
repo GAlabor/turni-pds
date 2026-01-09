@@ -5200,8 +5200,20 @@ function init(ctx) {
         textEl.textContent = text;
         okBtn.textContent = okText;
 
-        okBtn.classList.remove("ui-confirm-btn--primary", "ui-confirm-btn--danger");
-        okBtn.classList.add(variant === "danger" ? "ui-confirm-btn--danger" : "ui-confirm-btn--primary");
+        okBtn.classList.remove(
+  "ui-confirm-btn--primary",
+  "ui-confirm-btn--danger",
+  "ui-confirm-btn--danger-filled"
+);
+
+if (variant === "danger-filled") {
+  okBtn.classList.add("ui-confirm-btn--danger-filled");
+} else if (variant === "danger") {
+  okBtn.classList.add("ui-confirm-btn--danger");
+} else {
+  okBtn.classList.add("ui-confirm-btn--primary");
+}
+
 
         // show
         modal.hidden = false;
@@ -5290,7 +5302,7 @@ function init(ctx) {
           title: "Cancellare il contenuto?",
           text: "Questa operazione elimina tutti i dati dell’app.",
           okText: "Cancella",
-          variant: "danger"
+          variant: "danger-filled"
         });
         if (!ok) return;
 

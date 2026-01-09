@@ -1459,6 +1459,17 @@ body.ui-modal-open{
   color: #ff3b30;
   border-color: rgba(255,59,48,0.35);
 }
+
+.ui-confirm-btn--danger-filled{
+  background: #ff3b30;
+  color: #ffffff;
+  border-color: #ff3b30;
+}
+
+.ui-confirm-btn--danger-filled:active{
+  background: #e3362c;
+  border-color: #e3362c;
+}
 /* ===================== SPLIT ui-confirm-modal : END ======================= */
 
 
