@@ -5708,20 +5708,31 @@ function initTabs() {
   // ----------------------------
   // Gestione label versione
   // ----------------------------
-  function setVersionLabel(fullVersion) {
-    const elId = VERSION.labelElementId || "versionLabel";
-    const el = document.getElementById(elId);
-    if (!el) return;
+function setVersionLabel(fullVersion) {
+  const elId = VERSION.labelElementId || "versionLabel";
+  const el = document.getElementById(elId);
+  if (!el) return;
 
-    if (!fullVersion) {
-      el.textContent = "";
-      return;
-    }
-
-    const m = fullVersion.match(/V\s*([0-9.]+)/i);
-    const label = m ? m[1] : "";
-    el.textContent = label;
+  if (!fullVersion) {
+    el.textContent = "";
+    return;
   }
+
+  const s = String(fullVersion).trim();
+
+  // Estrae solo i numeri versione (es: "V 1.8.0" -> "1.8.0", "1.8.0" -> "1.8.0")
+  let ver = "";
+  let m = s.match(/^[Vv]\s*([0-9.]+)\s*$/);
+  if (m) {
+    ver = m[1];
+  } else {
+    m = s.match(/([0-9]+(?:\.[0-9]+)+)/);
+    ver = m ? m[1] : "";
+  }
+
+  el.textContent = ver ? ("v" + ver) : "";
+}
+
   // ===================== SPLIT version_label : END =====================
 
   // ===================== SPLIT register_sw : START =====================
