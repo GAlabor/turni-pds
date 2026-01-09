@@ -3382,13 +3382,21 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       if (turnazioniCard && turnazioniToggleBtn) {
         if (window.TurniInteractions && typeof TurniInteractions.attachCollapsibleCard === "function") {
           TurniInteractions.attachCollapsibleCard({
-            cardEl: turnazioniCard,
-            toggleBtn: turnazioniToggleBtn,
-            headerEl: turnazioniHeader,
-            getCollapsed,
-            setCollapsed,
-            ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"]
-          });
+  cardEl: turnazioniCard,
+  toggleBtn: turnazioniToggleBtn,
+  headerEl: turnazioniHeader,
+  getCollapsed,
+  setCollapsed,
+  ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"],
+  onCollapse: (collapsed) => {
+    // ✅ come "Modifica turni": se chiudi la card, esci da Modifica
+    if (collapsed && isEditing) {
+      isEditing = false;
+      refreshList();
+    }
+  }
+});
+
         } else {
           function apply() {
             turnazioniCard.classList.toggle("is-collapsed", turnazioniCollapsed);
@@ -3396,10 +3404,18 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
           }
           apply();
           turnazioniToggleBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            turnazioniCollapsed = !turnazioniCollapsed;
-            apply();
-          });
+  e.stopPropagation();
+  turnazioniCollapsed = !turnazioniCollapsed;
+
+  // ✅ reset edit quando collassi
+  if (turnazioniCollapsed && isEditing) {
+    isEditing = false;
+    refreshList();
+  }
+
+  apply();
+});
+
         }
       }
       // ===================== SPLIT collapse-behavior : END   =====================
@@ -4782,21 +4798,28 @@ function init(ctx) {
       TurniInteractions.attachPanelExitReset({
         panelEl: panelTurni,
         onExit: () => {
-          isCollapsed = true;
-          applyCollapsedState();
+  isCollapsed = true;
+  applyCollapsedState();
 
-          if (window.Turnazioni && typeof Turnazioni._setCollapsed === "function") {
-            Turnazioni._setCollapsed(true);
-          } else if (turnazioniCard && turnazioniToggleBtn) {
-            turnazioniCard.classList.add("is-collapsed");
-            turnazioniToggleBtn.setAttribute("aria-expanded", "false");
-          }
+  if (window.Turnazioni && typeof Turnazioni._setCollapsed === "function") {
+    Turnazioni._setCollapsed(true);
+  } else if (turnazioniCard && turnazioniToggleBtn) {
+    turnazioniCard.classList.add("is-collapsed");
+    turnazioniToggleBtn.setAttribute("aria-expanded", "false");
+  }
 
-          if (isEditing) {
-            isEditing = false;
-            refreshList();
-          }
-        }
+  // ✅ se stavi modificando i Turni, esci
+  if (isEditing) {
+    isEditing = false;
+    refreshList();
+  }
+
+  // ✅ se stavi modificando le Turnazioni, esci (quello che ti manca)
+  if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+    Turnazioni.exitEditMode();
+  }
+}
+
       });
     }
 // ===================== SPLIT interactions_module_attach : END   =====================
