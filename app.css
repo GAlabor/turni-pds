@@ -3447,34 +3447,6 @@ body.turni-no-select * {
 /* ===================== SPLIT tabbar-icon-calendar : END   ===================== */
 
 
-/* ===================== SPLIT version-label : START ===================== */
-
-/* =========================
-   VERSION LABEL (in basso a sinistra)
-   ========================= */
-
-/* Etichetta versione:
-   popolata da sw-register.js tramite #versionLabel
-*/
-.version-label {
-  position: fixed;
-  bottom: 6px;
-  left: 10px;
-  font-size: var(--t-cal-year-cell-mobile);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--version-color);
-  opacity: 0.9;
-  pointer-events: none;
-  user-select: none;
-  z-index: 9999;
-  text-shadow: 0 1px 2px rgba(15,23,42,0.35);
-}
-
-/* ===================== SPLIT version-label : END   ===================== */
-
-
 /* ===================== SPLIT responsive : START ===================== */
 
 /* =========================
