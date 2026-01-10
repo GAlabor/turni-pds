@@ -5651,6 +5651,10 @@ function initTabs() {
     if (settingsActive && typeof window.__bootSettingsOnce === "function") {
       window.__bootSettingsOnce();
     }
+
+    if (window.BootSplash && typeof BootSplash.hide === "function") {
+      BootSplash.hide();
+    }
   });
   // ===================== SPLIT bootstrap_domcontentloaded : END   =====================
 

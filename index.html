@@ -23,13 +23,26 @@
 
   <!-- ===================== SPLIT head-css : START ========================== -->
   <!-- CSS -->
-  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="boot-splash.css">
+
+<link rel="preload" href="app.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="app.css"></noscript>
+
 
   <!-- ===================== SPLIT head-css : END ============================ -->
 
 </head>
 
 <body>
+
+    <!-- BOOT SPLASH (copre la schermata nera iniziale) -->
+  <div id="bootSplash" aria-label="Avvio app">
+    <div class="bootSplash-inner">
+      <span class="bootSplash-white">Turni PdS</span>
+      <span class="bootSplash-grad" aria-hidden="true">Turni PdS</span>
+    </div>
+  </div>
+
   
   <!-- ===================== SPLIT svg-icon-sprite : START =================== -->
   <!-- ===================================================== -->
@@ -1002,7 +1015,9 @@
    
   <!-- ===================== SPLIT scripts : START =========================== -->
   <!-- JS -->
-  <script src="app.js" defer></script>
+  <script src="boot-splash.js" defer></script>
+<script src="app.js" defer></script>
+
   
   <!-- ===================== SPLIT scripts : END ============================= -->
 
