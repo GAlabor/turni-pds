@@ -3,7 +3,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-12-15 v1.8.6';
+const VERSION    = '2025-12-15 v1.9.0';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -48,6 +48,39 @@ const PRECACHE_URLS = [
   // ICO
 
   `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
+
+  // SPLASH iOS
+  `${ROOT}/splash/ios-splash_1080x2340_portrait.png`,
+  `${ROOT}/splash/ios-splash_1125x2436_portrait.png`,
+  `${ROOT}/splash/ios-splash_1136x640_landscape.png`,
+  `${ROOT}/splash/ios-splash_1170x2532_portrait.png`,
+  `${ROOT}/splash/ios-splash_1179x2556_portrait.png`,
+  `${ROOT}/splash/ios-splash_1242x2208_portrait.png`,
+  `${ROOT}/splash/ios-splash_1242x2688_portrait.png`,
+  `${ROOT}/splash/ios-splash_1284x2778_portrait.png`,
+  `${ROOT}/splash/ios-splash_1290x2796_portrait.png`,
+  `${ROOT}/splash/ios-splash_1334x750_landscape.png`,
+  `${ROOT}/splash/ios-splash_1536x2048_portrait.png`,
+  `${ROOT}/splash/ios-splash_1620x2160.png`,
+  `${ROOT}/splash/ios-splash_1668x2224_portrait.png`,
+  `${ROOT}/splash/ios-splash_1668x2388_portrait.png`,
+  `${ROOT}/splash/ios-splash_1792x828_landscape.png`,
+  `${ROOT}/splash/ios-splash_2048x1536_landscape.png`,
+  `${ROOT}/splash/ios-splash_2048x2732_portrait.png`,
+  `${ROOT}/splash/ios-splash_2208x1242_landscape.png`,
+  `${ROOT}/splash/ios-splash_2224x1668_landscape.png`,
+  `${ROOT}/splash/ios-splash_2340x1080_landscape.png`,
+  `${ROOT}/splash/ios-splash_2388x1668_landscape.png`,
+  `${ROOT}/splash/ios-splash_2436x1125_landscape.png`,
+  `${ROOT}/splash/ios-splash_2532x1170_landscape.png`,
+  `${ROOT}/splash/ios-splash_2556x1179_landscape.png`,
+  `${ROOT}/splash/ios-splash_2688x1242_landscape.png`,
+  `${ROOT}/splash/ios-splash_2732x2048_landscape.png`,
+  `${ROOT}/splash/ios-splash_2778x1284_landscape.png`,
+  `${ROOT}/splash/ios-splash_2796x1290_landscape.png`,
+  `${ROOT}/splash/ios-splash_640x1136_portrait.png`,
+  `${ROOT}/splash/ios-splash_750x1334_portrait.png`,
+  `${ROOT}/splash/ios-splash_828x1792_portrait.png`,
 
 
   // SVG UI
