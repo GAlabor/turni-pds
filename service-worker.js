@@ -3,7 +3,7 @@
 // Turni PdS — Service Worker
 // ==============================
 
-const VERSION    = '2025-12-15 v1.1.0';
+const VERSION    = '2025-12-15 v1.2.0';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -50,7 +50,6 @@ const PRECACHE_URLS = [
   `${ROOT}/ico/favicon-16.png`,
   `${ROOT}/ico/favicon-32.png`,
   `${ROOT}/ico/favicon.svg`,
-  `${ROOT}/ico/apple-touch-icon-180x180.png`,
   `${ROOT}/ico/icon-192x192.png`,
   `${ROOT}/ico/icon-512x512.png`,
   `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
