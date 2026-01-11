@@ -18,17 +18,22 @@
   // ============================
   // PATH / BASE URL
   // ============================
-  // In locale: base vuota
-  // In produzione: /turni-pds
-  const BASE = (location.hostname === "localhost") ? "" : "/turni-pds";
+  // BASE automatico:
+  // - se l'app è servita sotto /turni-pds → BASE="/turni-pds"
+  // - altrimenti → BASE=""
+  const PROD_BASE = "/turni-pds";
+  const path = location.pathname || "/";
+  const BASE = (path === PROD_BASE || path.startsWith(PROD_BASE + "/")) ? PROD_BASE : "";
   // ===================== SPLIT base-path : END =====================
+
 
 
   // ===================== SPLIT app-config-root : START =====================
   window.AppConfig = {
 
     // Debug (true su localhost)
-    DEBUG: (location.hostname === "localhost"),
+    DEBUG: (location.hostname === "localhost" || location.hostname === "127.0.0.1"),
+
 
     // ===================== SPLIT paths-pwa : START =====================
     // ============================
