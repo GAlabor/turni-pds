@@ -31,8 +31,18 @@
     }
   </style>
 
+    <script>
+    // evita che /turni-pds (senza slash) rompa i path relativi
+    (function () {
+      if (location.pathname === "/turni-pds") {
+        location.replace("/turni-pds/" + location.search + location.hash);
+      }
+    })();
+  </script>
 
-  <link rel="manifest" href="manifest.webmanifest">
+
+
+ <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
   <link rel="icon" type="image/svg+xml" href="ico/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="ico/favicon-32.png">
