@@ -13,8 +13,24 @@
   <meta name="mobile-web-app-capable" content="yes">
 
   <!-- Barra indirizzi / status bar colore (dove supportato) -->
+  <meta name="theme-color" content="#e7ecff">
   <meta name="theme-color" content="#e7ecff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Anti "flash" nero: sfondo immediato PRIMA che carichi app.css -->
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: #e7ecff; /* fallback immediato */
+    }
+    @media (prefers-color-scheme: dark) {
+      html, body { background: #020617; }
+    }
+  </style>
+
 
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
