@@ -2,23 +2,19 @@
 <html lang="it">
 
 <head>
-  <!--  index.html v 1.0 -->
-  <!-- ===================== SPLIT head-meta-pwa : START ===================== -->
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-
-  <!-- PWA / status bar iOS -->
+  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="mobile-web-app-capable" content="yes">
-
-  <!-- Barra indirizzi / status bar colore (dove supportato) -->
+  
   <meta name="theme-color" content="#e7ecff">
   <meta name="theme-color" content="#e7ecff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
-
-  <!-- Anti "flash" nero: sfondo immediato PRIMA che carichi app.css -->
+  
   <style>
     html, body {
       margin: 0;
@@ -40,20 +36,15 @@
     })();
   </script>
 
-
-
  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="favicon.ico">
   <link rel="icon" type="image/svg+xml" href="ico/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="ico/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="ico/favicon-16.png">
   <link rel="shortcut icon" href="ico/favicon.ico">
-
-  <!-- iOS: icona Home -->
+  
   <link rel="apple-touch-icon" sizes="180x180" href="ico/apple-touch-icon-180x180-flat.png">
-
-
-  <!-- iOS: splash screen -->
+  
   <link rel="apple-touch-startup-image" href="splash/ios-splash_640x1136_portrait.png"
         media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="splash/ios-splash_1136x640_landscape.png"
@@ -129,54 +120,38 @@
   <link rel="apple-touch-startup-image" href="splash/ios-splash_2732x2048_landscape.png"
         media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
 
-
-
-
-  <title>Turni PDS</title>
-  <!-- ===================== SPLIT head-meta-pwa : END ======================= -->
-
-  <!-- ===================== SPLIT head-css : START ========================== -->
-  <!-- CSS -->
+  <title>Turni PdS</title>
+ 
   <link rel="stylesheet" href="app.css">
-
-  <!-- ===================== SPLIT head-css : END ============================ -->
 
 </head>
 
 <body>
-  
-  <!-- ===================== SPLIT svg-icon-sprite : START =================== -->
-  <!-- ===================================================== -->
-  <!-- SVG ICON SPRITE (famiglie separate, niente forzature) -->
-  <!-- ===================================================== -->
+   
   <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
     <defs>
-
-      <!-- Chevron UI (settings rows, chevron laterale) -->
+      
       <symbol id="ico-ui-chevron-right" viewBox="0 0 24 24">
         <path d="M10 6 L16 12 L10 18" />
       </symbol>
       <symbol id="ico-ui-chevron-left" viewBox="0 0 24 24">
         <path d="M14 6 L8 12 L14 18" />
       </symbol>
-
-      <!-- Chevron NAV (calendario prev/next) -->
+      
       <symbol id="ico-nav-prev" viewBox="0 0 24 24">
         <path d="M14 6 L8 12 L14 18" />
       </symbol>
       <symbol id="ico-nav-next" viewBox="0 0 24 24">
         <path d="M10 6 L16 12 L10 18" />
       </symbol>
-
-      <!-- Chevron TOGGLE (espandi/collassa card) -->
+      
       <symbol id="ico-toggle-up" viewBox="0 0 24 24">
         <path d="M6 14 L12 8 L18 14" />
       </symbol>
       <symbol id="ico-toggle-down" viewBox="0 0 24 24">
         <path d="M6 10 L12 16 L18 10" />
       </symbol>
-
-      <!-- Plus -->
+      
       <symbol id="ico-plus" viewBox="0 0 24 24">
         <path d="M12 5 L12 19" />
         <path d="M5 12 L19 12" />
@@ -184,26 +159,18 @@
 
     </defs>
   </svg>
-  <!-- ===================== SPLIT svg-icon-sprite : END ===================== -->
-
-  <!-- ===================== SPLIT status-icon : START ======================= -->
-  <!-- ICONA STATO / SALVATAGGIO -->
+  
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
   </div>
-  <!-- ===================== SPLIT status-icon : END ========================= -->
-
-  <!-- ===================== SPLIT app-shell : START ========================= -->
-  <main class="app-shell">
-
-    <!-- ===================== SPLIT view-calendar : START =================== -->
-    <!-- VISTA CALENDARIO -->
+  
+  <main class="app-shell">   
+    
     <section class="view view-calendar is-active" data-view="calendar">
       <header class="app-header">
         <h1 class="app-title">Turni</h1>
       </header>
-
-      <!-- Selettore mese -->
+      
       <section class="monthbar">
         <button class="nav-btn prev" type="button" aria-label="Mese precedente">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -217,8 +184,7 @@
           </svg>
         </button>
       </section>
-
-      <!-- Contenitore calendario -->
+      
       <div class="calendar-wrapper">
         <div class="calendar-container mode-days" id="calendarContainer">
           <div class="dow-row">
@@ -230,28 +196,22 @@
             <div class="dow">Sab</div>
             <div class="dow">Dom</div>
           </div>
-
-          <!-- Griglia giorni -->
+          
           <div class="calendar-grid" id="calendar-grid">
-            <!-- Il JS inserirà le celle giorno -->
+            
           </div>
-
-          <!-- Griglia mesi -->
+          
           <div class="month-grid" id="month-grid">
-            <!-- Mesi inseriti via JS -->
+    
           </div>
-
-          <!-- Griglia anni -->
+          
           <div class="year-grid" id="year-grid">
-            <!-- Anni inseriti via JS -->
+            
           </div>
         </div>
       </div>
     </section>
-    <!-- ===================== SPLIT view-calendar : END ===================== -->
-
-    <!-- ===================== SPLIT view-inspag : START ===================== -->
-    <!-- VISTA INSERIMENTI / PAGAMENTI -->
+   
     <section class="view view-inspag" data-view="inspag">
       <header class="app-header">
         <h1 class="app-title">Inserimenti e Pagamenti</h1>
@@ -263,10 +223,7 @@
         </p>
       </div>
     </section>
-    <!-- ===================== SPLIT view-inspag : END ======================= -->
-
-    <!-- ===================== SPLIT view-riepilogo : START ================== -->
-    <!-- VISTA RIEPILOGO -->
+   
     <section class="view view-riepilogo" data-view="riepilogo">
       <header class="app-header">
         <h1 class="app-title">Riepilogo</h1>
@@ -277,17 +234,12 @@
           In questa sezione potrai vedere i riepiloghi per mese o anno.
         </p>
       </div>
-    </section>
-    <!-- ===================== SPLIT view-riepilogo : END ==================== -->
-
-    <!-- ===================== SPLIT view-settings : START =================== -->
-    <!-- VISTA IMPOSTAZIONI -->
+    </section>  
+    
     <section class="view view-settings" data-view="settings">
-
-
-      <!-- ===================== SPLIT settings-header : START =============== -->
+     
       <header class="app-header">
-        <!-- Freccia BACK principale, visibile solo dentro i pannelli -->
+        
         <button
           class="settings-back"
           type="button"
@@ -298,23 +250,16 @@
             <use href="#ico-ui-chevron-left"></use>
           </svg>
         </button>
-
-        <!-- Titolo principale dinamico -->
+        
         <h1 class="app-title" id="settingsTitle">Impostazioni</h1>
       </header>
-      <!-- ===================== SPLIT settings-header : END ================= -->
-
-      <!-- ===================== SPLIT settings-container : START ============ -->
-      <div class="settings-container">
-
+      
+      <div class="settings-container">              
         
-        <!-- ===================== SPLIT settings-main : START ================ -->
-        <!-- Schermata principale impostazioni -->
         <div class="settings-main is-active">
-
-          <!-- CONTENITORE 1 -->
+          
           <div class="settings-group-card">
-            <!-- Turni -->
+            
             <button class="settings-row" type="button" data-settings-page="turni">
               <div class="settings-row-left">
                 <span class="settings-row-label">Turni</span>
@@ -328,8 +273,7 @@
               </div>
             </button>
             <hr class="settings-separator">
-
-            <!-- Indennità -->
+            
             <button class="settings-row" type="button" data-settings-page="indennita">
               <div class="settings-row-left">
                 <span class="settings-row-label">Indennità</span>
@@ -343,8 +287,7 @@
               </div>
             </button>
             <hr class="settings-separator">
-
-            <!-- Festività -->
+            
             <button class="settings-row" type="button" data-settings-page="festivita">
               <div class="settings-row-left">
                 <span class="settings-row-label">Festività</span>
@@ -358,10 +301,9 @@
               </div>
             </button>
           </div>
-
-          <!-- CONTENITORE 2 -->
+          
           <div class="settings-group-card">
-            <!-- Tema -->
+            
             <button class="settings-row" type="button" data-settings-page="theme">
               <div class="settings-row-left">
                 <span class="settings-row-label">Tema</span>
@@ -376,8 +318,7 @@
               </div>
             </button>
             <hr class="settings-separator">
-
-            <!-- Info -->
+            
             <button class="settings-row" type="button" data-settings-page="updates">
               <div class="settings-row-left">
                 <span class="settings-row-label">Info</span>
@@ -394,7 +335,6 @@
             </button>
             <hr class="settings-separator">
 
-            <!-- Backup e Ripristino -->
             <button class="settings-row" type="button" data-settings-page="backup-restore">
               <div class="settings-row-left">
                 <span class="settings-row-label">Backup e Ripristino</span>
@@ -408,12 +348,8 @@
               </div>
             </button>
           </div>
-
         </div>
-        <!-- ===================== SPLIT settings-main : END ================== -->
-
-        <!-- ===================== SPLIT panel-theme : START =================== -->
-        <!-- PANNELLO TEMA -->
+        
         <div class="settings-panel settings-theme" data-settings-id="theme">
           <div class="settings-group">
             <p class="settings-hint">
@@ -433,20 +369,11 @@
             <span class="settings-choice-label" data-theme-label="dark"></span>
           </button>
         </div>
-        <!-- ===================== SPLIT panel-theme : END ===================== -->
-
-        <!-- ===================== SPLIT panel-indennita : START ============== -->
-        <!-- PANNELLO INDENNITÀ -->
+        
         <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
-        <!-- ===================== SPLIT panel-indennita : END ================ -->
-
-        <!-- ===================== SPLIT panel-festivita : START ============== -->
-        <!-- PANNELLO FESTIVITÀ -->
+        
         <div class="settings-panel settings-festivita" data-settings-id="festivita"></div>
-        <!-- ===================== SPLIT panel-festivita : END ================ -->
-
-        <!-- ===================== SPLIT panel-backup-restore : START ==================== -->
-        <!-- PANNELLO BACKUP E RIPRISTINO -->
+        
         <div class="settings-panel settings-backup-restore" data-settings-id="backup-restore">
           <div class="settings-group">
             <p class="settings-hint">
@@ -463,18 +390,13 @@
 </button>
 
         </div>
-        <!-- ===================== SPLIT panel-backup-restore : END ====================== -->
-
-        <!-- ===================== SPLIT panel-updates : START ================= -->
-        <!-- PANNELLO VERSIONE -->
+        
+        
         <div class="settings-panel settings-updates" data-settings-id="updates"></div>
-        <!-- ===================== SPLIT panel-updates : END =================== -->
-
-        <!-- ===================== SPLIT panel-turni : START =================== -->
-        <!-- PANNELLO TURNI (Visualizza turnazione + Turnazioni + Turni) -->
+        
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
-          <!-- 1) CARD: VISUALIZZA TURNAZIONE -->
+          
           <div class="turni-card turni-visual-card">
             <div class="turni-card-header">
               <h2 class="turni-panel-title">Visualizza Turnazione</h2>
@@ -495,7 +417,7 @@
               Nessuna turnazione impostata.
             </p>
 
-            <!-- ✅ Riga extra: Inizio Turnazione (compare SOLO con toggle ON) -->
+            
             <button
               class="turni-inline-row"
               type="button"
@@ -516,7 +438,7 @@
             </button>
           </div>
 
-          <!-- 2) CARD TURNAZIONI (chiusa di default) -->
+          
           <div class="turni-card turnazioni-card is-collapsed">
             <div class="turni-card-header">
               <h2 class="turni-panel-title">Turnazioni</h2>
@@ -549,8 +471,7 @@
               Nessuna turnazione salvata. Tocca + per aggiungerne una.
             </p>
           </div>
-
-          <!-- 3) CARD TURNI (chiusa di default) -->
+          
           <div class="turni-card is-collapsed">
             <div class="turni-card-header">
               <h2 class="turni-panel-title">Turni</h2>
@@ -584,10 +505,7 @@
             </p>
           </div>
         </div>
-        <!-- ===================== SPLIT panel-turni : END ===================== -->
-
-        <!-- ===================== SPLIT panel-turni-add : START ============== -->
-        <!-- PANNELLO AGGIUNGI TURNO -->
+        
         <div
           class="settings-panel settings-turni-add"
           data-settings-id="turni-add"
@@ -684,11 +602,7 @@
             </div>
           </div>
         </div>
-        <!-- ===================== SPLIT panel-turni-add : END ================ -->
 
-
-<!-- ===================== SPLIT panel-turni-start : START ============ -->
-<!-- ✅ AGGIUNTO: PANNELLO "Inizio Turnazione" -->
 <div
   class="settings-panel settings-turni-start"
   data-settings-id="turni-start"
@@ -744,12 +658,7 @@
 
   </div>
 </div>
-<!-- ===================== SPLIT panel-turni-start : END ============== -->
-
-
-
-        <!-- ===================== SPLIT panel-turni-start-pick : START ======= -->
-        <!-- ✅ AGGIUNTO: PANNELLO "SELEZIONA TURNO INIZIALE" -->
+        
         <div
           class="settings-panel settings-turni-start-pick"
           data-settings-id="turni-start-pick"
@@ -767,16 +676,14 @@
             </p>
           </div>
         </div>
-        <!-- ===================== SPLIT panel-turni-start-pick : END ========= -->
-
-        <!-- ===================== SPLIT panel-turnazioni-add : START ========= -->
-        <!-- PANNELLO AGGIUNGI TURNAZIONE -->
+        
+        
         <div
           class="settings-panel settings-turnazioni-add"
           data-settings-id="turnazioni-add"
           data-settings-title="Aggiungi turnazione">
 
-          <!-- ✅ Toolbar identica ad "Aggiungi turno" -->
+          
           <div class="turni-add-toolbar">
             <button class="pill-btn turni-save-btn" type="button" data-turnazioni-save>
               Salva
@@ -788,7 +695,7 @@
 
           <div class="turnazioni-add-wrap">
 
-            <!-- CARD 0: Nome Turnazione -->
+            
             <div class="turni-field-row turnazioni-name-row">
               <label class="turni-label turnazioni-name-label" for="turnazioniNome">
                 Nome
@@ -804,7 +711,7 @@
               </div>
             </div>
 
-            <!-- CARD 1: Giorni -->
+            
             <div class="turni-field-row turnazioni-days-row">
               <label class="turni-label turnazioni-days-label" for="turnazioniDaysInput">
                 Giorni Rotazione
@@ -812,7 +719,7 @@
               </label>
 
               <div class="turni-field-control turnazioni-days-control">
-                <!-- Desktop -->
+                
                 <div class="turnazioni-desktop-select">
                   <select id="turnazioniDaysSelect" class="turni-input turnazioni-days-select" aria-label="Seleziona numero giorni">
                     <option value="" selected></option>
@@ -826,7 +733,7 @@
                   </select>
                 </div>
 
-                <!-- Mobile -->
+                
                 <input
                   id="turnazioniDaysInput"
                   class="turni-input turnazioni-days-input"
@@ -840,21 +747,20 @@
               </div>
             </div>
 
-            <!-- CARD 2: Rotazione (titolo + sottotitolo + contenuto) -->
+            
             <div class="turnazioni-days-card" aria-label="Turni rotazione">
               <div class="turnazioni-days-card-header">
                 <div class="turnazioni-days-card-title">Turni Rotazione</div>
                 <div class="turnazioni-days-card-subtitle" id="turnazioniDaysSubtitle"></div>
               </div>
-
-              <!-- testo guida quando non ci sono giorni -->
+              
               <div class="turnazioni-days-placeholder" id="turnazioniDaysPlaceholder"></div>
 
-              <!-- griglia giorni -->
+              
               <div class="turnazioni-days-grid" id="turnazioniDaysGrid"></div>
             </div>
 
-            <!-- ✅ NUOVA CARD: Giorni di Riposo (1 / 2) -->
+            
             <div class="turni-field-row turnazioni-restdays-row">
               <p class="turni-label turnazioni-restdays-label">Giorni di Riposo</p>
 
@@ -875,10 +781,10 @@
               </div>
             </div>
 
-            <!-- CARD 3: Riposo del Lunedì -->
+            
             <div class="turnazioni-riposo-card" data-turnazioni-riposo-card>
 
-              <!-- header sempre visibile -->
+              
               <div class="turni-field-row turnazioni-riposo-header">
                 <p class="turni-label turnazioni-riposo-label">
                   Riposo del Lunedì
@@ -901,12 +807,12 @@
                 </div>
               </div>
 
-              <!-- toast 3s -->
+              
               <div class="turnazioni-help-toast" data-turnazioni-help-toast hidden>
                 Scegli cosa visualizzare se il riposo cade di Lunedì
               </div>
 
-              <!-- corpo: visibile solo con toggle ON -->
+              
               <div class="turnazioni-riposo-body" data-turnazioni-riposo-body>
                 <div class="turni-field-row">
                   <label class="turni-label" for="turnazioniRiposoNome">Nome</label>
@@ -953,11 +859,10 @@
                 </div>
               </div>
             </div>
-
-            <!-- CARD 4: Riposo del Martedì (identica) -->
+            
             <div class="turnazioni-riposo-card" data-turnazioni-riposo2-card>
 
-              <!-- header sempre visibile -->
+              
               <div class="turni-field-row turnazioni-riposo-header">
                 <p class="turni-label turnazioni-riposo-label">
                   Riposo del Martedì
@@ -979,13 +884,11 @@
                   </button>
                 </div>
               </div>
-
-              <!-- toast 3s -->
+              
               <div class="turnazioni-help-toast" data-turnazioni-help-toast2 hidden>
                 Scegli cosa visualizzare se il riposo cade di Martedì
               </div>
-
-              <!-- corpo: visibile solo con toggle ON -->
+              
               <div class="turnazioni-riposo-body" data-turnazioni-riposo2-body>
                 <div class="turni-field-row">
                   <label class="turni-label" for="turnazioniRiposo2Nome">Nome</label>
@@ -1032,13 +935,9 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-        <!-- ===================== SPLIT panel-turnazioni-add : END =========== -->
-
-        <!-- ===================== SPLIT panel-turnazioni-pick : START ======== -->
-        <!-- NUOVO PANNELLO: SELEZIONA TURNO PER ROTAZIONE -->
+        
         <div
           class="settings-panel settings-turnazioni-pick"
           data-settings-id="turnazioni-pick"
@@ -1049,7 +948,7 @@
               Seleziona un turno.
             </p>
 
-            <!-- ✅ toggle "giorno di riposo" -->
+            
             <div class="turnazioni-pick-rest-row" id="turnazioniPickRestRow">
               <span class="turnazioni-pick-rest-label">Imposta come giorno di riposo</span>
               <button
@@ -1069,19 +968,14 @@
             </p>
           </div>
         </div>
-        <!-- ===================== SPLIT panel-turnazioni-pick : END ========== -->
-
       </div>
-      <!-- ===================== SPLIT settings-container : END ============== -->
 
     </section>
-    <!-- ===================== SPLIT view-settings : END ===================== -->
+    
 
   </main>
-  <!-- ===================== SPLIT app-shell : END =========================== -->
 
-  <!-- ===================== SPLIT tabbar : START ============================ -->
-  <!-- TABBAR IN BASSO -->
+  
   <nav class="tabbar" aria-label="Barra schede">
     <button class="tab active" data-tab="calendar" aria-label="Calendario">
       <svg id="icoCalendar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -1111,16 +1005,11 @@
       <span class="tab-label">Impostazioni</span>
     </button>
   </nav>
-  <!-- ===================== SPLIT tabbar : END ============================== -->
   
-   
-  <!-- ===================== SPLIT scripts : START =========================== -->
-  <!-- JS -->
+  
   <script src="app.js" defer></script>
-  
-  <!-- ===================== SPLIT scripts : END ============================= -->
 
-  <!-- ===================== UI CONFIRM MODAL : START ===================== -->
+  
 <div class="ui-confirm" id="uiConfirm" hidden>
   <div class="ui-confirm-backdrop" data-ui-confirm-cancel></div>
 
@@ -1145,7 +1034,6 @@
     </div>
   </div>
 </div>
-<!-- ===================== UI CONFIRM MODAL : END ======================= -->
 
 
 </body>
