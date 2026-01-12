@@ -173,19 +173,6 @@ function renderTurnazioniPickList(opts) {
     return true;
   }
 
-function getPreferredTurnazioneForCalendar() {
-  if (!window.TurniStorage) return null;
-
-  const turnazioni = TurniStorage.loadTurnazioni();
-  if (!Array.isArray(turnazioni) || !turnazioni.length) return null;
-
-  const preferredId = TurniStorage.loadPreferredTurnazioneId();
-  if (preferredId) {
-    const pick = turnazioni.find(t => String(t.id) === String(preferredId));
-    if (pick) return pick;
-  }
-  return turnazioni[turnazioni.length - 1] || null;
-}
 
 function toLocalMidnight(dateObj) {
   if (!(dateObj instanceof Date)) return null;
@@ -307,7 +294,9 @@ function getCalendarSiglaForDate(dateObj) {
   const show = TurniStorage.loadVisualToggle();
   if (!show) return null;
 
-  const t = getPreferredTurnazioneForCalendar();
+  const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
+    ? TurniStorage.getPreferredTurnazione()
+    : null;
   if (!t) return null;
 
   const days = Number(t.days) || 0;
@@ -1429,6 +1418,20 @@ function emitStorageChange(key) {
     }
   }
   
+
+  function getPreferredTurnazione() {
+    const all = loadTurnazioni();
+    if (!Array.isArray(all) || all.length === 0) return null;
+
+    const preferredId = loadPreferredTurnazioneId();
+    if (preferredId) {
+      const pick = all.find(t => String(t.id) === String(preferredId));
+      if (pick) return pick;
+    }
+
+    return all[all.length - 1] || null;
+  }
+
   function loadTurnoIniziale() {
     try {
       const raw = localStorage.getItem(TURNI_START_KEY);
@@ -1494,6 +1497,7 @@ function emitStorageChange(key) {
     loadPreferredTurnazioneId,
     savePreferredTurnazioneId,
     
+    getPreferredTurnazione,
     loadTurnoIniziale,
     saveTurnoIniziale
   };
@@ -3132,27 +3136,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       return `${y}-${m}-${day}`;
     }
 
-    function getPreferredTurnazione() {
-      if (!window.TurniStorage) return null;
-      const { loadTurnazioni, loadPreferredTurnazioneId } = TurniStorage;
-
-      const all = (typeof loadTurnazioni === "function") ? loadTurnazioni() : [];
-      if (!Array.isArray(all) || all.length === 0) return null;
-
-      let pref = null;
-      const prefId = (typeof loadPreferredTurnazioneId === "function")
-        ? loadPreferredTurnazioneId()
-        : null;
-
-      if (prefId) {
-        pref = all.find(t => String(t.id) === String(prefId)) || null;
-      }
-      if (!pref) pref = all[all.length - 1];
-      return pref || null;
-    }
 
     function canUse() {
-      return !!getPreferredTurnazione();
+      return !!(window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function" && TurniStorage.getPreferredTurnazione());
     }
 
     function load() {
@@ -3191,7 +3177,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       // Se l'utente ha già iniziato a compilare, non tocchiamo nulla.
       if (dateOk || slotOk) return d;
 
-      const t = getPreferredTurnazione();
+      const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
+        ? TurniStorage.getPreferredTurnazione()
+        : null;
       if (!t) return d;
 
       const days = Number(t.days) || 0;
@@ -3204,7 +3192,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     }
 
     function getTurnoLabelForDraft(draft, kind) {
-      const t = getPreferredTurnazione();
+      const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
+        ? TurniStorage.getPreferredTurnazione()
+        : null;
       const idx = (draft && Number.isInteger(draft.slotIndex)) ? draft.slotIndex : null;
 
       if (!t || idx === null || idx < 0) return "";
@@ -3253,7 +3243,6 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     return {
       formatDateShortISO,
       getTodayISO,
-      getPreferredTurnazione,
       canUse,
       load,
       save,
@@ -3384,7 +3373,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   function renderPickList() {
     if (!startPickList) return;
 
-    const t = Svc.getPreferredTurnazione();
+    const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
+      ? TurniStorage.getPreferredTurnazione()
+      : null;
     if (!t) {
       renderTurnazioniPickList({ listEl: startPickList, emptyEl: startPickEmpty, items: [] });
       return;
