@@ -5047,3 +5047,26 @@ function setVersionLabel(fullVersion) {
     if (window[k]) window.App[k] = window[k];
   }
 })();
+
+
+(function () {
+  function updateLandscapeBlock() {
+    const root = document.documentElement;
+    const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+
+    if (isLandscape) {
+      root.classList.add("landscape-block");
+    } else {
+      root.classList.remove("landscape-block");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", updateLandscapeBlock, { passive: true });
+  } else {
+    updateLandscapeBlock();
+  }
+
+  window.addEventListener("orientationchange", updateLandscapeBlock, { passive: true });
+  window.addEventListener("resize", updateLandscapeBlock, { passive: true });
+})();
