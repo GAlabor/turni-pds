@@ -151,6 +151,8 @@ function renderTurnazioniPickList(opts) {
   
   let _lastCalDaySize = null;
   let _calendarDirty = false;
+  let _calendarInited = false;
+
 
 
   function updateDayCellSize() {
@@ -854,7 +856,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     if (currentMode !== MODES.DAYS) return;
 
     
-    const all = gridDays ? gridDays.querySelectorAll(".turno-sigla") : [];
+    const all = gridDays ? gridDays.querySelectorAll(".cal-turno-sigla") : [];
     if (all && all.length) {
       all.forEach(el => {
         
@@ -876,6 +878,8 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   }
 
   function init() {
+    if (_calendarInited) return;
+    _calendarInited = true;
     gridDays = document.getElementById("calendar-grid");
     gridMonths = document.getElementById("month-grid");
     gridYears = document.getElementById("year-grid");
