@@ -2701,33 +2701,3 @@ body.turni-no-select * {
   }
 }
 
-
-#portraitLockOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  display: none;
-
-  background: #0b0b0b;
-  color: #ffffff;
-
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 24px;
-}
-
-#portraitLockOverlay .box {
-  max-width: 420px;
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-html.landscape-block #portraitLockOverlay {
-  display: flex;
-}
-
-html.landscape-block,
-html.landscape-block body {
-  overflow: hidden !important;
-}
