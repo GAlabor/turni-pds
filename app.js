@@ -71,6 +71,48 @@ CALENDAR: {
 
 })();
 
+
+// UI helper condiviso: lista selezione stile "turnazioni-pick-row"
+function renderTurnazioniPickList(opts) {
+  if (!opts || !opts.listEl) return;
+
+  const listEl = opts.listEl;
+  const emptyEl = opts.emptyEl || null;
+  const items = Array.isArray(opts.items) ? opts.items : [];
+
+  listEl.innerHTML = "";
+
+  const has = items.length > 0;
+  if (emptyEl) emptyEl.hidden = has;
+  if (!has) return;
+
+  const isSelected = (typeof opts.isSelected === "function") ? opts.isSelected : (() => false);
+  const getLabel = (typeof opts.getLabel === "function")
+    ? opts.getLabel
+    : ((it) => (it && (it.nome || it.sigla)) ? String(it.nome || it.sigla) : "");
+
+  const onPick = (typeof opts.onPick === "function") ? opts.onPick : (() => {});
+
+  items.forEach((it, idx) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "turnazioni-pick-row";
+
+    if (isSelected(it, idx)) row.classList.add("is-selected");
+
+    const name = document.createElement("span");
+    name.className = "turnazioni-pick-name";
+    name.textContent = getLabel(it, idx) || "";
+
+    row.appendChild(name);
+
+    row.addEventListener("click", () => onPick(it, idx));
+
+    listEl.appendChild(row);
+  });
+}
+
+
 (function () {
 
   const monthNames = [
@@ -1860,9 +1902,10 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       if (window.Turni && typeof Turni.syncTurnoInizialeUI === "function") {
         Turni.syncTurnoInizialeUI();
       }
-      if (window.TurniStart && typeof TurniStart.syncFromTurnazioniChange === "function") {
-        TurniStart.syncFromTurnazioniChange();
-      }
+      // Notifica disaccoppiata: chiunque ascolti (es. TurniStart) si aggiorna da solo
+      document.dispatchEvent(new CustomEvent("turnazioni:changed", {
+        detail: { source: "TurnazioniList.notifyTurnoIniziale" }
+      }));
     }
   };
 
@@ -2132,41 +2175,25 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         ? TurniStorage.loadTurni()
         : [];
 
-      pickListEl.innerHTML = "";
-
       const hasTurni = Array.isArray(turni) && turni.length > 0;
-
-      if (pickEmpty) pickEmpty.hidden = hasTurni;
-      if (!hasTurni) return;
-
       const selected = (activePickIndex !== null) ? rotationSlots[activePickIndex] : null;
 
-      turni.forEach((t) => {
-        const row = document.createElement("button");
-        row.type = "button";
-        row.className = "turnazioni-pick-row";
-
-        if (selected && sameTurno(selected, t)) {
-          row.classList.add("is-selected");
-        }
-
-        const name = document.createElement("span");
-        name.className = "turnazioni-pick-name";
-        name.textContent = t.nome || "";
-
-        row.appendChild(name);
-
-        row.addEventListener("click", () => {
+      renderTurnazioniPickList({
+        listEl: pickListEl,
+        emptyEl: pickEmpty,
+        items: hasTurni ? turni : [],
+        isSelected: (t) => !!(selected && sameTurno(selected, t)),
+        getLabel: (t) => (t && t.nome) ? String(t.nome) : "",
+        onPick: (t) => {
           if (activePickIndex !== null) setSlotFromTurno(activePickIndex, t);
 
           if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
             SettingsUI.openPanel("turnazioni-add", { internal: true });
           }
-        });
-
-        pickListEl.appendChild(row);
+        }
       });
     }
+
 
     function renderDaysGrid(n) {
       if (!grid) return;
@@ -3047,99 +3074,200 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
 (function () {
 
-  
-  function formatDateShortISO(iso) {
-    if (!iso || typeof iso !== "string") return "";
-    const d = new Date(iso + "T00:00:00");
-    if (Number.isNaN(d.getTime())) return "";
-    try {
-      return new Intl.DateTimeFormat("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
-    } catch {
-      const dd = String(d.getDate()).padStart(2, "0");
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const yy = String(d.getFullYear());
-      return `${dd}/${mm}/${yy}`;
+  // Servizio unico: stato/validazione/salvataggio/summary per "Turno Iniziale"
+  // UI (pannelli, click, input) resta a TurniStart.
+  const TurnoInizialeService = (function () {
+
+    function formatDateShortISO(iso) {
+      if (!iso || typeof iso !== "string") return "";
+      const d = new Date(iso + "T00:00:00");
+      if (Number.isNaN(d.getTime())) return "";
+      try {
+        return new Intl.DateTimeFormat("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
+      } catch {
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yy = String(d.getFullYear());
+        return `${dd}/${mm}/${yy}`;
+      }
     }
-  }
 
-    
-  function getTodayISO() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  }
-  
-  function applyStartDefaultsIfEmpty() {
-    if (!canUse()) return;
-
-    const dateOk = !!(startDraft.date && String(startDraft.date).trim());
-    const slotOk = Number.isInteger(startDraft.slotIndex);
-
-    
-    if (dateOk || slotOk) return;
-
-    const t = getPreferredTurnazione();
-    if (!t) return;
-
-    const days = Number(t.days) || 0;
-    const slots = Array.isArray(t.slots) ? t.slots : [];
-
-    if (!days || !slots.length) return;
-
-    startDraft.date = getTodayISO();
-    startDraft.slotIndex = 0; 
-  }
-  
-  function getPreferredTurnazione() {
-    if (!window.TurniStorage) return null;
-    const { loadTurnazioni, loadPreferredTurnazioneId } = TurniStorage;
-
-    const all = (typeof loadTurnazioni === "function") ? loadTurnazioni() : [];
-    if (!Array.isArray(all) || all.length === 0) return null;
-
-    let pref = null;
-    const prefId = (typeof loadPreferredTurnazioneId === "function")
-      ? loadPreferredTurnazioneId()
-      : null;
-
-    if (prefId) {
-      pref = all.find(t => String(t.id) === String(prefId)) || null;
+    function getTodayISO() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
     }
-    if (!pref) pref = all[all.length - 1];
-    return pref || null;
-  }
 
-  function canUse() {
-    return !!getPreferredTurnazione();
-  }
-  
-let startRowBtn = null;
-let startSummaryEl = null;
-let startChevronEl = null;
+    function getPreferredTurnazione() {
+      if (!window.TurniStorage) return null;
+      const { loadTurnazioni, loadPreferredTurnazioneId } = TurniStorage;
 
-let panelStart = null;
-let panelStartPick = null;
+      const all = (typeof loadTurnazioni === "function") ? loadTurnazioni() : [];
+      if (!Array.isArray(all) || all.length === 0) return null;
 
-let startDateInput = null;
-let startTurnoRow = null;
-let startTurnoSummary = null;
+      let pref = null;
+      const prefId = (typeof loadPreferredTurnazioneId === "function")
+        ? loadPreferredTurnazioneId()
+        : null;
 
-let startSaveBtn = null;
-let startErrEl = null;
-let startErrCtl = null;
+      if (prefId) {
+        pref = all.find(t => String(t.id) === String(prefId)) || null;
+      }
+      if (!pref) pref = all[all.length - 1];
+      return pref || null;
+    }
+
+    function canUse() {
+      return !!getPreferredTurnazione();
+    }
+
+    function load() {
+      if (!window.TurniStorage || typeof TurniStorage.loadTurnoIniziale !== "function") {
+        return { date: "", slotIndex: null };
+      }
+      const d = TurniStorage.loadTurnoIniziale();
+      return (d && typeof d === "object")
+        ? { date: (d.date || ""), slotIndex: (Number.isInteger(d.slotIndex) ? d.slotIndex : null) }
+        : { date: "", slotIndex: null };
+    }
+
+    function save(draft) {
+      if (!window.TurniStorage || typeof TurniStorage.saveTurnoIniziale !== "function") return false;
+      TurniStorage.saveTurnoIniziale({
+        date: String((draft && draft.date) ? draft.date : ""),
+        slotIndex: (draft && Number.isInteger(draft.slotIndex)) ? draft.slotIndex : null
+      });
+      return true;
+    }
+
+    function validate(draft) {
+      if (!canUse()) return false;
+      const dateOk = !!(draft && draft.date && String(draft.date).trim());
+      const slotOk = !!(draft && Number.isInteger(draft.slotIndex));
+      return dateOk && slotOk;
+    }
+
+    function applyDefaultsIfEmpty(draft) {
+      if (!canUse()) return draft;
+
+      const d = (draft && typeof draft === "object") ? draft : { date: "", slotIndex: null };
+      const dateOk = !!(d.date && String(d.date).trim());
+      const slotOk = Number.isInteger(d.slotIndex);
+
+      // Se l'utente ha già iniziato a compilare, non tocchiamo nulla.
+      if (dateOk || slotOk) return d;
+
+      const t = getPreferredTurnazione();
+      if (!t) return d;
+
+      const days = Number(t.days) || 0;
+      const slots = Array.isArray(t.slots) ? t.slots : [];
+      if (!days || !slots.length) return d;
+
+      d.date = getTodayISO();
+      d.slotIndex = 0;
+      return d;
+    }
+
+    function getTurnoLabelForDraft(draft, kind) {
+      const t = getPreferredTurnazione();
+      const idx = (draft && Number.isInteger(draft.slotIndex)) ? draft.slotIndex : null;
+
+      if (!t || idx === null || idx < 0) return "";
+
+      const slots = Array.isArray(t.slots) ? t.slots : [];
+      const s = slots[idx] || null;
+
+      if (!s) return "";
+
+      if (kind === "sigla") {
+        return (s.sigla ? String(s.sigla).trim() : "");
+      }
+      // default: nome
+      return (s.nome ? String(s.nome).trim() : "");
+    }
+
+    function buildSummaryText() {
+      if (!window.TurniStorage || typeof TurniStorage.loadTurnoIniziale !== "function") return "";
+      const cfg = load();
+
+      const dateTxt = cfg.date ? formatDateShortISO(cfg.date) : "";
+      const turnoTxt = getTurnoLabelForDraft(cfg, "sigla");
+
+      if (dateTxt && turnoTxt) return `${dateTxt} · ${turnoTxt}`;
+      if (dateTxt) return dateTxt;
+      if (turnoTxt) return turnoTxt;
+      return "";
+    }
+
+    function normalizeISODateYear4(v) {
+      if (typeof v !== "string") return "";
+      let s = v.trim();
+
+      const firstDash = s.indexOf("-");
+      if (firstDash > 4) {
+        s = s.slice(0, 4) + s.slice(firstDash);
+      } else if (firstDash === -1 && /^\d{5,}$/.test(s)) {
+        s = s.slice(0, 4);
+      }
+
+      if (s.length > 10) s = s.slice(0, 10);
+
+      return s;
+    }
+
+    return {
+      formatDateShortISO,
+      getTodayISO,
+      getPreferredTurnazione,
+      canUse,
+      load,
+      save,
+      validate,
+      applyDefaultsIfEmpty,
+      getTurnoLabelForDraft,
+      buildSummaryText,
+      normalizeISODateYear4
+    };
+  })();
+
+  window.TurnoInizialeService = TurnoInizialeService;
+
+})();
 
 
-let startDraft = { date: "", slotIndex: null };
-let isDirty = false;
+(function () {
 
-let startPickList = null;
-let startPickEmpty = null;
+  // UI/controller: usa TurnoInizialeService per tutto ciò che non è UI.
+  if (!window.TurnoInizialeService) return;
 
+  const Svc = window.TurnoInizialeService;
 
-let visibleByToggle = true;
-  
+  let startRowBtn = null;
+  let startSummaryEl = null;
+  let startChevronEl = null;
+
+  let panelStart = null;
+  let panelStartPick = null;
+
+  let startDateInput = null;
+  let startTurnoRow = null;
+  let startTurnoSummary = null;
+
+  let startSaveBtn = null;
+  let startErrEl = null;
+  let startErrCtl = null;
+
+  let startDraft = { date: "", slotIndex: null };
+  let isDirty = false;
+
+  let startPickList = null;
+  let startPickEmpty = null;
+
+  let visibleByToggle = true;
+
   function setStartRowEnabled(enabled) {
     if (!startRowBtn) return;
     startRowBtn.classList.toggle("is-disabled", !enabled);
@@ -3147,342 +3275,253 @@ let visibleByToggle = true;
     if (startChevronEl) startChevronEl.style.display = enabled ? "" : "none";
   }
 
-function buildStartSummaryText() {
-  if (!window.TurniStorage) return "";
-  const { loadTurnoIniziale } = TurniStorage;
+  function setDirty(v) {
+    isDirty = !!v;
+  }
 
-  const cfg = (typeof loadTurnoIniziale === "function")
-    ? loadTurnoIniziale()
-    : { date: "", slotIndex: null };
+  function showStartError() {
+    if (!startErrEl) return;
+    if (startErrCtl) startErrCtl.show();
+    else startErrEl.hidden = false;
+  }
 
-  const dateTxt = cfg.date ? formatDateShortISO(cfg.date) : "";
+  function clearStartError() {
+    if (!startErrEl) return;
+    if (startErrCtl) startErrCtl.clear();
+    else startErrEl.hidden = true;
+  }
 
-  const t = getPreferredTurnazione();
-  const slotIndex = Number.isInteger(cfg.slotIndex) ? cfg.slotIndex : null;
+  function syncSummaryUI() {
+    const ok = Svc.canUse();
 
-  let turnoTxt = "";
-  if (t && slotIndex !== null && slotIndex >= 0) {
+    const txt = ok ? Svc.buildSummaryText() : "";
+    if (startSummaryEl) startSummaryEl.textContent = txt;
+
+    if (startTurnoSummary) {
+      if (!ok) {
+        startTurnoSummary.textContent = "";
+      } else {
+        startTurnoSummary.textContent = Svc.getTurnoLabelForDraft(startDraft, "nome");
+      }
+    }
+
+    if (startSaveBtn) {
+      startSaveBtn.disabled = !ok;
+      startSaveBtn.classList.toggle("is-disabled", !ok);
+    }
+
+    setStartRowEnabled(ok);
+  }
+
+  function syncPanelDraftUI() {
+    if (!panelStart) return;
+
+    if (startDateInput) startDateInput.value = startDraft.date || "";
+
+    if (startTurnoSummary) {
+      startTurnoSummary.textContent = Svc.canUse()
+        ? Svc.getTurnoLabelForDraft(startDraft, "nome")
+        : "";
+    }
+
+    if (startSaveBtn) {
+      const ok = Svc.canUse();
+      startSaveBtn.disabled = !ok;
+      startSaveBtn.classList.toggle("is-disabled", !ok);
+    }
+  }
+
+  function openPanelStart() {
+    if (!panelStart) return;
+    if (!Svc.canUse()) return;
+
+    startDraft = Svc.load();
+    setDirty(false);
+    clearStartError();
+
+    startDraft = Svc.applyDefaultsIfEmpty(startDraft);
+
+    syncPanelDraftUI();
+    syncSummaryUI();
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni-start", { internal: true });
+    }
+  }
+
+  function renderPickList() {
+    if (!startPickList) return;
+
+    const t = Svc.getPreferredTurnazione();
+    if (!t) {
+      renderTurnazioniPickList({ listEl: startPickList, emptyEl: startPickEmpty, items: [] });
+      return;
+    }
+
+    const days = Number(t.days) || 0;
     const slots = Array.isArray(t.slots) ? t.slots : [];
-    const s = slots[slotIndex] || null;
-    const sigla = s && s.sigla ? String(s.sigla).trim() : "";
-    turnoTxt = sigla;
-  }
 
-  if (dateTxt && turnoTxt) return `${dateTxt} · ${turnoTxt}`;
-  if (dateTxt) return dateTxt;
-  if (turnoTxt) return turnoTxt;
-  return "";
-}
-
-function syncSummaryUI() {
-  const ok = canUse();
-
-  
-  const txt = ok ? buildStartSummaryText() : "";
-  if (startSummaryEl) startSummaryEl.textContent = txt;
-
-  
-  if (startTurnoSummary) {
-    if (!ok) {
-      startTurnoSummary.textContent = "";
-    } else {
-      const t = getPreferredTurnazione();
-      const idx = Number.isInteger(startDraft.slotIndex) ? startDraft.slotIndex : null;
-
-      let turnoTxt = "";
-      if (t && idx !== null) {
-        const slots = Array.isArray(t.slots) ? t.slots : [];
-        const s = slots[idx] || null;
-        const nome = s && s.nome ? String(s.nome).trim() : "";
-        turnoTxt = nome;
-      }
-      startTurnoSummary.textContent = turnoTxt;
+    const items = [];
+    for (let i = 0; i < days; i++) {
+      const s = slots[i] || {};
+      items.push({
+        index: i,
+        sigla: s.sigla ? String(s.sigla).trim() : "",
+        nome:  s.nome  ? String(s.nome).trim()  : ""
+      });
     }
-  }
 
-  if (startSaveBtn) {
-    const canSave = ok;
-    startSaveBtn.disabled = !canSave;
-    startSaveBtn.classList.toggle("is-disabled", !canSave);
-  }
+    const selectedIndex = Number.isInteger(startDraft.slotIndex) ? startDraft.slotIndex : null;
 
-  setStartRowEnabled(ok);
-}
+    renderTurnazioniPickList({
+      listEl: startPickList,
+      emptyEl: startPickEmpty,
+      items,
+      isSelected: (it) => (selectedIndex !== null && it.index === selectedIndex),
+      getLabel: (it) => it.nome || it.sigla || "",
+      onPick: (it) => {
+        startDraft.slotIndex = it.index;
+        setDirty(true);
+        clearStartError();
+        syncPanelDraftUI();
 
-function setDirty(v) {
-  isDirty = !!v;
-}
-
-function showStartError() {
-  if (!startErrEl) return;
-  if (startErrCtl) startErrCtl.show();
-  else startErrEl.hidden = false;
-}
-
-function clearStartError() {
-  if (!startErrEl) return;
-  if (startErrCtl) startErrCtl.clear();
-  else startErrEl.hidden = true;
-}
-
-function syncPanelDraftUI() {
-  if (!panelStart) return;
-  if (startDateInput) startDateInput.value = startDraft.date || "";
-
-  
-  if (startTurnoSummary) {
-    if (!canUse()) {
-      startTurnoSummary.textContent = "";
-    } else {
-      const t = getPreferredTurnazione();
-      let turnoTxt = "";
-      if (t && Number.isInteger(startDraft.slotIndex)) {
-        const slots = Array.isArray(t.slots) ? t.slots : [];
-        const s = slots[startDraft.slotIndex] || null;
-        const nome = s && s.nome ? String(s.nome).trim() : "";
-        turnoTxt = nome;
-      }
-      startTurnoSummary.textContent = turnoTxt;
-    }
-  }
-
-  if (startSaveBtn) {
-    const canSave = canUse();
-    startSaveBtn.disabled = !canSave;
-    startSaveBtn.classList.toggle("is-disabled", !canSave);
-  }
-}
-
-function openPanelStart() {
-  if (!panelStart) return;
-  if (!canUse()) return;
-
-  
-  startDraft = TurniStorage.loadTurnoIniziale();
-  if (!startDraft || typeof startDraft !== "object") startDraft = { date: "", slotIndex: null };
-  setDirty(false);
-  clearStartError();
-
-  applyStartDefaultsIfEmpty();
-
-  syncPanelDraftUI();
-
-  syncSummaryUI();
-
-  if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-    SettingsUI.openPanel("turni-start", { internal: true });
-  }
-}
-
-
-function renderPickList() {
-  if (!startPickList) return;
-
-  const t = getPreferredTurnazione();
-  startPickList.innerHTML = "";
-  
-  const selectedIndex = Number.isInteger(startDraft.slotIndex) ? startDraft.slotIndex : null;
-
-  const has = !!t && (Number(t.days) || 0) > 0 && Array.isArray(t.slots);
-
-  if (startPickEmpty) startPickEmpty.hidden = has;
-  if (!has) return;
-
-  const days = Number(t.days) || 0;
-  const slots = Array.isArray(t.slots) ? t.slots : [];
-
-  for (let i = 0; i < days; i++) {
-    const s = slots[i] || {};
-    const sigla = s.sigla ? String(s.sigla).trim() : "";
-    const nome  = s.nome  ? String(s.nome).trim()  : "";
-
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "turnazioni-pick-row";
-    if (selectedIndex !== null && i === selectedIndex) row.classList.add("is-selected");
-
-    const nameEl = document.createElement("span");
-    nameEl.className = "turnazioni-pick-name";
-
-    let label = nome || sigla || "";
-    nameEl.textContent = label;
-    row.appendChild(nameEl);
-
-    row.addEventListener("click", () => {
-      startDraft.slotIndex = i;
-      setDirty(true);
-      clearStartError();
-      syncPanelDraftUI();
-
-      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        SettingsUI.openPanel("turni-start", { internal: true });
+        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          SettingsUI.openPanel("turni-start", { internal: true });
+        }
       }
     });
-
-    startPickList.appendChild(row);
   }
-}
-  
+
   function syncVisibility(visualOn) {
     visibleByToggle = !!visualOn;
     if (startRowBtn) startRowBtn.hidden = !visibleByToggle;
-
-    
     syncSummaryUI();
   }
-  
+
   function syncFromTurnazioniChange() {
-    
     syncSummaryUI();
-    
+
+    // Se sono nel pannello e non ho ancora toccato nulla, applica default coerenti.
     if (panelStart && panelStart.classList.contains("is-active") && !isDirty) {
-      applyStartDefaultsIfEmpty();
+      startDraft = Svc.applyDefaultsIfEmpty(startDraft);
       syncPanelDraftUI();
     }
 
     if (panelStartPick && panelStartPick.classList.contains("is-active")) {
-      
-      
       renderPickList();
     }
   }
 
-function init(ctx) {
-  if (!window.TurniStorage) return;
+  function init(ctx) {
+    if (!window.TurniStorage) return;
 
-  const panelTurni = ctx && ctx.panelTurni;
-  if (!panelTurni) return;
+    const panelTurni = ctx && ctx.panelTurni;
+    if (!panelTurni) return;
 
-  
-  startRowBtn     = panelTurni.querySelector("[data-turni-start-row]");
-  startSummaryEl  = panelTurni.querySelector("[data-turni-start-summary]");
-  startChevronEl  = panelTurni.querySelector("[data-turni-start-chevron]");
+    startRowBtn     = panelTurni.querySelector("[data-turni-start-row]");
+    startSummaryEl  = panelTurni.querySelector("[data-turni-start-summary]");
+    startChevronEl  = panelTurni.querySelector("[data-turni-start-chevron]");
 
-  const settingsView = document.querySelector(".view-settings");
-  panelStart     = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start[data-settings-id="turni-start"]') : null;
-  panelStartPick = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start-pick[data-settings-id="turni-start-pick"]') : null;
-
-  startDateInput    = panelStart ? panelStart.querySelector("#turniStartDate") : null;
-  startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
-  startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
-
-  startSaveBtn      = panelStart ? panelStart.querySelector("[data-turni-start-save]") : null;
-  startErrEl        = panelStart ? panelStart.querySelector("[data-turni-start-error]") : null;
-  startErrCtl       = (window.UIFeedback && typeof UIFeedback.createTempError === "function")
-    ? UIFeedback.createTempError(startErrEl, 2000)
-    : null;
-
-  startPickList     = panelStartPick ? panelStartPick.querySelector("#turniStartPickList") : null;
-  startPickEmpty    = panelStartPick ? panelStartPick.querySelector("#turniStartPickEmpty") : null;
-
-  
-  startDraft = TurniStorage.loadTurnoIniziale();
-  if (!startDraft || typeof startDraft !== "object") startDraft = { date: "", slotIndex: null };
-
-  if (startRowBtn) {
-    startRowBtn.addEventListener("click", () => {
-      if (startRowBtn.classList.contains("is-disabled")) return;
-      openPanelStart();
-    });
-  }
-
-  
-  function normalizeISODateYear4(v) {
-    if (typeof v !== "string") return "";
-    let s = v.trim();
-
-    
-    
-    const firstDash = s.indexOf("-");
-    if (firstDash > 4) {
-      s = s.slice(0, 4) + s.slice(firstDash);
-    } else if (firstDash === -1 && /^\d{5,}$/.test(s)) {
-      
-      s = s.slice(0, 4);
+    // Listener una sola volta: reagisce ai cambi Turnazioni
+    if (!init._turnazioniListenerBound) {
+      document.addEventListener("turnazioni:changed", () => {
+        syncFromTurnazioniChange();
+      });
+      init._turnazioniListenerBound = true;
     }
 
-    
-    if (s.length > 10) s = s.slice(0, 10);
+    const settingsView = document.querySelector(".view-settings");
+    panelStart     = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start[data-settings-id="turni-start"]') : null;
+    panelStartPick = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start-pick[data-settings-id="turni-start-pick"]') : null;
 
-    return s;
-  }
+    startDateInput    = panelStart ? panelStart.querySelector("#turniStartDate") : null;
+    startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
+    startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
 
-  if (startDateInput) {
-    
-    startDateInput.addEventListener("input", () => {
-      const before = startDateInput.value || "";
-      const norm = normalizeISODateYear4(before);
-      if (norm !== before) startDateInput.value = norm;
-    });
+    startSaveBtn      = panelStart ? panelStart.querySelector("[data-turni-start-save]") : null;
+    startErrEl        = panelStart ? panelStart.querySelector("[data-turni-start-error]") : null;
+    startErrCtl       = (window.UIFeedback && typeof UIFeedback.createTempError === "function")
+      ? UIFeedback.createTempError(startErrEl, 2000)
+      : null;
 
-    
-    startDateInput.addEventListener("change", () => {
-      const before = startDateInput.value || "";
-      const norm = normalizeISODateYear4(before);
-      if (norm !== before) startDateInput.value = norm;
+    startPickList     = panelStartPick ? panelStartPick.querySelector("#turniStartPickList") : null;
+    startPickEmpty    = panelStartPick ? panelStartPick.querySelector("#turniStartPickEmpty") : null;
 
-      startDraft.date = startDateInput.value || "";
-      setDirty(true);
-      clearStartError();
-      syncPanelDraftUI();
-    });
-  }
+    startDraft = Svc.load();
 
-  if (startSaveBtn) {
-    startSaveBtn.addEventListener("click", () => {
-      if (!canUse()) return;
-      clearStartError();
+    if (startRowBtn) {
+      startRowBtn.addEventListener("click", () => {
+        if (startRowBtn.classList.contains("is-disabled")) return;
+        openPanelStart();
+      });
+    }
 
-      const dateOk = !!(startDraft.date && String(startDraft.date).trim());
-      const slotOk = Number.isInteger(startDraft.slotIndex);
-
-      if (!dateOk || !slotOk) {
-        showStartError();
-        return;
-      }
-
-      TurniStorage.saveTurnoIniziale({
-        date: String(startDraft.date || ""),
-        slotIndex: startDraft.slotIndex
+    if (startDateInput) {
+      startDateInput.addEventListener("input", () => {
+        const before = startDateInput.value || "";
+        const norm = Svc.normalizeISODateYear4(before);
+        if (norm !== before) startDateInput.value = norm;
       });
 
-      setDirty(false);
-      syncSummaryUI();
+      startDateInput.addEventListener("change", () => {
+        const before = startDateInput.value || "";
+        const norm = Svc.normalizeISODateYear4(before);
+        if (norm !== before) startDateInput.value = norm;
 
-      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        SettingsUI.openPanel("turni", { internal: true });
-      }
-    });
+        startDraft.date = startDateInput.value || "";
+        setDirty(true);
+        clearStartError();
+        syncPanelDraftUI();
+      });
+    }
 
-    
-    startSaveBtn.disabled = !canUse();
-    startSaveBtn.classList.toggle("is-disabled", startSaveBtn.disabled);
+    if (startSaveBtn) {
+      startSaveBtn.addEventListener("click", () => {
+        if (!Svc.canUse()) return;
+        clearStartError();
+
+        if (!Svc.validate(startDraft)) {
+          showStartError();
+          return;
+        }
+
+        Svc.save(startDraft);
+
+        setDirty(false);
+        syncSummaryUI();
+
+        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          SettingsUI.openPanel("turni", { internal: true });
+        }
+      });
+
+      startSaveBtn.disabled = !Svc.canUse();
+      startSaveBtn.classList.toggle("is-disabled", startSaveBtn.disabled);
+    }
+
+    if (startTurnoRow) {
+      startTurnoRow.addEventListener("click", () => {
+        if (!Svc.canUse()) return;
+        renderPickList();
+        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          SettingsUI.openPanel("turni-start-pick", { internal: true });
+        }
+      });
+    }
+
+    syncSummaryUI();
+
+    // Compat: TurnazioniList chiama Turni.syncTurnoInizialeUI()
+    if (window.Turni) {
+      window.Turni.syncTurnoInizialeUI = syncFromTurnazioniChange;
+    }
   }
 
-  if (startTurnoRow) {
-    startTurnoRow.addEventListener("click", () => {
-      if (!canUse()) return;
-      renderPickList();
-      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-        SettingsUI.openPanel("turni-start-pick", { internal: true });
-      }
-    });
-  }
-  
-  syncSummaryUI();
-
-  
-  if (window.Turni) {
-    window.Turni.syncTurnoInizialeUI = syncFromTurnazioniChange;
-  }
-}
-  
   window.TurniStart = {
     init,
     syncVisibility,
     syncFromTurnazioniChange
   };
-  
 
 })();
 
