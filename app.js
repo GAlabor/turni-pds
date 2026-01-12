@@ -1505,17 +1505,21 @@ function emitStorageChange(key) {
 
 (function () {
 
-  function getSiglaFontSizeValue(siglaText) {
+  function getSiglaFontSizePx(siglaText) {
     const len = (siglaText || "").length;
 
-    if (len <= 2) return 15;    
-    if (len === 3) return 14;   
-    return 11.5;                
+    if (len <= 2) return 15;
+    if (len === 3) return 14;
+    return 11.5;
   }
+
+  // Unica sorgente di verità per lo sizing delle sigle (preview + liste).
+  window.SiglaSizing = window.SiglaSizing || {};
+  window.SiglaSizing.getFontSizePx = getSiglaFontSizePx;
 
   function applySiglaFontSize(el, siglaText) {
     if (!el) return;
-    const sizePx = getSiglaFontSizeValue(siglaText);
+    const sizePx = getSiglaFontSizePx(siglaText);
     el.style.fontSize = `${sizePx}px`;
   }
 
@@ -1660,13 +1664,10 @@ function emitStorageChange(key) {
   // Preview (celle quadrate): sizing semplice e coerente
   window.SiglaSizing.preview = function (el, txt) {
     if (!el) return;
-    if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
-      TurniRender.applySiglaFontSize(el, txt);
-      return;
-    }
-    const len = String(txt || "").length;
-    const sizePx = (len <= 2) ? 15 : (len == 3 ? 14 : 11.5);
-    el.style.fontSize = sizePx + "px";
+    const sizePx = (window.SiglaSizing && typeof SiglaSizing.getFontSizePx === "function")
+      ? SiglaSizing.getFontSizePx(txt)
+      : 15;
+    el.style.fontSize = `${sizePx}px`;
   };
 })();
 
