@@ -369,6 +369,14 @@ const _siglaFitCache = new Map();
 let _siglaBatchPending = [];
 let _siglaBatchScheduled = false;
 
+// Calendario (celle rettangolari): pipeline autofit+batch esposta via facciata
+window.SiglaSizing = window.SiglaSizing || {};
+window.SiglaSizing.calendarQueue = function (el, txt, baseFs) {
+  if (!el) return;
+  _siglaBatchPending.push({ el, txt: (txt != null ? String(txt) : ""), baseFs });
+  _scheduleSiglaBatch();
+};
+
 function _siglaCacheKey(el, siglaText, baseFs) {
   if (!el) return null;
 
@@ -565,8 +573,12 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
   
   const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
-  _siglaBatchPending.push({ el, txt: info.sigla, baseFs });
-  _scheduleSiglaBatch();
+  if (window.SiglaSizing && typeof SiglaSizing.calendarQueue === "function") {
+    SiglaSizing.calendarQueue(el, info.sigla, baseFs);
+  } else {
+    _siglaBatchPending.push({ el, txt: info.sigla, baseFs });
+    _scheduleSiglaBatch();
+  }
 }
 
   function updateHeader() {
@@ -1642,6 +1654,21 @@ function emitStorageChange(key) {
 
 })();
 
+(function () {
+  window.SiglaSizing = window.SiglaSizing || {};
+
+  // Preview (celle quadrate): sizing semplice e coerente
+  window.SiglaSizing.preview = function (el, txt) {
+    if (!el) return;
+    if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
+      TurniRender.applySiglaFontSize(el, txt);
+      return;
+    }
+    const len = String(txt || "").length;
+    const sizePx = (len <= 2) ? 15 : (len == 3 ? 14 : 11.5);
+    el.style.fontSize = sizePx + "px";
+  };
+})();
 
 (function () {
 	
@@ -2077,6 +2104,10 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     }
 
     function applySiglaFontSize(el, txt) {
+      if (window.SiglaSizing && typeof SiglaSizing.preview === "function") {
+        SiglaSizing.preview(el, txt);
+        return;
+      }
       if (window.TurniRender && typeof TurniRender.applySiglaFontSize === "function") {
         TurniRender.applySiglaFontSize(el, txt);
       }
