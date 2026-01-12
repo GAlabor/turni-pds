@@ -150,6 +150,8 @@ function renderTurnazioniPickList(opts) {
   let calendarContainer = null;
   
   let _lastCalDaySize = null;
+  let _calendarDirty = false;
+
 
   function updateDayCellSize() {
     if (!gridDays || !calendarContainer) return false;
@@ -906,8 +908,6 @@ if (nextBtn) {
     setupOutsideClickHandler();
     renderDays();
 
-
-let _calendarDirty = false;
 
 function isCalendarViewActive() {
   const v = document.querySelector(".view-calendar");
