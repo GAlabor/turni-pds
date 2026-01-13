@@ -345,6 +345,7 @@ body {
   overscroll-behavior: none;
   touch-action: manipulation;
   height: 100%;
+  overflow: hidden; /* niente scroll globale sempre attivo */
 }
 
 
@@ -370,16 +371,28 @@ body {
 .app-shell {
   max-width: 1120px;
   margin: 0 auto;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 
 .view {
   display: none;
+  min-height: 0;
 }
 
 .view.is-active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+
 
 
 .app-header {
@@ -401,10 +414,15 @@ body {
 
 
 @media (max-width: 900px) {
-  body {
-    
-    padding: calc(env(safe-area-inset-top) + var(--space-26)) var(--space-4) calc(var(--space-10) + env(safe-area-inset-bottom) + var(--tabbar-h));
+    body {
+    padding: 0; /* il body non deve più “gonfiarsi” e creare scroll fantasma */
   }
+
+  .app-shell {
+    padding: calc(env(safe-area-inset-top) + var(--space-26)) var(--space-4)
+             calc(var(--space-10) + env(safe-area-inset-bottom) + var(--tabbar-h));
+  }
+
 
   .app-header {
     padding: var(--space-10) var(--space-4) var(--space-8) var(--space-4);
@@ -419,9 +437,14 @@ body {
 
 @media (min-width: 901px) {
   body {
-    padding-bottom: var(--space-20);
+    padding: 0;
+  }
+
+  .app-shell {
+    padding: var(--space-18) var(--space-12) calc(var(--space-18) + var(--tabbar-h));
   }
 }
+
 
 .monthbar {
   margin: var(--space-14) 0 var(--space-20) 0;
