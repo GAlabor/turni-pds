@@ -397,6 +397,7 @@ body {
 
 .app-header {
   padding: var(--space-10) var(--space-6) var(--space-14) var(--space-6);
+  padding-top: calc(var(--space-10) + env(safe-area-inset-top));
   display: flex;
   align-items: center;
   gap: var(--space-8);
