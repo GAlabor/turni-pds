@@ -393,6 +393,13 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+@media (max-width: 900px) {
+  .view.is-active {
+    padding-bottom: calc(var(--tabbar-h) + var(--space-10) + env(safe-area-inset-bottom));
+  }
+}
+
+
 
 
 .app-header {
@@ -415,12 +422,12 @@ body {
 
 @media (max-width: 900px) {
     body {
-    padding: 0; /* il body non deve più “gonfiarsi” e creare scroll fantasma */
+    padding: 0;
   }
 
-  .app-shell {
+   .app-shell {
     padding: calc(env(safe-area-inset-top) + var(--space-26)) var(--space-4)
-             calc(var(--space-10) + env(safe-area-inset-bottom) + var(--tabbar-h));
+             calc(var(--space-10) + env(safe-area-inset-bottom));
   }
 
 
