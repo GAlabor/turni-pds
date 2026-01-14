@@ -5145,24 +5145,3 @@ function setVersionLabel(fullVersion) {
     if (window[k]) window.App[k] = window[k];
   }
 })();
-
-function setAppHeight() {
-  const vh = window.visualViewport
-    ? window.visualViewport.height
-    : window.innerHeight;
-  document.documentElement.style.setProperty('--app-height', `${vh}px`);
-}
-
-setAppHeight();
-
-window.addEventListener('resize', setAppHeight);
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', setAppHeight);
-}
-
-document.addEventListener('focusout', () => {
-  setTimeout(() => {
-    window.scrollTo(0, 0);
-    setAppHeight();
-  }, 50);
-});
