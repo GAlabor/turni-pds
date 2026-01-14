@@ -342,10 +342,7 @@
 
 html,
 body {
-  overscroll-behavior: none;
-  touch-action: manipulation;
   height: 100%;
-  overflow: hidden; /* niente scroll globale sempre attivo */
 }
 
 
@@ -371,7 +368,7 @@ body {
 .app-shell {
   max-width: 1120px;
   margin: 0 auto;
-  height: 100dvh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -388,7 +385,7 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 @media (max-width: 900px) {
@@ -1217,7 +1214,6 @@ body.ui-modal-open{
   display: none;
   flex-shrink: 0;
   cursor: grab;
-  touch-action: none;
 }
 
 .turni-handle svg {
