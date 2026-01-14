@@ -4931,6 +4931,39 @@ function initTabs() {
 
   
   window.addEventListener("DOMContentLoaded", () => {
+    (function () {
+  function setVh() {
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    document.documentElement.style.setProperty("--app-vh", (h * 0.01) + "px");
+  }
+
+  setVh();
+
+  window.addEventListener("resize", setVh);
+  window.addEventListener("orientationchange", setVh);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", setVh);
+    window.visualViewport.addEventListener("scroll", setVh);
+  }
+
+  document.addEventListener("focusin", (e) => {
+    const t = e.target;
+    if (!t) return;
+    const tag = t.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || t.isContentEditable) {
+      setTimeout(setVh, 50);
+      setTimeout(setVh, 200);
+    }
+  });
+
+  document.addEventListener("focusout", () => {
+    setTimeout(setVh, 50);
+    setTimeout(setVh, 200);
+  });
+})();
+
     
     if (window.Status && typeof Status.init === "function") {
       Status.init();
