@@ -64,6 +64,8 @@
   --nav-fg: #111827;
   
   --tabbar-h: 78px;
+
+  --app-height: 100vh;
   
   --tabbar-bg: linear-gradient(180deg, rgba(248,250,252,0.4), rgba(255,255,255,0.85));
   --tabbar-border: rgba(148,163,184,0.4);
@@ -371,7 +373,7 @@ body {
 .app-shell {
   max-width: 1120px;
   margin: 0 auto;
-  height: 100dvh;
+  height: var(--app-height);
   display: flex;
   flex-direction: column;
   min-height: 0;
