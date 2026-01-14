@@ -1381,19 +1381,85 @@ function emitStorageChange(key) {
   }
 
   function saveTurnazioni(arr) {
+  try {
+    localStorage.setItem(TURNAZIONI_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
+
+    emitStorageChange(TURNAZIONI_KEY);
+
     try {
-      localStorage.setItem(TURNAZIONI_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
+      document.dispatchEvent(new CustomEvent("turnazioni:changed", {
+        detail: { source: "TurniStorage.saveTurnazioni" }
+      }));
+    } catch {}
 
-
-      emitStorageChange(TURNAZIONI_KEY);
-
-      if (window.Status && typeof Status.markSaved === "function") {
-        Status.markSaved();
-      }
-    } catch (e) {
-      console.warn("Salvataggio turnazioni fallito:", e);
+    if (window.Status && typeof Status.markSaved === "function") {
+      Status.markSaved();
     }
+  } catch (e) {
+    console.warn("Salvataggio turnazioni fallito:", e);
   }
+}
+
+
+function syncTurnazioniForTurnoChange(prevTurno, nextTurno) {
+  const prev = prevTurno && typeof prevTurno === "object" ? prevTurno : null;
+  const next = nextTurno && typeof nextTurno === "object" ? nextTurno : null;
+  if (!prev || !next) return false;
+
+  const prevSigla = prev.sigla != null ? String(prev.sigla).trim() : "";
+  const prevNome  = prev.nome  != null ? String(prev.nome).trim()  : "";
+
+  const nextSlot = {
+    nome: next.nome != null ? String(next.nome).trim() : "",
+    sigla: next.sigla != null ? String(next.sigla).trim() : "",
+    colore: next.colore != null ? String(next.colore).trim() : ""
+  };
+
+  if (!nextSlot.sigla && !nextSlot.nome) return false;
+
+  const all = loadTurnazioni();
+  if (!Array.isArray(all) || !all.length) return false;
+
+  let changed = false;
+
+  const match = (slotObj) => {
+    if (!slotObj || typeof slotObj !== "object") return false;
+    const sSigla = slotObj.sigla != null ? String(slotObj.sigla).trim() : "";
+    const sNome  = slotObj.nome  != null ? String(slotObj.nome).trim()  : "";
+
+    
+    if (prevSigla && sSigla && sSigla === prevSigla) return true;
+    if (prevNome && sNome && sNome === prevNome) return true;
+    return false;
+  };
+
+  all.forEach((t) => {
+    if (!t || typeof t !== "object") return;
+
+    if (Array.isArray(t.slots)) {
+      t.slots = t.slots.map((s) => {
+        if (!match(s)) return s;
+        changed = true;
+        return Object.assign({}, s, nextSlot);
+      });
+    }
+
+    if (t.riposiFissi && typeof t.riposiFissi === "object") {
+      Object.keys(t.riposiFissi).forEach((k) => {
+        const rf = t.riposiFissi[k];
+        if (!match(rf)) return;
+        changed = true;
+        t.riposiFissi[k] = Object.assign({}, rf, nextSlot);
+      });
+    }
+  });
+
+  if (!changed) return false;
+  saveTurnazioni(all);
+  return true;
+}
+
+
 
   function loadPreferredTurnazioneId() {
     try {
@@ -1498,6 +1564,7 @@ function emitStorageChange(key) {
     
     loadTurnazioni,
     saveTurnazioni,
+    syncTurnazioniForTurnoChange,
     loadPreferredTurnazioneId,
     savePreferredTurnazioneId,
     
@@ -3085,6 +3152,30 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	        });
 	      }
 	      
+
+      if (!this._storageListenerAttached) {
+        this._storageListenerAttached = true;
+
+        const keys = (window.AppConfig && window.AppConfig.STORAGE_KEYS) ? window.AppConfig.STORAGE_KEYS : null;
+        const KEY_TURNAZIONI = keys ? keys.turnazioni : null;
+        const KEY_PREF      = keys ? keys.turnazioniPreferred : null;
+
+        window.addEventListener("turnipds:storage-changed", (ev) => {
+          const k = ev && ev.detail && ev.detail.key ? String(ev.detail.key) : "";
+
+          if (k && (k === String(KEY_TURNAZIONI) || k === String(KEY_PREF))) {
+            // micro-debounce per evitare refresh multipli nello stesso tick
+            try {
+              cancelAnimationFrame(this._rafRefreshList || 0);
+            } catch {}
+            this._rafRefreshList = requestAnimationFrame(() => {
+              refreshList();
+            });
+          }
+        });
+      }
+
+
 	      refreshList();
 	      
 	      this._exitEditMode = () => {
@@ -4150,12 +4241,21 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       const payload = { nome, sigla, inizio, fine, colore, noTime: isNoTime };
 
       if (editIndex !== null && editIndex >= 0 && editIndex < turni.length) {
-        turni[editIndex] = payload;
-      } else {
-        turni.push(payload);
-      }
+  const prev = turni[editIndex];
+  turni[editIndex] = payload;
+
+  
+  if (window.TurniStorage && typeof TurniStorage.syncTurnazioniForTurnoChange === "function") {
+    TurniStorage.syncTurnazioniForTurnoChange(prev, payload);
+  }
+} else {
+  turni.push(payload);
+}
+
 
       saveTurni(turni);
+
+
       refreshList();
 
       editIndex = null;
