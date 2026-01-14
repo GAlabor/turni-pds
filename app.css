@@ -371,7 +371,7 @@ body {
 .app-shell {
   max-width: 1120px;
   margin: 0 auto;
-  height: 100dvh;
+  height: var(--app-h, 100dvh);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -422,6 +422,21 @@ body {
     padding: calc(env(safe-area-inset-top) + var(--space-26)) var(--space-4)
              calc(var(--space-10) + env(safe-area-inset-bottom) + var(--tabbar-h));
   }
+
+    html.kb-open .tabbar {
+    display: none;
+  }
+
+  html.kb-open .app-shell {
+    padding: calc(env(safe-area-inset-top) + var(--space-26)) var(--space-4)
+             calc(var(--space-10) + env(safe-area-inset-bottom));
+  }
+
+  html.kb-open .settings-panel.settings-turnazioni-add.is-active,
+  html.kb-open .settings-panel.settings-turnazioni-pick.is-active {
+    padding-bottom: calc(var(--space-16) + env(safe-area-inset-bottom));
+  }
+
 
 
   .app-header {

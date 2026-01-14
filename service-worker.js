@@ -1,4 +1,4 @@
-const VERSION    = '2025-12-15 v1.3.0';
+const VERSION    = '2025-12-15 v1.4.0';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
