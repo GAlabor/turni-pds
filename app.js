@@ -4934,42 +4934,7 @@ function initTabs() {
   
   window.addEventListener("DOMContentLoaded", () => {
     
-    
-    const setViewportVars = () => {
-      const vv = window.visualViewport;
-      const vh = vv ? vv.height : window.innerHeight;
-      const kb = vv ? Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0)) : 0;
-      document.documentElement.style.setProperty("--app-height", Math.round(vh) + "px");
-      document.documentElement.style.setProperty("--kb", Math.round(kb) + "px");
-    };
-
-    const bump = () => requestAnimationFrame(() => requestAnimationFrame(setViewportVars));
-
-    bump();
-    window.addEventListener("resize", bump);
-    window.addEventListener("orientationchange", bump);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", bump);
-      window.visualViewport.addEventListener("scroll", bump);
-    }
-
-    document.addEventListener("focusin", (e) => {
-      const t = e.target;
-      if (!t || !(t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-
-      bump();
-
-      const scroller = t.closest(".view.is-active") || document.querySelector(".view.is-active");
-      if (!scroller) return;
-
-      requestAnimationFrame(() => {
-        try { t.scrollIntoView({ block: "center", inline: "nearest" }); } catch {}
-        try { scroller.scrollTop += 1; } catch {}
-      });
-    });
-
-    document.addEventListener("focusout", bump);
-if (window.Status && typeof Status.init === "function") {
+    if (window.Status && typeof Status.init === "function") {
       Status.init();
     }
 
