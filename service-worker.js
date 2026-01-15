@@ -1,26 +1,34 @@
-const VERSION    = '2026-01-15 v1.1.0';
+const VERSION    = '2025-12-15 v1.2.0';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
 const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
 
+
 function cacheKeyFor(req) {
   const url = new URL(req.url);
-  url.search = '';
-  url.hash = '';
+  url.search = "";
+  url.hash = "";
   return url.toString();
 }
 
-function withCreds(url) {
-  return new Request(url, { credentials: 'same-origin' });
-}
-
 const PRECACHE_URLS = [
+  // Shell base
+  `${ROOT}/`,
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
+
+  // CSS
   `${ROOT}/app.css`,
-  `${ROOT}/app.js`,
+
+
+  // JS
+`${ROOT}/app.js`,
+
+  // Favicon
   `${ROOT}/favicon.ico`,
+
+  // ICO
   `${ROOT}/ico/favicon.ico`,
   `${ROOT}/ico/favicon-16.png`,
   `${ROOT}/ico/favicon-32.png`,
@@ -28,6 +36,26 @@ const PRECACHE_URLS = [
   `${ROOT}/ico/icon-192x192.png`,
   `${ROOT}/ico/icon-512x512.png`,
   `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
+
+  // SPLASH iOS
+  `${ROOT}/splash/ios-splash_1080x2340_portrait.png`,
+  `${ROOT}/splash/ios-splash_1125x2436_portrait.png`,
+  `${ROOT}/splash/ios-splash_1170x2532_portrait.png`,
+  `${ROOT}/splash/ios-splash_1179x2556_portrait.png`,
+  `${ROOT}/splash/ios-splash_1242x2208_portrait.png`,
+  `${ROOT}/splash/ios-splash_1242x2688_portrait.png`,
+  `${ROOT}/splash/ios-splash_1284x2778_portrait.png`,
+  `${ROOT}/splash/ios-splash_1290x2796_portrait.png`,
+  `${ROOT}/splash/ios-splash_1536x2048_portrait.png`,
+  `${ROOT}/splash/ios-splash_1620x2160.png`,
+  `${ROOT}/splash/ios-splash_1668x2224_portrait.png`,
+  `${ROOT}/splash/ios-splash_1668x2388_portrait.png`,
+  `${ROOT}/splash/ios-splash_2048x2732_portrait.png`,
+  `${ROOT}/splash/ios-splash_640x1136_portrait.png`,
+  `${ROOT}/splash/ios-splash_750x1334_portrait.png`,
+  `${ROOT}/splash/ios-splash_828x1792_portrait.png`,
+
+  // SVG UI
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
@@ -46,7 +74,9 @@ function normalizeHTMLRequest(req) {
   if (!wantsHTML) return req;
 
   if (url.pathname === ROOT || url.pathname === ROOT + '/') {
-    return withCreds(`${ROOT}/index.html`);
+    return new Request(`${ROOT}/index.html`, {
+      credentials: 'same-origin'
+    });
   }
 
   return req;
@@ -55,7 +85,6 @@ function normalizeHTMLRequest(req) {
 async function handleHtmlFetch(event, req) {
   const htmlReq = normalizeHTMLRequest(req);
   const cache = await caches.open(CACHE_NAME);
-  const indexReq = withCreds(`${ROOT}/index.html`);
 
   let preload = null;
   if (event.preloadResponse) {
@@ -63,7 +92,7 @@ async function handleHtmlFetch(event, req) {
   }
 
   if (preload) {
-    try { await cache.put(indexReq, preload.clone()); } catch {}
+    try { await cache.put(`${ROOT}/index.html`, preload.clone()); } catch {}
     return preload;
   }
 
@@ -72,39 +101,25 @@ async function handleHtmlFetch(event, req) {
       cache: 'no-store',
       credentials: 'same-origin'
     });
-    try { await cache.put(indexReq, fresh.clone()); } catch {}
+    try { await cache.put(`${ROOT}/index.html`, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    const cached = await cache.match(indexReq);
+    const cached = await cache.match(`${ROOT}/index.html`);
     if (cached) return cached;
 
     return new Response(
       '<h1>Offline</h1><p>Nessuna cache disponibile.</p>',
       {
-        status: 503,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        status: 503
       }
     );
   }
 }
 
-async function handleSvgFetch(event, req) {
+async function handleSvgFetch(req) {
   const cache = await caches.open(CACHE_NAME);
   const key = cacheKeyFor(req);
-
-  const cached = await cache.match(key);
-  if (cached) {
-    event.waitUntil((async () => {
-      try {
-        const fresh = await fetch(req, {
-          cache: 'no-store',
-          credentials: 'same-origin'
-        });
-        try { await cache.put(key, fresh.clone()); } catch {}
-      } catch {}
-    })());
-    return cached;
-  }
 
   try {
     const fresh = await fetch(req, {
@@ -114,13 +129,9 @@ async function handleSvgFetch(event, req) {
     try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    return new Response(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
-      {
-        status: 404,
-        headers: { 'Content-Type': 'image/svg+xml; charset=utf-8' }
-      }
-    );
+    const cached = await cache.match(key);
+    if (cached) return cached;
+    return new Response('', { status: 504 });
   }
 }
 
@@ -129,6 +140,7 @@ async function handleStaticFetch(event, req) {
   const key = cacheKeyFor(req);
 
   const cached = await cache.match(key);
+
   if (cached) {
     event.waitUntil((async () => {
       try {
@@ -150,10 +162,7 @@ async function handleStaticFetch(event, req) {
     try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    return new Response('Offline: risorsa non in cache', {
-      status: 404,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    });
+    return new Response('', { status: 504 });
   }
 }
 
@@ -161,19 +170,8 @@ self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
 
-    const CORE = [
-      `${ROOT}/index.html`,
-      `${ROOT}/manifest.webmanifest`,
-      `${ROOT}/app.css`,
-      `${ROOT}/app.js`
-    ];
-
-    await Promise.all(CORE.map(u => cache.add(withCreds(u))));
-
     await Promise.allSettled(
-      PRECACHE_URLS
-        .filter(u => !CORE.includes(u))
-        .map(u => cache.add(withCreds(u)))
+      PRECACHE_URLS.map((u) => cache.add(u))
     );
 
     await self.skipWaiting();
@@ -205,12 +203,9 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-    if (
-    url.pathname === `${ROOT}/manifest.webmanifest` ||
-    url.pathname === `${ROOT}/favicon.ico` ||
-    url.pathname.startsWith(`${ROOT}/ico/`)
-  ) return;
-
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith('/service-worker.js')) return;
 
   const isHTML =
     req.mode === 'navigate' ||
@@ -222,7 +217,7 @@ self.addEventListener('fetch', event => {
   }
 
   if (url.pathname.startsWith(`${ROOT}/svg/`)) {
-    event.respondWith(handleSvgFetch(event, req));
+    event.respondWith(handleSvgFetch(req));
     return;
   }
 
