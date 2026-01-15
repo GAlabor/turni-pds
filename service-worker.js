@@ -1,4 +1,4 @@
-const VERSION    = '2026-01-15 v1.2.4';
+const VERSION    = '2026-01-15 v1.1.0';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -20,6 +20,14 @@ const PRECACHE_URLS = [
   `${ROOT}/manifest.webmanifest`,
   `${ROOT}/app.css`,
   `${ROOT}/app.js`,
+  `${ROOT}/favicon.ico`,
+  `${ROOT}/ico/favicon.ico`,
+  `${ROOT}/ico/favicon-16.png`,
+  `${ROOT}/ico/favicon-32.png`,
+  `${ROOT}/ico/favicon.svg`,
+  `${ROOT}/ico/icon-192x192.png`,
+  `${ROOT}/ico/icon-512x512.png`,
+  `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
@@ -197,15 +205,12 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith('/service-worker.js')) return;
-
-  if (
+    if (
     url.pathname === `${ROOT}/manifest.webmanifest` ||
     url.pathname === `${ROOT}/favicon.ico` ||
     url.pathname.startsWith(`${ROOT}/ico/`)
   ) return;
+
 
   const isHTML =
     req.mode === 'navigate' ||
