@@ -1,4 +1,4 @@
-const VERSION    = '2025-12-15 v1.2.1';
+const VERSION    = '2025-12-15 v1.2.2';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -11,6 +11,11 @@ function cacheKeyFor(req) {
   url.hash = "";
   return url.toString();
 }
+
+function withCreds(url) {
+  return new Request(url, { credentials: 'same-origin' });
+}
+
 
 const PRECACHE_URLS = [
   // Shell base
@@ -172,13 +177,15 @@ self.addEventListener('install', event => {
       `${ROOT}/app.js`
     ];
 
-    await Promise.all(CORE.map(u => cache.add(new Request(u, { credentials: 'same-origin' }))));
+    await Promise.all(CORE.map(u => cache.add(withCreds(u))));
+
 
         await Promise.allSettled(
       PRECACHE_URLS
         .filter(u => !CORE.includes(u))
-        .map(u => cache.add(new Request(u, { credentials: 'same-origin' })))
+        .map(u => cache.add(withCreds(u)))
     );
+
 
     await self.skipWaiting();
   })());
