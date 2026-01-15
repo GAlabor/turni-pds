@@ -1,14 +1,13 @@
-const VERSION    = '2025-12-15 v1.2.2';
+const VERSION    = '2026-01-15 v1.2.3';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
 const ROOT = SCOPE_URL.pathname.replace(/\/$/, '');
 
-
 function cacheKeyFor(req) {
   const url = new URL(req.url);
-  url.search = "";
-  url.hash = "";
+  url.search = '';
+  url.hash = '';
   return url.toString();
 }
 
@@ -16,22 +15,12 @@ function withCreds(url) {
   return new Request(url, { credentials: 'same-origin' });
 }
 
-
 const PRECACHE_URLS = [
-  // Shell base
   `${ROOT}/index.html`,
   `${ROOT}/manifest.webmanifest`,
-
-  // CSS
   `${ROOT}/app.css`,
-
-  // JS
   `${ROOT}/app.js`,
-
-  // Favicon
   `${ROOT}/favicon.ico`,
-
-  // ICO
   `${ROOT}/ico/favicon.ico`,
   `${ROOT}/ico/favicon-16.png`,
   `${ROOT}/ico/favicon-32.png`,
@@ -39,8 +28,6 @@ const PRECACHE_URLS = [
   `${ROOT}/ico/icon-192x192.png`,
   `${ROOT}/ico/icon-512x512.png`,
   `${ROOT}/ico/apple-touch-icon-180x180-flat.png`,
-
-  // SVG UI
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
@@ -59,9 +46,7 @@ function normalizeHTMLRequest(req) {
   if (!wantsHTML) return req;
 
   if (url.pathname === ROOT || url.pathname === ROOT + '/') {
-    return new Request(`${ROOT}/index.html`, {
-      credentials: 'same-origin'
-    });
+    return withCreds(`${ROOT}/index.html`);
   }
 
   return req;
@@ -70,8 +55,7 @@ function normalizeHTMLRequest(req) {
 async function handleHtmlFetch(event, req) {
   const htmlReq = normalizeHTMLRequest(req);
   const cache = await caches.open(CACHE_NAME);
-  const indexReq = new Request(`${ROOT}/index.html`, { credentials: 'same-origin' });
-
+  const indexReq = withCreds(`${ROOT}/index.html`);
 
   let preload = null;
   if (event.preloadResponse) {
@@ -97,8 +81,8 @@ async function handleHtmlFetch(event, req) {
     return new Response(
       '<h1>Offline</h1><p>Nessuna cache disponibile.</p>',
       {
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
-        status: 503
+        status: 503,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' }
       }
     );
   }
@@ -130,17 +114,21 @@ async function handleSvgFetch(event, req) {
     try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    return new Response('', { status: 504 });
+    return new Response(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
+      {
+        status: 404,
+        headers: { 'Content-Type': 'image/svg+xml; charset=utf-8' }
+      }
+    );
   }
 }
-
 
 async function handleStaticFetch(event, req) {
   const cache = await caches.open(CACHE_NAME);
   const key = cacheKeyFor(req);
 
   const cached = await cache.match(key);
-
   if (cached) {
     event.waitUntil((async () => {
       try {
@@ -162,7 +150,10 @@ async function handleStaticFetch(event, req) {
     try { await cache.put(key, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    return new Response('', { status: 504 });
+    return new Response('Offline: risorsa non in cache', {
+      status: 404,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
   }
 }
 
@@ -179,18 +170,15 @@ self.addEventListener('install', event => {
 
     await Promise.all(CORE.map(u => cache.add(withCreds(u))));
 
-
-        await Promise.allSettled(
+    await Promise.allSettled(
       PRECACHE_URLS
         .filter(u => !CORE.includes(u))
         .map(u => cache.add(withCreds(u)))
     );
 
-
     await self.skipWaiting();
   })());
 });
-
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
@@ -230,11 +218,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-    if (url.pathname.startsWith(`${ROOT}/svg/`)) {
+  if (url.pathname.startsWith(`${ROOT}/svg/`)) {
     event.respondWith(handleSvgFetch(event, req));
     return;
   }
-
 
   event.respondWith(handleStaticFetch(event, req));
 });
