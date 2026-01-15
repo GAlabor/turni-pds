@@ -1,4 +1,4 @@
-const VERSION    = '2025-12-15 v1.2.0';
+const VERSION    = '2025-12-15 v1.2.1';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -65,6 +65,8 @@ function normalizeHTMLRequest(req) {
 async function handleHtmlFetch(event, req) {
   const htmlReq = normalizeHTMLRequest(req);
   const cache = await caches.open(CACHE_NAME);
+  const indexReq = new Request(`${ROOT}/index.html`, { credentials: 'same-origin' });
+
 
   let preload = null;
   if (event.preloadResponse) {
@@ -72,7 +74,7 @@ async function handleHtmlFetch(event, req) {
   }
 
   if (preload) {
-    try { await cache.put(new Request(`${ROOT}/index.html`, { credentials: 'same-origin' }), preload.clone()); } catch {}
+    try { await cache.put(indexReq, preload.clone()); } catch {}
     return preload;
   }
 
@@ -81,10 +83,10 @@ async function handleHtmlFetch(event, req) {
       cache: 'no-store',
       credentials: 'same-origin'
     });
-    try { await cache.put(new Request(`${ROOT}/index.html`, { credentials: 'same-origin' }), fresh.clone()); } catch {}
+    try { await cache.put(indexReq, fresh.clone()); } catch {}
     return fresh;
   } catch {
-    const cached = await cache.match(new Request(`${ROOT}/index.html`, { credentials: 'same-origin' }));
+    const cached = await cache.match(indexReq);
     if (cached) return cached;
 
     return new Response(
@@ -170,12 +172,12 @@ self.addEventListener('install', event => {
       `${ROOT}/app.js`
     ];
 
-    await Promise.all(CORE.map(u => cache.add(u)));
+    await Promise.all(CORE.map(u => cache.add(new Request(u, { credentials: 'same-origin' }))));
 
-    await Promise.allSettled(
+        await Promise.allSettled(
       PRECACHE_URLS
         .filter(u => !CORE.includes(u))
-        .map(u => cache.add(u))
+        .map(u => cache.add(new Request(u, { credentials: 'same-origin' })))
     );
 
     await self.skipWaiting();
