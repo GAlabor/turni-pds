@@ -1,4 +1,4 @@
-const VERSION    = '2026-01-15 v1.2.3';
+const VERSION    = '2026-01-15 v1.2.4';
 const CACHE_NAME = `turni-pds-${VERSION}`;
 
 const SCOPE_URL = new URL(self.registration.scope);
@@ -205,9 +205,12 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith('/service-worker.js')) return;
+    if (
+    url.pathname === `${ROOT}/manifest.webmanifest` ||
+    url.pathname === `${ROOT}/favicon.ico` ||
+    url.pathname.startsWith(`${ROOT}/ico/`)
+  ) return;
+
 
   const isHTML =
     req.mode === 'navigate' ||
