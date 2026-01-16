@@ -637,18 +637,24 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       
       const colIndex = (startIndex + d - 1) % 7;
 
-      
-      if (colIndex === 6) {
+      const dateObj = new Date(currentYear, currentMonth, d);
+      let festNome = null;
+      if (window.Festivita && typeof Festivita.getNomeForDate === "function") {
+        festNome = Festivita.getNomeForDate(dateObj);
+      }
+
+      if (colIndex === 6 || festNome) {
         cell.classList.add("sunday");
       }
 
-      
+      if (festNome) {
+        cell.title = festNome;
+      }
+
       if (isCurrentMonth && d === today.getDate()) {
         cell.classList.add("today");
       }
 
-      
-      const dateObj = new Date(currentYear, currentMonth, d);
       applyTurnazioneOverlayToCell(cell, dateObj);
 
       gridDays.appendChild(cell);
@@ -1252,6 +1258,8 @@ window.addEventListener("storage", (ev) => {
   
   const TURNI_START_KEY = STORAGE_KEYS.turniStart;
 
+  const FEST_KEY = STORAGE_KEYS.festivita;
+
 function emitStorageChange(key) {
   try {
     window.dispatchEvent(new CustomEvent("turnipds:storage-changed", { detail: { key: String(key || "") } }));
@@ -1260,12 +1268,32 @@ function emitStorageChange(key) {
 
   function seedFactoryDefaultsIfNeeded() {
     try {
+      let seeded = false;
+
+      if (!localStorage.getItem(FEST_KEY)) {
+        const defs = [
+          { type: "fixed", d: 1,  m: 1,  nome: "Capodanno" },
+          { type: "fixed", d: 6,  m: 1,  nome: "Epifania" },
+          { type: "easter", offset: 0, nome: "Pasqua" },
+          { type: "easter", offset: 1, nome: "Lunedì dell'Angelo" },
+          { type: "fixed", d: 25, m: 4,  nome: "Festa della Liberazione" },
+          { type: "fixed", d: 1,  m: 5,  nome: "Festa dei Lavoratori" },
+          { type: "fixed", d: 2,  m: 6,  nome: "Festa della Repubblica" },
+          { type: "fixed", d: 15, m: 8,  nome: "Ferragosto" },
+          { type: "fixed", d: 1,  m: 11, nome: "Ognissanti" },
+          { type: "fixed", d: 8,  m: 12, nome: "Immacolata Concezione" },
+          { type: "fixed", d: 25, m: 12, nome: "Natale" },
+          { type: "fixed", d: 26, m: 12, nome: "Santo Stefano" }
+        ];
+        localStorage.setItem(FEST_KEY, JSON.stringify(defs));
+        seeded = true;
+      }
+
       const hasTurni = !!localStorage.getItem(TURNI_KEY);
       const hasTurnazioni = !!localStorage.getItem(TURNAZIONI_KEY);
       const hasStart = !!localStorage.getItem(TURNI_START_KEY);
 
-      
-      if (hasTurni || hasTurnazioni || hasStart) return false;
+      if (hasTurni || hasTurnazioni || hasStart) return seeded;
 
       const pad2 = (n) => String(n).padStart(2, "0");
       const now = new Date();
@@ -1313,8 +1341,7 @@ function emitStorageChange(key) {
       return false;
     }
   }
-
-  function loadTurni() {
+function loadTurni() {
     try {
       seedFactoryDefaultsIfNeeded();
 
@@ -1516,7 +1543,32 @@ function syncTurnazioniForTurnoChange(prevTurno, nextTurno) {
     }
   }
 
-  function saveTurnoIniziale(obj) {
+  
+  function loadFestivitaDefs() {
+    try {
+      seedFactoryDefaultsIfNeeded();
+      const raw = localStorage.getItem(FEST_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveFestivitaDefs(arr) {
+    try {
+      localStorage.setItem(FEST_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
+      emitStorageChange(FEST_KEY);
+      if (window.Status && typeof Status.markSaved === "function") {
+        Status.markSaved();
+      }
+    } catch (e) {
+      console.warn("Salvataggio festività fallito:", e);
+    }
+  }
+
+function saveTurnoIniziale(obj) {
     try {
       const payload = obj && typeof obj === "object" ? obj : {};
       const out = {
@@ -1570,11 +1622,189 @@ function syncTurnazioniForTurnoChange(prevTurno, nextTurno) {
     
     getPreferredTurnazione,
     loadTurnoIniziale,
-    saveTurnoIniziale
+    saveTurnoIniziale,
+
+    loadFestivita: loadFestivitaDefs,
+    saveFestivita: saveFestivitaDefs
   };
   
 
 
+})();
+
+(function () {
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function easterDate(year) {
+    const y = parseInt(year, 10);
+    const a = y % 19;
+    const b = Math.floor(y / 100);
+    const c = y % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(y, month - 1, day);
+  }
+
+  function addDays(dateObj, days) {
+    const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    d.setDate(d.getDate() + (Number(days) || 0));
+    return d;
+  }
+
+  function iso(d) {
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  }
+
+  function getDefs() {
+    const t = (window.TurniStorage && typeof TurniStorage.loadFestivita === 'function')
+      ? TurniStorage.loadFestivita()
+      : [];
+    return Array.isArray(t) ? t : [];
+  }
+
+  let cacheYear = null;
+  let cacheMap = null;
+
+  function buildMapForYear(year) {
+    const y = parseInt(year, 10);
+    const defs = getDefs();
+    const map = new Map();
+
+    const baseEaster = easterDate(y);
+
+    defs.forEach((it) => {
+      if (!it || typeof it !== 'object') return;
+      const type = String(it.type || 'fixed');
+      let d = null;
+
+      if (type === 'easter') {
+        const off = Number(it.offset) || 0;
+        d = addDays(baseEaster, off);
+      } else {
+        const dd = parseInt(it.d, 10);
+        const mm = parseInt(it.m, 10);
+        if (!dd || !mm) return;
+        d = new Date(y, mm - 1, dd);
+      }
+
+      const name = (typeof it.nome === 'string') ? it.nome : '';
+      if (!name) return;
+      map.set(iso(d), name);
+    });
+
+    cacheYear = y;
+    cacheMap = map;
+    return map;
+  }
+
+  function getNomeForDate(dateObj) {
+    if (!(dateObj instanceof Date)) return null;
+    const y = dateObj.getFullYear();
+    const map = (cacheYear === y && cacheMap) ? cacheMap : buildMapForYear(y);
+    return map.get(iso(dateObj)) || null;
+  }
+
+  function buildListForYear(year) {
+    const y = parseInt(year, 10);
+    const map = buildMapForYear(y);
+    const out = [];
+    for (const [k, v] of map.entries()) {
+      const parts = k.split('-');
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      out.push({ d, m, nome: v, iso: k });
+    }
+    out.sort((a, b) => (a.m - b.m) || (a.d - b.d));
+    return out;
+  }
+
+  function renderSettingsPanel() {
+    const panel = document.querySelector('.settings-panel.settings-festivita[data-settings-id="festivita"]');
+    if (!panel) return;
+
+    panel.innerHTML = '';
+
+    const group = document.createElement('div');
+    group.className = 'settings-group';
+
+    const hint = document.createElement('p');
+    hint.className = 'settings-hint';
+    hint.textContent = 'Festività nazionali italiane.';
+    group.appendChild(hint);
+
+    const card = document.createElement('div');
+    card.className = 'turni-card';
+
+    const header = document.createElement('div');
+    header.className = 'turni-card-header';
+
+    const title = document.createElement('h2');
+    title.className = 'turni-panel-title';
+    title.textContent = 'Festività';
+
+    header.appendChild(title);
+    card.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'turni-list';
+
+    const y = new Date().getFullYear();
+    const rows = buildListForYear(y);
+
+    rows.forEach((it) => {
+      const row = document.createElement('div');
+      row.className = 'turno-item';
+
+      const siglaPill = document.createElement('span');
+      siglaPill.className = 'turno-sigla-pill';
+
+      const siglaEl = document.createElement('span');
+      siglaEl.className = 'turno-sigla';
+      const txt = `${it.d}/${it.m}`;
+      siglaEl.textContent = txt;
+
+      if (window.SiglaSizing && typeof SiglaSizing.applyTo === 'function') {
+        SiglaSizing.applyTo(siglaEl, txt);
+      } else if (window.SiglaSizing && typeof SiglaSizing.getFontSizePx === 'function') {
+        siglaEl.style.fontSize = `${SiglaSizing.getFontSizePx(txt)}px`;
+      }
+
+      siglaPill.appendChild(siglaEl);
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'turno-name';
+      nameEl.textContent = it.nome;
+
+      const rightEl = document.createElement('span');
+      rightEl.className = 'turno-orario';
+      rightEl.textContent = 'Festivo';
+
+      row.appendChild(siglaPill);
+      row.appendChild(nameEl);
+      row.appendChild(rightEl);
+
+      list.appendChild(row);
+    });
+
+    card.appendChild(list);
+
+    panel.appendChild(group);
+    panel.appendChild(card);
+  }
+
+  window.Festivita = {
+    init: renderSettingsPanel,
+    getNomeForDate
+  };
 })();
 
 
@@ -4974,6 +5204,10 @@ function initTabs() {
           
           if (window.Turni && typeof Turni.init === "function") {
             Turni.init();
+          }
+
+          if (window.Festivita && typeof Festivita.init === "function") {
+            Festivita.init();
           }
         };
       })();
