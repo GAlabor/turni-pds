@@ -1166,6 +1166,39 @@ body.ui-modal-open{
   white-space: nowrap;
 }
 
+.festivita-card .turni-list {
+  margin-top: 0;
+}
+
+.turno-item--festivita {
+  align-items: stretch;
+}
+
+.turno-item--festivita .festivita-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.turno-item--festivita .festivita-date {
+  flex: 0 0 auto;
+}
+
+.turno-item--festivita .festivita-nome {
+  margin-left: 0;
+  margin-right: 0;
+  font-variant-numeric: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.turno-item--festivita .festivita-tag {
+  align-self: center;
+}
+
 
 .turno-delete-btn {
   position: relative;

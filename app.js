@@ -1742,17 +1742,7 @@ function saveTurnoIniziale(obj) {
     group.appendChild(hint);
 
     const card = document.createElement('div');
-    card.className = 'turni-card';
-
-    const header = document.createElement('div');
-    header.className = 'turni-card-header';
-
-    const title = document.createElement('h2');
-    title.className = 'turni-panel-title';
-    title.textContent = 'Festività';
-
-    header.appendChild(title);
-    card.appendChild(header);
+    card.className = 'turni-card festivita-card';
 
     const list = document.createElement('div');
     list.className = 'turni-list';
@@ -1760,36 +1750,34 @@ function saveTurnoIniziale(obj) {
     const y = new Date().getFullYear();
     const rows = buildListForYear(y);
 
+    const mesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
     rows.forEach((it) => {
       const row = document.createElement('div');
-      row.className = 'turno-item';
+      row.className = 'turno-item turno-item--festivita';
 
-      const siglaPill = document.createElement('span');
-      siglaPill.className = 'turno-sigla-pill';
+      const left = document.createElement('div');
+      left.className = 'festivita-left';
 
-      const siglaEl = document.createElement('span');
-      siglaEl.className = 'turno-sigla';
-      const txt = `${it.d}/${it.m}`;
-      siglaEl.textContent = txt;
+      const d = String(it.d).padStart(2, '0');
+      const mese = mesi[(Number(it.m) || 1) - 1] || '';
 
-      if (window.SiglaSizing && typeof SiglaSizing.applyTo === 'function') {
-        SiglaSizing.applyTo(siglaEl, txt);
-      } else if (window.SiglaSizing && typeof SiglaSizing.getFontSizePx === 'function') {
-        siglaEl.style.fontSize = `${SiglaSizing.getFontSizePx(txt)}px`;
-      }
+      const dateEl = document.createElement('span');
+      dateEl.className = 'turno-name festivita-date';
+      dateEl.textContent = `${d} ${mese}`;
 
-      siglaPill.appendChild(siglaEl);
+      const nomeEl = document.createElement('span');
+      nomeEl.className = 'turno-orario festivita-nome';
+      nomeEl.textContent = it.nome;
 
-      const nameEl = document.createElement('span');
-      nameEl.className = 'turno-name';
-      nameEl.textContent = it.nome;
+      left.appendChild(dateEl);
+      left.appendChild(nomeEl);
 
       const rightEl = document.createElement('span');
-      rightEl.className = 'turno-orario';
+      rightEl.className = 'turno-orario festivita-tag';
       rightEl.textContent = 'Festivo';
 
-      row.appendChild(siglaPill);
-      row.appendChild(nameEl);
+      row.appendChild(left);
       row.appendChild(rightEl);
 
       list.appendChild(row);
