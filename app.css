@@ -1320,7 +1320,9 @@ body.turni-no-select * {
 }
 
 .settings-panel.settings-turni .pill-btn,
-.settings-panel.settings-turni .icon-circle-btn {
+.settings-panel.settings-turni .icon-circle-btn,
+.settings-panel.settings-festivita .pill-btn,
+.settings-panel.settings-festivita .icon-circle-btn {
   color: var(--nav-fg);
 }
 

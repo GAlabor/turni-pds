@@ -1741,6 +1741,37 @@ function saveTurnoIniziale(obj) {
     hint.textContent = 'Festività nazionali italiane.';
     group.appendChild(hint);
 
+    const actionsBar = document.createElement('div');
+    actionsBar.className = 'turni-card-header';
+
+    const actionsLeft = document.createElement('div');
+
+    const actions = document.createElement('div');
+    actions.className = 'turni-card-actions';
+
+    const btnEdit = document.createElement('button');
+    btnEdit.className = 'pill-btn';
+    btnEdit.type = 'button';
+    btnEdit.textContent = 'Modifica';
+    btnEdit.setAttribute('data-festivita-edit', '');
+
+    const btnAdd = document.createElement('button');
+    btnAdd.className = 'icon-circle-btn';
+    btnAdd.type = 'button';
+    btnAdd.setAttribute('data-festivita-add', '');
+    btnAdd.setAttribute('aria-label', 'Aggiungi festività');
+    btnAdd.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <use href="#ico-plus"></use>
+      </svg>
+    `;
+
+    actions.appendChild(btnEdit);
+    actions.appendChild(btnAdd);
+
+    actionsBar.appendChild(actionsLeft);
+    actionsBar.appendChild(actions);
+
     const card = document.createElement('div');
     card.className = 'turni-card festivita-card';
 
@@ -1785,8 +1816,9 @@ function saveTurnoIniziale(obj) {
 
     card.appendChild(list);
 
+    group.appendChild(actionsBar);
+    group.appendChild(card);
     panel.appendChild(group);
-    panel.appendChild(card);
   }
 
   window.Festivita = {
