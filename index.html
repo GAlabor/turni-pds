@@ -344,6 +344,56 @@
         <div class="settings-panel settings-indennita" data-settings-id="indennita"></div>
         
         <div class="settings-panel settings-festivita" data-settings-id="festivita"></div>
+
+        <div
+          class="settings-panel settings-festivita-add"
+          data-settings-id="festivita-add"
+          data-settings-title="Aggiungi festività">
+
+          <div class="turni-add-toolbar">
+            <button class="pill-btn turni-save-btn" type="button" data-festivita-save>
+              Salva
+            </button>
+            <p class="turni-error" data-festivita-error hidden>
+              Compila tutti i campi
+            </p>
+          </div>
+
+          <div class="turni-form" data-festivita-form>
+            <div class="turni-field-row">
+              <label class="turni-label" for="festivitaNome">Nome</label>
+              <div class="turni-field-control">
+                <input
+                  class="turni-input"
+                  id="festivitaNome"
+                  type="text"
+                  maxlength="30"
+                  autocomplete="off">
+              </div>
+            </div>
+
+            <div class="turni-field-row">
+              <label class="turni-label" for="festivitaData">Data</label>
+              <div class="turni-field-control">
+                <input
+                  class="turni-input"
+                  id="festivitaData"
+                  type="date"
+                  inputmode="numeric"
+                  maxlength="10"
+                  pattern="\d{4}-\d{2}-\d{2}">
+              </div>
+            </div>
+
+            <div class="turni-field-row">
+              <p class="turni-label">Tipo</p>
+              <div class="turni-field-control festivita-level">
+                <button type="button" class="pill-btn festivita-level-btn" data-festivita-level="festivo">Festivo</button>
+                <button type="button" class="pill-btn festivita-level-btn" data-festivita-level="superfestivo">Superfestivo</button>
+              </div>
+            </div>
+          </div>
+        </div>
         
         <div class="settings-panel settings-backup-restore" data-settings-id="backup-restore">
           <div class="settings-group">

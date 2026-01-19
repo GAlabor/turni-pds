@@ -1270,20 +1270,20 @@ function emitStorageChange(key) {
     try {
       let seeded = false;
 
-      if (!localStorage.getItem(FEST_KEY)) {
+        if (!localStorage.getItem(FEST_KEY)) {
         const defs = [
-          { type: "fixed", d: 1,  m: 1,  nome: "Capodanno" },
-          { type: "fixed", d: 6,  m: 1,  nome: "Epifania" },
-          { type: "easter", offset: 0, nome: "Pasqua" },
-          { type: "easter", offset: 1, nome: "Lunedì dell'Angelo" },
-          { type: "fixed", d: 25, m: 4,  nome: "Festa della Liberazione" },
-          { type: "fixed", d: 1,  m: 5,  nome: "Festa dei Lavoratori" },
-          { type: "fixed", d: 2,  m: 6,  nome: "Festa della Repubblica" },
-          { type: "fixed", d: 15, m: 8,  nome: "Ferragosto" },
-          { type: "fixed", d: 1,  m: 11, nome: "Ognissanti" },
-          { type: "fixed", d: 8,  m: 12, nome: "Immacolata Concezione" },
-          { type: "fixed", d: 25, m: 12, nome: "Natale" },
-          { type: "fixed", d: 26, m: 12, nome: "Santo Stefano" }
+          { type: "fixed", d: 1,  m: 1,  nome: "Capodanno", livello: "festivo", custom: false },
+          { type: "fixed", d: 6,  m: 1,  nome: "Epifania", livello: "festivo", custom: false },
+          { type: "easter", offset: 0, nome: "Pasqua", livello: "festivo", custom: false },
+          { type: "easter", offset: 1, nome: "Lunedì dell'Angelo", livello: "festivo", custom: false },
+          { type: "fixed", d: 25, m: 4,  nome: "Festa della Liberazione", livello: "festivo", custom: false },
+          { type: "fixed", d: 1,  m: 5,  nome: "Festa dei Lavoratori", livello: "festivo", custom: false },
+          { type: "fixed", d: 2,  m: 6,  nome: "Festa della Repubblica", livello: "festivo", custom: false },
+          { type: "fixed", d: 15, m: 8,  nome: "Ferragosto", livello: "festivo", custom: false },
+          { type: "fixed", d: 1,  m: 11, nome: "Ognissanti", livello: "festivo", custom: false },
+          { type: "fixed", d: 8,  m: 12, nome: "Immacolata Concezione", livello: "festivo", custom: false },
+          { type: "fixed", d: 25, m: 12, nome: "Natale", livello: "festivo", custom: false },
+          { type: "fixed", d: 26, m: 12, nome: "Santo Stefano", livello: "festivo", custom: false }
         ];
         localStorage.setItem(FEST_KEY, JSON.stringify(defs));
         seeded = true;
@@ -1664,6 +1664,35 @@ function saveTurnoIniziale(obj) {
     return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
   }
 
+  const MESI = [
+    'Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+    'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'
+  ];
+
+  const FEST_KEY = (window.AppConfig && window.AppConfig.STORAGE_KEYS)
+    ? window.AppConfig.STORAGE_KEYS.festivita
+    : 'turnipds-festivita';
+
+  let defs = [];
+  let isEditing = false;
+  let cacheYear = null;
+  let cacheMap = null;
+
+  let panel = null;
+  let listEl = null;
+  let btnEdit = null;
+  let btnAdd = null;
+
+  let panelAdd = null;
+  let inputNome = null;
+  let inputData = null;
+  let levelBtns = [];
+  let btnSave = null;
+  let errEl = null;
+
+  let editingIndex = null;
+  let selectedLevel = 'festivo';
+
   function getDefs() {
     const t = (window.TurniStorage && typeof TurniStorage.loadFestivita === 'function')
       ? TurniStorage.loadFestivita()
@@ -1671,36 +1700,78 @@ function saveTurnoIniziale(obj) {
     return Array.isArray(t) ? t : [];
   }
 
-  let cacheYear = null;
-  let cacheMap = null;
+  function normalizeDefs(list) {
+    const arr = Array.isArray(list) ? list : [];
+    let changed = false;
+
+    const out = arr.map((it) => {
+      const o = (it && typeof it === 'object') ? { ...it } : null;
+      if (!o) return null;
+      if (o.livello !== 'festivo' && o.livello !== 'superfestivo') {
+        o.livello = 'festivo';
+        changed = true;
+      }
+      if (typeof o.custom !== 'boolean') {
+        o.custom = false;
+        changed = true;
+      }
+      return o;
+    }).filter(Boolean);
+
+    if (changed && window.TurniStorage && typeof TurniStorage.saveFestivita === 'function') {
+      TurniStorage.saveFestivita(out);
+    }
+
+    return out;
+  }
+
+  function resolveDateForDef(def, year) {
+    const y = parseInt(year, 10);
+    const type = String(def.type || 'fixed');
+    if (type === 'easter') {
+      const base = easterDate(y);
+      const off = Number(def.offset) || 0;
+      return addDays(base, off);
+    }
+    const dd = parseInt(def.d, 10);
+    const mm = parseInt(def.m, 10);
+    if (!dd || !mm) return null;
+    return new Date(y, mm - 1, dd);
+  }
+
+  function buildListForYear(year) {
+    const y = parseInt(year, 10);
+    const out = [];
+    defs.forEach((it, idx) => {
+      if (!it || typeof it !== 'object') return;
+      const dObj = resolveDateForDef(it, y);
+      if (!dObj) return;
+      const nome = (typeof it.nome === 'string') ? it.nome : '';
+      if (!nome) return;
+      const livello = (it.livello === 'superfestivo') ? 'superfestivo' : 'festivo';
+      const custom = !!it.custom;
+      out.push({
+        defIndex: idx,
+        dateObj: dObj,
+        iso: iso(dObj),
+        d: dObj.getDate(),
+        m: dObj.getMonth() + 1,
+        nome,
+        livello,
+        custom
+      });
+    });
+    out.sort((a, b) => (a.m - b.m) || (a.d - b.d));
+    return out;
+  }
 
   function buildMapForYear(year) {
     const y = parseInt(year, 10);
-    const defs = getDefs();
+    if (cacheYear === y && cacheMap) return cacheMap;
     const map = new Map();
-
-    const baseEaster = easterDate(y);
-
-    defs.forEach((it) => {
-      if (!it || typeof it !== 'object') return;
-      const type = String(it.type || 'fixed');
-      let d = null;
-
-      if (type === 'easter') {
-        const off = Number(it.offset) || 0;
-        d = addDays(baseEaster, off);
-      } else {
-        const dd = parseInt(it.d, 10);
-        const mm = parseInt(it.m, 10);
-        if (!dd || !mm) return;
-        d = new Date(y, mm - 1, dd);
-      }
-
-      const name = (typeof it.nome === 'string') ? it.nome : '';
-      if (!name) return;
-      map.set(iso(d), name);
+    buildListForYear(y).forEach((it) => {
+      map.set(it.iso, it.nome);
     });
-
     cacheYear = y;
     cacheMap = map;
     return map;
@@ -1713,22 +1784,39 @@ function saveTurnoIniziale(obj) {
     return map.get(iso(dateObj)) || null;
   }
 
-  function buildListForYear(year) {
-    const y = parseInt(year, 10);
-    const map = buildMapForYear(y);
-    const out = [];
-    for (const [k, v] of map.entries()) {
-      const parts = k.split('-');
-      const m = parseInt(parts[1], 10);
-      const d = parseInt(parts[2], 10);
-      out.push({ d, m, nome: v, iso: k });
+  function setEditButtonState() {
+    if (!btnEdit) return;
+
+    if (!listEl || !defs.length) {
+      btnEdit.disabled = true;
+      btnEdit.classList.remove('icon-circle-btn');
+      btnEdit.textContent = 'Modifica';
+      btnEdit.removeAttribute('aria-pressed');
+      return;
     }
-    out.sort((a, b) => (a.m - b.m) || (a.d - b.d));
-    return out;
+
+    btnEdit.disabled = false;
+
+    if (isEditing) {
+      btnEdit.setAttribute('aria-pressed', 'true');
+      btnEdit.classList.add('icon-circle-btn');
+      btnEdit.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 12.5 L10 16.5 L18 7.5" />
+        </svg>
+      `;
+    } else {
+      btnEdit.removeAttribute('aria-pressed');
+      btnEdit.classList.remove('icon-circle-btn');
+      btnEdit.textContent = 'Modifica';
+    }
   }
 
   function renderSettingsPanel() {
-    const panel = document.querySelector('.settings-panel.settings-festivita[data-settings-id="festivita"]');
+    if (!panel) {
+      panel = document.querySelector('.settings-panel.settings-festivita[data-settings-id="festivita"]');
+    }
     if (!panel) return;
 
     panel.innerHTML = '';
@@ -1738,7 +1826,7 @@ function saveTurnoIniziale(obj) {
 
     const hint = document.createElement('p');
     hint.className = 'settings-hint';
-    hint.textContent = 'Festività nazionali italiane.';
+    hint.textContent = 'Festività nazionali + personalizzate.';
     group.appendChild(hint);
 
     const actionsBar = document.createElement('div');
@@ -1749,13 +1837,13 @@ function saveTurnoIniziale(obj) {
     const actions = document.createElement('div');
     actions.className = 'turni-card-actions';
 
-    const btnEdit = document.createElement('button');
+    btnEdit = document.createElement('button');
     btnEdit.className = 'pill-btn';
     btnEdit.type = 'button';
     btnEdit.textContent = 'Modifica';
     btnEdit.setAttribute('data-festivita-edit', '');
 
-    const btnAdd = document.createElement('button');
+    btnAdd = document.createElement('button');
     btnAdd.className = 'icon-circle-btn';
     btnAdd.type = 'button';
     btnAdd.setAttribute('data-festivita-add', '');
@@ -1775,27 +1863,43 @@ function saveTurnoIniziale(obj) {
     const card = document.createElement('div');
     card.className = 'turni-card festivita-card';
 
-    const list = document.createElement('div');
-    list.className = 'turni-list';
+    listEl = document.createElement('div');
+    listEl.className = 'turni-list';
+    listEl.classList.toggle('editing', isEditing);
 
     const y = new Date().getFullYear();
     const rows = buildListForYear(y);
 
-    const mesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-
     rows.forEach((it) => {
       const row = document.createElement('div');
       row.className = 'turno-item turno-item--festivita';
+      row.dataset.index = String(it.defIndex);
+
+      if (isEditing && it.custom) {
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'turno-delete-btn';
+        delBtn.setAttribute('aria-label', 'Elimina festività');
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'turno-delete-icon';
+        iconSpan.textContent = '−';
+        delBtn.appendChild(iconSpan);
+        delBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          deleteFestivita(it.defIndex);
+        });
+        row.appendChild(delBtn);
+      }
 
       const left = document.createElement('div');
       left.className = 'festivita-left';
 
-      const d = String(it.d).padStart(2, '0');
-      const mese = mesi[(Number(it.m) || 1) - 1] || '';
+      const dd = String(it.d).padStart(2, '0');
+      const mese = MESI[(Number(it.m) || 1) - 1] || '';
 
       const dateEl = document.createElement('span');
       dateEl.className = 'turno-name festivita-date';
-      dateEl.textContent = `${d} ${mese}`;
+      dateEl.textContent = `${dd} ${mese}`;
 
       const nomeEl = document.createElement('span');
       nomeEl.className = 'turno-orario festivita-nome';
@@ -1806,25 +1910,235 @@ function saveTurnoIniziale(obj) {
 
       const rightEl = document.createElement('span');
       rightEl.className = 'turno-orario festivita-tag';
-      rightEl.textContent = 'Festivo';
+      rightEl.textContent = (it.livello === 'superfestivo') ? 'Superfestivo' : 'Festivo';
 
       row.appendChild(left);
       row.appendChild(rightEl);
 
-      list.appendChild(row);
+      listEl.appendChild(row);
     });
 
-    card.appendChild(list);
-
+    card.appendChild(listEl);
     group.appendChild(actionsBar);
     group.appendChild(card);
     panel.appendChild(group);
+
+    attachInteractions();
+    setEditButtonState();
   }
 
-  window.Festivita = {
-    init: renderSettingsPanel,
-    getNomeForDate
-  };
+  function clearAddError() {
+    if (errEl) errEl.hidden = true;
+    if (inputNome) inputNome.classList.remove('is-invalid');
+    if (inputData) inputData.classList.remove('is-invalid');
+  }
+
+  function showAddError() {
+    if (errEl) errEl.hidden = false;
+  }
+
+  function setLevel(next) {
+    selectedLevel = (next === 'superfestivo') ? 'superfestivo' : 'festivo';
+    levelBtns.forEach((b) => {
+      const v = b ? String(b.dataset.festivitaLevel || '') : '';
+      b.classList.toggle('is-on', v === selectedLevel);
+    });
+  }
+
+  function resetAddForm() {
+    clearAddError();
+    editingIndex = null;
+    if (inputNome) inputNome.value = '';
+    if (inputData) {
+      inputData.value = '';
+      inputData.disabled = false;
+    }
+    setLevel('festivo');
+  }
+
+  function openNewPanel() {
+    if (!panelAdd) return;
+    resetAddForm();
+    panelAdd.dataset.settingsTitle = 'Aggiungi festività';
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('festivita-add', { internal: true });
+    }
+  }
+
+  function openEditPanel(defIndex) {
+    const idx = parseInt(defIndex, 10);
+    if (!Number.isInteger(idx) || idx < 0 || idx >= defs.length) return;
+    const def = defs[idx];
+    if (!def) return;
+    if (!panelAdd) return;
+
+    resetAddForm();
+    editingIndex = idx;
+    panelAdd.dataset.settingsTitle = 'Modifica festività';
+
+    if (inputNome) inputNome.value = def.nome || '';
+
+    const y = new Date().getFullYear();
+    const dObj = resolveDateForDef(def, y);
+    if (inputData && dObj) {
+      inputData.value = iso(dObj);
+      inputData.disabled = !def.custom;
+    }
+
+    setLevel(def.livello === 'superfestivo' ? 'superfestivo' : 'festivo');
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('festivita-add', { internal: true });
+    }
+  }
+
+  function deleteFestivita(defIndex) {
+    const idx = parseInt(defIndex, 10);
+    if (!Number.isInteger(idx) || idx < 0 || idx >= defs.length) return;
+    const def = defs[idx];
+    if (!def || !def.custom) return;
+
+    defs.splice(idx, 1);
+    if (window.TurniStorage && typeof TurniStorage.saveFestivita === 'function') {
+      TurniStorage.saveFestivita(defs);
+    }
+    cacheYear = null;
+    cacheMap = null;
+    if (editingIndex === idx) editingIndex = null;
+    renderSettingsPanel();
+  }
+
+  function saveFromPanel() {
+    clearAddError();
+    const nome = (inputNome && inputNome.value != null) ? String(inputNome.value).trim() : '';
+    const dateStr = (inputData && inputData.value != null) ? String(inputData.value).trim() : '';
+
+    let hasError = false;
+    if (!nome) { if (inputNome) inputNome.classList.add('is-invalid'); hasError = true; }
+    if (editingIndex === null && !dateStr) { if (inputData) inputData.classList.add('is-invalid'); hasError = true; }
+
+    const idx = (editingIndex !== null) ? Number(editingIndex) : null;
+    const def = (idx !== null && idx >= 0 && idx < defs.length) ? defs[idx] : null;
+    const isCustom = def ? !!def.custom : true;
+
+    if (def && !isCustom) {
+      if (hasError) {
+        showAddError();
+        return;
+      }
+      defs[idx] = { ...def, nome, livello: selectedLevel };
+    } else {
+      const parts = dateStr.split('-');
+      const mm = parseInt(parts[1], 10);
+      const dd = parseInt(parts[2], 10);
+      if (!mm || !dd) { if (inputData) inputData.classList.add('is-invalid'); hasError = true; }
+      if (hasError) {
+        showAddError();
+        return;
+      }
+
+      if (def) {
+        defs[idx] = { ...def, type: 'fixed', d: dd, m: mm, nome, livello: selectedLevel, custom: true };
+      } else {
+        const existingIdx = defs.findIndex((x) => {
+          if (!x || typeof x !== 'object') return false;
+          if (!x.custom) return false;
+          const type = String(x.type || 'fixed');
+          if (type !== 'fixed') return false;
+          return parseInt(x.d, 10) === dd && parseInt(x.m, 10) === mm;
+        });
+
+        const payload = { type: 'fixed', d: dd, m: mm, nome, livello: selectedLevel, custom: true };
+        if (existingIdx >= 0) defs[existingIdx] = payload;
+        else defs.push(payload);
+      }
+    }
+
+    if (window.TurniStorage && typeof TurniStorage.saveFestivita === 'function') {
+      TurniStorage.saveFestivita(defs);
+    }
+
+    cacheYear = null;
+    cacheMap = null;
+    isEditing = false;
+    renderSettingsPanel();
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('festivita', { internal: true });
+    }
+  }
+
+  let _wired = false;
+  function attachInteractions() {
+    if (btnAdd) {
+      btnAdd.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openNewPanel();
+      });
+    }
+
+    if (window.TurniInteractions && typeof TurniInteractions.attachEditToggle === 'function') {
+      TurniInteractions.attachEditToggle({
+        btnEdit,
+        canEdit: () => Array.isArray(defs) && defs.length > 0,
+        getEditing: () => isEditing,
+        setEditing: (v) => { isEditing = !!v; },
+        refresh: renderSettingsPanel
+      });
+    }
+
+    if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 'function') {
+      TurniInteractions.attachRowEditClick({
+        listEl,
+        getEditing: () => isEditing,
+        onEditRow: (idx) => openEditPanel(idx)
+      });
+    }
+
+    if (_wired) return;
+    _wired = true;
+
+    panelAdd = document.querySelector('.settings-panel.settings-festivita-add[data-settings-id="festivita-add"]');
+    inputNome = document.getElementById('festivitaNome');
+    inputData = document.getElementById('festivitaData');
+    btnSave = document.querySelector('[data-festivita-save]');
+    errEl = document.querySelector('[data-festivita-error]');
+    levelBtns = Array.from(document.querySelectorAll('[data-festivita-level]'));
+
+    if (inputNome) inputNome.addEventListener('input', clearAddError);
+    if (inputData) inputData.addEventListener('input', clearAddError);
+
+    levelBtns.forEach((b) => {
+      b.addEventListener('click', () => {
+        setLevel(String(b.dataset.festivitaLevel || 'festivo'));
+      });
+    });
+
+    if (btnSave) {
+      btnSave.addEventListener('click', () => saveFromPanel());
+    }
+  }
+
+  function refreshFromStorage() {
+    defs = normalizeDefs(getDefs());
+    cacheYear = null;
+    cacheMap = null;
+  }
+
+  function init() {
+    panel = document.querySelector('.settings-panel.settings-festivita[data-settings-id="festivita"]');
+    refreshFromStorage();
+    renderSettingsPanel();
+
+    window.addEventListener('turnipds:storage-changed', (ev) => {
+      const k = ev && ev.detail ? String(ev.detail.key || '') : '';
+      if (k && k !== FEST_KEY) return;
+      refreshFromStorage();
+      renderSettingsPanel();
+    });
+  }
+
+  window.Festivita = { init, getNomeForDate };
 })();
 
 

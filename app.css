@@ -2482,6 +2482,23 @@ body.turni-no-select * {
   box-shadow: var(--shadow-accent-press);
 }
 
+.festivita-level {
+  display: flex;
+  gap: var(--space-10);
+  width: 100%;
+}
+
+.festivita-level-btn {
+  flex: 1 1 0;
+}
+
+.festivita-level-btn.is-on {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent-lift);
+}
+
 .icon-circle-btn {
   border-radius: 999px;
   border: 1px solid var(--border);
