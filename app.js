@@ -1674,7 +1674,7 @@ function saveTurnoIniziale(obj) {
     : 'turnipds-festivita';
 
   let defs = [];
-  let isEditing = false;
+  let isEditing = true;
   let cacheYear = null;
   let cacheMap = null;
 
@@ -1784,35 +1784,6 @@ function saveTurnoIniziale(obj) {
     return map.get(iso(dateObj)) || null;
   }
 
-  function setEditButtonState() {
-    if (!btnEdit) return;
-
-    if (!listEl || !defs.length) {
-      btnEdit.disabled = true;
-      btnEdit.classList.remove('icon-circle-btn');
-      btnEdit.textContent = 'Modifica';
-      btnEdit.removeAttribute('aria-pressed');
-      return;
-    }
-
-    btnEdit.disabled = false;
-
-    if (isEditing) {
-      btnEdit.setAttribute('aria-pressed', 'true');
-      btnEdit.classList.add('icon-circle-btn');
-      btnEdit.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M6 12.5 L10 16.5 L18 7.5" />
-        </svg>
-      `;
-    } else {
-      btnEdit.removeAttribute('aria-pressed');
-      btnEdit.classList.remove('icon-circle-btn');
-      btnEdit.textContent = 'Modifica';
-    }
-  }
-
   function renderSettingsPanel() {
     if (!panel) {
       panel = document.querySelector('.settings-panel.settings-festivita[data-settings-id="festivita"]');
@@ -1832,25 +1803,21 @@ function saveTurnoIniziale(obj) {
     const actions = document.createElement('div');
     actions.className = 'turni-card-actions';
 
-    btnEdit = document.createElement('button');
-    btnEdit.className = 'pill-btn';
-    btnEdit.type = 'button';
-    btnEdit.textContent = 'Modifica';
-    btnEdit.setAttribute('data-festivita-edit', '');
+btnEdit = null;
 
-    btnAdd = document.createElement('button');
-    btnAdd.className = 'icon-circle-btn';
-    btnAdd.type = 'button';
-    btnAdd.setAttribute('data-festivita-add', '');
-    btnAdd.setAttribute('aria-label', 'Aggiungi festività');
-    btnAdd.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <use href="#ico-plus"></use>
-      </svg>
-    `;
+btnAdd = document.createElement('button');
+btnAdd.className = 'icon-circle-btn';
+btnAdd.type = 'button';
+btnAdd.setAttribute('data-festivita-add', '');
+btnAdd.setAttribute('aria-label', 'Aggiungi festività');
+btnAdd.innerHTML = `
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <use href="#ico-plus"></use>
+  </svg>
+`;
 
-    actions.appendChild(btnEdit);
-    actions.appendChild(btnAdd);
+actions.appendChild(btnAdd);
+
 
     actionsBar.appendChild(actionsLeft);
     actionsBar.appendChild(actions);
@@ -1903,12 +1870,28 @@ function saveTurnoIniziale(obj) {
       left.appendChild(dateEl);
       left.appendChild(nomeEl);
 
-      const rightEl = document.createElement('span');
-      rightEl.className = 'turno-orario festivita-tag';
-      rightEl.textContent = (it.livello === 'superfestivo') ? 'Superfestivo' : 'Festivo';
+const rightWrap = document.createElement('div');
+rightWrap.className = 'festivita-right';
 
-      row.appendChild(left);
-      row.appendChild(rightEl);
+const tag = document.createElement('span');
+tag.className = 'turno-orario festivita-tag';
+tag.textContent = (it.livello === 'superfestivo') ? 'Superfestivo' : 'Festivo';
+
+const chevron = document.createElement('span');
+chevron.className = 'settings-row-chevron';
+chevron.setAttribute('aria-hidden', 'true');
+chevron.innerHTML = `
+  <svg viewBox="0 0 24 24" fill="none">
+    <use href="#ico-ui-chevron-right"></use>
+  </svg>
+`;
+
+rightWrap.appendChild(tag);
+rightWrap.appendChild(chevron);
+
+row.appendChild(left);
+row.appendChild(rightWrap);
+
 
       listEl.appendChild(row);
     });
@@ -1919,7 +1902,6 @@ function saveTurnoIniziale(obj) {
     panel.appendChild(group);
 
     attachInteractions();
-    setEditButtonState();
   }
 
   function clearAddError() {
@@ -2055,7 +2037,7 @@ function saveTurnoIniziale(obj) {
 
     cacheYear = null;
     cacheMap = null;
-    isEditing = false;
+    isEditing = true;
     renderSettingsPanel();
 
     if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
@@ -2072,23 +2054,15 @@ function saveTurnoIniziale(obj) {
       });
     }
 
-    if (window.TurniInteractions && typeof TurniInteractions.attachEditToggle === 'function') {
-      TurniInteractions.attachEditToggle({
-        btnEdit,
-        canEdit: () => Array.isArray(defs) && defs.length > 0,
-        getEditing: () => isEditing,
-        setEditing: (v) => { isEditing = !!v; },
-        refresh: renderSettingsPanel
-      });
-    }
 
-    if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 'function') {
-      TurniInteractions.attachRowEditClick({
-        listEl,
-        getEditing: () => isEditing,
-        onEditRow: (idx) => openEditPanel(idx)
-      });
-    }
+if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 'function') {
+  TurniInteractions.attachRowEditClick({
+    listEl,
+    getEditing: () => true,
+    onEditRow: (idx) => openEditPanel(idx)
+  });
+}
+
 
     if (_wired) return;
     _wired = true;

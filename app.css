@@ -1174,6 +1174,13 @@ body.ui-modal-open{
   align-items: stretch;
 }
 
+.festivita-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
 .turno-item--festivita .festivita-left {
   display: flex;
   flex-direction: column;
