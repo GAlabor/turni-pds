@@ -1824,11 +1824,6 @@ function saveTurnoIniziale(obj) {
     const group = document.createElement('div');
     group.className = 'settings-group';
 
-    const hint = document.createElement('p');
-    hint.className = 'settings-hint';
-    hint.textContent = 'Festività nazionali + personalizzate.';
-    group.appendChild(hint);
-
     const actionsBar = document.createElement('div');
     actionsBar.className = 'turni-card-header';
 
