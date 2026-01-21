@@ -2315,6 +2315,14 @@ body.turni-no-select * {
     transform 0.08s ease-out;
 }
 
+.icon-circle-btn {
+  width: var(--icon-circle-sm);
+  height: var(--icon-circle-sm);
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+  color: var(--accent);
+}
+
+
 
 .nav-btn {
   width: var(--icon-circle-lg);
@@ -2504,22 +2512,6 @@ body.turni-no-select * {
   color: #ffffff;
   border-color: var(--accent);
   box-shadow: var(--shadow-accent-lift);
-}
-
-.icon-circle-btn {
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface-strong);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--icon-circle-sm);
-  height: var(--icon-circle-sm);
-  padding: 0;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  color: var(--accent);
-  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
 }
 
 

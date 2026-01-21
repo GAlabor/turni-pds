@@ -1,4 +1,4 @@
-const VERSION = '1.6.5';
+const VERSION = '1.6.7';
 const APP_VERSION = VERSION;
 
 const ICO_VERSION = 'v1.0';
