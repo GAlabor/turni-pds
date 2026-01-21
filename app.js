@@ -4958,6 +4958,20 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
     if (!main || !titleEl || !backBtn) return;
 
+    (function bindPressFeedback(el) {
+  if (!el) return;
+  const on = () => el.classList.add("is-press");
+  const off = () => el.classList.remove("is-press");
+  el.addEventListener("pointerdown", on);
+  el.addEventListener("pointerup", off);
+  el.addEventListener("pointercancel", off);
+  el.addEventListener("pointerleave", off);
+  el.addEventListener("touchstart", on, { passive: true });
+  el.addEventListener("touchend", off);
+  el.addEventListener("touchcancel", off);
+})(backBtn);
+
+
     function hideBackBtn() {
       backBtn.hidden = true;
       backBtn.style.display = "none";

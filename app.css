@@ -2382,7 +2382,9 @@ body.turni-no-select * {
 
 .nav-btn:active,
 .settings-back:active,
-.icon-circle-btn:active {
+.icon-circle-btn:active,
+.settings-back.is-press,
+.icon-circle-btn.is-press {
   transform: scale(0.9);
   background: var(--accent);
   color: #ffffff;
