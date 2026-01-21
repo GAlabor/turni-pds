@@ -2169,22 +2169,22 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
       editBtn.disabled = false;
 
       if (isEditing) {
-        
-        
-        editBtn.setAttribute("aria-pressed", "true");
-        editBtn.classList.add("icon-circle-btn");
-        editBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M6 12.5 L10 16.5 L18 7.5" />
-          </svg>
-        `;
-      } else {
-        
-        editBtn.removeAttribute("aria-pressed");
-        editBtn.classList.remove("icon-circle-btn");
-        editBtn.textContent = "Modifica";
-      }
+  editBtn.setAttribute("aria-pressed", "true");
+  editBtn.classList.remove("pill-btn");
+  editBtn.classList.add("icon-circle-btn");
+  editBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 12.5 L10 16.5 L18 7.5" />
+    </svg>
+  `;
+} else {
+  editBtn.removeAttribute("aria-pressed");
+  editBtn.classList.remove("icon-circle-btn");
+  editBtn.classList.add("pill-btn");
+  editBtn.textContent = "Modifica";
+}
+
     }
 
     turni.forEach((t, index) => {
@@ -2381,19 +2381,22 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     editBtn.disabled = false;
 
     if (isEditing) {
-      editBtn.setAttribute("aria-pressed", "true");
-      editBtn.classList.add("icon-circle-btn");
-      editBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M6 12.5 L10 16.5 L18 7.5" />
-        </svg>
-      `;
-    } else {
-      editBtn.removeAttribute("aria-pressed");
-      editBtn.classList.remove("icon-circle-btn");
-      editBtn.textContent = "Modifica";
-    }
+  editBtn.setAttribute("aria-pressed", "true");
+  editBtn.classList.remove("pill-btn");
+  editBtn.classList.add("icon-circle-btn");
+  editBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M6 12.5 L10 16.5 L18 7.5" />
+    </svg>
+  `;
+} else {
+  editBtn.removeAttribute("aria-pressed");
+  editBtn.classList.remove("icon-circle-btn");
+  editBtn.classList.add("pill-btn");
+  editBtn.textContent = "Modifica";
+}
+
   }
 
   turnazioni.forEach((t, index) => {
