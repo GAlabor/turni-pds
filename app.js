@@ -1794,7 +1794,10 @@ function saveTurnoIniziale(obj) {
 
 const group = null;
 
-const actionsLeft = document.createElement('div');
+const actionsLeft = document.createElement('h2');
+actionsLeft.className = 'turni-panel-title';
+actionsLeft.textContent = 'Festivi e Superfestivi';
+
 
 const actions = document.createElement('div');
 actions.className = 'turni-card-actions';
