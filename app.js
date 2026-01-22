@@ -1796,7 +1796,7 @@ const group = null;
 
 const actionsLeft = document.createElement('h2');
 actionsLeft.className = 'turni-panel-title';
-actionsLeft.textContent = 'Festivi e Superfestivi';
+actionsLeft.textContent = 'Festivi';
 
 
 const actions = document.createElement('div');

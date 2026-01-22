@@ -1167,8 +1167,9 @@ body.ui-modal-open{
 }
 
 .festivita-card .turni-list {
-  margin-top: 0;
+  margin-top: var(--space-10);
 }
+
 
 .settings-panel.settings-festivita .festivita-card {
   margin-top: 0;
