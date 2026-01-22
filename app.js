@@ -1855,8 +1855,9 @@ rows.forEach((it) => {
   const left = document.createElement('div');
   left.className = 'festivita-left';
 
-  const dd = String(it.d).padStart(2, '0');
-  const mese = MESI[(Number(it.m) || 1) - 1] || '';
+const dd = String(it.d);
+const mese = MESI[(Number(it.m) || 1) - 1] || '';
+
 
   const dateEl = document.createElement('span');
   dateEl.className = 'turno-name festivita-date';
