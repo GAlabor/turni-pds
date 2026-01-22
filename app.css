@@ -1170,6 +1170,11 @@ body.ui-modal-open{
   margin-top: 0;
 }
 
+.settings-panel.settings-festivita .festivita-card {
+  margin-top: 0;
+}
+
+
 .turno-item--festivita {
   align-items: stretch;
 }
