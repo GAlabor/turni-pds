@@ -1792,8 +1792,7 @@ function saveTurnoIniziale(obj) {
 
     panel.innerHTML = '';
 
-const group = document.createElement('div');
-group.className = 'settings-group';
+const group = null;
 
 const actionsLeft = document.createElement('div');
 
@@ -1896,8 +1895,7 @@ rows.forEach((it) => {
 });
 
 card.appendChild(listEl);
-group.appendChild(card);
-panel.appendChild(group);
+panel.appendChild(card);
 
 
     attachInteractions();
