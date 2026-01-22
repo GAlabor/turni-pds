@@ -1792,16 +1792,13 @@ function saveTurnoIniziale(obj) {
 
     panel.innerHTML = '';
 
-    const group = document.createElement('div');
-    group.className = 'settings-group';
+const group = document.createElement('div');
+group.className = 'settings-group';
 
-    const actionsBar = document.createElement('div');
-    actionsBar.className = 'turni-card-header';
+const actionsLeft = document.createElement('div');
 
-    const actionsLeft = document.createElement('div');
-
-    const actions = document.createElement('div');
-    actions.className = 'turni-card-actions';
+const actions = document.createElement('div');
+actions.className = 'turni-card-actions';
 
 btnEdit = null;
 
@@ -1818,88 +1815,90 @@ btnAdd.innerHTML = `
 
 actions.appendChild(btnAdd);
 
+const card = document.createElement('div');
+card.className = 'turni-card festivita-card';
 
-    actionsBar.appendChild(actionsLeft);
-    actionsBar.appendChild(actions);
+const header = document.createElement('div');
+header.className = 'turni-card-header';
+header.appendChild(actionsLeft);
+header.appendChild(actions);
 
-    const card = document.createElement('div');
-    card.className = 'turni-card festivita-card';
+card.appendChild(header);
 
-    listEl = document.createElement('div');
-    listEl.className = 'turni-list';
-    listEl.classList.toggle('editing', isEditing);
+listEl = document.createElement('div');
+listEl.className = 'turni-list';
+listEl.classList.toggle('editing', isEditing);
 
-    const y = new Date().getFullYear();
-    const rows = buildListForYear(y);
+const y = new Date().getFullYear();
+const rows = buildListForYear(y);
 
-    rows.forEach((it) => {
-      const row = document.createElement('div');
-      row.className = 'turno-item turno-item--festivita';
-      row.dataset.index = String(it.defIndex);
+rows.forEach((it) => {
+  const row = document.createElement('div');
+  row.className = 'turno-item turno-item--festivita';
+  row.dataset.index = String(it.defIndex);
 
-      if (isEditing && it.custom) {
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.className = 'turno-delete-btn';
-        delBtn.setAttribute('aria-label', 'Elimina festività');
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'turno-delete-icon';
-        iconSpan.textContent = '−';
-        delBtn.appendChild(iconSpan);
-        delBtn.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          deleteFestivita(it.defIndex);
-        });
-        row.appendChild(delBtn);
-      }
-
-      const left = document.createElement('div');
-      left.className = 'festivita-left';
-
-      const dd = String(it.d).padStart(2, '0');
-      const mese = MESI[(Number(it.m) || 1) - 1] || '';
-
-      const dateEl = document.createElement('span');
-      dateEl.className = 'turno-name festivita-date';
-      dateEl.textContent = `${dd} ${mese}`;
-
-      const nomeEl = document.createElement('span');
-      nomeEl.className = 'turno-orario festivita-nome';
-      nomeEl.textContent = it.nome;
-
-      left.appendChild(dateEl);
-      left.appendChild(nomeEl);
-
-const rightWrap = document.createElement('div');
-rightWrap.className = 'festivita-right';
-
-const tag = document.createElement('span');
-tag.className = 'turno-orario festivita-tag';
-tag.textContent = (it.livello === 'superfestivo') ? 'Superfestivo' : 'Festivo';
-
-const chevron = document.createElement('span');
-chevron.className = 'settings-row-chevron';
-chevron.setAttribute('aria-hidden', 'true');
-chevron.innerHTML = `
-  <svg viewBox="0 0 24 24" fill="none">
-    <use href="#ico-ui-chevron-right"></use>
-  </svg>
-`;
-
-rightWrap.appendChild(tag);
-rightWrap.appendChild(chevron);
-
-row.appendChild(left);
-row.appendChild(rightWrap);
-
-
-      listEl.appendChild(row);
+  if (isEditing && it.custom) {
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'turno-delete-btn';
+    delBtn.setAttribute('aria-label', 'Elimina festività');
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'turno-delete-icon';
+    iconSpan.textContent = '−';
+    delBtn.appendChild(iconSpan);
+    delBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      deleteFestivita(it.defIndex);
     });
+    row.appendChild(delBtn);
+  }
 
-    card.appendChild(listEl);
-    group.appendChild(actionsBar);
-    group.appendChild(card);
-    panel.appendChild(group);
+  const left = document.createElement('div');
+  left.className = 'festivita-left';
+
+  const dd = String(it.d).padStart(2, '0');
+  const mese = MESI[(Number(it.m) || 1) - 1] || '';
+
+  const dateEl = document.createElement('span');
+  dateEl.className = 'turno-name festivita-date';
+  dateEl.textContent = `${dd} ${mese}`;
+
+  const nomeEl = document.createElement('span');
+  nomeEl.className = 'turno-orario festivita-nome';
+  nomeEl.textContent = it.nome;
+
+  left.appendChild(dateEl);
+  left.appendChild(nomeEl);
+
+  const rightWrap = document.createElement('div');
+  rightWrap.className = 'festivita-right';
+
+  const tag = document.createElement('span');
+  tag.className = 'turno-orario festivita-tag';
+  tag.textContent = (it.livello === 'superfestivo') ? 'Superfestivo' : 'Festivo';
+
+  const chevron = document.createElement('span');
+  chevron.className = 'settings-row-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none">
+      <use href="#ico-ui-chevron-right"></use>
+    </svg>
+  `;
+
+  rightWrap.appendChild(tag);
+  rightWrap.appendChild(chevron);
+
+  row.appendChild(left);
+  row.appendChild(rightWrap);
+
+  listEl.appendChild(row);
+});
+
+card.appendChild(listEl);
+group.appendChild(card);
+panel.appendChild(group);
+
 
     attachInteractions();
   }
