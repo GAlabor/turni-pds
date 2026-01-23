@@ -1846,21 +1846,6 @@ rows.forEach((it) => {
   row.className = 'turno-item turno-item--festivita';
   row.dataset.index = String(it.defIndex);
 
-  if (isEditing && it.custom) {
-    const delBtn = document.createElement('button');
-    delBtn.type = 'button';
-    delBtn.className = 'turno-delete-btn';
-    delBtn.setAttribute('aria-label', 'Elimina festività');
-    const iconSpan = document.createElement('span');
-    iconSpan.className = 'turno-delete-icon';
-    iconSpan.textContent = '−';
-    delBtn.appendChild(iconSpan);
-    delBtn.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      deleteFestivita(it.defIndex);
-    });
-    row.appendChild(delBtn);
-  }
 
   const left = document.createElement('div');
   left.className = 'festivita-left';
