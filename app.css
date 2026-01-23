@@ -2513,14 +2513,33 @@ body.turni-no-select * {
 
 .festivita-level-btn {
   flex: 1 1 0;
+  font-weight: 500;
 }
 
 .festivita-level-btn.is-on {
-  background: var(--accent);
+  background: var(--surface-strong);
   color: #ffffff;
   border-color: var(--accent);
-  box-shadow: var(--shadow-accent-lift);
+  box-shadow: none;
 }
+
+@media (hover:hover) {
+  .festivita-level-btn:hover {
+    background: var(--surface-strong);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: none;
+  }
+}
+
+.festivita-level-btn:active {
+  background: var(--surface-strong);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+
 
 
 .app-status {
