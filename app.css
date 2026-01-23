@@ -1708,6 +1708,24 @@ body.turni-no-select * {
   pointer-events: none;
 }
 
+.settings-panel.settings-festivita-add .turni-field-row.is-disabled .turni-input{
+  background: transparent;
+  border-color: rgba(148,163,184,0.25);
+  color: var(--subtext);
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.settings-panel.settings-festivita-add .turni-field-row.is-disabled .turni-label{
+  opacity: 0.55;
+}
+
+.settings-panel.settings-festivita-add .turni-field-row.is-disabled .turni-input::-webkit-calendar-picker-indicator{
+  opacity: 0;
+}
+
+
 .turni-no-time-on .turni-field-row[data-type="ora"] .turni-label {
   opacity: 0.55;
 }

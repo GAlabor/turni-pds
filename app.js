@@ -1687,6 +1687,7 @@ function saveTurnoIniziale(obj) {
   let panelAdd = null;
   let inputNome = null;
   let inputData = null;
+  let dataRow = null;
   let levelBtns = [];
   let btnSave = null;
   let errEl = null;
@@ -1915,16 +1916,18 @@ panel.appendChild(card);
     });
   }
 
-  function resetAddForm() {
-    clearAddError();
-    editingIndex = null;
-    if (inputNome) inputNome.value = '';
-    if (inputData) {
-      inputData.value = '';
-      inputData.disabled = false;
-    }
-    setLevel('festivo');
+function resetAddForm() {
+  clearAddError();
+  editingIndex = null;
+  if (inputNome) inputNome.value = '';
+  if (inputData) {
+    inputData.value = '';
+    inputData.disabled = false;
   }
+  if (dataRow) dataRow.classList.remove('is-disabled');
+  setLevel('festivo');
+}
+
 
   function openNewPanel() {
     if (!panelAdd) return;
@@ -1951,9 +1954,11 @@ panel.appendChild(card);
     const y = new Date().getFullYear();
     const dObj = resolveDateForDef(def, y);
     if (inputData && dObj) {
-      inputData.value = iso(dObj);
-      inputData.disabled = !def.custom;
-    }
+  inputData.value = iso(dObj);
+  inputData.disabled = !def.custom;
+}
+if (dataRow) dataRow.classList.toggle('is-disabled', !!(inputData && inputData.disabled));
+
 
     setLevel(def.livello === 'superfestivo' ? 'superfestivo' : 'festivo');
 
@@ -2064,6 +2069,7 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
     inputNome = document.getElementById('festivitaNome');
     inputData = document.getElementById('festivitaData');
     btnSave = document.querySelector('[data-festivita-save]');
+    dataRow = inputData ? inputData.closest('.turni-field-row') : null;
     errEl = document.querySelector('[data-festivita-error]');
     levelBtns = Array.from(document.querySelectorAll('[data-festivita-level]'));
 
