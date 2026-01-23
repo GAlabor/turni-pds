@@ -1272,18 +1272,19 @@ function emitStorageChange(key) {
 
         if (!localStorage.getItem(FEST_KEY)) {
         const defs = [
-          { type: "fixed", d: 1,  m: 1,  nome: "Capodanno", livello: "festivo", custom: false },
-          { type: "fixed", d: 6,  m: 1,  nome: "Epifania", livello: "festivo", custom: false },
-          { type: "easter", offset: 0, nome: "Pasqua", livello: "festivo", custom: false },
-          { type: "easter", offset: 1, nome: "Lunedì dell'Angelo", livello: "festivo", custom: false },
-          { type: "fixed", d: 25, m: 4,  nome: "Festa della Liberazione", livello: "festivo", custom: false },
-          { type: "fixed", d: 1,  m: 5,  nome: "Festa dei Lavoratori", livello: "festivo", custom: false },
-          { type: "fixed", d: 2,  m: 6,  nome: "Festa della Repubblica", livello: "festivo", custom: false },
-          { type: "fixed", d: 15, m: 8,  nome: "Ferragosto", livello: "festivo", custom: false },
-          { type: "fixed", d: 1,  m: 11, nome: "Ognissanti", livello: "festivo", custom: false },
-          { type: "fixed", d: 8,  m: 12, nome: "Immacolata Concezione", livello: "festivo", custom: false },
-          { type: "fixed", d: 25, m: 12, nome: "Natale", livello: "festivo", custom: false },
-          { type: "fixed", d: 26, m: 12, nome: "Santo Stefano", livello: "festivo", custom: false }
+          { type: "fixed",  d: 1,  m: 1,  nome: "Capodanno",              livello: "superfestivo", custom: false, factory: true },
+          { type: "fixed",  d: 6,  m: 1,  nome: "Epifania",               livello: "festivo", custom: false, factory: true },
+          { type: "easter", offset: 0,    nome: "Pasqua",                 livello: "superfestivo", custom: false, factory: true },
+          { type: "easter", offset: 1,    nome: "Lunedì dell'Angelo",     livello: "superfestivo", custom: false, factory: true },
+          { type: "fixed",  d: 25, m: 4,  nome: "Festa della Liberazione",livello: "festivo", custom: false, factory: true },
+          { type: "fixed",  d: 1,  m: 5,  nome: "Festa dei Lavoratori",   livello: "superfestivo", custom: false, factory: true },
+          { type: "fixed",  d: 2,  m: 6,  nome: "Festa della Repubblica", livello: "superfestivo", custom: false, factory: true },
+          { type: "fixed",  d: 15, m: 8,  nome: "Ferragosto",             livello: "superfestivo", custom: false, factory: true },
+          { type: "fixed",  d: 1,  m: 11, nome: "Ognissanti",             livello: "festivo", custom: false, factory: true },
+          { type: "fixed",  d: 8,  m: 12, nome: "Immacolata Concezione",  livello: "festivo", custom: false, factory: true },
+          { type: "fixed",  d: 25, m: 12, nome: "Natale",                 livello: "superfestivo", custom: false, factory: true },
+          { type: "fixed",  d: 26, m: 12, nome: "Santo Stefano",          livello: "superfestivo", custom: false, factory: true }
+
         ];
         localStorage.setItem(FEST_KEY, JSON.stringify(defs));
         seeded = true;
@@ -1715,6 +1716,12 @@ function saveTurnoIniziale(obj) {
         o.custom = false;
         changed = true;
       }
+
+if (typeof o.factory !== 'boolean') {
+  o.factory = !o.custom;
+  changed = true;
+}
+
       return o;
     }).filter(Boolean);
 
@@ -2026,7 +2033,7 @@ panel.appendChild(card);
           return parseInt(x.d, 10) === dd && parseInt(x.m, 10) === mm;
         });
 
-        const payload = { type: 'fixed', d: dd, m: mm, nome, livello: selectedLevel, custom: true };
+        const payload = { type: 'fixed', d: dd, m: mm, nome, livello: selectedLevel, custom: true, factory: false };
         if (existingIdx >= 0) defs[existingIdx] = payload;
         else defs.push(payload);
       }
