@@ -1967,21 +1967,6 @@ if (dataRow) dataRow.classList.toggle('is-disabled', !!(inputData && inputData.d
     }
   }
 
-  function deleteFestivita(defIndex) {
-    const idx = parseInt(defIndex, 10);
-    if (!Number.isInteger(idx) || idx < 0 || idx >= defs.length) return;
-    const def = defs[idx];
-    if (!def || !def.custom) return;
-
-    defs.splice(idx, 1);
-    if (window.TurniStorage && typeof TurniStorage.saveFestivita === 'function') {
-      TurniStorage.saveFestivita(defs);
-    }
-    cacheYear = null;
-    cacheMap = null;
-    if (editingIndex === idx) editingIndex = null;
-    renderSettingsPanel();
-  }
 
   function saveFromPanel() {
     clearAddError();
