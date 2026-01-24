@@ -1690,6 +1690,7 @@ function saveTurnoIniziale(obj) {
   let dataRow = null;
   let levelBtns = [];
   let btnSave = null;
+  let btnDelete = null;
   let errEl = null;
 
   let editingIndex = null;
@@ -1919,6 +1920,7 @@ panel.appendChild(card);
 function resetAddForm() {
   clearAddError();
   editingIndex = null;
+  if (btnDelete) btnDelete.hidden = true;
   if (inputNome) inputNome.value = '';
   if (inputData) {
     inputData.value = '';
@@ -1928,6 +1930,38 @@ function resetAddForm() {
   setLevel('festivo');
 }
 
+
+
+  function canDeleteDef(def) {
+    if (!def || typeof def !== 'object') return false;
+    return def.factory === false || def.custom === true;
+  }
+
+  function deleteFromPanel() {
+    const idx = (editingIndex !== null) ? Number(editingIndex) : null;
+    if (idx === null || idx < 0 || idx >= defs.length) return;
+    const def = defs[idx];
+    if (!canDeleteDef(def)) return;
+
+    const nome = def && def.nome ? String(def.nome) : '';
+    const ok = window.confirm(nome ? `Eliminare "${nome}"?` : 'Eliminare questa festività?');
+    if (!ok) return;
+
+    defs.splice(idx, 1);
+
+    if (window.TurniStorage && typeof TurniStorage.saveFestivita === 'function') {
+      TurniStorage.saveFestivita(defs);
+    }
+
+    cacheYear = null;
+    cacheMap = null;
+    editingIndex = null;
+    renderSettingsPanel();
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('festivita', { internal: true });
+    }
+  }
 
   function openNewPanel() {
     if (!panelAdd) return;
@@ -1950,6 +1984,8 @@ function resetAddForm() {
     panelAdd.dataset.settingsTitle = 'Modifica festività';
 
     if (inputNome) inputNome.value = def.nome || '';
+
+    if (btnDelete) btnDelete.hidden = !canDeleteDef(def);
 
     const y = new Date().getFullYear();
     const dObj = resolveDateForDef(def, y);
@@ -2054,6 +2090,7 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
     inputNome = document.getElementById('festivitaNome');
     inputData = document.getElementById('festivitaData');
     btnSave = document.querySelector('[data-festivita-save]');
+    btnDelete = document.querySelector('[data-festivita-delete]');
     dataRow = inputData ? inputData.closest('.turni-field-row') : null;
     errEl = document.querySelector('[data-festivita-error]');
     levelBtns = Array.from(document.querySelectorAll('[data-festivita-level]'));
@@ -2069,6 +2106,10 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
 
     if (btnSave) {
       btnSave.addEventListener('click', () => saveFromPanel());
+    }
+
+    if (btnDelete) {
+      btnDelete.addEventListener('click', () => deleteFromPanel());
     }
   }
 

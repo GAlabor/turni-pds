@@ -1673,6 +1673,41 @@ body.turni-no-select * {
   padding: 0 var(--space-20);
 }
 
+.turni-add-actions {
+  display: flex;
+  gap: var(--space-10);
+  align-items: center;
+}
+
+.turni-delete-btn {
+  background: transparent;
+  color: #dc2626;
+  border-color: #dc2626;
+  box-shadow: none;
+}
+
+.pill-btn.turni-delete-btn {
+  height: 40px;
+  padding: 0 var(--space-20);
+}
+
+@media (hover:hover) {
+  .turni-delete-btn:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: none;
+  }
+}
+
+.turni-delete-btn:active {
+  transform: translateY(1px);
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: none;
+}
+
 .turni-save-btn:active {
   transform: translateY(1px);
 }
