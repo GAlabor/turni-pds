@@ -2215,10 +2215,30 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
     turni.forEach((t, index) => {
       const row = document.createElement("div");
       row.className = "turno-item";
-      
       row.dataset.index = String(index);
 
-      
+      const actions = document.createElement("div");
+      actions.className = "turno-swipe-actions";
+
+      const btnEditSwipe = document.createElement("button");
+      btnEditSwipe.type = "button";
+      btnEditSwipe.className = "turno-swipe-action is-edit";
+      btnEditSwipe.setAttribute("aria-label", "Modifica turno");
+      btnEditSwipe.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-edit"></use></svg>`;
+
+      const btnTrashSwipe = document.createElement("button");
+      btnTrashSwipe.type = "button";
+      btnTrashSwipe.className = "turno-swipe-action is-trash";
+      btnTrashSwipe.setAttribute("aria-label", "Elimina turno");
+      btnTrashSwipe.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-trash"></use></svg>`;
+
+      actions.appendChild(btnEditSwipe);
+      actions.appendChild(btnTrashSwipe);
+      row.appendChild(actions);
+
+      const mover = document.createElement("div");
+      mover.className = "turno-swipe-mover";
+
       if (isEditing && onDelete) {
         const delBtn = document.createElement("button");
         delBtn.type = "button";
@@ -2234,10 +2254,9 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
           onDelete(index);
         });
 
-        row.appendChild(delBtn);
+        mover.appendChild(delBtn);
       }
 
-      
       const siglaPill = document.createElement("span");
       siglaPill.className = "turno-sigla-pill";
 
@@ -2248,7 +2267,7 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
       if (t.colore) {
         siglaEl.style.color = t.colore;
       }
-      
+
       applySiglaFontSize(siglaEl, siglaTxt);
 
       siglaPill.appendChild(siglaEl);
@@ -2263,7 +2282,6 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
         orarioEl.textContent = `${t.inizio} - ${t.fine}`;
       }
 
-      
       const handle = document.createElement("div");
       handle.className = "turni-handle";
       handle.setAttribute("aria-hidden", "true");
@@ -2275,13 +2293,16 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
         </svg>
       `;
 
-      row.appendChild(siglaPill);
-      row.appendChild(nameEl);
-      row.appendChild(orarioEl);
-      row.appendChild(handle);
+      mover.appendChild(siglaPill);
+      mover.appendChild(nameEl);
+      mover.appendChild(orarioEl);
+      mover.appendChild(handle);
+
+      row.appendChild(mover);
 
       listEl.appendChild(row);
     });
+
   }
 
   window.TurniRender = {
@@ -4318,7 +4339,7 @@ function attachRowSwipe(opts) {
     return ignoreSelectors.some(sel => safeClosest(e.target, sel));
   }
 
-  const MAX = -72;
+  const MAX = -104;
   const THRESH = 8;
 
   let activeRow = null;
@@ -4328,10 +4349,17 @@ function attachRowSwipe(opts) {
   let isActive = false;
   let isHorizontal = false;
 
-  function setRowX(row, x) {
-  row.dataset.swipeX = String(x);
-  row.style.transform = `translateX(${x}px)`;
+  function getMover(row) {
+  return row ? (row.querySelector(".turno-swipe-mover") || row) : null;
 }
+
+function setRowX(row, x) {
+  const mover = getMover(row);
+  if (!mover) return;
+  row.dataset.swipeX = String(x);
+  mover.style.transform = `translateX(${x}px)`;
+}
+
 
 
   function closeRow(row) {
@@ -4347,8 +4375,10 @@ function attachRowSwipe(opts) {
     if (!row) return;
     row.classList.add("is-swiped");
     row.classList.remove("is-swiping");
-    row.style.transform = "";
+    const mover = getMover(row);
+    if (mover) mover.style.transform = "";
   }
+
 
   function clamp(v, min, max) {
     return Math.min(max, Math.max(min, v));
@@ -4410,8 +4440,8 @@ function attachRowSwipe(opts) {
   : (activeRow.classList.contains("is-swiped") ? MAX : 0);
 
 
-    if (curX <= (MAX / 2)) openRow(activeRow);
-    else closeRow(activeRow);
+ if (curX <= (MAX * 0.6)) openRow(activeRow);
+else closeRow(activeRow);
 
     activeRow.classList.remove("is-swiping");
 

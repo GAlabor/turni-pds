@@ -1112,24 +1112,82 @@ body.ui-modal-open{
 
 
 .turno-item {
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  touch-action: pan-y;
+  overflow: hidden;
+  background: var(--surface-strong);
+}
+
+
+.turno-swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+
+.turno-swipe-action {
+  width: var(--icon-circle-md);
+  height: var(--icon-circle-md);
+  border-radius: 999px;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(15,23,42,0.16);
+  color: #fff;
+  pointer-events: auto;
+}
+
+.turno-swipe-action svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.turno-swipe-action.is-edit {
+  background: #0a84ff;
+}
+
+.turno-swipe-action.is-trash {
+  background: #ff3b30;
+}
+
+.turno-swipe-mover {
   display: flex;
   align-items: center;
   gap: var(--space-6);
   padding: var(--space-6) var(--space-2);
-  border-bottom: 1px solid var(--border);
-  position: relative;
-  touch-action: pan-y;
+  width: 100%;
+  min-height: 100%;
   will-change: transform;
   transition: transform 0.18s ease;
+  background: var(--surface-strong);
 }
 
-.turno-item.is-swiping {
+
+.turno-item.is-swiping .turno-swipe-mover {
   transition: none;
 }
 
-.turno-item.is-swiped {
-  transform: translateX(-72px);
+.turno-item.is-swiped .turno-swipe-mover {
+  transform: translateX(-104px);
 }
+
 
 
 .turno-item:last-child {
