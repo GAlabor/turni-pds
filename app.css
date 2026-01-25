@@ -1153,7 +1153,7 @@ body.ui-modal-open{
   display: block;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.4;
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
