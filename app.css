@@ -1118,7 +1118,19 @@ body.ui-modal-open{
   padding: var(--space-6) var(--space-2);
   border-bottom: 1px solid var(--border);
   position: relative;
+  touch-action: pan-y;
+  will-change: transform;
+  transition: transform 0.18s ease;
 }
+
+.turno-item.is-swiping {
+  transition: none;
+}
+
+.turno-item.is-swiped {
+  transform: translateX(-72px);
+}
+
 
 .turno-item:last-child {
   border-bottom: none;

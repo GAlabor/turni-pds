@@ -4289,18 +4289,146 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     }
 
     listEl.addEventListener("click", (e) => {
-      if (!getEditing()) return;
-      if (shouldIgnore(e)) return;
+  if (!getEditing()) return;
+  if (shouldIgnore(e)) return;
 
-      const row = safeClosest(e.target, ".turno-item");
-      if (!row) return;
+  const row = safeClosest(e.target, ".turno-item");
+  if (!row) return;
 
-      const idx = parseInt(row.dataset.index, 10);
-      if (Number.isNaN(idx)) return;
+  if (row.dataset.swipeMoved === "1") return;
 
-      if (typeof onEditRow === "function") onEditRow(idx);
-    });
+  const idx = parseInt(row.dataset.index, 10);
+  if (Number.isNaN(idx)) return;
+
+  if (typeof onEditRow === "function") onEditRow(idx);
+});
+
   }
+
+function attachRowSwipe(opts) {
+  const {
+    listEl,
+    getEditing,
+    ignoreSelectors = [".turno-delete-btn", ".turni-handle"]
+  } = opts || {};
+
+  if (!listEl) return;
+
+  function shouldIgnore(e) {
+    return ignoreSelectors.some(sel => safeClosest(e.target, sel));
+  }
+
+  const MAX = -72;
+  const THRESH = 8;
+
+  let activeRow = null;
+  let startX = 0;
+  let startY = 0;
+  let baseX = 0;
+  let isActive = false;
+  let isHorizontal = false;
+
+  function setRowX(row, x) {
+  row.dataset.swipeX = String(x);
+  row.style.transform = `translateX(${x}px)`;
+}
+
+
+  function closeRow(row) {
+  if (!row) return;
+  row.classList.remove("is-swiped");
+  row.classList.remove("is-swiping");
+  setRowX(row, 0);
+  delete row.dataset.swipeX;
+}
+
+
+  function openRow(row) {
+    if (!row) return;
+    row.classList.add("is-swiped");
+    row.classList.remove("is-swiping");
+    row.style.transform = "";
+  }
+
+  function clamp(v, min, max) {
+    return Math.min(max, Math.max(min, v));
+  }
+
+  listEl.addEventListener("pointerdown", (e) => {
+    if (typeof getEditing === "function" && getEditing()) return;
+    if (shouldIgnore(e)) return;
+
+    const row = safeClosest(e.target, ".turno-item");
+    if (!row) return;
+
+    activeRow = row;
+    startX = e.clientX;
+    startY = e.clientY;
+    isActive = true;
+    isHorizontal = false;
+    baseX = row.classList.contains("is-swiped") ? MAX : 0;
+    setRowX(activeRow, baseX);
+    activeRow.dataset.swipeMoved = "0";
+
+    try { activeRow.setPointerCapture(e.pointerId); } catch {}
+
+    activeRow.classList.add("is-swiping");
+  });
+
+  listEl.addEventListener("pointermove", (e) => {
+    if (!isActive || !activeRow) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (!isHorizontal) {
+      if (Math.abs(dx) < THRESH && Math.abs(dy) < THRESH) return;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        activeRow.classList.remove("is-swiping");
+        isActive = false;
+        activeRow = null;
+        return;
+      }
+      isHorizontal = true;
+    }
+
+    e.preventDefault();
+
+    const nextX = clamp(baseX + dx, MAX, 0);
+    setRowX(activeRow, nextX);
+
+    if (Math.abs(dx) > 12) activeRow.dataset.swipeMoved = "1";
+  }, { passive: false });
+
+  function endSwipe(e) {
+    if (!isActive || !activeRow) return;
+
+    try { activeRow.releasePointerCapture(e.pointerId); } catch {}
+
+    const curX = activeRow.dataset.swipeX != null
+  ? parseFloat(activeRow.dataset.swipeX)
+  : (activeRow.classList.contains("is-swiped") ? MAX : 0);
+
+
+    if (curX <= (MAX / 2)) openRow(activeRow);
+    else closeRow(activeRow);
+
+    activeRow.classList.remove("is-swiping");
+
+    const rowRef = activeRow;
+    setTimeout(() => {
+      if (rowRef) rowRef.dataset.swipeMoved = "0";
+    }, 220);
+
+    isActive = false;
+    isHorizontal = false;
+    activeRow = null;
+  }
+
+  listEl.addEventListener("pointerup", endSwipe);
+  listEl.addEventListener("pointercancel", endSwipe);
+}
+
 
   function attachDragSort(opts) {
     const { listEl, getEditing, getItems, setItems, saveItems, refresh } = opts || {};
@@ -4471,12 +4599,14 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   }
 
   window.TurniInteractions = {
-    attachCollapsibleCard,
-    attachEditToggle,
-    attachRowEditClick,
-    attachDragSort,
-    attachPanelExitReset
-  };
+  attachCollapsibleCard,
+  attachEditToggle,
+  attachRowEditClick,
+  attachRowSwipe,
+  attachDragSort,
+  attachPanelExitReset
+};
+
 
 
 })();
@@ -4853,14 +4983,10 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         refresh: refreshList
       });
 
-      TurniInteractions.attachRowEditClick({
-        listEl,
-        getEditing: () => isEditing,
-        onEditRow: (idx) => {
-          if (!turni[idx]) return;
-          openEditTurnoPanel(idx);
-        }
-      });
+      TurniInteractions.attachRowSwipe({
+  listEl,
+  getEditing: () => isEditing
+});
 
       TurniInteractions.attachDragSort({
         listEl,
