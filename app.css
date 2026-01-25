@@ -1125,14 +1125,13 @@ body.ui-modal-open{
   right: 0;
   top: 0;
   bottom: 0;
-  width: 96px;
+  width: 56px;
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   pointer-events: none;
 }
+
 
 
 .turno-swipe-action {
@@ -1159,10 +1158,6 @@ body.ui-modal-open{
   stroke-linejoin: round;
 }
 
-.turno-swipe-action.is-edit {
-  background: #0a84ff;
-}
-
 .turno-swipe-action.is-trash {
   background: #ff3b30;
 }
@@ -1185,9 +1180,8 @@ body.ui-modal-open{
 }
 
 .turno-item.is-swiped .turno-swipe-mover {
-  transform: translateX(-104px);
+  transform: translateX(-56px);
 }
-
 
 
 .turno-item:last-child {

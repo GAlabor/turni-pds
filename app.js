@@ -2220,19 +2220,12 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
       const actions = document.createElement("div");
       actions.className = "turno-swipe-actions";
 
-      const btnEditSwipe = document.createElement("button");
-      btnEditSwipe.type = "button";
-      btnEditSwipe.className = "turno-swipe-action is-edit";
-      btnEditSwipe.setAttribute("aria-label", "Modifica turno");
-      btnEditSwipe.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-edit"></use></svg>`;
-
       const btnTrashSwipe = document.createElement("button");
       btnTrashSwipe.type = "button";
       btnTrashSwipe.className = "turno-swipe-action is-trash";
       btnTrashSwipe.setAttribute("aria-label", "Elimina turno");
       btnTrashSwipe.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-trash"></use></svg>`;
 
-      actions.appendChild(btnEditSwipe);
       actions.appendChild(btnTrashSwipe);
       row.appendChild(actions);
 
@@ -4339,7 +4332,7 @@ function attachRowSwipe(opts) {
     return ignoreSelectors.some(sel => safeClosest(e.target, sel));
   }
 
-  const MAX = -104;
+  const MAX = -56;
   const THRESH = 8;
 
   let activeRow = null;
