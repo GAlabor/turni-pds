@@ -4351,26 +4351,34 @@ function setRowX(row, x) {
   if (!mover) return;
   row.dataset.swipeX = String(x);
   mover.style.transform = `translateX(${x}px)`;
+  const p = clamp(Math.abs(x) / Math.abs(MAX), 0, 1);
+  row.style.setProperty("--swipeP", String(p));
 }
 
 
 
-  function closeRow(row) {
+
+
+function closeRow(row) {
   if (!row) return;
   row.classList.remove("is-swiped");
   row.classList.remove("is-swiping");
   setRowX(row, 0);
+  row.style.setProperty("--swipeP", "0");
   delete row.dataset.swipeX;
 }
 
 
-  function openRow(row) {
-    if (!row) return;
-    row.classList.add("is-swiped");
-    row.classList.remove("is-swiping");
-    const mover = getMover(row);
-    if (mover) mover.style.transform = "";
-  }
+
+function openRow(row) {
+  if (!row) return;
+  row.classList.add("is-swiped");
+  row.classList.remove("is-swiping");
+  row.style.setProperty("--swipeP", "1");
+  const mover = getMover(row);
+  if (mover) mover.style.transform = "";
+}
+
 
 
   function clamp(v, min, max) {
