@@ -4370,9 +4370,6 @@ function setRowX(row, x) {
 
 
 
-
-
-
 function closeRow(row) {
   if (!row) return;
   row.classList.remove("is-swiped");
