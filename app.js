@@ -5050,6 +5050,13 @@ function openRow(row) {
         refresh: refreshList
       });
 
+      TurniInteractions.attachRowEditClick({
+  listEl,
+  getEditing: () => true,
+  onEditRow: (idx) => openEditTurnoPanel(idx)
+});
+
+
       TurniInteractions.attachRowSwipe({
         listEl,
         getEditing: () => isEditing,
