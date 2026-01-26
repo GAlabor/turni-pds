@@ -1137,13 +1137,6 @@ body.ui-modal-open{
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  opacity: var(--swipeP, 0);
-  transform: scale(calc(0.85 + (0.15 * var(--swipeP, 0))));
-  will-change: transform, opacity;
-}
-
-.turno-item:not(.is-swiping) .turno-swipe-actions {
-  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
 
@@ -1155,8 +1148,17 @@ body.ui-modal-open{
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 8px 18px rgba(15,23,42,0.16);
   color: #fff;
   pointer-events: auto;
+  transform: scale(var(--swipeP, 0));
+  opacity: var(--swipeP, 0);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.turno-item:not(.is-swiping) .turno-swipe-action {
+  transition: transform 0.18s ease, opacity 0.18s ease;
 }
 
 

@@ -4359,14 +4359,17 @@ function setRowX(row, x) {
 
 
 
+
 function closeRow(row) {
   if (!row) return;
   row.classList.remove("is-swiped");
   row.classList.remove("is-swiping");
-  setRowX(row, 0);
   row.style.setProperty("--swipeP", "0");
+  const mover = getMover(row);
+  if (mover) mover.style.transform = "";
   delete row.dataset.swipeX;
 }
+
 
 
 
@@ -4378,6 +4381,7 @@ function openRow(row) {
   const mover = getMover(row);
   if (mover) mover.style.transform = "";
 }
+
 
 
 
