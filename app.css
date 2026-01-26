@@ -1584,7 +1584,7 @@ body.turni-no-select * {
 
 
 .settings-panel.settings-turni.is-active{
-  overflow: hidden;
+  overflow: visible;
 }
 
 
