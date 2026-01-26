@@ -2226,7 +2226,14 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
       btnTrashSwipe.setAttribute("aria-label", "Elimina turno");
       btnTrashSwipe.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-trash"></use></svg>`;
 
+      btnTrashSwipe.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        if (onDelete) onDelete(index);
+      });
+
       actions.appendChild(btnTrashSwipe);
+
+
       row.appendChild(actions);
 
       const mover = document.createElement("div");
@@ -4293,8 +4300,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       listEl,
       getEditing,
       onEditRow,
-      ignoreSelectors = [".turno-delete-btn", ".turni-handle"]
+      ignoreSelectors = [".turno-delete-btn", ".turni-handle", ".turno-swipe-actions", ".turno-swipe-action"]
     } = opts || {};
+
 
     if (!listEl) return;
 
@@ -4323,8 +4331,9 @@ function attachRowSwipe(opts) {
   const {
     listEl,
     getEditing,
-    ignoreSelectors = [".turno-delete-btn", ".turni-handle"]
+    ignoreSelectors = [".turno-delete-btn", ".turni-handle", ".turno-swipe-actions", ".turno-swipe-action"]
   } = opts || {};
+
 
   if (!listEl) return;
 
@@ -4334,6 +4343,10 @@ function attachRowSwipe(opts) {
 
   const MAX = -56;
   const THRESH = 8;
+
+  const onSwipeDelete = typeof opts.onSwipeDelete === "function" ? opts.onSwipeDelete : null;
+  const DELETE_PCT = 0.65;
+  const DELETE_MIN_PX = 160;
 
   let activeRow = null;
   let startX = 0;
@@ -4429,7 +4442,11 @@ function openRow(row) {
 
     e.preventDefault();
 
-    const nextX = clamp(baseX + dx, MAX, 0);
+    const w = activeRow.getBoundingClientRect().width || activeRow.offsetWidth || 0;
+    const dragMin = onSwipeDelete ? -w : MAX;
+
+    const nextX = clamp(baseX + dx, dragMin, 0);
+
     setRowX(activeRow, nextX);
 
     if (Math.abs(dx) > 12) activeRow.dataset.swipeMoved = "1";
@@ -4445,10 +4462,28 @@ function openRow(row) {
   : (activeRow.classList.contains("is-swiped") ? MAX : 0);
 
 
- if (curX <= (MAX * 0.6)) openRow(activeRow);
-else closeRow(activeRow);
+    const w = activeRow.getBoundingClientRect().width || activeRow.offsetWidth || 0;
+    const deleteThreshold = -Math.max(DELETE_MIN_PX, w * DELETE_PCT);
+
+    if (onSwipeDelete && curX <= deleteThreshold) {
+      const idx = parseInt(activeRow.dataset.index, 10);
+      if (!Number.isNaN(idx)) {
+        setRowX(activeRow, -w);
+        activeRow.classList.remove("is-swiping");
+        isActive = false;
+        isHorizontal = false;
+        const rowRef = activeRow;
+        activeRow = null;
+        onSwipeDelete(idx);
+        return;
+      }
+    }
+
+    if (curX <= (MAX * 0.6)) openRow(activeRow);
+    else closeRow(activeRow);
 
     activeRow.classList.remove("is-swiping");
+
 
     const rowRef = activeRow;
     setTimeout(() => {
@@ -5019,9 +5054,19 @@ else closeRow(activeRow);
       });
 
       TurniInteractions.attachRowSwipe({
-  listEl,
-  getEditing: () => isEditing
-});
+        listEl,
+        getEditing: () => isEditing,
+        onSwipeDelete: (index) => {
+          if (index < 0 || index >= turni.length) return;
+
+          turni.splice(index, 1);
+          saveTurni(turni);
+
+          if (!turni.length) isEditing = false;
+          refreshList();
+        }
+      });
+
 
       TurniInteractions.attachDragSort({
         listEl,
