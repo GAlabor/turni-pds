@@ -2929,3 +2929,13 @@ body.turni-no-select * {
   }
 }
 
+html, body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+
