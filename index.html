@@ -15,17 +15,24 @@
   <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
   
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      background: #e7ecff; /* fallback immediato */
-    }
-    @media (prefers-color-scheme: dark) {
-      html, body { background: #020617; }
-    }
-  </style>
+<script>
+(function(){try{var t=localStorage.getItem("turnipds-theme")||"system";var r=document.documentElement;if(t==="light"||t==="dark")r.setAttribute("data-theme",t);else r.removeAttribute("data-theme");}catch(e){}})();
+</script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: #dbe5ff;
+  }
+  html[data-theme="dark"], html[data-theme="dark"] body {
+    background: #020617;
+  }
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme]), html:not([data-theme]) body { background: #020617; }
+  }
+</style>
+
 
     <script>
     // evita che /turni-pds (senza slash) rompa i path relativi

@@ -2,6 +2,8 @@
 :root {
   
   --bg: radial-gradient(circle at top, #fefefe 0%, #e7ecff 40%, #dbe5ff 100%);
+    --bg-under: #dbe5ff;
+
   
   --surface: rgba(255,255,255,0.88);      
   --surface-strong: rgba(255,255,255,0.96);
@@ -263,6 +265,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+    --bg-under: #020617;
     --surface: rgba(15,23,42,0.94);
     --surface-strong: rgba(15,23,42,0.98);
     --border: rgba(148,163,184,0.26);
@@ -301,6 +304,7 @@
 
 :root[data-theme="dark"] {
   --bg: radial-gradient(circle at top, #111827 0%, #020617 55%, #000000 100%);
+    --bg-under: #020617;
   --surface: rgba(15,23,42,0.94);
   --surface-strong: rgba(15,23,42,0.98);
   --border: rgba(148,163,184,0.26);
@@ -343,6 +347,9 @@
 html,
 body {
   height: 100%;
+}
+html{
+  background: var(--bg-under);
 }
 
 
