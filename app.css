@@ -1137,8 +1137,16 @@ body.ui-modal-open{
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
+.turno-item.is-swiped .turno-swipe-actions {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: none;
+}
 
 
 .turno-swipe-action {
@@ -1149,10 +1157,10 @@ body.ui-modal-open{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 18px rgba(15,23,42,0.16);
   color: #fff;
   pointer-events: auto;
 }
+
 
 .turno-swipe-action svg {
   width: 18px;
