@@ -4322,6 +4322,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     listEl.addEventListener("click", (e) => {
   if (!getEditing()) return;
   if (shouldIgnore(e)) return;
+  if (listEl.dataset.suppressRowClick === "1") return;
+
 
   const row = safeClosest(e.target, ".turno-item");
   if (!row) return;
@@ -4776,19 +4778,22 @@ function unlockGestures() {
 
       draggingRow.classList.remove("dragging");
 
-      const items = typeof getItems === "function" ? getItems() : [];
-      const newOrder = [];
-      const rowEls = listEl.querySelectorAll(".turno-item");
-      rowEls.forEach(rowEl => {
-        const idx = parseInt(rowEl.dataset.index, 10);
-        if (!Number.isNaN(idx) && items[idx]) newOrder.push(items[idx]);
-      });
+            if (draggingRow.dataset.dragMoved === "1") {
+        const items = typeof getItems === "function" ? getItems() : [];
+        const newOrder = [];
+        const rowEls = listEl.querySelectorAll(".turno-item");
+        rowEls.forEach(rowEl => {
+          const idx = parseInt(rowEl.dataset.index, 10);
+          if (!Number.isNaN(idx) && items[idx]) newOrder.push(items[idx]);
+        });
 
-      if (newOrder.length === items.length) {
-        if (typeof setItems === "function") setItems(newOrder);
-        if (typeof saveItems === "function") saveItems(newOrder);
-        if (typeof refresh === "function") refresh();
+        if (newOrder.length === items.length) {
+          if (typeof setItems === "function") setItems(newOrder);
+          if (typeof saveItems === "function") saveItems(newOrder);
+          if (typeof refresh === "function") refresh();
+        }
       }
+
 
       const rowRef = draggingRow;
       setTimeout(() => {
@@ -4813,8 +4818,14 @@ function unlockGestures() {
       closeAllSwipes();
       lockGestures();
 
+      listEl.dataset.suppressRowClick = "1";
+      setTimeout(() => {
+        if (listEl) delete listEl.dataset.suppressRowClick;
+      }, 420);
+
       draggingRow.classList.add("dragging");
-      draggingRow.dataset.dragMoved = "1";
+      draggingRow.dataset.dragMoved = "0";
+
 
       try { draggingRow.setPointerCapture(dragPointerId); } catch {}
 
