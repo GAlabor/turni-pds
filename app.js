@@ -4319,11 +4319,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       return ignoreSelectors.some(sel => safeClosest(e.target, sel));
     }
 
-listEl.addEventListener("click", (e) => {
+    listEl.addEventListener("click", (e) => {
   if (!getEditing()) return;
-  if (listEl.dataset.dragging === "1") return;
   if (shouldIgnore(e)) return;
-
 
   const row = safeClosest(e.target, ".turno-item");
   if (!row) return;
@@ -4344,6 +4342,7 @@ function attachRowSwipe(opts) {
     getEditing,
     ignoreSelectors = [".turno-delete-btn", ".turni-handle", ".turno-swipe-actions", ".turno-swipe-action"]
   } = opts || {};
+
 
   if (!listEl) return;
 
@@ -4366,99 +4365,86 @@ function attachRowSwipe(opts) {
   let isHorizontal = false;
 
   function getMover(row) {
-    return row ? (row.querySelector(".turno-swipe-mover") || row) : null;
-  }
+  return row ? (row.querySelector(".turno-swipe-mover") || row) : null;
+}
+
+function setRowX(row, x) {
+  const mover = getMover(row);
+  if (!mover) return;
+  row.dataset.swipeX = String(x);
+  mover.style.transform = `translateX(${x}px)`;
+  const p = clamp(Math.abs(x) / Math.abs(MAX), 0, 1);
+  row.style.setProperty("--swipeP", String(p));
+}
+
+
+
+function closeRow(row) {
+  if (!row) return;
+  row.classList.remove("is-swiped");
+  row.classList.remove("is-swiping");
+  row.style.setProperty("--swipeP", "0");
+  const mover = getMover(row);
+  if (mover) mover.style.transform = "";
+  delete row.dataset.swipeX;
+}
+
+
+
+
+function openRow(row) {
+  if (!row) return;
+  row.classList.add("is-swiped");
+  row.classList.remove("is-swiping");
+  row.style.setProperty("--swipeP", "1");
+  const mover = getMover(row);
+  if (mover) mover.style.transform = "";
+}
+
+
+
 
   function clamp(v, min, max) {
     return Math.min(max, Math.max(min, v));
   }
 
-  function setRowX(row, x) {
-    const mover = getMover(row);
-    if (!mover) return;
-    row.dataset.swipeX = String(x);
-    mover.style.transform = `translateX(${x}px)`;
-    const p = clamp(Math.abs(x) / Math.abs(MAX), 0, 1);
-    row.style.setProperty("--swipeP", String(p));
-  }
+  listEl.addEventListener("pointerdown", (e) => {
+    if (typeof getEditing === "function" && getEditing()) return;
+    if (shouldIgnore(e)) return;
 
-  function closeRow(row) {
+    const row = safeClosest(e.target, ".turno-item");
     if (!row) return;
-    row.classList.remove("is-swiped");
-    row.classList.remove("is-swiping");
-    row.style.setProperty("--swipeP", "0");
-    const mover = getMover(row);
-    if (mover) mover.style.transform = "";
-    delete row.dataset.swipeX;
-  }
 
-  function openRow(row) {
-    if (!row) return;
-    row.classList.add("is-swiped");
-    row.classList.remove("is-swiping");
-    row.style.setProperty("--swipeP", "1");
-    const mover = getMover(row);
-    if (mover) mover.style.transform = "";
-  }
-
-  function cancelSwipe() {
-    if (activeRow) {
-      activeRow.classList.remove("is-swiping");
-      activeRow.dataset.swipeMoved = "0";
-    }
-    isActive = false;
+    activeRow = row;
+    startX = e.clientX;
+    startY = e.clientY;
+    isActive = true;
     isHorizontal = false;
-    activeRow = null;
-  }
+    baseX = row.classList.contains("is-swiped") ? MAX : 0;
+    setRowX(activeRow, baseX);
+    activeRow.dataset.swipeMoved = "0";
 
-  listEl.__turniSwipeCancel = cancelSwipe;
+    try { activeRow.setPointerCapture(e.pointerId); } catch {}
 
-listEl.addEventListener("pointerdown", (e) => {
-  if (listEl.dataset.dragging === "1") return;
-  if (typeof getEditing === "function" && getEditing()) return;
-  if (shouldIgnore(e)) return;
+    activeRow.classList.add("is-swiping");
+  });
 
-  const row = safeClosest(e.target, ".turno-item");
-  if (!row) return;
-
-  activeRow = row;
-  startX = e.clientX;
-  startY = e.clientY;
-  isActive = false;
-  isHorizontal = false;
-  baseX = row.classList.contains("is-swiped") ? MAX : 0;
-  setRowX(activeRow, baseX);
-  activeRow.dataset.swipeMoved = "0";
-});
-
-
-listEl.addEventListener("pointermove", (e) => {
-  if (!activeRow) return;
-  if (listEl.dataset.dragging === "1") return;
-
+  listEl.addEventListener("pointermove", (e) => {
+    if (!isActive || !activeRow) return;
 
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
 
-if (!isHorizontal) {
-  if (Math.abs(dx) < THRESH && Math.abs(dy) < THRESH) return;
-
-  if (Math.abs(dy) > Math.abs(dx)) {
-    activeRow = null;
-    isActive = false;
-    isHorizontal = false;
-    return;
-  }
-
-  isHorizontal = true;
-  isActive = true;
-
-  try { activeRow.setPointerCapture(e.pointerId); } catch {}
-  activeRow.classList.add("is-swiping");
-}
-
-
-    if (!isActive) return;
+    if (!isHorizontal) {
+      if (Math.abs(dx) < THRESH && Math.abs(dy) < THRESH) return;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        activeRow.classList.remove("is-swiping");
+        isActive = false;
+        activeRow = null;
+        return;
+      }
+      isHorizontal = true;
+    }
 
     e.preventDefault();
 
@@ -4473,18 +4459,14 @@ if (!isHorizontal) {
   }, { passive: false });
 
   function endSwipe(e) {
-    if (!activeRow) return;
-
-    if (!isActive) {
-      cancelSwipe();
-      return;
-    }
+    if (!isActive || !activeRow) return;
 
     try { activeRow.releasePointerCapture(e.pointerId); } catch {}
 
     const curX = activeRow.dataset.swipeX != null
-      ? parseFloat(activeRow.dataset.swipeX)
-      : (activeRow.classList.contains("is-swiped") ? MAX : 0);
+  ? parseFloat(activeRow.dataset.swipeX)
+  : (activeRow.classList.contains("is-swiped") ? MAX : 0);
+
 
     const w = activeRow.getBoundingClientRect().width || activeRow.offsetWidth || 0;
     const deleteThreshold = -Math.max(DELETE_MIN_PX, w * DELETE_PCT);
@@ -4494,8 +4476,10 @@ if (!isHorizontal) {
       if (!Number.isNaN(idx)) {
         setRowX(activeRow, -w);
         activeRow.classList.remove("is-swiping");
+        isActive = false;
+        isHorizontal = false;
         const rowRef = activeRow;
-        cancelSwipe();
+        activeRow = null;
         onSwipeDelete(idx);
         return;
       }
@@ -4506,12 +4490,15 @@ if (!isHorizontal) {
 
     activeRow.classList.remove("is-swiping");
 
+
     const rowRef = activeRow;
     setTimeout(() => {
       if (rowRef) rowRef.dataset.swipeMoved = "0";
     }, 220);
 
-    cancelSwipe();
+    isActive = false;
+    isHorizontal = false;
+    activeRow = null;
   }
 
   listEl.addEventListener("pointerup", endSwipe);
@@ -4519,184 +4506,127 @@ if (!isHorizontal) {
 }
 
 
+  function attachDragSort(opts) {
+    const { listEl, getEditing, getItems, setItems, saveItems, refresh } = opts || {};
+    if (!listEl) return;
 
-function attachDragSort(opts) {
-  const {
-    listEl,
-    getEditing,
-    getItems,
-    setItems,
-    saveItems,
-    refresh,
-    pressDelay = 260,
-    moveCancelThreshold = 8
-  } = opts || {};
-  if (!listEl) return;
+    let draggedRow = null;
 
-  let draggedRow = null;
-  let pressTimer = null;
-  let armed = false;
-  let downX = 0;
-  let downY = 0;
+    function getDragAfterElement(container, y) {
+      const rows = [...container.querySelectorAll(".turno-item:not(.dragging)")];
 
-  function clearPress() {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      pressTimer = null;
-    }
-    armed = false;
-  }
-
-  function resetSwipeRow(row) {
-    if (!row) return;
-    row.classList.remove("is-swiped");
-    row.classList.remove("is-swiping");
-    row.style.setProperty("--swipeP", "0");
-    const mover = row.querySelector(".turno-swipe-mover") || row;
-    if (mover) mover.style.transform = "";
-    delete row.dataset.swipeX;
-    row.dataset.swipeMoved = "0";
-  }
-
-  function getDragAfterElement(container, y) {
-    const rows = [...container.querySelectorAll(".turno-item:not(.dragging)")];
-    return rows.reduce(
-      (closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - (box.top + box.height / 2);
-        if (offset < 0 && offset > closest.offset) return { offset, element: child };
-        return closest;
-      },
-      { offset: Number.NEGATIVE_INFINITY, element: null }
-    ).element;
-  }
-
-  function onPointerMove(e) {
-    if (armed && !draggedRow) {
-      const dx = e.clientX - downX;
-      const dy = e.clientY - downY;
-      if (Math.abs(dx) > moveCancelThreshold || Math.abs(dy) > moveCancelThreshold) clearPress();
-      return;
+      return rows.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - (box.top + box.height / 2);
+          if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+          }
+          return closest;
+        },
+        { offset: Number.NEGATIVE_INFINITY, element: null }
+      ).element;
     }
 
-    if (!draggedRow) return;
+    function onPointerMove(e) {
+      if (!draggedRow) return;
 
-    e.preventDefault();
-    const y = e.clientY;
+      e.preventDefault();
+      const y = e.clientY;
 
-    const rows = Array.from(listEl.querySelectorAll(".turno-item"));
-    const oldRects = new Map();
-    rows.forEach(r => oldRects.set(r, r.getBoundingClientRect()));
+      const rows = Array.from(listEl.querySelectorAll(".turno-item"));
+      const oldRects = new Map();
+      rows.forEach(r => oldRects.set(r, r.getBoundingClientRect()));
 
-    const afterElement = getDragAfterElement(listEl, y);
+      const afterElement = getDragAfterElement(listEl, y);
 
-    if (afterElement === draggedRow || (afterElement && afterElement.previousSibling === draggedRow)) return;
-
-    if (afterElement == null) listEl.appendChild(draggedRow);
-    else listEl.insertBefore(draggedRow, afterElement);
-
-    const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
-    newRows.forEach(r => {
-      if (r === draggedRow) return;
-      const oldRect = oldRects.get(r);
-      if (!oldRect) return;
-      const newRect = r.getBoundingClientRect();
-      const dy = oldRect.top - newRect.top;
-      if (Math.abs(dy) > 1) {
-        r.style.transition = "none";
-        r.style.transform = `translateY(${dy}px)`;
-        requestAnimationFrame(() => {
-          r.style.transition = "transform 0.12s ease";
-          r.style.transform = "";
-        });
+      if (afterElement === draggedRow || (afterElement && afterElement.previousSibling === draggedRow)) {
+        return;
       }
+
+      if (afterElement == null) {
+        listEl.appendChild(draggedRow);
+      } else {
+        listEl.insertBefore(draggedRow, afterElement);
+      }
+
+      
+      const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
+      newRows.forEach(r => {
+        if (r === draggedRow) return;
+        const oldRect = oldRects.get(r);
+        if (!oldRect) return;
+        const newRect = r.getBoundingClientRect();
+        const dy = oldRect.top - newRect.top;
+
+        if (Math.abs(dy) > 1) {
+          r.style.transition = "none";
+          r.style.transform = `translateY(${dy}px)`;
+          requestAnimationFrame(() => {
+            r.style.transition = "transform 0.12s ease";
+            r.style.transform = "";
+          });
+        }
+      });
+    }
+
+    function onPointerUp() {
+      if (draggedRow) {
+        draggedRow.classList.remove("dragging");
+
+        const items = typeof getItems === "function" ? getItems() : [];
+        const newOrder = [];
+
+        const rowEls = listEl.querySelectorAll(".turno-item");
+        rowEls.forEach(rowEl => {
+          const idx = parseInt(rowEl.dataset.index, 10);
+          if (!Number.isNaN(idx) && items[idx]) {
+            newOrder.push(items[idx]);
+          }
+        });
+
+        if (newOrder.length === items.length && typeof setItems === "function") {
+          setItems(newOrder);
+          if (typeof saveItems === "function") saveItems(newOrder);
+          if (typeof refresh === "function") refresh();
+        }
+
+        draggedRow = null;
+      }
+
+      document.documentElement.classList.remove("turni-no-select");
+      document.body.classList.remove("turni-no-select");
+
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+    }
+
+    listEl.addEventListener("pointerdown", (e) => {
+      if (!getEditing()) return;
+
+      const handle = safeClosest(e.target, ".turni-handle");
+      if (!handle) return;
+
+      const row = safeClosest(handle, ".turno-item");
+      if (!row) return;
+
+      draggedRow = row;
+      draggedRow.classList.add("dragging");
+
+      document.documentElement.classList.add("turni-no-select");
+      document.body.classList.add("turni-no-select");
+
+      e.preventDefault();
+
+      if (window.getSelection) {
+        const sel = window.getSelection();
+        if (sel && sel.removeAllRanges) sel.removeAllRanges();
+      }
+
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
     });
   }
-
-  function finalizeOrder() {
-    const items = typeof getItems === "function" ? getItems() : [];
-    const newOrder = [];
-
-    const rowEls = listEl.querySelectorAll(".turno-item");
-    rowEls.forEach(rowEl => {
-      const idx = parseInt(rowEl.dataset.index, 10);
-      if (!Number.isNaN(idx) && items[idx]) newOrder.push(items[idx]);
-    });
-
-    if (newOrder.length === items.length && typeof setItems === "function") {
-      setItems(newOrder);
-      if (typeof saveItems === "function") saveItems(newOrder);
-      if (typeof refresh === "function") refresh();
-    }
-  }
-
-  function endDrag() {
-    clearPress();
-
-    if (draggedRow) {
-      draggedRow.classList.remove("dragging");
-      finalizeOrder();
-      draggedRow = null;
-    }
-
-    document.documentElement.classList.remove("turni-no-select");
-    document.body.classList.remove("turni-no-select");
-
-    window.removeEventListener("pointermove", onPointerMove, { capture: true });
-    window.removeEventListener("pointerup", endDrag, { capture: true });
-    window.removeEventListener("pointercancel", endDrag, { capture: true });
-
-    setTimeout(() => { listEl.dataset.dragging = "0"; }, 180);
-  }
-
-  function startDrag(row, e) {
-    resetSwipeRow(row);
-
-    draggedRow = row;
-    draggedRow.classList.add("dragging");
-
-    listEl.dataset.dragging = "1";
-
-    document.documentElement.classList.add("turni-no-select");
-    document.body.classList.add("turni-no-select");
-
-    e.preventDefault();
-
-    if (window.getSelection) {
-      const sel = window.getSelection();
-      if (sel && sel.removeAllRanges) sel.removeAllRanges();
-    }
-
-    window.addEventListener("pointermove", onPointerMove, { passive: false, capture: true });
-    window.addEventListener("pointerup", endDrag, { capture: true });
-    window.addEventListener("pointercancel", endDrag, { capture: true });
-  }
-
-  listEl.addEventListener("pointerdown", (e) => {
-    if (typeof getEditing === "function" && !getEditing()) return;
-
-    const row = safeClosest(e.target, ".turno-item");
-    if (!row) return;
-
-    if (safeClosest(e.target, ".turno-delete-btn")) return;
-    if (safeClosest(e.target, ".turno-swipe-action")) return;
-
-    downX = e.clientX;
-    downY = e.clientY;
-    armed = true;
-
-    clearTimeout(pressTimer);
-    pressTimer = setTimeout(() => {
-      if (!armed) return;
-      armed = false;
-      startDrag(row, e);
-    }, pressDelay);
-  });
-
-  listEl.addEventListener("pointerup", () => clearPress());
-  listEl.addEventListener("pointercancel", () => clearPress());
-}
-
 
 
   function attachPanelExitReset(opts) {
@@ -5111,16 +5041,6 @@ function initTurniPanel() {
         refreshList();
       }
     });
-
-    TurniInteractions.attachDragSort({
-  listEl,
-  getEditing: () => true,
-  getItems: () => turni,
-  setItems: (next) => { turni = next; },
-  saveItems: (next) => saveTurni(next),
-  refresh: () => refreshList()
-});
-
 
     TurniInteractions.attachPanelExitReset({
       panelEl: panelTurni,
