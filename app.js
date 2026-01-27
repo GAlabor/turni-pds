@@ -4326,6 +4326,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   const row = safeClosest(e.target, ".turno-item");
   if (!row) return;
 
+  if (row.dataset.dragMoved === "1") return;
   if (row.dataset.swipeMoved === "1") return;
 
   const idx = parseInt(row.dataset.index, 10);
@@ -4409,6 +4410,7 @@ function openRow(row) {
   }
 
   listEl.addEventListener("pointerdown", (e) => {
+    if (listEl.dataset.dragLock === "1") return;
     if (typeof getEditing === "function" && getEditing()) return;
     if (shouldIgnore(e)) return;
 
@@ -4430,6 +4432,16 @@ function openRow(row) {
   });
 
   listEl.addEventListener("pointermove", (e) => {
+    if (listEl.dataset.dragLock === "1") {
+      if (activeRow) {
+        try { activeRow.releasePointerCapture(e.pointerId); } catch {}
+        activeRow.classList.remove("is-swiping");
+      }
+      isActive = false;
+      isHorizontal = false;
+      activeRow = null;
+      return;
+    }
     if (!isActive || !activeRow) return;
 
     const dx = e.clientX - startX;
@@ -4459,6 +4471,12 @@ function openRow(row) {
   }, { passive: false });
 
   function endSwipe(e) {
+    if (listEl.dataset.dragLock === "1") {
+      isActive = false;
+      isHorizontal = false;
+      activeRow = null;
+      return;
+    }
     if (!isActive || !activeRow) return;
 
     try { activeRow.releasePointerCapture(e.pointerId); } catch {}
@@ -4629,6 +4647,221 @@ function openRow(row) {
   }
 
 
+  function attachLongPressReorder(opts) {
+    const {
+      listEl,
+      getItems,
+      setItems,
+      saveItems,
+      refresh,
+      ignoreSelectors = [".turno-delete-btn", ".turni-handle", ".turno-swipe-actions", ".turno-swipe-action"]
+    } = opts || {};
+
+    if (!listEl) return;
+
+    const HOLD_MS = 320;
+    const MOVE_CANCEL_PX = 10;
+
+    let pressTimer = 0;
+    let pressRow = null;
+    let pressPointerId = null;
+    let dragPointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let draggingRow = null;
+
+    function shouldIgnore(e) {
+      if (!e || !e.target) return false;
+      return ignoreSelectors.some(sel => safeClosest(e.target, sel));
+    }
+
+    function clearPress() {
+      if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = 0;
+      }
+      pressRow = null;
+      pressPointerId = null;
+    }
+
+    function lockGestures() {
+      listEl.dataset.dragLock = "1";
+      document.documentElement.classList.add("turni-no-select", "turni-drag-lock");
+      document.body.classList.add("turni-no-select", "turni-drag-lock");
+      listEl.dataset.prevTouchAction = listEl.style.touchAction || "";
+      listEl.style.touchAction = "none";
+      document.addEventListener("touchmove", preventTouchMove, { passive: false });
+    }
+
+    function unlockGestures() {
+      delete listEl.dataset.dragLock;
+      document.documentElement.classList.remove("turni-no-select", "turni-drag-lock");
+      document.body.classList.remove("turni-no-select", "turni-drag-lock");
+      listEl.style.touchAction = listEl.dataset.prevTouchAction || "";
+      delete listEl.dataset.prevTouchAction;
+      document.removeEventListener("touchmove", preventTouchMove, { passive: false });
+    }
+
+    function preventTouchMove(e) {
+      if (listEl.dataset.dragLock === "1") e.preventDefault();
+    }
+
+    function closeAllSwipes() {
+      const rows = listEl.querySelectorAll(".turno-item.is-swiped, .turno-item.is-swiping");
+      rows.forEach(r => {
+        r.classList.remove("is-swiped", "is-swiping");
+        r.style.setProperty("--swipeP", "0");
+        const mover = r.querySelector(".turno-swipe-mover") || r;
+        mover.style.transform = "";
+        delete r.dataset.swipeX;
+        r.dataset.swipeMoved = "0";
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const rows = [...container.querySelectorAll(".turno-item:not(.dragging)")];
+      return rows.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - (box.top + box.height / 2);
+          if (offset < 0 && offset > closest.offset) return { offset, element: child };
+          return closest;
+        },
+        { offset: Number.NEGATIVE_INFINITY, element: null }
+      ).element;
+    }
+
+    function onDragMove(e) {
+      if (!draggingRow) return;
+      e.preventDefault();
+
+      const y = e.clientY;
+      const afterElement = getDragAfterElement(listEl, y);
+
+      const rows = Array.from(listEl.querySelectorAll(".turno-item"));
+      const oldRects = new Map();
+      rows.forEach(r => oldRects.set(r, r.getBoundingClientRect()));
+
+      if (afterElement == null) listEl.appendChild(draggingRow);
+      else if (afterElement !== draggingRow && afterElement.previousSibling !== draggingRow) listEl.insertBefore(draggingRow, afterElement);
+
+      const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
+      newRows.forEach(r => {
+        if (r === draggingRow) return;
+        const oldRect = oldRects.get(r);
+        if (!oldRect) return;
+        const newRect = r.getBoundingClientRect();
+        const dy = oldRect.top - newRect.top;
+        if (Math.abs(dy) > 1) {
+          r.style.transition = "none";
+          r.style.transform = `translateY(${dy}px)`;
+          requestAnimationFrame(() => {
+            r.style.transition = "transform 0.12s ease";
+            r.style.transform = "";
+          });
+        }
+      });
+
+      draggingRow.dataset.dragMoved = "1";
+    }
+
+    function onDragEnd(e) {
+      if (!draggingRow) {
+        unlockGestures();
+        return;
+      }
+
+      try { draggingRow.releasePointerCapture(dragPointerId); } catch {}
+
+      draggingRow.classList.remove("dragging");
+
+      const items = typeof getItems === "function" ? getItems() : [];
+      const newOrder = [];
+      const rowEls = listEl.querySelectorAll(".turno-item");
+      rowEls.forEach(rowEl => {
+        const idx = parseInt(rowEl.dataset.index, 10);
+        if (!Number.isNaN(idx) && items[idx]) newOrder.push(items[idx]);
+      });
+
+      if (newOrder.length === items.length) {
+        if (typeof setItems === "function") setItems(newOrder);
+        if (typeof saveItems === "function") saveItems(newOrder);
+        if (typeof refresh === "function") refresh();
+      }
+
+      const rowRef = draggingRow;
+      setTimeout(() => {
+        if (rowRef) rowRef.dataset.dragMoved = "0";
+      }, 240);
+
+      draggingRow = null;
+      dragPointerId = null;
+      unlockGestures();
+
+      document.removeEventListener("pointermove", onDragMove, { passive: false });
+      document.removeEventListener("pointerup", onDragEnd);
+      document.removeEventListener("pointercancel", onDragEnd);
+    }
+
+    function startDrag(e) {
+      if (!pressRow) return;
+      draggingRow = pressRow;
+      dragPointerId = pressPointerId;
+      clearPress();
+
+      closeAllSwipes();
+      lockGestures();
+
+      draggingRow.classList.add("dragging");
+      draggingRow.dataset.dragMoved = "0";
+
+      try { draggingRow.setPointerCapture(dragPointerId); } catch {}
+
+      if (window.getSelection) {
+        const sel = window.getSelection();
+        if (sel && sel.removeAllRanges) sel.removeAllRanges();
+      }
+
+      document.addEventListener("pointermove", onDragMove, { passive: false });
+      document.addEventListener("pointerup", onDragEnd);
+      document.addEventListener("pointercancel", onDragEnd);
+    }
+
+    listEl.addEventListener("pointerdown", (e) => {
+      if (listEl.dataset.dragLock === "1") return;
+      if (shouldIgnore(e)) return;
+
+      const row = safeClosest(e.target, ".turno-item");
+      if (!row) return;
+
+      pressRow = row;
+      pressPointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      if (pressTimer) clearTimeout(pressTimer);
+      pressTimer = setTimeout(() => startDrag(e), HOLD_MS);
+    }, { capture: true });
+
+    listEl.addEventListener("pointermove", (e) => {
+      if (draggingRow) return;
+      if (!pressRow) return;
+      if (pressPointerId !== e.pointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > MOVE_CANCEL_PX || Math.abs(dy) > MOVE_CANCEL_PX) clearPress();
+    }, { capture: true });
+
+    listEl.addEventListener("pointerup", (e) => {
+      if (!draggingRow) clearPress();
+    }, { capture: true });
+
+    listEl.addEventListener("pointercancel", (e) => {
+      if (!draggingRow) clearPress();
+    }, { capture: true });
+  }
+
+
   function attachPanelExitReset(opts) {
     const { panelEl, onExit } = opts || {};
     if (!panelEl) return;
@@ -4680,6 +4913,7 @@ function openRow(row) {
   attachRowEditClick,
   attachRowSwipe,
   attachDragSort,
+  attachLongPressReorder,
   attachPanelExitReset
 };
 
@@ -5040,6 +5274,14 @@ function initTurniPanel() {
         saveTurni(turni);
         refreshList();
       }
+    });
+
+    TurniInteractions.attachLongPressReorder({
+      listEl,
+      getItems: () => turni,
+      setItems: (next) => { turni = next; },
+      saveItems: (next) => { saveTurni(next); },
+      refresh: refreshList
     });
 
     TurniInteractions.attachPanelExitReset({
