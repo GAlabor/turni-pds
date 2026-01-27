@@ -1245,6 +1245,41 @@ body.ui-modal-open{
   white-space: nowrap;
 }
 
+.turno-row-chevron{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  opacity:0.7;
+  margin-left: var(--space-2);
+}
+
+.turno-row-chevron svg{
+  width:14px;
+  height:14px;
+  display:block;
+  fill:none;
+  stroke: var(--subtext);
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition: transform 0.12s ease, opacity 0.16s ease;
+}
+
+@media (hover:hover){
+  .turno-item:hover .turno-row-chevron{
+    opacity:1;
+  }
+  .turno-item:hover .turno-row-chevron svg{
+    transform: translateX(1px);
+  }
+}
+
+.turni-list.editing .turno-row-chevron{
+  display:none;
+}
+
+
 .festivita-card .turni-list {
   margin-top: var(--space-10);
 }

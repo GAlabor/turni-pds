@@ -2276,14 +2276,21 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
       nameEl.className = "turno-name";
       nameEl.textContent = t.nome || "";
 
-      const orarioEl = document.createElement("span");
-      orarioEl.className = "turno-orario";
-      if (t.inizio && t.fine) {
-        orarioEl.textContent = `${t.inizio} - ${t.fine}`;
-      }
+const orarioEl = document.createElement("span");
+orarioEl.className = "turno-orario";
+if (t.inizio && t.fine) {
+  orarioEl.textContent = `${t.inizio} - ${t.fine}`;
+}
 
-      const handle = document.createElement("div");
-      handle.className = "turni-handle";
+const chevron = document.createElement("span");
+chevron.className = "turno-row-chevron";
+chevron.setAttribute("aria-hidden", "true");
+chevron.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6 L15 12 L9 18" /></svg>`;
+
+const handle = document.createElement("div");
+handle.className = "turni-handle";
+
+
       handle.setAttribute("aria-hidden", "true");
       handle.innerHTML = `
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2293,10 +2300,12 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
         </svg>
       `;
 
-      mover.appendChild(siglaPill);
-      mover.appendChild(nameEl);
-      mover.appendChild(orarioEl);
-      mover.appendChild(handle);
+mover.appendChild(siglaPill);
+mover.appendChild(nameEl);
+mover.appendChild(orarioEl);
+mover.appendChild(chevron);
+mover.appendChild(handle);
+
 
       row.appendChild(mover);
 
