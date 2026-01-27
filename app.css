@@ -1127,6 +1127,8 @@ body.ui-modal-open{
 }
 
 
+
+
 .turno-swipe-actions {
   position: absolute;
   right: 0;
@@ -1415,6 +1417,10 @@ body.turni-no-select * {
   box-shadow: 0 12px 28px rgba(15,23,42,0.4);
   transform: scale(1.02);
   z-index: 5;
+}
+
+.turni-no-select .turno-item {
+  touch-action: none;
 }
 
 
