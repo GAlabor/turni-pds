@@ -4684,23 +4684,24 @@ function openRow(row) {
       pressPointerId = null;
     }
 
-    function lockGestures() {
-      listEl.dataset.dragLock = "1";
-      document.documentElement.classList.add("turni-no-select", "turni-drag-lock");
-      document.body.classList.add("turni-no-select", "turni-drag-lock");
-      listEl.dataset.prevTouchAction = listEl.style.touchAction || "";
-      listEl.style.touchAction = "none";
-      document.addEventListener("touchmove", preventTouchMove, { passive: false });
-    }
+function lockGestures() {
+  listEl.dataset.dragLock = "1";
+  document.documentElement.classList.add("turni-no-select");
+  document.body.classList.add("turni-no-select");
+  listEl.dataset.prevTouchAction = listEl.style.touchAction || "";
+  listEl.style.touchAction = "none";
+  document.addEventListener("touchmove", preventTouchMove, { passive: false });
+}
 
-    function unlockGestures() {
-      delete listEl.dataset.dragLock;
-      document.documentElement.classList.remove("turni-no-select", "turni-drag-lock");
-      document.body.classList.remove("turni-no-select", "turni-drag-lock");
-      listEl.style.touchAction = listEl.dataset.prevTouchAction || "";
-      delete listEl.dataset.prevTouchAction;
-      document.removeEventListener("touchmove", preventTouchMove, { passive: false });
-    }
+function unlockGestures() {
+  delete listEl.dataset.dragLock;
+  document.documentElement.classList.remove("turni-no-select");
+  document.body.classList.remove("turni-no-select");
+  listEl.style.touchAction = listEl.dataset.prevTouchAction || "";
+  delete listEl.dataset.prevTouchAction;
+  document.removeEventListener("touchmove", preventTouchMove, { passive: false });
+}
+
 
     function preventTouchMove(e) {
       if (listEl.dataset.dragLock === "1") e.preventDefault();
