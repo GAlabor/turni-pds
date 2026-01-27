@@ -4814,7 +4814,7 @@ function unlockGestures() {
       lockGestures();
 
       draggingRow.classList.add("dragging");
-      draggingRow.dataset.dragMoved = "0";
+      draggingRow.dataset.dragMoved = "1";
 
       try { draggingRow.setPointerCapture(dragPointerId); } catch {}
 
