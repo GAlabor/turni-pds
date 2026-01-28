@@ -4619,31 +4619,123 @@ function openRow(row) {
       document.removeEventListener("pointerup", onPointerUp);
     }
 
-    listEl.addEventListener("pointerdown", (e) => {
-      if (!getEditing()) return;
+let pendingRow = null;
+let pendingPointerId = null;
 
-      const handle = safeClosest(e.target, ".turni-handle");
-      if (!handle) return;
+function onPointerMove(e) {
+  if (!draggedRow) {
+    if (!pendingRow) return;
+    if (pendingPointerId !== e.pointerId) return;
 
-      const row = safeClosest(handle, ".turno-item");
-      if (!row) return;
+    draggedRow = pendingRow;
+    pendingRow = null;
+    pendingPointerId = null;
 
-      draggedRow = row;
-      draggedRow.classList.add("dragging");
+    draggedRow.classList.add("dragging");
 
-      document.documentElement.classList.add("turni-no-select");
-      document.body.classList.add("turni-no-select");
+    document.documentElement.classList.add("turni-no-select");
+    document.body.classList.add("turni-no-select");
 
-      e.preventDefault();
+    try { draggedRow.setPointerCapture(e.pointerId); } catch {}
 
-      if (window.getSelection) {
-        const sel = window.getSelection();
-        if (sel && sel.removeAllRanges) sel.removeAllRanges();
-      }
+    if (window.getSelection) {
+      const sel = window.getSelection();
+      if (sel && sel.removeAllRanges) sel.removeAllRanges();
+    }
+  }
 
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
-    });
+  e.preventDefault();
+  const y = e.clientY;
+
+  const rows = Array.from(listEl.querySelectorAll(".turno-item"));
+  const oldRects = new Map();
+  rows.forEach(r => oldRects.set(r, r.getBoundingClientRect()));
+
+  const afterElement = getDragAfterElement(listEl, y);
+
+  if (afterElement === draggedRow || (afterElement && afterElement.previousSibling === draggedRow)) {
+    return;
+  }
+
+  if (afterElement == null) {
+    listEl.appendChild(draggedRow);
+  } else {
+    listEl.insertBefore(draggedRow, afterElement);
+  }
+
+  const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
+  newRows.forEach(r => {
+    if (r === draggedRow) return;
+    const oldRect = oldRects.get(r);
+    if (!oldRect) return;
+    const newRect = r.getBoundingClientRect();
+    const dy = oldRect.top - newRect.top;
+
+    if (Math.abs(dy) > 1) {
+      r.style.transition = "none";
+      r.style.transform = `translateY(${dy}px)`;
+      requestAnimationFrame(() => {
+        r.style.transition = "transform 0.12s ease";
+        r.style.transform = "";
+      });
+    }
+  });
+}
+
+function onPointerUp(e) {
+  if (!draggedRow) {
+    pendingRow = null;
+    pendingPointerId = null;
+
+    document.removeEventListener("pointermove", onPointerMove);
+    document.removeEventListener("pointerup", onPointerUp);
+    return;
+  }
+
+  draggedRow.classList.remove("dragging");
+
+  const items = typeof getItems === "function" ? getItems() : [];
+  const newOrder = [];
+
+  const rowEls = listEl.querySelectorAll(".turno-item");
+  rowEls.forEach(rowEl => {
+    const idx = parseInt(rowEl.dataset.index, 10);
+    if (!Number.isNaN(idx) && items[idx]) {
+      newOrder.push(items[idx]);
+    }
+  });
+
+  if (newOrder.length === items.length && typeof setItems === "function") {
+    setItems(newOrder);
+    if (typeof saveItems === "function") saveItems(newOrder);
+    if (typeof refresh === "function") refresh();
+  }
+
+  draggedRow = null;
+
+  document.documentElement.classList.remove("turni-no-select");
+  document.body.classList.remove("turni-no-select");
+
+  document.removeEventListener("pointermove", onPointerMove);
+  document.removeEventListener("pointerup", onPointerUp);
+}
+
+listEl.addEventListener("pointerdown", (e) => {
+  if (!getEditing()) return;
+
+  const handle = safeClosest(e.target, ".turni-handle");
+  if (!handle) return;
+
+  const row = safeClosest(handle, ".turno-item");
+  if (!row) return;
+
+  pendingRow = row;
+  pendingPointerId = e.pointerId;
+
+  document.addEventListener("pointermove", onPointerMove, { passive: false });
+  document.addEventListener("pointerup", onPointerUp);
+});
+
   }
 
 
