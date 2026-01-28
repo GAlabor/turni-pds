@@ -4858,43 +4858,48 @@ function unlockGestures() {
       draggingRow.dataset.dragMoved = "1";
     }
 
-    function onDragEnd(e) {
-      if (!draggingRow) {
-        unlockGestures();
-        return;
-      }
+function onDragEnd(e) {
+  if (!draggingRow) {
+    unlockGestures();
+    return;
+  }
 
-      try { draggingRow.releasePointerCapture(dragPointerId); } catch {}
+  const moved = draggingRow.dataset.dragMoved === "1";
 
-      draggingRow.classList.remove("dragging");
+  try { draggingRow.releasePointerCapture(dragPointerId); } catch {}
 
-      const items = typeof getItems === "function" ? getItems() : [];
-      const newOrder = [];
-      const rowEls = listEl.querySelectorAll(".turno-item");
-      rowEls.forEach(rowEl => {
-        const idx = parseInt(rowEl.dataset.index, 10);
-        if (!Number.isNaN(idx) && items[idx]) newOrder.push(items[idx]);
-      });
+  draggingRow.classList.remove("dragging");
 
-      if (newOrder.length === items.length) {
-        if (typeof setItems === "function") setItems(newOrder);
-        if (typeof saveItems === "function") saveItems(newOrder);
-        if (typeof refresh === "function") refresh();
-      }
+  if (moved) {
+    const items = typeof getItems === "function" ? getItems() : [];
+    const newOrder = [];
+    const rowEls = listEl.querySelectorAll(".turno-item");
+    rowEls.forEach(rowEl => {
+      const idx = parseInt(rowEl.dataset.index, 10);
+      if (!Number.isNaN(idx) && items[idx]) newOrder.push(items[idx]);
+    });
 
-      const rowRef = draggingRow;
-      setTimeout(() => {
-        if (rowRef) rowRef.dataset.dragMoved = "0";
-      }, 240);
-
-      draggingRow = null;
-      dragPointerId = null;
-      unlockGestures();
-
-      document.removeEventListener("pointermove", onDragMove, { passive: false });
-      document.removeEventListener("pointerup", onDragEnd);
-      document.removeEventListener("pointercancel", onDragEnd);
+    if (newOrder.length === items.length) {
+      if (typeof setItems === "function") setItems(newOrder);
+      if (typeof saveItems === "function") saveItems(newOrder);
+      if (typeof refresh === "function") refresh();
     }
+  }
+
+  const rowRef = draggingRow;
+  setTimeout(() => {
+    if (rowRef) rowRef.dataset.dragMoved = "0";
+  }, 240);
+
+  draggingRow = null;
+  dragPointerId = null;
+  unlockGestures();
+
+  document.removeEventListener("pointermove", onDragMove, { passive: false });
+  document.removeEventListener("pointerup", onDragEnd);
+  document.removeEventListener("pointercancel", onDragEnd);
+}
+
 
     function startDrag(e) {
       if (!pressRow) return;
