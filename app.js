@@ -4319,8 +4319,12 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       return ignoreSelectors.some(sel => safeClosest(e.target, sel));
     }
 
-    listEl.addEventListener("click", (e) => {
+listEl.addEventListener("click", (e) => {
   if (!getEditing()) return;
+
+  const until = Number(listEl.dataset.suppressClickUntil || "0");
+  if (Date.now() < until) return;
+
   if (shouldIgnore(e)) return;
 
   const row = safeClosest(e.target, ".turno-item");
@@ -4334,6 +4338,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
   if (typeof onEditRow === "function") onEditRow(idx);
 });
+
 
   }
 
@@ -4828,34 +4833,42 @@ function unlockGestures() {
       if (!draggingRow) return;
       e.preventDefault();
 
-      const y = e.clientY;
-      const afterElement = getDragAfterElement(listEl, y);
+const y = e.clientY;
+const afterElement = getDragAfterElement(listEl, y);
 
-      const rows = Array.from(listEl.querySelectorAll(".turno-item"));
-      const oldRects = new Map();
-      rows.forEach(r => oldRects.set(r, r.getBoundingClientRect()));
+const rows = Array.from(listEl.querySelectorAll(".turno-item"));
+const oldRects = new Map();
+rows.forEach(r => oldRects.set(r, r.getBoundingClientRect()));
 
-      if (afterElement == null) listEl.appendChild(draggingRow);
-      else if (afterElement !== draggingRow && afterElement.previousSibling !== draggingRow) listEl.insertBefore(draggingRow, afterElement);
+const beforeIndex = Array.from(listEl.children).indexOf(draggingRow);
 
-      const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
-      newRows.forEach(r => {
-        if (r === draggingRow) return;
-        const oldRect = oldRects.get(r);
-        if (!oldRect) return;
-        const newRect = r.getBoundingClientRect();
-        const dy = oldRect.top - newRect.top;
-        if (Math.abs(dy) > 1) {
-          r.style.transition = "none";
-          r.style.transform = `translateY(${dy}px)`;
-          requestAnimationFrame(() => {
-            r.style.transition = "transform 0.12s ease";
-            r.style.transform = "";
-          });
-        }
-      });
+if (afterElement == null) {
+  if (draggingRow !== listEl.lastElementChild) listEl.appendChild(draggingRow);
+} else if (afterElement !== draggingRow && afterElement.previousSibling !== draggingRow) {
+  listEl.insertBefore(draggingRow, afterElement);
+}
 
-      draggingRow.dataset.dragMoved = "1";
+const afterIndex = Array.from(listEl.children).indexOf(draggingRow);
+
+const newRows = Array.from(listEl.querySelectorAll(".turno-item"));
+newRows.forEach(r => {
+  if (r === draggingRow) return;
+  const oldRect = oldRects.get(r);
+  if (!oldRect) return;
+  const newRect = r.getBoundingClientRect();
+  const dy = oldRect.top - newRect.top;
+  if (Math.abs(dy) > 1) {
+    r.style.transition = "none";
+    r.style.transform = `translateY(${dy}px)`;
+    requestAnimationFrame(() => {
+      r.style.transition = "transform 0.12s ease";
+      r.style.transform = "";
+    });
+  }
+});
+
+if (beforeIndex !== afterIndex) draggingRow.dataset.dragMoved = "1";
+
     }
 
 function onDragEnd(e) {
@@ -4869,6 +4882,8 @@ function onDragEnd(e) {
   try { draggingRow.releasePointerCapture(dragPointerId); } catch {}
 
   draggingRow.classList.remove("dragging");
+  listEl.dataset.suppressClickUntil = String(Date.now() + 450);
+
 
   if (moved) {
     const items = typeof getItems === "function" ? getItems() : [];
@@ -4910,8 +4925,10 @@ function onDragEnd(e) {
       closeAllSwipes();
       lockGestures();
 
-      draggingRow.classList.add("dragging");
-      draggingRow.dataset.dragMoved = "0";
+draggingRow.classList.add("dragging");
+draggingRow.dataset.dragMoved = "0";
+listEl.dataset.suppressClickUntil = String(Date.now() + 450);
+
 
       try { draggingRow.setPointerCapture(dragPointerId); } catch {}
 
