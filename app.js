@@ -4767,6 +4767,56 @@ listEl.addEventListener("pointerdown", (e) => {
     let startY = 0;
     let draggingRow = null;
 
+        const SCROLL_EDGE_PX = 72;
+    const SCROLL_MAX_PX = 18;
+
+    const scrollEl = (function findScrollParent(el) {
+      let p = el;
+      while (p && p !== document.body) {
+        const cs = window.getComputedStyle(p);
+        const oy = cs.overflowY;
+        if ((oy === "auto" || oy === "scroll") && p.scrollHeight > p.clientHeight) return p;
+        p = p.parentElement;
+      }
+      return document.scrollingElement || document.documentElement;
+    })(listEl);
+
+    let autoScrollRaf = 0;
+    let lastClientY = 0;
+
+    function autoScrollTick() {
+      if (!draggingRow) return;
+
+      const r = scrollEl.getBoundingClientRect ? scrollEl.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+      const topEdge = r.top + SCROLL_EDGE_PX;
+      const bottomEdge = r.bottom - SCROLL_EDGE_PX;
+
+      let delta = 0;
+      if (lastClientY < topEdge) {
+        const t = Math.min(1, (topEdge - lastClientY) / SCROLL_EDGE_PX);
+        delta = -Math.ceil(SCROLL_MAX_PX * t);
+      } else if (lastClientY > bottomEdge) {
+        const t = Math.min(1, (lastClientY - bottomEdge) / SCROLL_EDGE_PX);
+        delta = Math.ceil(SCROLL_MAX_PX * t);
+      }
+
+      if (delta !== 0) scrollEl.scrollTop += delta;
+
+      autoScrollRaf = requestAnimationFrame(autoScrollTick);
+    }
+
+    function autoScrollStart(y) {
+      lastClientY = y || 0;
+      if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
+      autoScrollRaf = requestAnimationFrame(autoScrollTick);
+    }
+
+    function autoScrollStop() {
+      if (autoScrollRaf) cancelAnimationFrame(autoScrollRaf);
+      autoScrollRaf = 0;
+    }
+
+
     function shouldIgnore(e) {
       if (!e || !e.target) return false;
       return ignoreSelectors.some(sel => safeClosest(e.target, sel));
@@ -4832,6 +4882,8 @@ function unlockGestures() {
     function onDragMove(e) {
       if (!draggingRow) return;
       e.preventDefault();
+      lastClientY = e.clientY;
+
 
 const y = e.clientY;
 const afterElement = getDragAfterElement(listEl, y);
@@ -4872,6 +4924,8 @@ if (beforeIndex !== afterIndex) draggingRow.dataset.dragMoved = "1";
     }
 
 function onDragEnd(e) {
+  autoScrollStop();
+
   if (!draggingRow) {
     unlockGestures();
     return;
@@ -4883,7 +4937,6 @@ function onDragEnd(e) {
 
   draggingRow.classList.remove("dragging");
   listEl.dataset.suppressClickUntil = String(Date.now() + 450);
-
 
   if (moved) {
     const items = typeof getItems === "function" ? getItems() : [];
@@ -4916,6 +4969,7 @@ function onDragEnd(e) {
 }
 
 
+
     function startDrag(e) {
       if (!pressRow) return;
       draggingRow = pressRow;
@@ -4924,6 +4978,8 @@ function onDragEnd(e) {
 
       closeAllSwipes();
       lockGestures();
+      autoScrollStart(startY);
+
 
 draggingRow.classList.add("dragging");
 draggingRow.dataset.dragMoved = "0";
