@@ -2582,6 +2582,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       if (!this.visualHintEl) return;
 
       const has = Array.isArray(this.saved) && this.saved.length > 0;
+      this.visualHintEl.classList.toggle("is-empty", !has);
+
       if (!has) {
         this.visualHintEl.textContent = "Nessuna turnazione impostata.";
         return;
@@ -4102,8 +4104,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   }
 
   function syncVisibility(visualOn) {
-    visibleByToggle = !!visualOn;
-    if (startRowBtn) startRowBtn.hidden = !visibleByToggle;
+    visibleByToggle = true;
+    if (startRowBtn) startRowBtn.hidden = false;
     syncSummaryUI();
   }
 
@@ -5221,11 +5223,7 @@ function initTurniPanel() {
     function applyVisualState() {
       visualToggleBtn.classList.toggle("is-on", visualOn);
       visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
-
-      const visualCard = visualToggleBtn.closest(".turni-card");
-      if (visualCard) {
-        visualCard.classList.toggle("is-collapsed", !visualOn);
-      }
+    }
 
       if (visualHint) {
         visualHint.hidden = !visualOn;
@@ -5245,7 +5243,7 @@ function initTurniPanel() {
         saveVisualToggle(visualOn);
       }
     });
-  }
+  
 
   function applyNoTimeState() {
     noTimeToggleBtn.classList.toggle("is-on", isNoTime);

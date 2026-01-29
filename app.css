@@ -1542,6 +1542,121 @@ body.turni-no-select * {
 }
 
 
+.turni-visual-top{
+  display:flex;
+  flex-direction:column;
+  gap: var(--space-8);
+}
+
+.turni-visual-active{
+  display:flex;
+  align-items:center;
+  gap: var(--space-12);
+}
+
+.turni-visual-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 0 var(--space-14);
+  height: 32px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: var(--fs-pill-btn);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.turni-visual-pill.is-empty{
+  background: var(--surface-strong);
+  color: var(--subtext);
+  border: 1px solid var(--border);
+}
+
+.turni-visual-change{
+  border:none;
+  background: transparent;
+  padding: 0;
+  font-size: var(--fs-pill-btn);
+  font-weight: 600;
+  color: rgba(10,132,255,0.85);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.turni-visual-next{
+  margin-top: var(--space-10);
+  display:flex;
+  align-items:baseline;
+  gap: var(--space-8);
+}
+
+.turni-visual-next-label{
+  font-size: var(--fs-turni-form-hint);
+  font-weight: 600;
+  color: var(--subtext);
+}
+
+.turni-visual-next-value{
+  font-size: var(--fs-turni-form-hint);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.turni-visual-primary{
+  width: 100%;
+  margin-top: var(--space-12);
+  border-radius: 999px;
+  border: 1px solid rgba(10,132,255,0.35);
+  background: rgba(10,132,255,0.22);
+  height: 40px;
+  padding: 0 var(--space-16);
+  font-size: var(--fs-pill-btn);
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.08s ease-out;
+}
+
+.turni-visual-primary:active{
+  transform: scale(0.98);
+}
+
+.turni-visual-sep{
+  margin-top: var(--space-14);
+  height: 1px;
+  background: rgba(148,163,184,0.25);
+}
+
+.turni-visual-calendar{
+  margin-top: var(--space-12);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: var(--space-12);
+}
+
+.turni-visual-calendar-left{
+  display:flex;
+  align-items:center;
+  gap: var(--space-10);
+  color: var(--subtext);
+  font-size: var(--fs-turni-form-hint);
+  font-weight: 600;
+}
+
+.turni-visual-calendar-left svg{
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
 .turni-inline-row {
   width: 100%;
   margin-top: var(--space-10);

@@ -116,7 +116,20 @@
         <path d="M14 6 L8 12 L14 18" />
       </symbol>
       
-      <symbol id="ico-nav-prev" viewBox="0 0 24 24">
+      
+      <symbol id="ico-ui-calendar" viewBox="0 0 24 24">
+        <path d="M7 4v3" />
+        <path d="M17 4v3" />
+        <path d="M4.5 8.5h15" />
+        <path d="M6 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" />
+        <path d="M8 12h.01" />
+        <path d="M12 12h.01" />
+        <path d="M16 12h.01" />
+        <path d="M8 16h.01" />
+        <path d="M12 16h.01" />
+        <path d="M16 16h.01" />
+      </symbol>
+<symbol id="ico-nav-prev" viewBox="0 0 24 24">
         <path d="M14 6 L8 12 L14 18" />
       </symbol>
       <symbol id="ico-nav-next" viewBox="0 0 24 24">
@@ -447,48 +460,46 @@
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
           
-          <div class="turni-card turni-visual-card">
-            <div class="turni-card-header">
-              <h2 class="turni-panel-title">Visualizza Turnazione</h2>
+                    <div class="turni-card turni-visual-card">
+            <div class="turni-visual-top">
+              <h2 class="turni-panel-title">Turnazione Attiva</h2>
 
-              <div class="turni-card-actions">
-                <button
-                  class="toggle-switch"
-                  type="button"
-                  role="switch"
-                  aria-checked="true"
-                  data-turni-visual-toggle
-                  aria-label="Attiva o disattiva la visualizzazione della turnazione">
-                </button>
+              <div class="turni-visual-active">
+                <span class="turni-visual-pill" data-turni-visual-hint>Nessuna turnazione impostata.</span>
+                <button class="turni-visual-change" type="button">Cambia</button>
               </div>
             </div>
 
-            <p class="turni-visual-hint" data-turni-visual-hint>
-              Nessuna turnazione impostata.
-            </p>
+            <div class="turni-visual-next">
+              <span class="turni-visual-next-label">Prossimo turno</span>
+              <span class="turni-visual-next-value" data-turni-start-summary></span>
+            </div>
 
-            
-            <button
-              class="turni-inline-row"
-              type="button"
-              data-turni-start-row
-              hidden>
-              <div class="turni-inline-row-left">
-                <span class="turni-inline-row-label">Inizio Turnazione</span>
-              </div>
-
-              <div class="turni-inline-row-right">
-                <span class="turni-inline-row-summary" data-turni-start-summary></span>
-                <span class="turni-inline-row-chevron" data-turni-start-chevron aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <use href="#ico-ui-chevron-right"></use>
-                  </svg>
-                </span>
-              </div>
+            <button class="turni-visual-primary" type="button" data-turni-start-row>
+              Imposta inizio turnazione
             </button>
+
+            <div class="turni-visual-sep" aria-hidden="true"></div>
+
+            <div class="turni-visual-calendar">
+              <div class="turni-visual-calendar-left">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <use href="#ico-ui-calendar"></use>
+                </svg>
+                <span>Mostra in calendario</span>
+              </div>
+
+              <button
+                class="toggle-switch"
+                type="button"
+                role="switch"
+                aria-checked="true"
+                data-turni-visual-toggle
+                aria-label="Mostra o nascondi la turnazione nel calendario">
+              </button>
+            </div>
           </div>
 
-          
           <div class="turni-card turnazioni-card is-collapsed">
             <div class="turni-card-header">
               <h2 class="turni-panel-title">Turnazioni</h2>
