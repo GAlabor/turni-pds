@@ -1574,17 +1574,6 @@ body.turni-no-select * {
   border: 1px solid var(--border);
 }
 
-.turni-visual-change{
-  border:none;
-  background: transparent;
-  padding: 0;
-  font-size: var(--fs-pill-btn);
-  font-weight: 600;
-  color: rgba(10,132,255,0.85);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
 .turni-visual-next{
   margin-top: var(--space-10);
   display:flex;
