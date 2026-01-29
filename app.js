@@ -4784,26 +4784,44 @@ listEl.addEventListener("pointerdown", (e) => {
     let autoScrollRaf = 0;
     let lastClientY = 0;
 
-    function autoScrollTick() {
-      if (!draggingRow) return;
+function autoScrollTick() {
+  if (!draggingRow) return;
 
-      const r = scrollEl.getBoundingClientRect ? scrollEl.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
-      const topEdge = r.top + SCROLL_EDGE_PX;
-      const bottomEdge = r.bottom - SCROLL_EDGE_PX;
+  const isPageScroll =
+    scrollEl === document.scrollingElement ||
+    scrollEl === document.documentElement ||
+    scrollEl === document.body;
 
-      let delta = 0;
-      if (lastClientY < topEdge) {
-        const t = Math.min(1, (topEdge - lastClientY) / SCROLL_EDGE_PX);
-        delta = -Math.ceil(SCROLL_MAX_PX * t);
-      } else if (lastClientY > bottomEdge) {
-        const t = Math.min(1, (lastClientY - bottomEdge) / SCROLL_EDGE_PX);
-        delta = Math.ceil(SCROLL_MAX_PX * t);
-      }
+  const r = isPageScroll
+    ? { top: 0, bottom: window.innerHeight }
+    : (scrollEl.getBoundingClientRect ? scrollEl.getBoundingClientRect() : { top: 0, bottom: window.innerHeight });
 
-      if (delta !== 0) scrollEl.scrollTop += delta;
+  const topEdge = r.top + SCROLL_EDGE_PX;
+  const bottomEdge = r.bottom - SCROLL_EDGE_PX;
 
-      autoScrollRaf = requestAnimationFrame(autoScrollTick);
+  let delta = 0;
+
+  if (lastClientY < topEdge) {
+    const t = Math.min(1, (topEdge - lastClientY) / SCROLL_EDGE_PX);
+    delta = -Math.ceil(SCROLL_MAX_PX * t);
+  } else if (lastClientY > bottomEdge) {
+    const t = Math.min(1, (lastClientY - bottomEdge) / SCROLL_EDGE_PX);
+    delta = Math.ceil(SCROLL_MAX_PX * t);
+  }
+
+  if (delta !== 0) {
+    if (isPageScroll) {
+      window.scrollBy(0, delta);
+    } else {
+      const maxScroll = Math.max(0, scrollEl.scrollHeight - scrollEl.clientHeight);
+      const next = Math.max(0, Math.min(maxScroll, scrollEl.scrollTop + delta));
+      scrollEl.scrollTop = next;
     }
+  }
+
+  autoScrollRaf = requestAnimationFrame(autoScrollTick);
+}
+
 
     function autoScrollStart(y) {
       lastClientY = y || 0;
