@@ -1564,7 +1564,7 @@ body.turni-no-select * {
   background: var(--accent);
   color: #ffffff;
   font-size: var(--fs-pill-btn);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1;
 }
 
@@ -1584,14 +1584,15 @@ body.turni-no-select * {
 .turni-visual-next-label{
   font-size: var(--fs-turni-form-hint);
   font-weight: 600;
-  color: var(--subtext);
+  color: var(--text);
 }
 
 .turni-visual-next-value{
   font-size: var(--fs-turni-form-hint);
-  font-weight: 500;
-  color: var(--text);
+  font-weight: 400;
+  color: var(--subtext);
 }
+
 
 .turni-visual-primary{
   width: 100%;
