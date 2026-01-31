@@ -1564,7 +1564,7 @@ body.turni-no-select * {
   background: var(--accent);
   color: #ffffff;
   font-size: var(--fs-pill-btn);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1;
 }
 
