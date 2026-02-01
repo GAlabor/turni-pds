@@ -234,6 +234,11 @@
   --ui-shadow-accent-sm: 0 4px 10px rgba(10,132,255,0.20);
   --ui-shadow-accent-md: 0 8px 18px rgba(10,132,255,0.22);
   --ui-shadow-accent-press: 0 2px 6px rgba(10,132,255,0.30);
+
+  --ui-primary-pill-bg: rgba(10,132,255,0.14);
+--ui-primary-pill-border: rgba(10,132,255,0.35);
+--ui-primary-pill-fg: var(--accent);
+--ui-primary-pill-shadow: none;
 }
 
 
@@ -288,6 +293,11 @@
     --tabColor: #6b7280;
     --tabActiveColor: #4b8dff;
 
+    --ui-primary-pill-bg: rgba(75,141,255,0.22);
+    --ui-primary-pill-border: rgba(75,141,255,0.40);
+    --ui-primary-pill-fg: #ffffff;
+    --ui-primary-pill-shadow: none;
+
     --color-arrow-month: var(--nav-fg);
     --color-back-icon: var(--text);
 
@@ -326,6 +336,11 @@
 
   --tabColor: #6b7280;
   --tabActiveColor: #4b8dff;
+
+  --ui-primary-pill-bg: rgba(75,141,255,0.22);
+  --ui-primary-pill-border: rgba(75,141,255,0.40);
+  --ui-primary-pill-fg: #ffffff;
+  --ui-primary-pill-shadow: none;
 
   --ui-tab-active-pill-bg: rgba(142,142,147,0.26);
 
@@ -1598,15 +1613,16 @@ body.turni-no-select * {
   width: 100%;
   margin-top: var(--space-12);
   border-radius: 999px;
-  border: 1px solid rgba(10,132,255,0.35);
-  background: rgba(10,132,255,0.22);
+  border: 1px solid var(--ui-primary-pill-border);
+  background: var(--ui-primary-pill-bg);
   height: 40px;
   padding: 0 var(--space-16);
   font-size: var(--fs-pill-btn);
   font-weight: 600;
-  color: #ffffff;
+  color: var(--ui-primary-pill-fg);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--ui-primary-pill-shadow);
   transition: transform 0.08s ease-out;
 }
 
