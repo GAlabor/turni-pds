@@ -235,8 +235,8 @@
   --ui-shadow-accent-md: 0 8px 18px rgba(10,132,255,0.22);
   --ui-shadow-accent-press: 0 2px 6px rgba(10,132,255,0.30);
 
-  --ui-primary-pill-bg: rgba(10,132,255,0.14);
---ui-primary-pill-border: rgba(10,132,255,0.35);
+--ui-primary-pill-bg: rgba(10,132,255,0.10);
+--ui-primary-pill-border: rgba(10,132,255,0.22);
 --ui-primary-pill-fg: var(--accent);
 --ui-primary-pill-shadow: none;
 }
@@ -1618,7 +1618,7 @@ body.turni-no-select * {
   height: 40px;
   padding: 0 var(--space-16);
   font-size: var(--fs-pill-btn);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ui-primary-pill-fg);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -1628,6 +1628,7 @@ body.turni-no-select * {
 
 .turni-visual-primary:active{
   transform: scale(0.98);
+  background: rgba(10,132,255,0.14);
 }
 
 .turni-visual-sep{
