@@ -1313,7 +1313,7 @@ function emitStorageChange(key) {
       const turnazioniFactory = [
         {
           id: turnazioneId,
-          name: "Turnazione in quinta",
+          name: "In quinta",
           days: 5,
           slots: [
             { nome: "Sera",         sigla: "S", colore: "#30B0C7" },
