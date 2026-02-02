@@ -1557,84 +1557,130 @@ body.turni-no-select * {
 }
 
 
+.turni-visual-card .turni-panel-title{
+  font-size: var(--fs-turni-panel-title-desktop);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: var(--ls-turni-panel-title);
+}
+
+@media (max-width: 900px) {
+  .turni-visual-card .turni-panel-title{
+    font-size: var(--fs-turni-panel-title-mobile);
+  }
+}
+
+
 .turni-visual-top{
   display:flex;
-  flex-direction:column;
-  gap: var(--space-8);
+  align-items:center;
+  justify-content:space-between;
+  gap: var(--space-12);
 }
 
 .turni-visual-active{
   display:flex;
   align-items:center;
-  gap: var(--space-12);
+  gap: var(--space-10);
 }
 
 .turni-visual-pill{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding: 0 var(--space-14);
-  height: 32px;
+  padding: 0 var(--space-12);
+  height: 30px;
   border-radius: 999px;
-  background: var(--accent);
-  color: #ffffff;
+  background: rgba(10,132,255,0.12);
+  color: var(--accent);
+  border: 1px solid rgba(10,132,255,0.22);
   font-size: var(--fs-pill-btn);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.turni-visual-pill::after{
+  content: "›";
+  display:inline-flex;
+  margin-left: 8px;
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(-1px);
+  opacity: 0.7;
 }
 
 .turni-visual-pill.is-empty{
   background: var(--surface-strong);
   color: var(--subtext);
   border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.turni-visual-pill.is-empty::after{
+  content: "";
+  margin-left: 0;
 }
 
 .turni-visual-next{
-  margin-top: var(--space-10);
+  margin-top: var(--space-14);
   display:flex;
-  align-items:baseline;
-  gap: var(--space-8);
+  flex-direction:column;
+  gap: var(--space-4);
 }
 
 .turni-visual-next-label{
   font-size: var(--fs-turni-form-hint);
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 700;
+  color: var(--subtext);
+  letter-spacing: 0.01em;
 }
 
 .turni-visual-next-value{
-  font-size: var(--fs-turni-form-hint);
-  font-weight: 400;
-  color: var(--subtext);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
 }
-
 
 .turni-visual-primary{
   width: 100%;
-  margin-top: var(--space-12);
-  border-radius: 999px;
-  border: 1px solid var(--ui-primary-pill-border);
-  background: var(--ui-primary-pill-bg);
-  height: 40px;
-  padding: 0 var(--space-16);
+  margin-top: var(--space-14);
+  border-radius: 16px;
+  border: 1px solid rgba(148,163,184,0.35);
+  background: var(--surface-strong);
+  min-height: 46px;
+  padding: 12px 12px;
   font-size: var(--fs-pill-btn);
-  font-weight: 500;
-  color: var(--ui-primary-pill-fg);
+  font-weight: 650;
+  color: var(--text);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  box-shadow: var(--ui-primary-pill-shadow);
-  transition: transform 0.08s ease-out;
+  box-shadow: none;
+  transition: transform 0.08s ease-out, background 0.12s ease-out;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+}
+
+.turni-visual-primary::after{
+  content: "›";
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.55;
+  transform: translateY(-1px);
 }
 
 .turni-visual-primary:active{
-  transform: scale(0.98);
-  background: rgba(10,132,255,0.14);
+  transform: scale(0.99);
+  background: rgba(148,163,184,0.14);
 }
 
 .turni-visual-sep{
   margin-top: var(--space-14);
   height: 1px;
-  background: rgba(148,163,184,0.25);
+  background: rgba(148,163,184,0.18);
 }
 
 .turni-visual-calendar{
@@ -1651,7 +1697,7 @@ body.turni-no-select * {
   gap: var(--space-10);
   color: var(--subtext);
   font-size: var(--fs-turni-form-hint);
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .turni-visual-calendar-left svg{
