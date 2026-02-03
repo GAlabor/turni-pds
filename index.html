@@ -460,45 +460,61 @@
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
           
-                    <div class="turni-card turni-visual-card">
-            <div class="turni-visual-top">
-              <h2 class="turni-panel-title">Turnazione Attiva</h2>
+            <div class="turni-card turni-visual-card turni-active-card">
+            <h2 class="turni-panel-title">Turnazione Attiva</h2>
 
-              <div class="turni-visual-active">
-                <span class="turni-visual-pill" data-turni-visual-hint>Nessuna turnazione impostata.</span>
-              </div>
+            
+              <button class="settings-row turni-active-row" type="button" data-turni-active-row>
+                <div class="settings-row-left">
+                  <span class="settings-row-label">Turnazione</span>
+                </div>
 
-            </div>
-
-            <div class="turni-visual-next">
-              <span class="turni-visual-next-label">Prossimo turno</span>
-              <span class="turni-visual-next-value" data-turni-start-summary></span>
-            </div>
-
-            <button class="turni-visual-primary" type="button" data-turni-start-row>
-              Imposta inizio turnazione
-            </button>
-
-            <div class="turni-visual-sep" aria-hidden="true"></div>
-
-            <div class="turni-visual-calendar">
-              <div class="turni-visual-calendar-left">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <use href="#ico-ui-calendar"></use>
-                </svg>
-                <span>Mostra in calendario</span>
-              </div>
-
-              <button
-                class="toggle-switch"
-                type="button"
-                role="switch"
-                aria-checked="true"
-                data-turni-visual-toggle
-                aria-label="Mostra o nascondi la turnazione nel calendario">
+                <div class="settings-row-right">
+                  <span class="settings-row-summary" data-turni-visual-hint>Nessuna turnazione impostata.</span>
+                  <span class="settings-row-chevron" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <use href="#ico-ui-chevron-right"></use>
+                    </svg>
+                  </span>
+                </div>
               </button>
+
+              <hr class="settings-separator">
+
+              <button class="settings-row turni-active-row" type="button" data-turni-start-row>
+                <div class="settings-row-left">
+                  <span class="settings-row-label">Prossimo turno</span>
+                </div>
+
+                <div class="settings-row-right">
+                  <span class="settings-row-summary" data-turni-start-summary></span>
+                  <span class="settings-row-chevron" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <use href="#ico-ui-chevron-right"></use>
+                    </svg>
+                  </span>
+                </div>
+              </button>
+
+              <hr class="settings-separator">
+
+              <div class="settings-row turni-active-row turni-active-row--switch">
+                <div class="settings-row-left">
+                  <span class="settings-row-label">Mostra in calendario</span>
+                </div>
+
+                <div class="settings-row-right">
+                  <button
+                    class="toggle-switch"
+                    type="button"
+                    role="switch"
+                    aria-checked="true"
+                    data-turni-visual-toggle
+                    aria-label="Mostra o nascondi la turnazione nel calendario">
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
 
           <div class="turni-card turnazioni-card is-collapsed">
             <div class="turni-card-header">

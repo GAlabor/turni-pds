@@ -886,10 +886,9 @@ body {
 
 
 .settings-row-summary {
-  font-size: var(--fs-settings-summary);
-  font-weight: var(--fw-settings-summary);
-  color: var(--col-settings-summary);
-  letter-spacing: var(--ls-settings-summary);
+  font-size: var(--fs-row-label);
+  font-weight: var(--fw-regular);
+  color: var(--subtext);
 }
 
 .settings-row-chevron {
@@ -1707,6 +1706,37 @@ body.turni-no-select * {
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.turni-active-card{
+  --_card-padding: 14px 12px 12px;
+}
+
+.turni-active-card .turni-panel-title{
+  margin: 0 0 var(--space-10) 0;
+}
+
+.turni-active-card .turni-active-group{
+  --_card-padding: 2px 12px 2px;
+  padding: 2px 12px 2px;
+}
+
+.turni-active-card .settings-row{
+  padding: 14px 6px;
+}
+
+.turni-active-card .settings-row-label{
+  font-size: var(--fs-turni-form-label);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.turni-active-card .settings-row-summary{
+  color: var(--subtext);
+}
+
+.turni-active-card .turni-active-row--switch{
+  cursor: default;
 }
 
 
