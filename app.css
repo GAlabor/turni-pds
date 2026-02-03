@@ -359,6 +359,11 @@
   box-sizing: border-box;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+}
+
 html,
 body {
   height: 100%;
@@ -861,6 +866,11 @@ body {
   justify-content: space-between;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  -webkit-text-size-adjust: 100%;
 }
 
 
@@ -1709,7 +1719,7 @@ body.turni-no-select * {
 }
 
 .turni-active-card{
-  --_card-padding: 14px 12px 12px;
+  --_card-padding: 14px 12px 6px;
 }
 
 .turni-active-card .turni-panel-title{
@@ -1722,22 +1732,34 @@ body.turni-no-select * {
 }
 
 .turni-active-card .settings-row{
-  padding: 14px 6px;
+  padding: 10px 6px;
+  min-height: 44px;
 }
 
 .turni-active-card .settings-row-label{
-  font-size: var(--fs-turni-form-label);
+  font-size: var(--fs-turni-nome);
   font-weight: 500;
   color: var(--text);
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .turni-active-card .settings-row-summary{
+  font-size: var(--fs-turni-orario);
+  font-weight: 400;
   color: var(--subtext);
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .turni-active-card .turni-active-row--switch{
   cursor: default;
+  padding-bottom: 6px;
 }
+
 
 
 .turni-inline-row {
