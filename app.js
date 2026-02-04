@@ -2405,7 +2405,6 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   const opts = options || {};
   const isEditing = !!opts.isEditing;
   const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
-
   const onEdit = typeof opts.onEdit === "function" ? opts.onEdit : null;
 
   listEl.innerHTML = "";
@@ -2433,22 +2432,21 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     editBtn.disabled = false;
 
     if (isEditing) {
-  editBtn.setAttribute("aria-pressed", "true");
-  editBtn.classList.remove("pill-btn");
-  editBtn.classList.add("icon-circle-btn");
-  editBtn.innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M6 12.5 L10 16.5 L18 7.5" />
-    </svg>
-  `;
-} else {
-  editBtn.removeAttribute("aria-pressed");
-  editBtn.classList.remove("icon-circle-btn");
-  editBtn.classList.add("pill-btn");
-  editBtn.textContent = "Modifica";
-}
-
+      editBtn.setAttribute("aria-pressed", "true");
+      editBtn.classList.remove("pill-btn");
+      editBtn.classList.add("icon-circle-btn");
+      editBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 12.5 L10 16.5 L18 7.5" />
+        </svg>
+      `;
+    } else {
+      editBtn.removeAttribute("aria-pressed");
+      editBtn.classList.remove("icon-circle-btn");
+      editBtn.classList.add("pill-btn");
+      editBtn.textContent = "Modifica";
+    }
   }
 
   turnazioni.forEach((t, index) => {
@@ -2456,6 +2454,9 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     row.className = "turno-item";
     row.dataset.index = String(index);
     row.dataset.turnazioneId = t && t.id != null ? String(t.id) : "";
+
+    const mover = document.createElement("div");
+    mover.className = "turno-swipe-mover";
 
     if (isEditing && onDelete) {
       const delBtn = document.createElement("button");
@@ -2473,25 +2474,34 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         onDelete(index);
       });
 
-      row.appendChild(delBtn);
+      mover.appendChild(delBtn);
     }
 
     const nameEl = document.createElement("span");
     nameEl.className = "turno-name";
     nameEl.textContent = t && t.name ? String(t.name) : "";
-    row.appendChild(nameEl);
 
     const sigleEl = document.createElement("span");
     sigleEl.className = "turno-orario";
     sigleEl.textContent = formatSigle(t);
-    row.appendChild(sigleEl);
+
+    const chevron = document.createElement("span");
+    chevron.className = "turno-row-chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6 L15 12 L9 18" /></svg>`;
+
+    mover.appendChild(nameEl);
+    mover.appendChild(sigleEl);
+    mover.appendChild(chevron);
+
+    row.appendChild(mover);
 
     if (onEdit) row.addEventListener("click", () => onEdit(index));
 
     listEl.appendChild(row);
   });
 }
-  
+
   const api = {
     panelTurni: null,
     listEl: null,
