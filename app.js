@@ -2406,10 +2406,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   const isEditing = !!opts.isEditing;
   const onDelete = typeof opts.onDelete === "function" ? opts.onDelete : null;
 
-  
-  const onSelect = (!isEditing && typeof opts.onSelect === "function") ? opts.onSelect : null;
-
-  const preferredId = opts.preferredId != null ? String(opts.preferredId) : null;
+  const onEdit = typeof opts.onEdit === "function" ? opts.onEdit : null;
 
   listEl.innerHTML = "";
 
@@ -2460,9 +2457,6 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     row.dataset.index = String(index);
     row.dataset.turnazioneId = t && t.id != null ? String(t.id) : "";
 
-    const isSel = preferredId && t && String(t.id) === preferredId;
-    row.classList.toggle("is-selected", !!isSel);
-
     if (isEditing && onDelete) {
       const delBtn = document.createElement("button");
       delBtn.type = "button";
@@ -2492,10 +2486,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     sigleEl.textContent = formatSigle(t);
     row.appendChild(sigleEl);
 
-    
-    if (onSelect) {
-      row.addEventListener("click", () => onSelect(index));
-    }
+    if (onEdit) row.addEventListener("click", () => onEdit(index));
 
     listEl.appendChild(row);
   });
@@ -2558,18 +2549,8 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         this.editBtn,
         {
           isEditing: !!opts.isEditing,
-          preferredId: this.preferredId,
           onDelete: opts.onDelete,
-          onSelect: (idx) => {
-            const t = this.saved && this.saved[idx] ? this.saved[idx] : null;
-            if (!t) return;
-            this.preferredId = String(t.id);
-            if (hasStorage) TurniStorage.savePreferredTurnazioneId(this.preferredId);
-            
-            this.refresh(options);
-            this.syncVisualHint();
-            this.notifyTurnoIniziale();
-          }
+          onEdit: opts.onEdit
         }
       );
 
@@ -3538,7 +3519,6 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         turnazioniToggleBtn,
         turnazioniHeader,
         turnazioniAddBtn,
-        turnazioniEditBtn,
         visualHintEl
       } = ctx || {};
       
@@ -3570,13 +3550,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   getCollapsed,
   setCollapsed,
   ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"],
-  onCollapse: (collapsed) => {
-    
-    if (collapsed && isEditing) {
-      isEditing = false;
-      refreshList();
-    }
-  }
+  onCollapse: () => {}
 });
 
         } else {
@@ -3588,13 +3562,6 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
           turnazioniToggleBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   turnazioniCollapsed = !turnazioniCollapsed;
-
-  
-  if (turnazioniCollapsed && isEditing) {
-    isEditing = false;
-    refreshList();
-  }
-
   apply();
 });
 
@@ -3611,10 +3578,6 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
         });
       }
 	      
-	      let isEditing = false;
-	      const getEditing = () => isEditing;
-	      const setEditing = (v) => { isEditing = !!v; };
-
 	      const loadTurnazioni = () => (
 	        window.TurniStorage && typeof TurniStorage.loadTurnazioni === "function"
 	          ? TurniStorage.loadTurnazioni()
@@ -3645,14 +3608,21 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	      const refreshList = () => {
 	        if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
 	          TurnazioniList.refresh({
-	            isEditing,
+	            isEditing: false,
+	            onEdit: (index) => {
+	              const list = loadTurnazioni();
+	              const t = list && list[index] ? list[index] : null;
+	              if (!t) return;
+	              if (window.TurnazioniAdd && typeof TurnazioniAdd.openEdit === "function") {
+	                TurnazioniAdd.openEdit(t, index);
+	              }
+	            },
 	            onDelete: (index) => {
 	              const list = loadTurnazioni();
 	              if (!Array.isArray(list) || !list[index]) return;
 	              list.splice(index, 1);
 	              saveTurnazioni(list);
 	              normalizePreferredAfterDelete(list);
-	              if (!list.length) setEditing(false);
 	              refreshList();
 	            }
 	          });
@@ -3665,8 +3635,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	          panelTurni,
 	          turnazioniListEl,
 	          turnazioniEmptyEl: turnazioniEmpty,
-	          visualHintEl,
-	          turnazioniEditBtn
+	          visualHintEl
 	        });
 	      }
 
@@ -3680,70 +3649,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
       }
       
 	      
-	      if (turnazioniEditBtn && window.TurniInteractions && typeof TurniInteractions.attachEditToggle === "function") {
-	        TurniInteractions.attachEditToggle({
-	          btnEdit: turnazioniEditBtn,
-	          getEditing,
-	          setEditing,
-	          canEdit: () => {
-	            const list = loadTurnazioni();
-	            return Array.isArray(list) && list.length > 0;
-	          },
-	          refresh: refreshList
-	        });
-	      } else if (turnazioniEditBtn) {
-	        
-	        turnazioniEditBtn.addEventListener("click", (e) => {
-	          e.stopPropagation();
-	          const list = loadTurnazioni();
-	          if (!Array.isArray(list) || !list.length) return;
-	          isEditing = !isEditing;
-	          refreshList();
-	        });
-	      }
 
-	      
-	      if (turnazioniListEl && window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === "function") {
-	        TurniInteractions.attachRowEditClick({
-	          listEl: turnazioniListEl,
-	          getEditing,
-	          onEditRow: (index) => {
-	            const list = loadTurnazioni();
-	            const t = list && list[index] ? list[index] : null;
-	            if (!t) return;
-	            if (window.TurnazioniAdd && typeof TurnazioniAdd.openEdit === "function") {
-	              TurnazioniAdd.openEdit(t, index);
-	            }
-	          }
-	        });
-	      }
-
-	      
-	      if (turnazioniListEl && window.TurniInteractions && typeof TurniInteractions.attachDragSort === "function") {
-	        TurniInteractions.attachDragSort({
-	          listEl: turnazioniListEl,
-	          getEditing,
-	          getItems: () => loadTurnazioni(),
-	          setItems: () => {},
-	          saveItems: (next) => {
-	            saveTurnazioni(next);
-	          },
-	          refresh: refreshList
-	        });
-	      }
-	
-	      
-	      if (window.SettingsUI && typeof SettingsUI.onChange === "function") {
-	        SettingsUI.onChange((prevId, nextId) => {
-	          
-	          if (prevId === "turni" && nextId !== "turni") {
-	            if (isEditing) {
-	              isEditing = false;
-	              refreshList();
-	            }
-	          }
-	        });
-	      }
 	      
 
       if (!this._storageListenerAttached) {
@@ -3771,11 +3677,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
 	      refreshList();
 	      
-	      this._exitEditMode = () => {
-	        if (!isEditing) return;
-	        isEditing = false;
-	        refreshList();
-	      };
+	      this._exitEditMode = () => {};
 
       
       this._setCollapsed = (v) => {

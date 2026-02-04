@@ -2688,15 +2688,6 @@ body.turni-no-select * {
 
 
 
-[data-turnazioni-list] .turno-item.is-selected .turno-name{
-  color: var(--accent);
-}
-
-[data-turnazioni-list] .turno-item.is-selected .turno-orario{
-  color: color-mix(in srgb, var(--accent) 70%, var(--subtext));
-}
-
-
 .calendar-container,
 .settings-container {
   background: var(--surface);
