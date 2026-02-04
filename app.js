@@ -4239,6 +4239,98 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 
 (function () {
 
+  let activeRowBtn = null;
+  let panelPick = null;
+  let listEl = null;
+  let emptyEl = null;
+
+  function loadTurnazioniSafe() {
+    if (!window.TurniStorage || typeof TurniStorage.loadTurnazioni !== "function") return [];
+    const all = TurniStorage.loadTurnazioni();
+    return Array.isArray(all) ? all : [];
+  }
+
+  function getPreferredIdSafe() {
+    if (!window.TurniStorage || typeof TurniStorage.loadPreferredTurnazioneId !== "function") return null;
+    const v = TurniStorage.loadPreferredTurnazioneId();
+    return v ? String(v) : null;
+  }
+
+  function setPreferredIdSafe(id) {
+    if (!window.TurniStorage || typeof TurniStorage.savePreferredTurnazioneId !== "function") return;
+    TurniStorage.savePreferredTurnazioneId(id ? String(id) : null);
+  }
+
+  function openPickPanel() {
+    if (!panelPick || !listEl) return;
+
+    const saved = loadTurnazioniSafe();
+    const preferredId = getPreferredIdSafe();
+
+    const items = saved.map((t) => ({
+      id: t && t.id != null ? String(t.id) : "",
+      nome: t && t.name != null ? String(t.name) : ""
+    })).filter(it => it.id);
+
+    renderTurnazioniPickList({
+      listEl,
+      emptyEl,
+      items,
+      isSelected: (it) => (preferredId && String(it.id) === String(preferredId)),
+      getLabel: (it) => (it && it.nome) ? String(it.nome) : "",
+      onPick: (it) => {
+        if (!it || !it.id) return;
+        setPreferredIdSafe(it.id);
+
+        if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
+          TurnazioniList.refresh();
+        }
+
+        try {
+          document.dispatchEvent(new CustomEvent("turnazioni:changed", {
+            detail: { source: "TurniActivePick" }
+          }));
+        } catch {}
+
+        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+          SettingsUI.openPanel("turni", { internal: true });
+        }
+      }
+    });
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni-active-pick", { internal: true });
+    }
+  }
+
+  function init(ctx) {
+    const panelTurni = ctx && ctx.panelTurni;
+    if (!panelTurni) return;
+
+    activeRowBtn = panelTurni.querySelector("[data-turni-active-row]");
+
+    const settingsView = document.querySelector(".view-settings");
+    panelPick = settingsView
+      ? settingsView.querySelector('.settings-panel.settings-turni-active-pick[data-settings-id="turni-active-pick"]')
+      : null;
+
+    listEl = panelPick ? panelPick.querySelector("#turniActivePickList") : null;
+    emptyEl = panelPick ? panelPick.querySelector("#turniActivePickEmpty") : null;
+
+    if (activeRowBtn) {
+      activeRowBtn.addEventListener("click", () => {
+        openPickPanel();
+      });
+    }
+  }
+
+  window.TurniActivePick = { init };
+
+})();
+
+
+(function () {
+
 
   function safeClosest(target, selector) {
     try { return target && target.closest ? target.closest(selector) : null; }
@@ -5505,6 +5597,10 @@ function initTurniPanel() {
 
   if (window.TurniStart && typeof TurniStart.init === "function") {
     TurniStart.init({ panelTurni });
+  }
+
+  if (window.TurniActivePick && typeof TurniActivePick.init === "function") {
+    TurniActivePick.init({ panelTurni });
   }
 
   exitEditModeImpl = function () {
