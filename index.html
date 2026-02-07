@@ -460,61 +460,76 @@
         <div class="settings-panel settings-turni" data-settings-id="turni">
 
           
-            <div class="turni-card turni-visual-card turni-active-card">
-            <h2 class="turni-panel-title">Turnazione Attiva</h2>
+<div class="turni-card turni-visual-card turni-active-card is-collapsed">
+  <div class="turni-card-header">
+    <h2 class="turni-panel-title">Turnazione Attiva</h2>
 
-            
-              <button class="settings-row turni-active-row" type="button" data-turni-active-row>
-                <div class="settings-row-left">
-                  <span class="settings-row-label">Turnazione</span>
-                </div>
+    <div class="turni-card-actions">
+      <button
+        class="turni-toggle-btn"
+        type="button"
+        data-turni-active-toggle
+        aria-label="Mostra o nascondi la turnazione attiva"
+        aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <use href="#ico-toggle-up"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
 
-                <div class="settings-row-right">
-                  <span class="settings-row-summary" data-turni-visual-hint>Nessuna turnazione impostata.</span>
-                  <span class="settings-row-chevron" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <use href="#ico-ui-chevron-right"></use>
-                    </svg>
-                  </span>
-                </div>
-              </button>
+  <button class="settings-row turni-active-row" type="button" data-turni-active-row>
+    <div class="settings-row-left">
+      <span class="settings-row-label">Turnazione</span>
+    </div>
 
-              <hr class="settings-separator">
+    <div class="settings-row-right">
+      <span class="settings-row-summary" data-turni-visual-hint>Nessuna turnazione impostata.</span>
+      <span class="settings-row-chevron" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <use href="#ico-ui-chevron-right"></use>
+        </svg>
+      </span>
+    </div>
+  </button>
 
-              <button class="settings-row turni-active-row" type="button" data-turni-start-row>
-                <div class="settings-row-left">
-                  <span class="settings-row-label">Prossimo turno</span>
-                </div>
+  <hr class="settings-separator">
 
-                <div class="settings-row-right">
-                  <span class="settings-row-summary" data-turni-start-summary></span>
-                  <span class="settings-row-chevron" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <use href="#ico-ui-chevron-right"></use>
-                    </svg>
-                  </span>
-                </div>
-              </button>
+  <button class="settings-row turni-active-row" type="button" data-turni-start-row>
+    <div class="settings-row-left">
+      <span class="settings-row-label">Inizio Rotazione</span>
+    </div>
 
-              <hr class="settings-separator">
+    <div class="settings-row-right">
+      <span class="settings-row-summary" data-turni-start-summary></span>
+      <span class="settings-row-chevron" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <use href="#ico-ui-chevron-right"></use>
+        </svg>
+      </span>
+    </div>
+  </button>
 
-              <div class="settings-row turni-active-row turni-active-row--switch">
-                <div class="settings-row-left">
-                  <span class="settings-row-label">Mostra in calendario</span>
-                </div>
+  <hr class="settings-separator">
 
-                <div class="settings-row-right">
-                  <button
-                    class="toggle-switch"
-                    type="button"
-                    role="switch"
-                    aria-checked="true"
-                    data-turni-visual-toggle
-                    aria-label="Mostra o nascondi la turnazione nel calendario">
-                  </button>
-                </div>
-              </div>
-            </div>
+  <div class="settings-row turni-active-row turni-active-row--switch">
+    <div class="settings-row-left">
+      <span class="settings-row-label">Mostra in calendario</span>
+    </div>
+
+    <div class="settings-row-right">
+      <button
+        class="toggle-switch"
+        type="button"
+        role="switch"
+        aria-checked="true"
+        data-turni-visual-toggle
+        aria-label="Mostra o nascondi la turnazione nel calendario">
+      </button>
+    </div>
+  </div>
+</div>
+
 
           <div class="turni-card turnazioni-card is-collapsed">
             <div class="turni-card-header">
