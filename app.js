@@ -4015,11 +4015,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     });
   }
 
-  function syncVisibility(visualOn) {
-    visibleByToggle = true;
-    if (startRowBtn) startRowBtn.hidden = false;
-    syncSummaryUI();
-  }
+function syncVisibility() {}
 
   function syncFromTurnazioniChange() {
     syncSummaryUI();
@@ -5221,33 +5217,29 @@ function initTurniPanel() {
   refreshList();
   applyCollapsedState();
 
-  if (visualToggleBtn && typeof loadVisualToggle === "function") {
-    let visualOn = loadVisualToggle();
+if (visualToggleBtn && typeof loadVisualToggle === "function") {
+  let visualOn = loadVisualToggle();
 
-    function applyVisualState() {
-      visualToggleBtn.classList.toggle("is-on", visualOn);
-      visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
-    }
+  function applyVisualState() {
+    visualToggleBtn.classList.toggle("is-on", visualOn);
+    visualToggleBtn.setAttribute("aria-checked", visualOn ? "true" : "false");
 
-      if (visualHint) {
-        visualHint.hidden = !visualOn;
-      }
+  }
 
-      if (window.TurniStart && typeof TurniStart.syncVisibility === "function") {
-        TurniStart.syncVisibility(visualOn);
-      }
-    }
+  applyVisualState();
 
+  visualToggleBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    visualOn = !visualOn;
     applyVisualState();
 
-    visualToggleBtn.addEventListener("click", () => {
-      visualOn = !visualOn;
-      applyVisualState();
-      if (typeof saveVisualToggle === "function") {
-        saveVisualToggle(visualOn);
-      }
-    });
-  
+    if (typeof saveVisualToggle === "function") {
+      saveVisualToggle(visualOn);
+    }
+  });
+}  
 
   function applyNoTimeState() {
     noTimeToggleBtn.classList.toggle("is-on", isNoTime);
@@ -5447,7 +5439,7 @@ function initTurniPanel() {
       headerEl,
       getCollapsed,
       setCollapsed,
-      ignoreClickSelectors: ["[data-turni-add]", "[data-turni-toggle]"]
+      ignoreClickSelectors: ["[data-turni-add]", "[data-turni-toggle]", "[data-turni-visual-toggle]"]
     });
 
     TurniInteractions.attachRowEditClick({
