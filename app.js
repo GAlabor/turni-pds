@@ -5157,11 +5157,6 @@ function initTurniPanel() {
   const visualToggleBtn = panelTurni.querySelector("[data-turni-visual-toggle]");
   const visualHint = panelTurni.querySelector("[data-turni-visual-hint]");
 
-  const activeCard = panelTurni.querySelector(".turni-active-card");
-const activeToggleBtn = panelTurni.querySelector("[data-turni-active-toggle]");
-const activeHeaderEl = activeCard ? activeCard.querySelector(".turni-card-header") : null;
-
-
   const formEl = panelAdd.querySelector("[data-turni-add-form]");
   const inputNome = panelAdd.querySelector("#addTurnoNome");
   const inputSigla = panelAdd.querySelector("#addTurnoSigla");
@@ -5176,15 +5171,13 @@ const activeHeaderEl = activeCard ? activeCard.querySelector(".turni-card-header
   const noTimeToggleBtn = panelAdd.querySelector("[data-turni-no-time-toggle]");
 
   if (
-  !activeCard || !activeToggleBtn || !activeHeaderEl ||
-  !listEl || !btnAdd || !toggleBtn || !cardEl || !headerEl ||
-  !formEl || !inputNome || !inputSigla || !inputInizio || !inputFine ||
-  !colorInput || !colorPreview || !colorTrigger ||
-  !saveBtn || !errorEl || !siglaPreviewEl || !noTimeToggleBtn
-) {
-  return;
-}
-
+    !listEl || !btnAdd || !toggleBtn || !cardEl || !headerEl ||
+    !formEl || !inputNome || !inputSigla || !inputInizio || !inputFine ||
+    !colorInput || !colorPreview || !colorTrigger ||
+    !saveBtn || !errorEl || !siglaPreviewEl || !noTimeToggleBtn
+  ) {
+    return;
+  }
 
   const turnazioniCard = panelTurni.querySelector(".turnazioni-card");
   const turnazioniToggleBtn = panelTurni.querySelector("[data-turnazioni-toggle]");
@@ -5197,21 +5190,7 @@ const activeHeaderEl = activeCard ? activeCard.querySelector(".turni-card-header
 
   let turni = loadTurni();
   let isCollapsed = cardEl.classList.contains("is-collapsed");
-
-  let isActiveCollapsed = activeCard.classList.contains("is-collapsed");
-
-function getActiveCollapsed() { return isActiveCollapsed; }
-function setActiveCollapsed(v) { isActiveCollapsed = !!v; }
-
-function applyActiveCollapsedState() {
-  activeCard.classList.toggle("is-collapsed", isActiveCollapsed);
-  activeToggleBtn.setAttribute("aria-expanded", isActiveCollapsed ? "false" : "true");
-}
-
-
   let editIndex = null;
-
-
 
   let isNoTime = false;
 
@@ -5241,8 +5220,6 @@ function applyActiveCollapsedState() {
 
   refreshList();
   applyCollapsedState();
-  applyActiveCollapsedState();
-
 
   if (visualToggleBtn && typeof loadVisualToggle === "function") {
     let visualOn = loadVisualToggle();
@@ -5463,24 +5440,15 @@ function applyActiveCollapsedState() {
     }
   });
 
-if (window.TurniInteractions) {
-  TurniInteractions.attachCollapsibleCard({
-    cardEl: activeCard,
-    toggleBtn: activeToggleBtn,
-    headerEl: activeHeaderEl,
-    getCollapsed: getActiveCollapsed,
-    setCollapsed: setActiveCollapsed
-  });
-
-  TurniInteractions.attachCollapsibleCard({
-    cardEl,
-    toggleBtn,
-    headerEl,
-    getCollapsed,
-    setCollapsed,
-    ignoreClickSelectors: ["[data-turni-add]", "[data-turni-toggle]"]
-  });
-
+  if (window.TurniInteractions) {
+    TurniInteractions.attachCollapsibleCard({
+      cardEl,
+      toggleBtn,
+      headerEl,
+      getCollapsed,
+      setCollapsed,
+      ignoreClickSelectors: ["[data-turni-add]", "[data-turni-toggle]"]
+    });
 
     TurniInteractions.attachRowEditClick({
       listEl,
@@ -5512,9 +5480,6 @@ if (window.TurniInteractions) {
       onExit: () => {
         isCollapsed = true;
         applyCollapsedState();
-        isActiveCollapsed = true;
-        applyActiveCollapsedState();
-
 
         if (window.Turnazioni && typeof Turnazioni._setCollapsed === "function") {
           Turnazioni._setCollapsed(true);
