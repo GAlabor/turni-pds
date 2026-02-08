@@ -5540,6 +5540,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
   };
   
   let activePanelId = null; 
+  let navStack = [];
   let pendingInternalNav = false;
   
   const changeListeners = new Set();
@@ -5634,6 +5635,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
 
       const prev = activePanelId;
       activePanelId = null;
+      navStack = [];
 
       main.classList.add("is-active");
       panels.forEach(p => p.classList.remove("is-active"));
@@ -5645,8 +5647,16 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     function showPanel(id, meta) {
       if (!id) return;
 
-      const prev = activePanelId;
-      activePanelId = id;
+const prev = activePanelId;
+
+if (prev === id) return;
+
+if (!(meta && meta.reason === "back")) {
+  navStack.push(prev);
+}
+
+activePanelId = id;
+
 
       if (prev === "turni" && id !== "turni") {
         if (window.Turni && typeof Turni.exitEditMode === "function") {
@@ -5681,32 +5691,17 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       });
     });
 
-    backBtn.addEventListener("click", () => {
-      
+backBtn.addEventListener("click", () => {
+  const prev = navStack.pop();
 
-      if (activePanelId === "turni-add") {
-        showPanel("turni", { reason: "back" });
-        return;
-      }
-      if (activePanelId === "turni-start") {
-        showPanel("turni", { reason: "back" });
-        return;
-      }
-      if (activePanelId === "turni-start-pick") {
-        showPanel("turni-start", { reason: "back" });
-        return;
-      }
-      if (activePanelId === "turnazioni-add") {
-        showPanel("turni", { reason: "back" });
-        return;
-      }
-      if (activePanelId === "turnazioni-pick") {
-        showPanel("turnazioni-add", { reason: "back" });
-        return;
-      }
+  if (prev !== null && prev !== undefined) {
+    showPanel(prev, { reason: "back" });
+    return;
+  }
 
-      showMain({ reason: "back" });
-    });
+  showMain({ reason: "back" });
+});
+
     
   }
   
