@@ -2449,11 +2449,34 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     }
   }
 
+  const IGNORE_SEL = [".turno-delete-btn", ".turni-handle", ".turno-swipe-actions", ".turno-swipe-action"];
+
+  function shouldIgnoreClick(target) {
+    return IGNORE_SEL.some(sel => (target && target.closest ? target.closest(sel) : null));
+  }
+
   turnazioni.forEach((t, index) => {
     const row = document.createElement("div");
     row.className = "turno-item";
     row.dataset.index = String(index);
     row.dataset.turnazioneId = t && t.id != null ? String(t.id) : "";
+
+    const actions = document.createElement("div");
+    actions.className = "turno-swipe-actions";
+
+    const btnTrashSwipe = document.createElement("button");
+    btnTrashSwipe.type = "button";
+    btnTrashSwipe.className = "turno-swipe-action is-trash";
+    btnTrashSwipe.setAttribute("aria-label", "Elimina turnazione");
+    btnTrashSwipe.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-trash"></use></svg>`;
+
+    btnTrashSwipe.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      if (onDelete) onDelete(index);
+    });
+
+    actions.appendChild(btnTrashSwipe);
+    row.appendChild(actions);
 
     const mover = document.createElement("div");
     mover.className = "turno-swipe-mover";
@@ -2490,17 +2513,39 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     chevron.setAttribute("aria-hidden", "true");
     chevron.innerHTML = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6 L15 12 L9 18" /></svg>`;
 
+    const handle = document.createElement("div");
+    handle.className = "turni-handle";
+    handle.setAttribute("aria-hidden", "true");
+    handle.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 7 H18" />
+        <path d="M6 12 H18" />
+        <path d="M6 17 H18" />
+      </svg>
+    `;
+
     mover.appendChild(nameEl);
     mover.appendChild(sigleEl);
     mover.appendChild(chevron);
+    mover.appendChild(handle);
 
     row.appendChild(mover);
 
-    if (onEdit) row.addEventListener("click", () => onEdit(index));
+    if (onEdit) {
+      row.addEventListener("click", (e) => {
+        const until = Number(listEl.dataset.suppressClickUntil || "0");
+        if (Date.now() < until) return;
+        if (shouldIgnoreClick(e.target)) return;
+        if (row.dataset.dragMoved === "1") return;
+        if (row.dataset.swipeMoved === "1") return;
+        onEdit(index);
+      });
+    }
 
     listEl.appendChild(row);
   });
 }
+
 
   const api = {
     panelTurni: null,
@@ -3615,29 +3660,30 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	        TurniStorage.savePreferredTurnazioneId(String(nextList[nextList.length - 1].id));
 	      };
 
-	      const refreshList = () => {
-	        if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
-	          TurnazioniList.refresh({
-	            isEditing: false,
-	            onEdit: (index) => {
-	              const list = loadTurnazioni();
-	              const t = list && list[index] ? list[index] : null;
-	              if (!t) return;
-	              if (window.TurnazioniAdd && typeof TurnazioniAdd.openEdit === "function") {
-	                TurnazioniAdd.openEdit(t, index);
-	              }
-	            },
-	            onDelete: (index) => {
-	              const list = loadTurnazioni();
-	              if (!Array.isArray(list) || !list[index]) return;
-	              list.splice(index, 1);
-	              saveTurnazioni(list);
-	              normalizePreferredAfterDelete(list);
-	              refreshList();
-	            }
-	          });
-	        }
-	      };
+      let turnazioni = [];
+
+      const refreshList = () => {
+        turnazioni = loadTurnazioni();
+        if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
+          TurnazioniList.refresh({
+            isEditing: false,
+            onEdit: (index) => {
+              const t = turnazioni && turnazioni[index] ? turnazioni[index] : null;
+              if (!t) return;
+              if (window.TurnazioniAdd && typeof TurnazioniAdd.openEdit === "function") {
+                TurnazioniAdd.openEdit(t, index);
+              }
+            },
+            onDelete: (index) => {
+              if (!Array.isArray(turnazioni) || !turnazioni[index]) return;
+              turnazioni.splice(index, 1);
+              saveTurnazioni(turnazioni);
+              normalizePreferredAfterDelete(turnazioni);
+              refreshList();
+            }
+          });
+        }
+      };
 	      
 
 	      if (window.TurnazioniList && typeof TurnazioniList.init === "function") {
@@ -3661,6 +3707,32 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	      
 
 	      
+
+if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
+        Turnazioni._turnazioniInteractionsAttached = true;
+
+        TurniInteractions.attachRowSwipe({
+          listEl: turnazioniListEl,
+          getEditing: () => false,
+          onSwipeDelete: (index) => {
+            turnazioni = loadTurnazioni();
+            if (!Array.isArray(turnazioni) || !turnazioni[index]) return;
+            turnazioni.splice(index, 1);
+            saveTurnazioni(turnazioni);
+            normalizePreferredAfterDelete(turnazioni);
+            refreshList();
+          }
+        });
+
+        TurniInteractions.attachLongPressReorder({
+          listEl: turnazioniListEl,
+          getItems: () => turnazioni,
+          setItems: (next) => { turnazioni = next; },
+          saveItems: (next) => { saveTurnazioni(next); },
+          refresh: refreshList
+        });
+      }
+
 
       if (!this._storageListenerAttached) {
         this._storageListenerAttached = true;
