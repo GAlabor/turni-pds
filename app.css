@@ -1318,14 +1318,21 @@ body.ui-modal-open{
 
 
 .turno-item--festivita {
-  align-items: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-10);
+  padding: var(--space-6) var(--space-2);
 }
+
 
 .festivita-right {
   display: flex;
   align-items: center;
   gap: 8px;
+  align-self: center;
 }
+
 
 
 .turno-item--festivita .festivita-left {
