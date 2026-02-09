@@ -1508,9 +1508,10 @@ function syncTurnazioniForTurnoChange(prevTurno, nextTurno) {
 
       emitStorageChange(TURNAZIONI_PREF_KEY);
 
-      if (window.Status && typeof Status.markSaved === "function") {
-        Status.markSaved();
-      }
+if (!window.__suppressAutosaveStatus && window.Status && typeof Status.markSaved === "function") {
+  Status.markSaved();
+}
+
     } catch (e) {
       console.warn("Salvataggio preferita fallito:", e);
     }
@@ -1561,9 +1562,10 @@ function syncTurnazioniForTurnoChange(prevTurno, nextTurno) {
     try {
       localStorage.setItem(FEST_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
       emitStorageChange(FEST_KEY);
-      if (window.Status && typeof Status.markSaved === "function") {
-        Status.markSaved();
-      }
+if (!window.__suppressAutosaveStatus && window.Status && typeof Status.markSaved === "function") {
+  Status.markSaved();
+}
+
     } catch (e) {
       console.warn("Salvataggio festività fallito:", e);
     }
@@ -6217,6 +6219,13 @@ function initTabs() {
       TurniStorage.seedFactoryDefaultsIfNeeded();
     }
 
+    if (window.Festivita && typeof Festivita.init === "function") {
+  window.__suppressAutosaveStatus = true;
+  Festivita.init();
+  window.__suppressAutosaveStatus = false;
+}
+
+
     
     if (window.Calendar && typeof Calendar.init === "function") {
       Calendar.init();
@@ -6248,10 +6257,6 @@ function initTabs() {
           
           if (window.Turni && typeof Turni.init === "function") {
             Turni.init();
-          }
-
-          if (window.Festivita && typeof Festivita.init === "function") {
-            Festivita.init();
           }
         };
       })();
