@@ -3605,7 +3605,11 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
   getCollapsed,
   setCollapsed,
   ignoreClickSelectors: ["[data-turnazioni-add]", "[data-turnazioni-toggle]", "[data-turnazioni-edit]"],
-  onCollapse: () => {}
+  onCollapse: (collapsed) => {
+    if (collapsed && window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+      TurniInteractions.closeAllSwipesInList(turnazioniListEl);
+    }
+  }
 });
 
         } else {
@@ -5526,7 +5530,12 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       headerEl,
       getCollapsed,
       setCollapsed,
-      ignoreClickSelectors: ["[data-turni-add]", "[data-turni-toggle]", "[data-turni-visual-toggle]"]
+      ignoreClickSelectors: ["[data-turni-add]", "[data-turni-toggle]", "[data-turni-visual-toggle]"],
+      onCollapse: (collapsed) => {
+        if (collapsed && window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+          TurniInteractions.closeAllSwipesInList(listEl);
+        }
+      }
     });
 
     TurniInteractions.attachRowEditClick({
