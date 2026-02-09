@@ -5170,6 +5170,20 @@ listEl.dataset.suppressClickUntil = String(Date.now() + 450);
     return { disconnect: () => obs.disconnect() };
   }
 
+
+function closeAllSwipesInList(listEl) {
+  if (!listEl) return;
+  const rows = listEl.querySelectorAll(".turno-item.is-swiped, .turno-item.is-swiping");
+  rows.forEach(r => {
+    r.classList.remove("is-swiped", "is-swiping");
+    r.style.setProperty("--swipeP", "0");
+    const mover = r.querySelector(".turno-swipe-mover") || r;
+    mover.style.transform = "";
+    delete r.dataset.swipeX;
+    r.dataset.swipeMoved = "0";
+  });
+}
+
   window.TurniInteractions = {
   attachCollapsibleCard,
   attachEditToggle,
@@ -5177,6 +5191,7 @@ listEl.dataset.suppressClickUntil = String(Date.now() + 450);
   attachRowSwipe,
   attachDragSort,
   attachLongPressReorder,
+  closeAllSwipesInList,
   attachPanelExitReset
 };
 
@@ -5542,6 +5557,11 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     TurniInteractions.attachPanelExitReset({
       panelEl: panelTurni,
       onExit: () => {
+        if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+          TurniInteractions.closeAllSwipesInList(listEl);
+          const tList = panelTurni.querySelector("[data-turnazioni-list]");
+          TurniInteractions.closeAllSwipesInList(tList);
+        }
         isCollapsed = true;
         applyCollapsedState();
 
@@ -6113,6 +6133,14 @@ function initTabs() {
             Turnazioni.exitEditMode();
           }
 
+
+          if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+            const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
+            const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
+            TurniInteractions.closeAllSwipesInList(turniList);
+            TurniInteractions.closeAllSwipesInList(turnazioniList);
+          }
+
           if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
             
             SettingsUI.showMain();
@@ -6122,15 +6150,24 @@ function initTabs() {
       }
       
       
+      
       if (activeViewId === "settings" && target !== "settings") {
         if (window.Turni && typeof Turni.exitEditMode === "function") {
           Turni.exitEditMode();
         }
-        
+
         if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
           Turnazioni.exitEditMode();
         }
+
+        if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+          const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
+          const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
+          TurniInteractions.closeAllSwipesInList(turniList);
+          TurniInteractions.closeAllSwipesInList(turnazioniList);
+        }
       }
+
 
       
       tabs.forEach(t => t.classList.toggle("active", t === tab));
