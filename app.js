@@ -638,17 +638,25 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       const colIndex = (startIndex + d - 1) % 7;
 
       const dateObj = new Date(currentYear, currentMonth, d);
-      let festNome = null;
-      if (window.Festivita && typeof Festivita.getNomeForDate === "function") {
-        festNome = Festivita.getNomeForDate(dateObj);
+
+      let festInfo = null;
+      if (window.Festivita) {
+        if (typeof Festivita.getInfoForDate === "function") {
+          festInfo = Festivita.getInfoForDate(dateObj);
+        } else if (typeof Festivita.getNomeForDate === "function") {
+          const nome = Festivita.getNomeForDate(dateObj);
+          if (nome) festInfo = { nome: String(nome), livello: "festivo" };
+        }
       }
 
-      if (colIndex === 6 || festNome) {
+      if (colIndex === 6) {
         cell.classList.add("sunday");
       }
 
-      if (festNome) {
-        cell.title = festNome;
+      if (festInfo && festInfo.nome) {
+        const livello = (festInfo.livello === "superfestivo") ? "superfestivo" : "festivo";
+        cell.classList.add(livello === "superfestivo" ? "is-superfestivo" : "is-festivo");
+        cell.title = String(festInfo.nome);
       }
 
       if (isCurrentMonth && d === today.getDate()) {
@@ -1781,18 +1789,28 @@ if (typeof o.factory !== 'boolean') {
     if (cacheYear === y && cacheMap) return cacheMap;
     const map = new Map();
     buildListForYear(y).forEach((it) => {
-      map.set(it.iso, it.nome);
+      map.set(it.iso, { nome: it.nome, livello: it.livello });
     });
     cacheYear = y;
     cacheMap = map;
     return map;
   }
 
-  function getNomeForDate(dateObj) {
+  function getInfoForDate(dateObj) {
     if (!(dateObj instanceof Date)) return null;
     const y = dateObj.getFullYear();
     const map = (cacheYear === y && cacheMap) ? cacheMap : buildMapForYear(y);
-    return map.get(iso(dateObj)) || null;
+    const hit = map.get(iso(dateObj)) || null;
+    if (!hit) return null;
+    const nome = (hit && hit.nome != null) ? String(hit.nome) : "";
+    if (!nome) return null;
+    const livello = (hit && hit.livello === "superfestivo") ? "superfestivo" : "festivo";
+    return { nome, livello };
+  }
+
+  function getNomeForDate(dateObj) {
+    const info = getInfoForDate(dateObj);
+    return info ? info.nome : null;
   }
 
   function renderSettingsPanel() {
@@ -2134,7 +2152,7 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
     });
   }
 
-  window.Festivita = { init, getNomeForDate };
+  window.Festivita = { init, getNomeForDate, getInfoForDate };
 })();
 
 
