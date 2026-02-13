@@ -804,6 +804,99 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       renderYears();
     }
   }
+  function setupSwipeToNavigate() {
+    if (!calendarContainer) return;
+
+    let active = false;
+    let pid = null;
+    let sx = 0;
+    let sy = 0;
+    let lx = 0;
+    let ly = 0;
+    let locked = false;
+    let horiz = false;
+
+    function reset() {
+      active = false;
+      pid = null;
+      sx = sy = lx = ly = 0;
+      locked = false;
+      horiz = false;
+    }
+
+    function canStart(ev) {
+      if (!ev) return false;
+      if (ev.pointerType !== "touch") return false;
+      if (currentMode !== MODES.DAYS) return false;
+      const t = ev.target;
+      if (t && t.closest && t.closest("button, a, input, textarea, select, label, [role=\"button\"]")) return false;
+      return true;
+    }
+
+    calendarContainer.addEventListener("pointerdown", (ev) => {
+      if (!canStart(ev)) return;
+      active = true;
+      pid = ev.pointerId;
+      sx = lx = ev.clientX;
+      sy = ly = ev.clientY;
+      locked = false;
+      horiz = false;
+    });
+
+    calendarContainer.addEventListener(
+      "pointermove",
+      (ev) => {
+        if (!active || ev.pointerId !== pid) return;
+
+        lx = ev.clientX;
+        ly = ev.clientY;
+
+        const dx = lx - sx;
+        const dy = ly - sy;
+        const adx = Math.abs(dx);
+        const ady = Math.abs(dy);
+
+        if (!locked) {
+          if (adx < 10 && ady < 10) return;
+
+          if (adx > ady * 1.2) {
+            locked = true;
+            horiz = true;
+            try { calendarContainer.setPointerCapture(pid); } catch {}
+            ev.preventDefault();
+          } else {
+            locked = true;
+            horiz = false;
+          }
+        }
+
+        if (horiz) ev.preventDefault();
+      },
+      { passive: false }
+    );
+
+    function end(ev) {
+      if (!active || ev.pointerId !== pid) return;
+
+      const dx = lx - sx;
+      const dy = ly - sy;
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+
+      if (horiz && currentMode === MODES.DAYS && adx >= 45 && adx > ady * 1.2) {
+        if (dx < 0) goNext();
+        else goPrev();
+      }
+
+      try { calendarContainer.releasePointerCapture(pid); } catch {}
+      reset();
+    }
+
+    calendarContainer.addEventListener("pointerup", end);
+    calendarContainer.addEventListener("pointercancel", end);
+  }
+
+
 
   function setupOutsideClickHandler() {
     document.addEventListener("click", (ev) => {
@@ -913,6 +1006,9 @@ if (prevBtn) {
 if (nextBtn) {
   nextBtn.addEventListener("click", goNext);
 }
+
+setupSwipeToNavigate();
+
     
     monthLabel.addEventListener("click", () => {
       if (currentMode === MODES.DAYS) {
