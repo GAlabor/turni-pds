@@ -359,11 +359,6 @@
         </div>
         
         <div class="settings-panel settings-theme" data-settings-id="theme">
-          <div class="settings-group">
-            <p class="settings-hint">
-              Scegli come visualizzare Turni PdS.
-            </p>
-          </div>
 
           <button class="settings-choice" data-theme="system">
             <span class="settings-choice-label" data-theme-label="system"></span>
@@ -438,11 +433,6 @@
         </div>
         
         <div class="settings-panel settings-backup-restore" data-settings-id="backup-restore">
-          <div class="settings-group">
-            <p class="settings-hint">
-              Ripristina i dati dell’app. Operazione irreversibile.
-            </p>
-          </div>
 
 <button class="settings-choice settings-choice--primary" type="button" data-backup-restore-factory>
   Ripristina configurazione iniziale
@@ -679,20 +669,17 @@
   data-settings-id="turni-start"
   data-settings-title="Inizio rotazione">
 
-  <div class="settings-group">
-    <p class="settings-hint">
-      Scegli il giorno e il turno iniziale della rotazione.
-    </p>
-  </div>
+<div class="turni-add-toolbar">
+  <button class="icon-circle-btn" type="button" data-turni-start-save aria-label="Conferma">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 13 L9 17 L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <p class="turni-error" data-turni-start-error hidden>
+    Seleziona giorno e turno
+  </p>
+</div>
 
-  <div class="turni-add-toolbar">
-    <button class="pill-btn turni-save-btn" type="button" data-turni-start-save>
-      Salva
-    </button>
-    <p class="turni-error" data-turni-start-error hidden>
-      Seleziona giorno e turno
-    </p>
-  </div>
 
   <div class="turni-form">
 
