@@ -2760,6 +2760,39 @@ body.turni-no-select * {
   color: var(--accent);
 }
 
+.icon-circle-btn--confirm{
+  width: var(--icon-circle-lg);
+  height: var(--icon-circle-lg);
+  background: var(--accent);
+  border: none;
+  color: var(--text);
+}
+
+.icon-circle-btn--confirm svg{
+  width: 30px;
+  height: 30px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+}
+
+@media (hover:hover) {
+  .icon-circle-btn--confirm:hover{
+    background: var(--accent);
+    color: var(--text);
+    border-color: transparent;
+    box-shadow: var(--shadow-accent-hover);
+  }
+}
+
+.icon-circle-btn--confirm:active,
+.icon-circle-btn--confirm.is-press{
+  transform: scale(0.9);
+  background: var(--accent);
+  color: var(--text);
+  border-color: transparent;
+  box-shadow: var(--shadow-accent-press);
+}
+
 
 
 .nav-btn {
@@ -2804,6 +2837,13 @@ body.turni-no-select * {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.icon-circle-btn--confirm svg{
+  width: 30px;
+  height: 30px;
+  stroke-width: 2.4;
+}
+
 
 
 @media (hover:hover) {
