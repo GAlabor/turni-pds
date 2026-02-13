@@ -57,8 +57,8 @@
   
   --dow-muted: #6b7280;     
   --sunday: #5E6A7D;
---cal-festivo: #AA6F6F;
---cal-superfestivo: #AA6F6F;
+--cal-festivo: #B34747;
+--cal-superfestivo: #B34747;
   --today-border: var(--accent); 
   
   --version-color: rgba(15,23,42,0.65);
@@ -285,8 +285,8 @@
     --dow-muted: #9ca3af;
     --sunday: #8A93A3;
 
---cal-festivo: #E3A9A9;
---cal-superfestivo: #E3A9A9;
+--cal-festivo: #F08A8A;
+--cal-superfestivo: #F08A8A;
     --today-border: var(--accent);
     --version-color: rgba(226,232,240,0.8);
 
@@ -332,8 +332,8 @@
   --dow-muted: #9ca3af;
   --sunday: #8A93A3;
 
-    --cal-festivo: #E3A9A9;
-    --cal-superfestivo: #E3A9A9;
+    --cal-festivo: #F08A8A;
+    --cal-superfestivo: #F08A8A;
   --today-border: var(--accent);
   --version-color: rgba(226,232,240,0.8);
 
