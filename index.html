@@ -148,6 +148,11 @@
         <path d="M5 12 L19 12" />
       </symbol>
 
+      <symbol id="ico-check" viewBox="0 0 24 24">
+        <path d="M5 13 L9 17 L19 7" />
+      </symbol>
+
+
       <symbol id="ico-trash" viewBox="0 0 24 24">
         <path d="M9 6.5a3 3 0 0 1 6 0" />
         <path d="M4.8 6.5h14.4" />
@@ -670,11 +675,11 @@
   data-settings-title="Inizio rotazione">
 
 <div class="turni-add-toolbar">
-  <button class="icon-circle-btn" type="button" data-turni-start-save aria-label="Conferma">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M5 13 L9 17 L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
+<button class="icon-circle-btn" type="button" data-turni-start-save aria-label="Conferma">
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <use href="#ico-check"></use>
+  </svg>
+</button>
   <p class="turni-error" data-turni-start-error hidden>
     Seleziona giorno e turno
   </p>
