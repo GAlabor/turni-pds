@@ -804,8 +804,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       renderYears();
     }
   }
-  function setupSwipeToNavigate() {
-    if (!calendarContainer) return;
+  function setupSwipeToNavigate(rootEl) {
+    const root = rootEl || calendarContainer;
+    if (!root) return;
 
     let active = false;
     let pid = null;
@@ -824,16 +825,26 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       horiz = false;
     }
 
+    function isAllowedZone(target) {
+      if (!target || !target.closest) return false;
+      return !!target.closest(".monthbar, .calendar-wrapper, #calendarContainer");
+    }
+
     function canStart(ev) {
       if (!ev) return false;
       if (ev.pointerType !== "touch") return false;
       if (currentMode !== MODES.DAYS) return false;
+
       const t = ev.target;
+
+      if (!isAllowedZone(t)) return false;
+
       if (t && t.closest && t.closest("button, a, input, textarea, select, label, [role=\"button\"]")) return false;
+
       return true;
     }
 
-    calendarContainer.addEventListener("pointerdown", (ev) => {
+    root.addEventListener("pointerdown", (ev) => {
       if (!canStart(ev)) return;
       active = true;
       pid = ev.pointerId;
@@ -843,7 +854,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       horiz = false;
     });
 
-    calendarContainer.addEventListener(
+    root.addEventListener(
       "pointermove",
       (ev) => {
         if (!active || ev.pointerId !== pid) return;
@@ -862,7 +873,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
           if (adx > ady * 1.2) {
             locked = true;
             horiz = true;
-            try { calendarContainer.setPointerCapture(pid); } catch {}
+            try { root.setPointerCapture(pid); } catch {}
             ev.preventDefault();
           } else {
             locked = true;
@@ -888,12 +899,12 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
         else goPrev();
       }
 
-      try { calendarContainer.releasePointerCapture(pid); } catch {}
+      try { root.releasePointerCapture(pid); } catch {}
       reset();
     }
 
-    calendarContainer.addEventListener("pointerup", end);
-    calendarContainer.addEventListener("pointercancel", end);
+    root.addEventListener("pointerup", end);
+    root.addEventListener("pointercancel", end);
   }
 
 
@@ -994,6 +1005,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     prevBtn = document.querySelector(".prev");
     nextBtn = document.querySelector(".next");
     calendarContainer = document.getElementById("calendarContainer");
+    const calendarViewEl = document.querySelector(".view-calendar");
 
     if (!gridDays || !monthLabel || !calendarContainer) return;
 
@@ -1007,7 +1019,7 @@ if (nextBtn) {
   nextBtn.addEventListener("click", goNext);
 }
 
-setupSwipeToNavigate();
+setupSwipeToNavigate(calendarViewEl || calendarContainer);
 
     
     monthLabel.addEventListener("click", () => {

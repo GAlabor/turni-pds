@@ -484,6 +484,7 @@ body {
 
 
 .monthbar {
+  touch-action: pan-y;
   margin: var(--space-14) 0 var(--space-20) 0;
   display: flex;
   align-items: center;
@@ -493,12 +494,14 @@ body {
 
 
 .month-label {
+  touch-action: pan-y;
   font-size: var(--fs-cal-header); 
   font-weight: 600;
   cursor: pointer;
 }
 
 .calendar-wrapper {
+  touch-action: pan-y;
   display: flex;
   justify-content: center;
 }
