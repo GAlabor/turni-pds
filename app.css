@@ -551,6 +551,8 @@ body {
 .cal-swipe-layer {
   position: absolute;
   inset: 0;
+  padding: inherit;
+  box-sizing: border-box;
   will-change: transform;
   pointer-events: none;
   z-index: 1;
