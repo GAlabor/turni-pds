@@ -855,13 +855,14 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   function setSwipeFx(dx) {
     if (!calendarContainer) return;
     const w = Math.max(1, calendarContainer.clientWidth || 1);
-    const p = Math.max(-1, Math.min(1, dx / w));
-    const r = (-p * 6);
-    const shade = Math.min(0.22, Math.abs(p) * 0.22);
-    const prevO = Math.max(0, Math.min(1, p * 1.15));
-    const nextO = Math.max(0, Math.min(1, (-p) * 1.15));
-    const peekR = (-p * 4);
-    calendarContainer.style.setProperty("--calSwipeX", Math.round(dx) + "px");
+    const clampedDx = Math.max(-w, Math.min(w, dx));
+    const p = Math.max(-1, Math.min(1, clampedDx / w));
+    const r = 0;
+    const shade = Math.min(0.10, Math.abs(p) * 0.10);
+    const prevO = Math.max(0, Math.min(1, p));
+    const nextO = Math.max(0, Math.min(1, -p));
+    const peekR = 0;
+    calendarContainer.style.setProperty("--calSwipeX", Math.round(clampedDx) + "px");
     calendarContainer.style.setProperty("--calSwipeR", (Math.round(r * 10) / 10) + "deg");
     calendarContainer.style.setProperty("--calSwipeShade", String(shade));
     calendarContainer.style.setProperty("--calPeekPrevO", String(prevO));
@@ -980,15 +981,12 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     swipeAnimRunning = true;
 
     const w = Math.max(1, calendarContainer.clientWidth || 1);
-    const startDx = Number.isFinite(fromDx) ? fromDx : 0;
-    const startR = (function () {
-      const p = Math.max(-1, Math.min(1, startDx / w));
-      return (-p * 6);
-    })();
+    const startDx = Number.isFinite(fromDx) ? Math.max(-w, Math.min(w, fromDx)) : 0;
+    const startR = 0;
 
     const oldLayer = inner.cloneNode(true);
     oldLayer.classList.add("cal-swipe-layer", "cal-swipe-old");
-    oldLayer.style.transform = `translateX(${Math.round(startDx)}px) rotateY(${(Math.round(startR * 10) / 10)}deg)`;
+    oldLayer.style.transform = `translate3d(${Math.round(startDx)}px, 0, 0) rotateY(${(Math.round(startR * 10) / 10)}deg)`;
     calendarContainer.appendChild(oldLayer);
 
     calendarContainer.classList.remove("is-swiping", "is-settling", "is-animating");
@@ -1000,7 +998,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     const newStart = -dir * w;
 
     inner.style.transition = "none";
-    inner.style.transform = `translateX(${Math.round(newStart)}px) rotateY(${(-dir * 6).toFixed(1)}deg)`;
+    inner.style.transform = `translate3d(${Math.round(newStart)}px, 0, 0) rotateY(0deg)`;
 
     if (dir < 0) goNext(); else goPrev();
 
@@ -1009,9 +1007,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     calendarContainer.classList.add("is-animating");
 
     requestAnimationFrame(() => {
-      oldLayer.style.transform = `translateX(${Math.round(dir * w)}px) rotateY(${(dir * 6).toFixed(1)}deg)`;
+      oldLayer.style.transform = `translate3d(${Math.round(dir * w)}px, 0, 0) rotateY(0deg)`;
       inner.style.transition = "transform 280ms cubic-bezier(0.22, 0.9, 0.2, 1)";
-      inner.style.transform = "translateX(0px) rotateY(0deg)";
+      inner.style.transform = "translate3d(0px, 0, 0) rotateY(0deg)";
     });
 
     const cleanup = () => {

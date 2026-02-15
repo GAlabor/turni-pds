@@ -523,9 +523,10 @@ body {
 
 .cal-swipe-inner {
   position: relative;
-  transform: translateX(var(--calSwipeX, 0px)) rotateY(var(--calSwipeR, 0deg));
+  transform: translate3d(var(--calSwipeX, 0px), 0, 0) rotateY(var(--calSwipeR, 0deg));
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
+  backface-visibility: hidden;
   will-change: transform;
   z-index: 2;
 }
@@ -556,6 +557,7 @@ body {
   will-change: transform;
   pointer-events: none;
   z-index: 1;
+  backface-visibility: hidden;
 }
 
 .cal-swipe-peek {
@@ -564,13 +566,13 @@ body {
 
 .cal-swipe-peek-prev {
   opacity: var(--calPeekPrevO, 0);
-  transform: translateX(calc(-100% + var(--calSwipeX, 0px))) rotateY(var(--calPeekR, 0deg));
+  transform: translate3d(calc(-100% + var(--calSwipeX, 0px)), 0, 0) rotateY(var(--calPeekR, 0deg));
   transform-origin: 50% 50%;
 }
 
 .cal-swipe-peek-next {
   opacity: var(--calPeekNextO, 0);
-  transform: translateX(calc(100% + var(--calSwipeX, 0px))) rotateY(var(--calPeekR, 0deg));
+  transform: translate3d(calc(100% + var(--calSwipeX, 0px)), 0, 0) rotateY(var(--calPeekR, 0deg));
   transform-origin: 50% 50%;
 }
 
