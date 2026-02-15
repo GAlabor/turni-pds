@@ -609,35 +609,37 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
   function renderDays() {
     if (!gridDays) return;
 
-    gridDays.innerHTML = "";
+    fillDaysGrid(gridDays, currentYear, currentMonth);
 
-    const firstDay = new Date(currentYear, currentMonth, 1);
+    updateHeader();
+    updateDayCellSize();
+  }
 
+  function fillDaysGrid(targetGrid, year, month) {
+    if (!targetGrid) return;
+    targetGrid.innerHTML = "";
+
+    const firstDay = new Date(year, month, 1);
     const startIndex = (firstDay.getDay() + 6) % 7;
-
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const isCurrentMonth =
-      currentYear === today.getFullYear() &&
-      currentMonth === today.getMonth();
+      year === today.getFullYear() &&
+      month === today.getMonth();
 
-    
     for (let i = 0; i < startIndex; i++) {
       const empty = document.createElement("div");
       empty.className = "day empty";
-      gridDays.appendChild(empty);
+      targetGrid.appendChild(empty);
     }
 
-    
     for (let d = 1; d <= daysInMonth; d++) {
       const cell = document.createElement("div");
       cell.className = "day";
       cell.textContent = d;
 
-      
       const colIndex = (startIndex + d - 1) % 7;
-
-      const dateObj = new Date(currentYear, currentMonth, d);
+      const dateObj = new Date(year, month, d);
 
       let festInfo = null;
       if (window.Festivita) {
@@ -665,20 +667,24 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
       applyTurnazioneOverlayToCell(cell, dateObj);
 
-      gridDays.appendChild(cell);
+      targetGrid.appendChild(cell);
     }
-
-    updateHeader();
-    updateDayCellSize();
   }
 
   function renderMonths() {
     if (!gridMonths) return;
 
-    gridMonths.innerHTML = "";
+    fillMonthsGrid(gridMonths, currentYear, true);
 
+    updateHeader();
+  }
+
+  function fillMonthsGrid(targetGrid, year, enableClicks) {
+    if (!targetGrid) return;
+    targetGrid.innerHTML = "";
     const todayYear = today.getFullYear();
     const todayMonth = today.getMonth();
+    const clicks = !!enableClicks;
 
     for (let m = 0; m < 12; m++) {
       const cell = document.createElement("button");
@@ -686,54 +692,65 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       cell.className = "month-cell";
       cell.textContent = monthShort[m];
 
-      
-      if (currentYear === todayYear && m === todayMonth) {
+      if (year === todayYear && m === todayMonth) {
         cell.classList.add("is-current");
       }
 
-      cell.addEventListener("click", () => {
-        currentMonth = m;
-        currentMode = MODES.DAYS;
-        updateContainerModeClass();
-        renderDays();
-      });
+      if (clicks) {
+        cell.addEventListener("click", () => {
+          currentMonth = m;
+          currentMode = MODES.DAYS;
+          updateContainerModeClass();
+          renderDays();
+        });
+      } else {
+        cell.disabled = true;
+      }
 
-      gridMonths.appendChild(cell);
+      targetGrid.appendChild(cell);
     }
-
-    updateHeader();
   }
 
   function renderYears() {
     if (!gridYears) return;
 
-    gridYears.innerHTML = "";
+    fillYearsGrid(gridYears, yearRangeStart, YEARS_PAGE_SIZE, true);
 
-    const end = yearRangeStart + YEARS_PAGE_SIZE - 1;
+    updateHeader();
+  }
+
+  function fillYearsGrid(targetGrid, rangeStart, pageSize, enableClicks) {
+    if (!targetGrid) return;
+    targetGrid.innerHTML = "";
+    const start = Number.isFinite(rangeStart) ? rangeStart : 0;
+    const size = Number.isFinite(pageSize) ? pageSize : YEARS_PAGE_SIZE;
+    const end = start + size - 1;
     const todayYear = today.getFullYear();
+    const clicks = !!enableClicks;
 
-    for (let y = yearRangeStart; y <= end; y++) {
+    for (let y = start; y <= end; y++) {
       const cell = document.createElement("button");
       cell.type = "button";
       cell.className = "year-cell";
       cell.textContent = y;
 
-      
       if (y === todayYear) {
         cell.classList.add("is-current");
       }
 
-      cell.addEventListener("click", () => {
-        currentYear = y;
-        currentMode = MODES.MONTHS;
-        updateContainerModeClass();
-        renderMonths();
-      });
+      if (clicks) {
+        cell.addEventListener("click", () => {
+          currentYear = y;
+          currentMode = MODES.MONTHS;
+          updateContainerModeClass();
+          renderMonths();
+        });
+      } else {
+        cell.disabled = true;
+      }
 
-      gridYears.appendChild(cell);
+      targetGrid.appendChild(cell);
     }
-
-    updateHeader();
   }
 
   function setMode(mode) {
@@ -804,6 +821,248 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       renderYears();
     }
   }
+
+  let swipeInner = null;
+  let swipeAnimRunning = false;
+  let peekPrevLayer = null;
+  let peekNextLayer = null;
+  let peekKey = "";
+
+  function ensureSwipeInner() {
+    if (!calendarContainer) return null;
+    if (swipeInner && swipeInner.parentElement === calendarContainer) return swipeInner;
+
+    const existing = calendarContainer.querySelector(":scope > .cal-swipe-inner");
+    if (existing) {
+      swipeInner = existing;
+      return swipeInner;
+    }
+
+    const inner = document.createElement("div");
+    inner.className = "cal-swipe-inner";
+
+    const toMove = [];
+    for (const ch of Array.from(calendarContainer.children)) {
+      if (ch.classList && ch.classList.contains("cal-swipe-layer")) continue;
+      toMove.push(ch);
+    }
+    toMove.forEach(n => inner.appendChild(n));
+    calendarContainer.appendChild(inner);
+    swipeInner = inner;
+    return swipeInner;
+  }
+
+  function setSwipeFx(dx) {
+    if (!calendarContainer) return;
+    const w = Math.max(1, calendarContainer.clientWidth || 1);
+    const p = Math.max(-1, Math.min(1, dx / w));
+    const r = (-p * 6);
+    const shade = Math.min(0.22, Math.abs(p) * 0.22);
+    const prevO = Math.max(0, Math.min(1, p * 1.15));
+    const nextO = Math.max(0, Math.min(1, (-p) * 1.15));
+    const peekR = (-p * 4);
+    calendarContainer.style.setProperty("--calSwipeX", Math.round(dx) + "px");
+    calendarContainer.style.setProperty("--calSwipeR", (Math.round(r * 10) / 10) + "deg");
+    calendarContainer.style.setProperty("--calSwipeShade", String(shade));
+    calendarContainer.style.setProperty("--calPeekPrevO", String(prevO));
+    calendarContainer.style.setProperty("--calPeekNextO", String(nextO));
+    calendarContainer.style.setProperty("--calPeekR", (Math.round(peekR * 10) / 10) + "deg");
+  }
+
+  function clearSwipeFx() {
+    if (!calendarContainer) return;
+    calendarContainer.style.removeProperty("--calSwipeX");
+    calendarContainer.style.removeProperty("--calSwipeR");
+    calendarContainer.style.removeProperty("--calSwipeShade");
+    calendarContainer.style.removeProperty("--calPeekPrevO");
+    calendarContainer.style.removeProperty("--calPeekNextO");
+    calendarContainer.style.removeProperty("--calPeekR");
+  }
+
+  function stripIdsDeep(el) {
+    if (!el || !el.querySelectorAll) return;
+    const all = el.querySelectorAll("[id]");
+    all.forEach(n => n.removeAttribute("id"));
+  }
+
+  function getAdjacentState(dir) {
+    const s = {
+      mode: currentMode,
+      year: currentYear,
+      month: currentMonth,
+      yearRangeStart: yearRangeStart
+    };
+
+    if (s.mode === MODES.DAYS) {
+      let y = s.year;
+      let m = s.month + (dir > 0 ? -1 : 1);
+      if (m < 0) { m = 11; y--; }
+      if (m > 11) { m = 0; y++; }
+      return { mode: s.mode, year: y, month: m, yearRangeStart: s.yearRangeStart };
+    }
+
+    if (s.mode === MODES.MONTHS) {
+      return { mode: s.mode, year: s.year + (dir > 0 ? -1 : 1), month: s.month, yearRangeStart: s.yearRangeStart };
+    }
+
+    if (s.mode === MODES.YEARS) {
+      const delta = YEARS_PAGE_SIZE * (dir > 0 ? -1 : 1);
+      return { mode: s.mode, year: s.year, month: s.month, yearRangeStart: s.yearRangeStart + delta };
+    }
+
+    return s;
+  }
+
+  function ensurePeekLayers() {
+    if (!calendarContainer) return;
+    const inner = ensureSwipeInner();
+    if (!inner) return;
+
+    const key = `${currentMode}|${currentYear}|${currentMonth}|${yearRangeStart}`;
+    if (peekPrevLayer && peekNextLayer && peekKey === key) return;
+
+    removePeekLayers();
+    peekKey = key;
+
+    const prevState = getAdjacentState(1);
+    const nextState = getAdjacentState(-1);
+
+    const makeLayer = (cls, state) => {
+      const layer = inner.cloneNode(true);
+      layer.classList.add("cal-swipe-layer", "cal-swipe-peek", cls);
+      stripIdsDeep(layer);
+
+      const gDays = layer.querySelector(".calendar-grid");
+      const gMonths = layer.querySelector(".month-grid");
+      const gYears = layer.querySelector(".year-grid");
+
+      if (state.mode === MODES.DAYS) {
+        fillDaysGrid(gDays, state.year, state.month);
+      } else if (state.mode === MODES.MONTHS) {
+        fillMonthsGrid(gMonths, state.year, false);
+      } else if (state.mode === MODES.YEARS) {
+        fillYearsGrid(gYears, state.yearRangeStart, YEARS_PAGE_SIZE, false);
+      }
+
+      return layer;
+    };
+
+    peekPrevLayer = makeLayer("cal-swipe-peek-prev", prevState);
+    peekNextLayer = makeLayer("cal-swipe-peek-next", nextState);
+
+    calendarContainer.insertBefore(peekPrevLayer, inner);
+    calendarContainer.insertBefore(peekNextLayer, inner);
+  }
+
+  function removePeekLayers() {
+    if (peekPrevLayer && peekPrevLayer.parentElement) peekPrevLayer.parentElement.removeChild(peekPrevLayer);
+    if (peekNextLayer && peekNextLayer.parentElement) peekNextLayer.parentElement.removeChild(peekNextLayer);
+    peekPrevLayer = null;
+    peekNextLayer = null;
+    peekKey = "";
+  }
+
+  function animateSwipeNavigate(dir, fromDx) {
+    if (!calendarContainer) return;
+    removePeekLayers();
+    if (swipeAnimRunning) {
+      if (dir < 0) goNext(); else goPrev();
+      clearSwipeFx();
+      return;
+    }
+
+    const inner = ensureSwipeInner();
+    if (!inner) {
+      if (dir < 0) goNext(); else goPrev();
+      return;
+    }
+
+    swipeAnimRunning = true;
+
+    const w = Math.max(1, calendarContainer.clientWidth || 1);
+    const startDx = Number.isFinite(fromDx) ? fromDx : 0;
+    const startR = (function () {
+      const p = Math.max(-1, Math.min(1, startDx / w));
+      return (-p * 6);
+    })();
+
+    const oldLayer = inner.cloneNode(true);
+    oldLayer.classList.add("cal-swipe-layer", "cal-swipe-old");
+    oldLayer.style.transform = `translateX(${Math.round(startDx)}px) rotateY(${(Math.round(startR * 10) / 10)}deg)`;
+    calendarContainer.appendChild(oldLayer);
+
+    calendarContainer.classList.remove("is-swiping", "is-settling", "is-animating");
+    calendarContainer.offsetHeight;
+
+    clearSwipeFx();
+    calendarContainer.style.setProperty("--calSwipeShade", "0.14");
+
+    const newStart = -dir * w;
+
+    inner.style.transition = "none";
+    inner.style.transform = `translateX(${Math.round(newStart)}px) rotateY(${(-dir * 6).toFixed(1)}deg)`;
+
+    if (dir < 0) goNext(); else goPrev();
+
+    calendarContainer.offsetHeight;
+
+    calendarContainer.classList.add("is-animating");
+
+    requestAnimationFrame(() => {
+      oldLayer.style.transform = `translateX(${Math.round(dir * w)}px) rotateY(${(dir * 6).toFixed(1)}deg)`;
+      inner.style.transition = "transform 280ms cubic-bezier(0.22, 0.9, 0.2, 1)";
+      inner.style.transform = "translateX(0px) rotateY(0deg)";
+    });
+
+    const cleanup = () => {
+      oldLayer.removeEventListener("transitionend", onEnd);
+      if (oldLayer && oldLayer.parentElement) oldLayer.parentElement.removeChild(oldLayer);
+      calendarContainer.classList.remove("is-animating", "is-settling", "is-swiping");
+      inner.style.transition = "";
+      inner.style.transform = "";
+      clearSwipeFx();
+      calendarContainer.style.removeProperty("--calSwipeShade");
+      swipeAnimRunning = false;
+    };
+
+    const onEnd = (e) => {
+      if (!e || e.propertyName !== "transform") return;
+      cleanup();
+    };
+
+    oldLayer.addEventListener("transitionend", onEnd);
+
+    setTimeout(() => {
+      if (swipeAnimRunning) cleanup();
+    }, 420);
+  }
+
+  function animateSwipeCancel(fromDx) {
+    if (!calendarContainer) return;
+    const inner = ensureSwipeInner();
+    if (!inner) return;
+    calendarContainer.classList.remove("is-animating");
+    calendarContainer.classList.add("is-settling");
+    setSwipeFx(Number.isFinite(fromDx) ? fromDx : 0);
+    requestAnimationFrame(() => {
+      setSwipeFx(0);
+    });
+
+    const done = () => {
+      inner.removeEventListener("transitionend", onEnd);
+      calendarContainer.classList.remove("is-settling", "is-swiping");
+      clearSwipeFx();
+      removePeekLayers();
+    };
+
+    const onEnd = (e) => {
+      if (!e || e.propertyName !== "transform") return;
+      done();
+    };
+
+    inner.addEventListener("transitionend", onEnd);
+    setTimeout(done, 320);
+  }
   function setupSwipeToNavigate(rootEl) {
     const root = rootEl || calendarContainer;
     if (!root) return;
@@ -851,12 +1110,15 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
 
     root.addEventListener("pointerdown", (ev) => {
       if (!canStart(ev)) return;
+      ensureSwipeInner();
+      removePeekLayers();
       active = true;
       pid = ev.pointerId;
       sx = lx = ev.clientX;
       sy = ly = ev.clientY;
       locked = false;
       horiz = false;
+      calendarContainer && calendarContainer.classList.remove("is-settling", "is-animating");
     });
 
     root.addEventListener(
@@ -880,13 +1142,19 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
             horiz = true;
             try { root.setPointerCapture(pid); } catch {}
             ev.preventDefault();
+            if (calendarContainer) calendarContainer.classList.add("is-swiping");
+            ensurePeekLayers();
           } else {
             locked = true;
             horiz = false;
           }
         }
 
-        if (horiz) ev.preventDefault();
+        if (horiz) {
+          ev.preventDefault();
+          ensurePeekLayers();
+          setSwipeFx(dx);
+        }
       },
       { passive: false }
     );
@@ -900,8 +1168,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       const ady = Math.abs(dy);
 
       if (horiz && adx >= 45 && adx > ady * 1.2) {
-        if (dx < 0) goNext();
-        else goPrev();
+        animateSwipeNavigate(dx < 0 ? -1 : 1, dx);
+      } else if (horiz) {
+        animateSwipeCancel(dx);
       }
 
       try { root.releasePointerCapture(pid); } catch {}

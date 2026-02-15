@@ -515,6 +515,69 @@ body {
   max-width: 1280px;       
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+  position: relative;
+  overflow: hidden;
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.cal-swipe-inner {
+  position: relative;
+  transform: translateX(var(--calSwipeX, 0px)) rotateY(var(--calSwipeR, 0deg));
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  z-index: 2;
+}
+
+.cal-swipe-inner::before,
+.cal-swipe-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--calSwipeShade, 0);
+  background: linear-gradient(to right, rgba(0,0,0,0.14), transparent 48%, rgba(0,0,0,0.06));
+}
+
+.calendar-container.is-settling .cal-swipe-inner {
+  transition: transform 220ms cubic-bezier(0.22, 0.9, 0.2, 1);
+}
+
+.calendar-container.is-swiping .cal-swipe-inner {
+  transition: none;
+}
+
+.cal-swipe-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cal-swipe-peek {
+  opacity: 0;
+}
+
+.cal-swipe-peek-prev {
+  opacity: var(--calPeekPrevO, 0);
+  transform: translateX(calc(-100% + var(--calSwipeX, 0px))) rotateY(var(--calPeekR, 0deg));
+  transform-origin: 50% 50%;
+}
+
+.cal-swipe-peek-next {
+  opacity: var(--calPeekNextO, 0);
+  transform: translateX(calc(100% + var(--calSwipeX, 0px))) rotateY(var(--calPeekR, 0deg));
+  transform-origin: 50% 50%;
+}
+
+.calendar-container.is-animating .cal-swipe-old {
+  transition: transform 280ms cubic-bezier(0.22, 0.9, 0.2, 1);
+}
+
+.cal-swipe-old {
+  z-index: 3;
 }
 
 
