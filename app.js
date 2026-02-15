@@ -833,13 +833,18 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     function canStart(ev) {
       if (!ev) return false;
       if (ev.pointerType !== "touch") return false;
-      if (currentMode !== MODES.DAYS) return false;
 
       const t = ev.target;
 
       if (!isAllowedZone(t)) return false;
 
-      if (t && t.closest && t.closest("button, a, input, textarea, select, label, [role=\"button\"]")) return false;
+      if (t && t.closest) {
+        const inInteractive = !!t.closest("button, a, input, textarea, select, label, [role=\"button\"]");
+        if (inInteractive) {
+          const allowPickBtn = !!t.closest(".month-cell, .year-cell");
+          if (!allowPickBtn) return false;
+        }
+      }
 
       return true;
     }
@@ -894,7 +899,7 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
       const adx = Math.abs(dx);
       const ady = Math.abs(dy);
 
-      if (horiz && currentMode === MODES.DAYS && adx >= 45 && adx > ady * 1.2) {
+      if (horiz && adx >= 45 && adx > ady * 1.2) {
         if (dx < 0) goNext();
         else goPrev();
       }
