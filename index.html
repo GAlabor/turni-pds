@@ -176,11 +176,6 @@
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
   </div>
-  <button id="turniStartTopSave" class="icon-circle-btn icon-circle-btn--confirm turni-start-top-save" type="button" data-turni-start-save aria-label="Conferma">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <use href="#ico-check"></use>
-    </svg>
-  </button>
   
   <main class="app-shell">   
     
@@ -679,7 +674,19 @@
   data-settings-id="turni-start"
   data-settings-title="Inizio rotazione">
 
-<div class="turni-card turni-start-card">
+<div class="turni-add-toolbar">
+<button class="icon-circle-btn icon-circle-btn--confirm" type="button" data-turni-start-save aria-label="Conferma">
+
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <use href="#ico-check"></use>
+  </svg>
+</button>
+  <p class="turni-error" data-turni-start-error hidden>
+    Seleziona giorno e turno
+  </p>
+</div>
+
+
   <div class="turni-form">
 
     <div class="turni-field-row">
@@ -714,11 +721,6 @@
     </button>
 
   </div>
-</div>
-
-<p class="turni-error" data-turni-start-error hidden>
-  Seleziona giorno e turno
-</p>
 </div>
         
         <div
