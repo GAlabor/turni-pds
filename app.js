@@ -4533,7 +4533,7 @@ function syncVisibility() {}
     startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
     startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
 
-    startSaveBtn      = panelStart ? panelStart.querySelector("[data-turni-start-save]") : null;
+    startSaveBtn      = document.getElementById("turniStartTopSave") || (panelStart ? panelStart.querySelector("[data-turni-start-save]") : null);
     startErrEl        = panelStart ? panelStart.querySelector("[data-turni-start-error]") : null;
     startErrCtl       = (window.UIFeedback && typeof UIFeedback.createTempError === "function")
       ? UIFeedback.createTempError(startErrEl, 2000)
@@ -4592,6 +4592,12 @@ function syncVisibility() {}
 
       startSaveBtn.disabled = !Svc.canUse();
       startSaveBtn.classList.toggle("is-disabled", startSaveBtn.disabled);
+    }
+
+    if (window.SettingsUI && typeof SettingsUI.onChange === "function") {
+      SettingsUI.onChange((prevId, nextId) => {
+        document.body.classList.toggle("mode-turni-start", nextId === "turni-start");
+      });
     }
 
     if (startTurnoRow) {
