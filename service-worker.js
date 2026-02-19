@@ -1,9 +1,9 @@
-const VERSION = '2.5.1';
+const VERSION = '2.5.2';
 const APP_VERSION = VERSION;
 
 const ICO_VERSION = 'v1.0';
 const SPLASH_VERSION = 'v1.0';
-const SVG_VERSION = 'v1.0';
+const SVG_VERSION = 'v1.1';
 
 const CACHE_APP = `turni-app-${APP_VERSION}`;
 const CACHE_ICO = `turni-ico-${ICO_VERSION}`;
@@ -63,7 +63,8 @@ const SVG_URLS = [
   `${ROOT}/svg/inspag.svg`,
   `${ROOT}/svg/riepilogo.svg`,
   `${ROOT}/svg/settings.svg`,
-  `${ROOT}/svg/login.svg`
+  `${ROOT}/svg/login.svg`,
+  `${ROOT}/svg/circle.svg`
 ];
 
 function normalizeHTMLRequest(req) {
