@@ -110,10 +110,10 @@
     <defs>
       
       <symbol id="ico-ui-chevron-right" viewBox="0 0 24 24">
-        <path d="M10 6 L16 12 L10 18" />
+        <path d="M10 6 L16 12 L10 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
       </symbol>
       <symbol id="ico-ui-chevron-left" viewBox="0 0 24 24">
-        <path d="M14 6 L8 12 L14 18" />
+        <path d="M14 6 L8 12 L14 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
       </symbol>
       
       
@@ -130,10 +130,10 @@
         <path d="M16 16h.01" />
       </symbol>
 <symbol id="ico-nav-prev" viewBox="0 0 24 24">
-        <path d="M14 6 L8 12 L14 18" />
+        <path d="M14 6 L8 12 L14 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
       </symbol>
       <symbol id="ico-nav-next" viewBox="0 0 24 24">
-        <path d="M10 6 L16 12 L10 18" />
+        <path d="M10 6 L16 12 L10 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
       </symbol>
       
       <symbol id="ico-toggle-up" viewBox="0 0 24 24">
@@ -259,7 +259,10 @@
           data-settings-back-main
           aria-label="Torna alle impostazioni"
           hidden>
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg class="settings-back-circle" viewBox="0 0 512 512" aria-hidden="true">
+            <circle cx="256" cy="256" r="210"></circle>
+          </svg>
+          <svg class="settings-back-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <use href="#ico-ui-chevron-left"></use>
           </svg>
         </button>

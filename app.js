@@ -1564,6 +1564,14 @@ window.addEventListener("storage", (ev) => {
 
   const { PATHS } = window.AppConfig;
   const SVG_BASE = PATHS.svgBase;
+  let _statusLoginSvgText = null;
+  const _statusCheckSvgText = `<!-- status-check.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <circle cx="256" cy="256" r="210" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" opacity="0.35"/>
+  <path d="M170 270 L230 330 L350 200" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+
   
   async function loadSVGInto(id, file) {
     const host = document.getElementById(id);
@@ -1579,6 +1587,9 @@ window.addEventListener("storage", (ev) => {
 
       const txt = await res.text();
       host.innerHTML = txt.trim();
+      if (host.id === 'icoStatus' && file === 'login.svg') {
+        _statusLoginSvgText = txt.trim();
+      }
     } catch (err) {
       console.error("Errore icona:", file, err);
     }
@@ -1619,10 +1630,24 @@ window.addEventListener("storage", (ev) => {
   async function loadStatusIcon() {
     await loadSVGInto("icoStatus", "login.svg");
   }
-  
-  window.Icons = {
+
+  function setStatusVariant(variant) {
+    const host = document.getElementById("icoStatus");
+    if (!host) return;
+    const v = String(variant || "").toLowerCase();
+    if (v === 'check') {
+      host.innerHTML = _statusCheckSvgText.trim();
+      return;
+    }
+    if (_statusLoginSvgText) {
+      host.innerHTML = _statusLoginSvgText;
+    }
+  }
+
+window.Icons = {
     initTabbar: loadTabbarIcons,
-    loadStatusIcon
+    loadStatusIcon,
+    setStatusVariant
   };
   
 
@@ -6101,6 +6126,16 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       return s.replace(/^Impostazioni\s*-\s*/i, "").trim();
     }
 
+    function syncStatusIcon(panelId) {
+      if (!window.Icons || typeof Icons.setStatusVariant !== 'function') return;
+      const id = panelId == null ? '' : String(panelId);
+      if (id === 'turni-start' || id === 'turni-start-pick') {
+        Icons.setStatusVariant('check');
+      } else {
+        Icons.setStatusVariant('login');
+      }
+    }
+
     function setHeaderForMain() {
       titleEl.textContent = "Impostazioni";
       hideBackBtn();
@@ -6141,6 +6176,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       main.classList.add("is-active");
       panels.forEach(p => p.classList.remove("is-active"));
       setHeaderForMain();
+      syncStatusIcon(null);
 
       emitChange(prev, null, meta);
     }
@@ -6175,6 +6211,7 @@ activePanelId = id;
         p.classList.toggle("is-active", p.dataset.settingsId === id);
       });
       setHeaderForPanel(id);
+      syncStatusIcon(id);
 
       emitChange(prev, id, meta);
     }
