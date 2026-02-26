@@ -91,6 +91,7 @@
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
   
   --topbar-top: calc(env(safe-area-inset-top) + 20px);
+  --topbar-inset: 16px;
   --icon-circle-lg: 48px;  
   --icon-circle-lg-mobile: 44px; 
   --icon-circle-md: 34px;  
@@ -2832,7 +2833,10 @@ body.turni-no-select * {
 .settings-back{
   width: var(--status-icon-size);
   height: var(--status-icon-size);
-  position: relative;
+  position: fixed;
+  top: var(--topbar-top);
+  left: calc(env(safe-area-inset-left) + var(--topbar-inset));
+  z-index: 9999;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -3147,7 +3151,7 @@ body.turni-no-select * {
 .app-status {
   position: fixed;
   top: var(--topbar-top);   
-  right: 16px;
+  right: calc(env(safe-area-inset-right) + var(--topbar-inset));
   z-index: 9999;
   width: var(--status-icon-size);
   height: var(--status-icon-size);
