@@ -2850,9 +2850,9 @@ body.turni-no-select * {
     border-color: transparent;
     box-shadow: none;
   }
-  .settings-back:hover .settings-back-circle circle{
-    opacity: 0.55;
-  }
+.settings-back:hover .settings-back-circle circle{
+  stroke-opacity: 0.55;
+}
 }
 
 .settings-back:active,
@@ -2864,7 +2864,7 @@ body.turni-no-select * {
 }
 .settings-back:active .settings-back-circle circle,
 .settings-back.is-press .settings-back-circle circle{
-  opacity: 0.65;
+  stroke-opacity: 0.65;
 }
 
 .icon-circle-btn {
@@ -2955,8 +2955,9 @@ body.turni-no-select * {
 .settings-back-circle circle {
   stroke: var(--accent);
   stroke-width: 20;
-  fill: none;
-  opacity: 0.35;
+  fill: var(--surface-strong);
+  fill-opacity: 1;
+  stroke-opacity: 0.35;
   stroke-linecap: round;
 }
 
