@@ -7,6 +7,8 @@
   
   --surface: rgba(255,255,255,0.88);      
   --surface-strong: rgba(255,255,255,0.96);
+
+  --status-icon-bg: var(--surface-strong);
   
   --border: rgba(120,130,170,0.18);
   
@@ -277,6 +279,7 @@
     --bg-under: #020617;
     --surface: rgba(15,23,42,0.94);
     --surface-strong: rgba(15,23,42,0.98);
+    --status-icon-bg: var(--bg-under);
     --border: rgba(148,163,184,0.26);
     --text: #e5e7eb;
     --subtext: #9ca3af;
@@ -324,6 +327,7 @@
     --bg-under: #020617;
   --surface: rgba(15,23,42,0.94);
   --surface-strong: rgba(15,23,42,0.98);
+  --status-icon-bg: var(--bg-under);
   --border: rgba(148,163,184,0.26);
   --text: #e5e7eb;
   --subtext: #9ca3af;
@@ -2955,7 +2959,7 @@ body.turni-no-select * {
 .settings-back-circle circle {
   stroke: var(--accent);
   stroke-width: 20;
-  fill: var(--surface-strong);
+  fill: var(--status-icon-bg);
   fill-opacity: 1;
   stroke-opacity: 0.35;
   stroke-linecap: round;
@@ -3177,10 +3181,11 @@ body.turni-no-select * {
 
 #icoStatus #loginCircleBase {
   stroke: var(--accent);
-  fill: none;
+  stroke-opacity: 0.35;
+  fill: var(--status-icon-bg);
+  fill-opacity: 1;
   transform-origin: center;
-  opacity: 0.35;
-  transition: opacity 0.2s ease;
+  transition: stroke-opacity 0.2s ease;
 }
 
 
@@ -3197,7 +3202,7 @@ body.turni-no-select * {
 
 
 .status-idle #icoStatus #loginCircleBase {
-  opacity: 0.35;
+  stroke-opacity: 0.35;
 }
 
 .status-idle #icoStatus #loginCircle {
@@ -3207,7 +3212,7 @@ body.turni-no-select * {
 
 
 .status-saving #icoStatus #loginCircleBase {
-  opacity: 0.35;
+  stroke-opacity: 0.35;
 }
 
 .status-saving #icoStatus #loginCircle {
@@ -3217,7 +3222,7 @@ body.turni-no-select * {
 
 
 .status-ok #icoStatus #loginCircleBase {
-  opacity: 1;
+  stroke-opacity: 1;
 }
 
 .status-ok #icoStatus #loginCircle {
