@@ -6113,11 +6113,13 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     function hideBackBtn() {
       backBtn.hidden = true;
       backBtn.style.display = "none";
+      settingsView.classList.remove("has-back");
     }
 
     function showBackBtn() {
       backBtn.hidden = false;
       backBtn.style.display = "inline-flex";
+      settingsView.classList.add("has-back");
     }
     
     function stripSettingsPrefix(txt) {

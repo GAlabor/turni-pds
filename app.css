@@ -2847,6 +2847,10 @@ body.turni-no-select * {
   color: var(--color-back-icon);
 }
 
+.view-settings.has-back #settingsTitle{
+  margin-left: calc(var(--status-icon-size) + var(--space-8));
+}
+
 @media (hover:hover) {
   .settings-back:hover{
     background: transparent;
