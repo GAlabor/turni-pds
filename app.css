@@ -93,7 +93,7 @@
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
   
   --topbar-top: calc(env(safe-area-inset-top) + 16px);
-  --topbar-inset: 8px;
+  --topbar-inset: 16px;
   --icon-circle-lg: 48px;  
   --icon-circle-lg-mobile: 44px; 
   --icon-circle-md: 34px;  
@@ -2886,30 +2886,6 @@ body.turni-no-select * {
 }
 
 
-@media (hover:hover) {
-  .settings-back:hover{
-    background: transparent;
-    color: var(--accent);
-    border-color: transparent;
-    box-shadow: none;
-  }
-.settings-back:hover .settings-back-circle circle{
-  stroke-opacity: 0.55;
-}
-}
-
-.settings-back:active,
-.settings-back.is-press{
-  background: transparent;
-  color: var(--accent);
-  border-color: transparent;
-  box-shadow: none;
-}
-.settings-back:active .settings-back-circle circle,
-.settings-back.is-press .settings-back-circle circle{
-  stroke-opacity: 0.65;
-}
-
 .icon-circle-btn {
   width: var(--icon-circle-sm);
   height: var(--icon-circle-sm);
@@ -2996,12 +2972,20 @@ body.turni-no-select * {
 }
 
 .settings-back-circle circle {
-  stroke: var(--accent);
-  stroke-width: 20;
-  fill: var(--status-icon-bg);
+  stroke: var(--border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  fill: var(--surface-strong);
   fill-opacity: 1;
-  stroke-opacity: 0.35;
+  stroke-opacity: 1;
   stroke-linecap: round;
+}
+
+.settings-back:active .settings-back-circle circle,
+.settings-back.is-press .settings-back-circle circle{
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-opacity: 1;
 }
 
 
