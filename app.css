@@ -2981,12 +2981,7 @@ body.turni-no-select * {
   stroke-linecap: round;
 }
 
-.settings-back:active .settings-back-circle circle,
-.settings-back.is-press .settings-back-circle circle{
-  fill: var(--accent);
-  stroke: var(--accent);
-  stroke-opacity: 1;
-}
+
 
 
 .icon-circle-btn svg {
@@ -3010,7 +3005,6 @@ body.turni-no-select * {
 
 @media (hover:hover) {
   .nav-btn:hover,
-  .settings-back:hover,
   .icon-circle-btn:hover {
     background: var(--accent);
     color: #ffffff;
@@ -3021,15 +3015,28 @@ body.turni-no-select * {
 
 
 .nav-btn:active,
-.settings-back:active,
 .icon-circle-btn:active,
-.settings-back.is-press,
 .icon-circle-btn.is-press {
   transform: scale(0.9);
   background: var(--accent);
   color: #ffffff;
   border-color: var(--accent);
   box-shadow: var(--shadow-accent-press);
+}
+
+.settings-back:active,
+.settings-back.is-press {
+  transform: scale(0.9);
+  background: transparent;
+  color: var(--color-back-icon);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.settings-back:active .settings-back-circle circle,
+.settings-back.is-press .settings-back-circle circle {
+  stroke: var(--border);
+  fill: var(--surface-strong);
 }
 
 
