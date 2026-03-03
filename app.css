@@ -93,7 +93,7 @@
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
   
   --topbar-top: calc(env(safe-area-inset-top) + 20px);
-  --topbar-inset: 16px;
+  --topbar-inset: 8px;
   --icon-circle-lg: 48px;  
   --icon-circle-lg-mobile: 44px; 
   --icon-circle-md: 34px;  
