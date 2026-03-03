@@ -92,7 +92,7 @@
   --press: 1px;
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
   
-  --topbar-top: calc(env(safe-area-inset-top) + 20px);
+  --topbar-top: calc(env(safe-area-inset-top) + 16px);
   --topbar-inset: 8px;
   --icon-circle-lg: 48px;  
   --icon-circle-lg-mobile: 44px; 
@@ -439,6 +439,7 @@ body {
 
 
 .app-header {
+  margin-bottom: 4px;
   padding: 0 var(--space-6) var(--space-14) var(--space-6);
   padding-right: calc(var(--space-6) + var(--status-icon-size) + 16px);
   min-height: var(--status-icon-size);
@@ -453,8 +454,13 @@ body {
   font-size: var(--fs-title-lg);
   font-weight: var(--fw-page-title);
   letter-spacing: var(--ls-title-lg);
-
   line-height: var(--lh-display);
+}
+
+.view-calendar .app-title,
+.view-inspag .app-title,
+.view-riepilogo .app-title {
+  margin-left: 6px;
 }
 
 
