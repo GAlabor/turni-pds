@@ -458,6 +458,38 @@ body {
 }
 
 
+.view.has-back .app-title{
+  position: fixed;
+  top: var(--topbar-top);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9998;
+  height: var(--status-icon-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  padding: 0 var(--space-10);
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(
+    100vw
+    - env(safe-area-inset-left)
+    - env(safe-area-inset-right)
+    - (2 * (var(--status-icon-size) + var(--topbar-inset) + 28px))
+  );
+}
+
+.view.has-back .app-header{
+  padding-bottom: 0;
+}
+
+
 @media (max-width: 900px) {
     body {
     padding: 0;
@@ -2847,9 +2879,6 @@ body.turni-no-select * {
   color: var(--color-back-icon);
 }
 
-.view-settings.has-back #settingsTitle{
-  margin-left: calc(var(--status-icon-size) + var(--space-8));
-}
 
 @media (hover:hover) {
   .settings-back:hover{
