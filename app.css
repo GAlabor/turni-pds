@@ -103,11 +103,11 @@
   
   --status-icon-size: 48px; 
   
-  --icon-arrow-size: 22px;     
+  --icon-arrow-size: 24px;     
   --icon-arrow-stroke: 2.4;
   --color-arrow-month: var(--nav-fg); 
 
-  --icon-back-size: 22px;      
+  --icon-back-size: 26px;      
   --color-back-icon: var(--text); 
 
   --cal-day-size: 40px;
