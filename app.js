@@ -6647,32 +6647,41 @@ function initTabs() {
             TurniInteractions.closeAllSwipesInList(turnazioniList);
           }
 
-          if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
-            
-            SettingsUI.showMain();
-          }
-          return;
+if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
+  SettingsUI.showMain();
+}
+if (window.Icons && typeof Icons.setStatusVariant === "function") {
+  Icons.setStatusVariant("login");
+}
+return;
         }
       }
       
       
       
-      if (activeViewId === "settings" && target !== "settings") {
-        if (window.Turni && typeof Turni.exitEditMode === "function") {
-          Turni.exitEditMode();
-        }
+if (activeViewId === "settings" && target !== "settings") {
+  if (window.Turni && typeof Turni.exitEditMode === "function") {
+    Turni.exitEditMode();
+  }
 
-        if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
-          Turnazioni.exitEditMode();
-        }
+  if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+    Turnazioni.exitEditMode();
+  }
 
-        if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
-          const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
-          const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
-          TurniInteractions.closeAllSwipesInList(turniList);
-          TurniInteractions.closeAllSwipesInList(turnazioniList);
-        }
-      }
+  if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+    const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
+    const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
+    TurniInteractions.closeAllSwipesInList(turniList);
+    TurniInteractions.closeAllSwipesInList(turnazioniList);
+  }
+
+  if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
+    SettingsUI.showMain();
+  }
+  if (window.Icons && typeof Icons.setStatusVariant === "function") {
+    Icons.setStatusVariant("login");
+  }
+}
 
 
       
