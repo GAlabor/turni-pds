@@ -4471,6 +4471,33 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
     }
   }
 
+  function commitStart() {
+    if (!Svc.canUse()) return false;
+    clearStartError();
+
+    if (!Svc.validate(startDraft)) {
+      showStartError();
+      return false;
+    }
+
+    Svc.save(startDraft);
+
+    setDirty(false);
+    syncSummaryUI();
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni", { internal: true });
+    }
+
+    return true;
+  }
+
+  function backFromPick() {
+    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni-start", { internal: true });
+    }
+  }
+
   function renderPickList() {
     if (!startPickList) return;
 
@@ -4640,7 +4667,9 @@ function syncVisibility() {}
   window.TurniStart = {
     init,
     syncVisibility,
-    syncFromTurnazioniChange
+    syncFromTurnazioniChange,
+    commitStart,
+    backFromPick
   };
 
 })();
@@ -6136,6 +6165,11 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       } else {
         Icons.setStatusVariant('login');
       }
+
+      const statusEl = document.getElementById("statusIcon");
+      if (statusEl) {
+        statusEl.classList.toggle("is-action", id === 'turni-start' || id === 'turni-start-pick');
+      }
     }
 
     function setHeaderForMain() {
@@ -6222,6 +6256,30 @@ activePanelId = id;
     settingsApi.showPanelFn = showPanel;
     
     showMain({ reason: "init" });
+
+    if (!initSettingsNavigation._statusActionBound) {
+      initSettingsNavigation._statusActionBound = true;
+      const statusEl = document.getElementById("statusIcon");
+      if (statusEl) {
+        statusEl.addEventListener("click", () => {
+          if (!window.SettingsUI || typeof SettingsUI.getActivePanelId !== "function") return;
+          const id = SettingsUI.getActivePanelId();
+          if (id === "turni-start") {
+            if (window.TurniStart && typeof TurniStart.commitStart === "function") {
+              TurniStart.commitStart();
+            }
+            return;
+          }
+          if (id === "turni-start-pick") {
+            if (window.TurniStart && typeof TurniStart.backFromPick === "function") {
+              TurniStart.backFromPick();
+            } else if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+              SettingsUI.openPanel("turni-start", { internal: true });
+            }
+          }
+        });
+      }
+    }
    
     
     rows.forEach(row => {
