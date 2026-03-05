@@ -2872,6 +2872,10 @@ body.turni-no-select * {
   left: calc(env(safe-area-inset-left) + var(--topbar-inset));
   z-index: 9999;
 
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+
   border: none;
   background: transparent;
   box-shadow: none;
