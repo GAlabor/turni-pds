@@ -2749,8 +2749,29 @@ body.turni-no-select * {
   background: transparent;
 }
 
-.turnazioni-pick-row.is-selected .turnazioni-pick-name{
+.turnazioni-pick-row.is-selected-default .turnazioni-pick-name{
   color: var(--accent);
+}
+
+.turnazioni-pick-check{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: var(--space-8);
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.turnazioni-pick-check svg{
+  width: 20px;
+  height: 20px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 

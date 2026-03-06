@@ -90,21 +90,38 @@ function renderTurnazioniPickList(opts) {
   const getLabel = (typeof opts.getLabel === "function")
     ? opts.getLabel
     : ((it) => (it && (it.nome || it.sigla)) ? String(it.nome || it.sigla) : "");
-
   const onPick = (typeof opts.onPick === "function") ? opts.onPick : (() => {});
+  const showSelectedCheck = !!opts.showSelectedCheck;
+  const keepSelectedTextColor = !!opts.keepSelectedTextColor;
 
   items.forEach((it, idx) => {
     const row = document.createElement("button");
     row.type = "button";
     row.className = "turnazioni-pick-row";
 
-    if (isSelected(it, idx)) row.classList.add("is-selected");
+    const selected = !!isSelected(it, idx);
+    if (selected) {
+      row.classList.add("is-selected");
+      if (!keepSelectedTextColor) row.classList.add("is-selected-default");
+    }
 
     const name = document.createElement("span");
     name.className = "turnazioni-pick-name";
     name.textContent = getLabel(it, idx) || "";
 
     row.appendChild(name);
+
+    if (selected && showSelectedCheck) {
+      const check = document.createElement("span");
+      check.className = "turnazioni-pick-check";
+      check.setAttribute("aria-hidden", "true");
+      check.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <use href="#ico-check"></use>
+        </svg>
+      `;
+      row.appendChild(check);
+    }
 
     row.addEventListener("click", () => onPick(it, idx));
 
@@ -4716,6 +4733,8 @@ function syncVisibility() {}
       items,
       isSelected: (it) => (preferredId && String(it.id) === String(preferredId)),
       getLabel: (it) => (it && it.nome) ? String(it.nome) : "",
+      showSelectedCheck: true,
+      keepSelectedTextColor: true,
       onPick: (it) => {
         if (!it || !it.id) return;
         setPreferredIdSafe(it.id);
