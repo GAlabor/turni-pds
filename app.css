@@ -2757,8 +2757,8 @@ body.turni-no-select * {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   margin-left: var(--space-8);
   flex-shrink: 0;
   color: var(--accent);

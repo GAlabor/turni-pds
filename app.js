@@ -4727,33 +4727,35 @@ function syncVisibility() {}
       nome: t && t.name != null ? String(t.name) : ""
     })).filter(it => it.id);
 
-    renderTurnazioniPickList({
-      listEl,
-      emptyEl,
-      items,
-      isSelected: (it) => (preferredId && String(it.id) === String(preferredId)),
-      getLabel: (it) => (it && it.nome) ? String(it.nome) : "",
-      showSelectedCheck: true,
-      keepSelectedTextColor: true,
-      onPick: (it) => {
-        if (!it || !it.id) return;
-        setPreferredIdSafe(it.id);
+    function renderCurrentPickList(selectedId) {
+      renderTurnazioniPickList({
+        listEl,
+        emptyEl,
+        items,
+        isSelected: (it) => (selectedId && String(it.id) === String(selectedId)),
+        getLabel: (it) => (it && it.nome) ? String(it.nome) : "",
+        showSelectedCheck: true,
+        keepSelectedTextColor: true,
+        onPick: (it) => {
+          if (!it || !it.id) return;
+          setPreferredIdSafe(it.id);
 
-        if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
-          TurnazioniList.refresh();
+          if (window.TurnazioniList && typeof TurnazioniList.refresh === "function") {
+            TurnazioniList.refresh();
+          }
+
+          try {
+            document.dispatchEvent(new CustomEvent("turnazioni:changed", {
+              detail: { source: "TurniActivePick" }
+            }));
+          } catch {}
+
+          renderCurrentPickList(String(it.id));
         }
+      });
+    }
 
-        try {
-          document.dispatchEvent(new CustomEvent("turnazioni:changed", {
-            detail: { source: "TurniActivePick" }
-          }));
-        } catch {}
-
-        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-          SettingsUI.openPanel("turni", { internal: true });
-        }
-      }
-    });
+    renderCurrentPickList(preferredId);
 
     if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turni-active-pick", { internal: true });
