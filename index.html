@@ -681,19 +681,12 @@
   data-settings-id="turni-start"
   data-settings-title="Inizio rotazione">
 
-<div class="turni-add-toolbar">
-  <p class="turni-error" data-turni-start-error hidden>
-    Seleziona giorno e turno
-  </p>
-</div>
-
+<div class="turnazioni-pick-wrap">
   <p class="settings-hint">
     Seleziona il giorno e il turno da cui far partire la rotazione.
   </p>
 
-  <div class="turni-form turni-start-form">
-
-    <div class="turnazioni-pick-list turni-start-list" aria-label="Inizio rotazione">
+  <div class="turnazioni-pick-list turni-start-list" aria-label="Inizio rotazione">
 <label
   class="turnazioni-pick-row turni-start-pick-row turni-start-date-row"
   data-turni-start-date-row
@@ -718,23 +711,27 @@
     pattern="\d{4}-\d{2}-\d{2}">
 </label>
 
-      <button
-        class="turnazioni-pick-row turni-start-pick-row"
-        type="button"
-        data-turni-start-turno-row>
-        <span class="turnazioni-pick-name">Turno</span>
+    <button
+      class="turnazioni-pick-row turni-start-pick-row"
+      type="button"
+      data-turni-start-turno-row>
+      <span class="turnazioni-pick-name">Turno</span>
 
-        <span class="turni-start-pick-right">
-          <span class="turni-start-pick-summary" id="turniStartTurnoSummary"></span>
-          <span class="settings-row-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <use href="#ico-ui-chevron-right"></use>
-            </svg>
-          </span>
+      <span class="turni-start-pick-right">
+        <span class="turni-start-pick-summary" id="turniStartTurnoSummary"></span>
+        <span class="settings-row-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <use href="#ico-ui-chevron-right"></use>
+          </svg>
         </span>
-      </button>
-    </div>
+      </span>
+    </button>
   </div>
+
+  <p class="turni-error" data-turni-start-error hidden>
+    Seleziona giorno e turno
+  </p>
+</div>
 </div>
         
         <div

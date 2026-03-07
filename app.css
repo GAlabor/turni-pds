@@ -2649,8 +2649,8 @@ body.turni-no-select * {
 
 
 
-.turni-start-form{
-  gap: 0;
+.settings-panel.settings-turni-start .turni-error{
+  margin: 0 var(--space-2);
 }
 
 .turni-start-date-row{
