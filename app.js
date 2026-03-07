@@ -6266,7 +6266,10 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     function syncStatusIcon(panelId) {
       if (!window.Icons || typeof Icons.setStatusVariant !== 'function') return;
       const id = panelId == null ? '' : String(panelId);
-      if (isTurniStartFlow(id)) {
+      const hideStatus = isTurniStartPickPanel(id);
+      if (hideStatus) {
+        Icons.setStatusVariant('login');
+      } else if (isTurniStartFlow(id)) {
         Icons.setStatusVariant('check');
       } else {
         Icons.setStatusVariant('login');
@@ -6274,7 +6277,9 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
 
       const statusEl = document.getElementById("statusIcon");
       if (statusEl) {
-        statusEl.classList.toggle("is-action", isTurniStartFlow(id));
+        statusEl.hidden = hideStatus;
+        statusEl.style.display = hideStatus ? "none" : "flex";
+        statusEl.classList.toggle("is-action", !hideStatus && isTurniStartFlow(id));
       }
     }
 
