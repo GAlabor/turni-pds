@@ -6230,20 +6230,37 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       return s.replace(/^Impostazioni\s*-\s*/i, "").trim();
     }
 
-    function isTurniStartFlow(panelId) {
+    function isTurniStartCancelPanel(panelId) {
       const id = panelId == null ? '' : String(panelId);
-      return id === 'turni-start' || id === 'turni-start-pick';
+      return id === 'turni-start';
+    }
+
+    function isTurniStartPickPanel(panelId) {
+      const id = panelId == null ? '' : String(panelId);
+      return id === 'turni-start-pick';
+    }
+
+    function isTurniStartFlow(panelId) {
+      return isTurniStartCancelPanel(panelId) || isTurniStartPickPanel(panelId);
     }
 
     function syncBackIcon(panelId) {
       const iconUse = backBtn ? backBtn.querySelector('.settings-back-chevron use') : null;
       if (!iconUse) return;
-      iconUse.setAttribute('href', isTurniStartFlow(panelId) ? '#ico-ui-close' : '#ico-ui-chevron-left');
+      iconUse.setAttribute('href', isTurniStartCancelPanel(panelId) ? '#ico-ui-close' : '#ico-ui-chevron-left');
     }
 
     function syncBackLabel(panelId) {
       if (!backBtn) return;
-      backBtn.setAttribute('aria-label', isTurniStartFlow(panelId) ? 'Annulla modifiche' : 'Torna alle impostazioni');
+      if (isTurniStartCancelPanel(panelId)) {
+        backBtn.setAttribute('aria-label', 'Annulla modifiche');
+        return;
+      }
+      if (isTurniStartPickPanel(panelId)) {
+        backBtn.setAttribute('aria-label', 'Torna a Inizio rotazione');
+        return;
+      }
+      backBtn.setAttribute('aria-label', 'Torna alle impostazioni');
     }
 
     function syncStatusIcon(panelId) {
@@ -6385,9 +6402,18 @@ activePanelId = id;
     });
 
 backBtn.addEventListener("click", () => {
-  if (activePanelId === "turni-start" || activePanelId === "turni-start-pick") {
+  if (activePanelId === "turni-start") {
     if (window.TurniStart && typeof TurniStart.cancelStart === "function") {
       TurniStart.cancelStart();
+    }
+    return;
+  }
+
+  if (activePanelId === "turni-start-pick") {
+    if (window.TurniStart && typeof TurniStart.backFromPick === "function") {
+      TurniStart.backFromPick();
+    } else if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni-start", { internal: true });
     }
     return;
   }
