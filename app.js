@@ -4572,6 +4572,8 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
       items,
       isSelected: (it) => (selectedIndex !== null && it.index === selectedIndex),
       getLabel: (it) => it.nome || it.sigla || "",
+      showSelectedCheck: true,
+      keepSelectedTextColor: true,
       onPick: (it) => {
         startDraft.slotIndex = it.index;
         setDirty(true);
