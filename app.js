@@ -3328,7 +3328,7 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     function openPickPanelForDay(index) {
       activePickIndex = index;
 
-      if (pickHint) pickHint.textContent = `Seleziona un turno per il giorno ${index + 1}.`;
+      if (pickHint) pickHint.textContent = `Seleziona un turno per l'inizio della rotazione ${index + 1}.`;
       if (restRowEl) restRowEl.style.display = "flex";
 
       syncRestToggleUI();
