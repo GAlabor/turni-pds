@@ -2648,6 +2648,60 @@ body.turni-no-select * {
 }
 
 
+
+.turni-start-form{
+  gap: 0;
+}
+
+.turni-start-date-input{
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.turni-start-list{
+  width: 100%;
+}
+
+.turni-start-pick-row{
+  justify-content: space-between;
+}
+
+.turni-start-pick-right{
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.turni-start-pick-summary{
+  font-size: var(--fs-turni-orario);
+  color: var(--subtext);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.turni-start-pick-row .settings-row-chevron{
+  margin-left: 0;
+}
+
+.turni-start-pick-row.is-disabled{
+  cursor: default;
+  opacity: 0.55;
+}
+
+.turni-start-pick-row.is-disabled .turnazioni-pick-name,
+.turni-start-pick-row.is-disabled .turni-start-pick-summary{
+  color: var(--subtext);
+}
+
+.turni-start-pick-row.is-disabled .settings-row-chevron{
+  display: none;
+}
+
 .settings-panel.settings-turnazioni-pick.is-active{
   overflow: hidden;
 }

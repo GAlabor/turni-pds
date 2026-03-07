@@ -683,40 +683,50 @@
   </p>
 </div>
 
+  <div class="turni-form turni-start-form">
+    <input
+      class="turni-start-date-input"
+      id="turniStartDate"
+      type="date"
+      inputmode="numeric"
+      maxlength="10"
+      pattern="\d{4}-\d{2}-\d{2}"
+      tabindex="-1"
+      aria-hidden="true">
 
-  <div class="turni-form">
+    <div class="turnazioni-pick-list turni-start-list" aria-label="Inizio rotazione">
+      <button
+        class="turnazioni-pick-row turni-start-pick-row"
+        type="button"
+        data-turni-start-date-row>
+        <span class="turnazioni-pick-name">Giorno</span>
 
-    <div class="turni-field-row">
-      <label class="turni-label" for="turniStartDate">Giorno</label>
-      <div class="turni-field-control">
-        <input
-          class="turni-input"
-          id="turniStartDate"
-          type="date"
-          inputmode="numeric"
-          maxlength="10"
-          pattern="\d{4}-\d{2}-\d{2}">
-      </div>
-    </div>
-
-    <button
-      class="turni-inline-row"
-      type="button"
-      data-turni-start-turno-row>
-      <div class="turni-inline-row-left">
-        <span class="turni-inline-row-label">Turno</span>
-      </div>
-
-      <div class="turni-inline-row-right">
-        <span class="turni-inline-row-summary" id="turniStartTurnoSummary"></span>
-        <span class="turni-inline-row-chevron" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <use href="#ico-ui-chevron-right"></use>
-          </svg>
+        <span class="turni-start-pick-right">
+          <span class="turni-start-pick-summary" id="turniStartDateSummary"></span>
+          <span class="settings-row-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <use href="#ico-ui-chevron-right"></use>
+            </svg>
+          </span>
         </span>
-      </div>
-    </button>
+      </button>
 
+      <button
+        class="turnazioni-pick-row turni-start-pick-row"
+        type="button"
+        data-turni-start-turno-row>
+        <span class="turnazioni-pick-name">Turno</span>
+
+        <span class="turni-start-pick-right">
+          <span class="turni-start-pick-summary" id="turniStartTurnoSummary"></span>
+          <span class="settings-row-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <use href="#ico-ui-chevron-right"></use>
+            </svg>
+          </span>
+        </span>
+      </button>
+    </div>
   </div>
 </div>
         

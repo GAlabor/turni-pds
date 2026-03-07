@@ -4392,6 +4392,8 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
   let panelStartPick = null;
 
   let startDateInput = null;
+  let startDateRow = null;
+  let startDateSummary = null;
   let startTurnoRow = null;
   let startTurnoSummary = null;
 
@@ -4450,12 +4452,21 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
     }
 
     setStartRowEnabled(ok);
+
+    if (startDateRow) startDateRow.classList.toggle("is-disabled", !ok);
+    if (startTurnoRow) startTurnoRow.classList.toggle("is-disabled", !ok);
   }
 
   function syncPanelDraftUI() {
     if (!panelStart) return;
 
     if (startDateInput) startDateInput.value = startDraft.date || "";
+
+    if (startDateSummary) {
+      startDateSummary.textContent = Svc.canUse() && startDraft.date
+        ? Svc.formatDateShortISO(startDraft.date)
+        : "";
+    }
 
     if (startTurnoSummary) {
       startTurnoSummary.textContent = Svc.canUse()
@@ -4599,6 +4610,8 @@ function syncVisibility() {}
     panelStartPick = settingsView ? settingsView.querySelector('.settings-panel.settings-turni-start-pick[data-settings-id="turni-start-pick"]') : null;
 
     startDateInput    = panelStart ? panelStart.querySelector("#turniStartDate") : null;
+    startDateRow      = panelStart ? panelStart.querySelector("[data-turni-start-date-row]") : null;
+    startDateSummary  = panelStart ? panelStart.querySelector("#turniStartDateSummary") : null;
     startTurnoRow     = panelStart ? panelStart.querySelector("[data-turni-start-turno-row]") : null;
     startTurnoSummary = panelStart ? panelStart.querySelector("#turniStartTurnoSummary") : null;
 
@@ -4617,6 +4630,27 @@ function syncVisibility() {}
       startRowBtn.addEventListener("click", () => {
         if (startRowBtn.classList.contains("is-disabled")) return;
         openPanelStart();
+      });
+    }
+
+    function openDatePicker() {
+      if (!Svc.canUse()) return;
+      if (!startDateInput) return;
+
+      try {
+        if (typeof startDateInput.showPicker === "function") {
+          startDateInput.showPicker();
+          return;
+        }
+      } catch {}
+
+      try { startDateInput.focus({ preventScroll: true }); } catch {}
+      try { startDateInput.click(); } catch {}
+    }
+
+    if (startDateRow) {
+      startDateRow.addEventListener("click", () => {
+        openDatePicker();
       });
     }
 
