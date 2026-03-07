@@ -4644,8 +4644,39 @@ function syncVisibility() {}
         }
       } catch {}
 
+      const prevStyle = {
+        position: startDateInput.style.position,
+        left: startDateInput.style.left,
+        top: startDateInput.style.top,
+        width: startDateInput.style.width,
+        height: startDateInput.style.height,
+        opacity: startDateInput.style.opacity,
+        pointerEvents: startDateInput.style.pointerEvents,
+        zIndex: startDateInput.style.zIndex
+      };
+
+      startDateInput.style.position = "fixed";
+      startDateInput.style.left = "-9999px";
+      startDateInput.style.top = "0";
+      startDateInput.style.width = "1px";
+      startDateInput.style.height = "1px";
+      startDateInput.style.opacity = "0";
+      startDateInput.style.pointerEvents = "auto";
+      startDateInput.style.zIndex = "-1";
+
       try { startDateInput.focus({ preventScroll: true }); } catch {}
       try { startDateInput.click(); } catch {}
+
+      setTimeout(() => {
+        startDateInput.style.position = prevStyle.position;
+        startDateInput.style.left = prevStyle.left;
+        startDateInput.style.top = prevStyle.top;
+        startDateInput.style.width = prevStyle.width;
+        startDateInput.style.height = prevStyle.height;
+        startDateInput.style.opacity = prevStyle.opacity;
+        startDateInput.style.pointerEvents = prevStyle.pointerEvents;
+        startDateInput.style.zIndex = prevStyle.zIndex;
+      }, 250);
     }
 
     if (startDateRow) {
