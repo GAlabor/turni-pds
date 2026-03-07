@@ -684,32 +684,31 @@
 </div>
 
   <div class="turni-form turni-start-form">
-    <input
-      class="turni-start-date-input"
-      id="turniStartDate"
-      type="date"
-      inputmode="numeric"
-      maxlength="10"
-      pattern="\d{4}-\d{2}-\d{2}"
-      tabindex="-1"
-      aria-hidden="true">
 
     <div class="turnazioni-pick-list turni-start-list" aria-label="Inizio rotazione">
-      <button
-        class="turnazioni-pick-row turni-start-pick-row"
-        type="button"
-        data-turni-start-date-row>
-        <span class="turnazioni-pick-name">Giorno</span>
+<label
+  class="turnazioni-pick-row turni-start-pick-row turni-start-date-row"
+  data-turni-start-date-row
+  for="turniStartDate">
+  <span class="turnazioni-pick-name">Giorno</span>
 
-        <span class="turni-start-pick-right">
-          <span class="turni-start-pick-summary" id="turniStartDateSummary"></span>
-          <span class="settings-row-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <use href="#ico-ui-chevron-right"></use>
-            </svg>
-          </span>
-        </span>
-      </button>
+  <span class="turni-start-pick-right">
+    <span class="turni-start-pick-summary" id="turniStartDateSummary"></span>
+    <span class="settings-row-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <use href="#ico-ui-chevron-right"></use>
+      </svg>
+    </span>
+  </span>
+
+  <input
+    class="turni-start-date-input"
+    id="turniStartDate"
+    type="date"
+    inputmode="numeric"
+    maxlength="10"
+    pattern="\d{4}-\d{2}-\d{2}">
+</label>
 
       <button
         class="turnazioni-pick-row turni-start-pick-row"
