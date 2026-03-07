@@ -4520,6 +4520,20 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
     return true;
   }
 
+  function cancelStart() {
+    startDraft = Svc.load();
+    setDirty(false);
+    clearStartError();
+    syncPanelDraftUI();
+    syncSummaryUI();
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni", { internal: true });
+    }
+
+    return true;
+  }
+
   function backFromPick() {
     if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turni-start", { internal: true });
@@ -4723,6 +4737,7 @@ function syncVisibility() {}
     syncVisibility,
     syncFromTurnazioniChange,
     commitStart,
+    cancelStart,
     backFromPick
   };
 
@@ -6215,10 +6230,26 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       return s.replace(/^Impostazioni\s*-\s*/i, "").trim();
     }
 
+    function isTurniStartFlow(panelId) {
+      const id = panelId == null ? '' : String(panelId);
+      return id === 'turni-start' || id === 'turni-start-pick';
+    }
+
+    function syncBackIcon(panelId) {
+      const iconUse = backBtn ? backBtn.querySelector('.settings-back-chevron use') : null;
+      if (!iconUse) return;
+      iconUse.setAttribute('href', isTurniStartFlow(panelId) ? '#ico-ui-close' : '#ico-ui-chevron-left');
+    }
+
+    function syncBackLabel(panelId) {
+      if (!backBtn) return;
+      backBtn.setAttribute('aria-label', isTurniStartFlow(panelId) ? 'Annulla modifiche' : 'Torna alle impostazioni');
+    }
+
     function syncStatusIcon(panelId) {
       if (!window.Icons || typeof Icons.setStatusVariant !== 'function') return;
       const id = panelId == null ? '' : String(panelId);
-      if (id === 'turni-start' || id === 'turni-start-pick') {
+      if (isTurniStartFlow(id)) {
         Icons.setStatusVariant('check');
       } else {
         Icons.setStatusVariant('login');
@@ -6226,12 +6257,14 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
 
       const statusEl = document.getElementById("statusIcon");
       if (statusEl) {
-        statusEl.classList.toggle("is-action", id === 'turni-start' || id === 'turni-start-pick');
+        statusEl.classList.toggle("is-action", isTurniStartFlow(id));
       }
     }
 
     function setHeaderForMain() {
       titleEl.textContent = "Impostazioni";
+      syncBackIcon(null);
+      syncBackLabel(null);
       hideBackBtn();
     }
 
@@ -6241,6 +6274,8 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       const panel = settingsView.querySelector(`.settings-panel[data-settings-id="${id}"]`);
       if (panel && panel.dataset.settingsTitle) {
         titleEl.textContent = stripSettingsPrefix(panel.dataset.settingsTitle);
+        syncBackIcon(id);
+        syncBackLabel(id);
         showBackBtn();
         return;
       }
@@ -6254,6 +6289,8 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       }
 
       titleEl.textContent = stripSettingsPrefix(label);
+      syncBackIcon(id);
+      syncBackLabel(id);
       showBackBtn();
     }
     
@@ -6348,6 +6385,13 @@ activePanelId = id;
     });
 
 backBtn.addEventListener("click", () => {
+  if (activePanelId === "turni-start" || activePanelId === "turni-start-pick") {
+    if (window.TurniStart && typeof TurniStart.cancelStart === "function") {
+      TurniStart.cancelStart();
+    }
+    return;
+  }
+
   const prev = navStack.pop();
 
   if (prev !== null && prev !== undefined) {
