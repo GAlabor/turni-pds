@@ -452,16 +452,11 @@ body {
 
 .app-title {
   margin: 0;
+  margin-left: 6px;
   font-size: var(--fs-title-lg);
   font-weight: var(--fw-page-title);
   letter-spacing: var(--ls-title-lg);
   line-height: var(--lh-display);
-}
-
-.view-calendar .app-title,
-.view-inspag .app-title,
-.view-riepilogo .app-title {
-  margin-left: 6px;
 }
 
 
