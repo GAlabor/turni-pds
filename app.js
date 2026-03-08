@@ -3882,6 +3882,10 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	        clearEditContext();
 	        resetTurnazioneForm();
 
+        if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+          if (SettingsUI.goBackTo("turni")) return;
+        }
+
         if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
           SettingsUI.openPanel("turni", { internal: true });
         }
@@ -4527,6 +4531,10 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
     syncPanelDraftUI();
     syncSummaryUI();
 
+    if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+      if (SettingsUI.goBackTo("turni")) return true;
+    }
+
     if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turni", { internal: true });
     }
@@ -4535,6 +4543,10 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
   }
 
   function backFromPick() {
+    if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+      if (SettingsUI.goBackTo("turni-start")) return;
+    }
+
     if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turni-start", { internal: true });
     }
@@ -4694,22 +4706,7 @@ function syncVisibility() {}
 
     if (startSaveBtn) {
       startSaveBtn.addEventListener("click", () => {
-        if (!Svc.canUse()) return;
-        clearStartError();
-
-        if (!Svc.validate(startDraft)) {
-          showStartError();
-          return;
-        }
-
-        Svc.save(startDraft);
-
-        setDirty(false);
-        syncSummaryUI();
-
-        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-          SettingsUI.openPanel("turni", { internal: true });
-        }
+        commitStart();
       });
 
       startSaveBtn.disabled = !Svc.canUse();
@@ -6454,6 +6451,41 @@ backBtn.addEventListener("click", () => {
       if (typeof settingsApi.showPanelFn === "function") {
         settingsApi.showPanelFn(id, { reason: "api", internal: !!(opts && opts.internal) });
       }
+    },
+
+    goBackTo: function (id) {
+      const targetId = (id == null) ? null : String(id);
+
+      if (targetId) {
+        const prev = navStack.pop();
+        if (prev === targetId) {
+          if (typeof settingsApi.showPanelFn === "function") {
+            settingsApi.showPanelFn(targetId, { reason: "back", internal: true });
+          }
+          return true;
+        }
+
+        if (prev !== undefined) {
+          navStack.push(prev);
+        }
+
+        return false;
+      }
+
+      const prev = navStack.pop();
+      if (prev !== null && prev !== undefined) {
+        if (typeof settingsApi.showPanelFn === "function") {
+          settingsApi.showPanelFn(prev, { reason: "back", internal: true });
+        }
+        return true;
+      }
+
+      if (typeof settingsApi.showMainFn === "function") {
+        settingsApi.showMainFn({ reason: "back", internal: true });
+        return true;
+      }
+
+      return false;
     },
 
     
