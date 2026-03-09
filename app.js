@@ -2780,6 +2780,9 @@ mover.appendChild(handle);
 	
 	let openEditTurnazioneImpl = null;
 	let clearEditTurnazioneImpl = null;
+	let commitTurnazioneImpl = null;
+	let cancelTurnazioneImpl = null;
+	let backFromPickImpl = null;
 
   
 function formatSigle(turnazione) {
@@ -3838,58 +3841,95 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
     }
 
 
+    function commitTurnazione() {
+      clearError();
+
+      if (!hasStorage) {
+        showError();
+        return false;
+      }
+
+      const v = validateTurnazione();
+      if (!v.ok) {
+        showError();
+        return false;
+      }
+
+      const payload = buildPayload(v.name, v.days, editingId);
+
+      savedTurnazioni = TurniStorage.loadTurnazioni();
+      if (editingIndex !== null && editingIndex >= 0 && editingIndex < savedTurnazioni.length) {
+        savedTurnazioni[editingIndex] = payload;
+      } else {
+        savedTurnazioni.push(payload);
+      }
+      TurniStorage.saveTurnazioni(savedTurnazioni);
+
+      preferredId = String(payload.id);
+      TurniStorage.savePreferredTurnazioneId(preferredId);
+
+      lastSaveTs = Date.now();
+      isDirty = false;
+
+      if (window.TurnazioniList) {
+        TurnazioniList.refresh();
+      }
+
+      if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+        Turnazioni.exitEditMode();
+      }
+      clearEditContext();
+      resetTurnazioneForm();
+
+      if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+        if (SettingsUI.goBackTo("turni")) return true;
+      }
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni", { internal: true });
+      }
+
+      return true;
+    }
+
+    function cancelTurnazione() {
+      clearError();
+      resetTurnazioneForm();
+      clearEditContext();
+
+      if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+        Turnazioni.exitEditMode();
+      }
+
+      if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+        if (SettingsUI.goBackTo("turni")) return true;
+      }
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turni", { internal: true });
+      }
+
+      return true;
+    }
+
+    function backFromPick() {
+      if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+        if (SettingsUI.goBackTo("turnazioni-add")) return true;
+      }
+
+      if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+        SettingsUI.openPanel("turnazioni-add", { internal: true });
+      }
+
+      return true;
+    }
+
+    commitTurnazioneImpl = commitTurnazione;
+    cancelTurnazioneImpl = cancelTurnazione;
+    backFromPickImpl = backFromPick;
+
     if (btnSave) {
-      btnSave.addEventListener("click", () => {
-        clearError();
-
-        if (!hasStorage) {
-          showError();
-          return;
-        }
-
-        const v = validateTurnazione();
-        if (!v.ok) {
-          showError();
-          return;
-        }
-	        
-	        const payload = buildPayload(v.name, v.days, editingId);
-
-	        savedTurnazioni = TurniStorage.loadTurnazioni();
-	        if (editingIndex !== null && editingIndex >= 0 && editingIndex < savedTurnazioni.length) {
-	          savedTurnazioni[editingIndex] = payload;
-	        } else {
-	          savedTurnazioni.push(payload);
-	        }
-	        TurniStorage.saveTurnazioni(savedTurnazioni);
-
-	        
-	        preferredId = String(payload.id);
-	        TurniStorage.savePreferredTurnazioneId(preferredId);
-
-        lastSaveTs = Date.now();
-        isDirty = false;
-
-	        
-	        if (window.TurnazioniList) {
-	          TurnazioniList.refresh();
-	        }
-
-	        
-	        if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
-	          Turnazioni.exitEditMode();
-	        }
-	        clearEditContext();
-	        resetTurnazioneForm();
-
-        if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
-          if (SettingsUI.goBackTo("turni")) return;
-        }
-
-        if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
-          SettingsUI.openPanel("turni", { internal: true });
-        }
-      });
+      btnSave.addEventListener("click", commitTurnazione);
     }
     
     if (select && input && grid) {
@@ -3996,6 +4036,24 @@ function renderTurnazioni(listEl, turnazioni, emptyHintEl, editBtn, options) {
 	      if (typeof clearEditTurnazioneImpl === "function") {
 	        clearEditTurnazioneImpl();
 	      }
+	    },
+	    commit: function () {
+	      if (typeof commitTurnazioneImpl === "function") {
+	        return commitTurnazioneImpl();
+	      }
+	      return false;
+	    },
+	    cancel: function () {
+	      if (typeof cancelTurnazioneImpl === "function") {
+	        return cancelTurnazioneImpl();
+	      }
+	      return false;
+	    },
+	    backFromPick: function () {
+	      if (typeof backFromPickImpl === "function") {
+	        return backFromPickImpl();
+	      }
+	      return false;
 	    }
 	  };
 
@@ -6243,20 +6301,43 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       return isTurniStartCancelPanel(panelId) || isTurniStartPickPanel(panelId);
     }
 
+    function isTurnazioniCancelPanel(panelId) {
+      const id = panelId == null ? '' : String(panelId);
+      return id === 'turnazioni-add';
+    }
+
+    function isTurnazioniPickPanel(panelId) {
+      const id = panelId == null ? '' : String(panelId);
+      return id === 'turnazioni-pick';
+    }
+
+    function isActionCancelPanel(panelId) {
+      return isTurniStartCancelPanel(panelId) || isTurnazioniCancelPanel(panelId);
+    }
+
+    function isActionFlow(panelId) {
+      const id = panelId == null ? '' : String(panelId);
+      return isTurniStartFlow(id) || isTurnazioniCancelPanel(id);
+    }
+
     function syncBackIcon(panelId) {
       const iconUse = backBtn ? backBtn.querySelector('.settings-back-chevron use') : null;
       if (!iconUse) return;
-      iconUse.setAttribute('href', isTurniStartCancelPanel(panelId) ? '#ico-ui-close' : '#ico-ui-chevron-left');
+      iconUse.setAttribute('href', isActionCancelPanel(panelId) ? '#ico-ui-close' : '#ico-ui-chevron-left');
     }
 
     function syncBackLabel(panelId) {
       if (!backBtn) return;
-      if (isTurniStartCancelPanel(panelId)) {
+      if (isActionCancelPanel(panelId)) {
         backBtn.setAttribute('aria-label', 'Annulla modifiche');
         return;
       }
       if (isTurniStartPickPanel(panelId)) {
         backBtn.setAttribute('aria-label', 'Torna a Inizio rotazione');
+        return;
+      }
+      if (isTurnazioniPickPanel(panelId)) {
+        backBtn.setAttribute('aria-label', 'Torna a Aggiungi turnazione');
         return;
       }
       backBtn.setAttribute('aria-label', 'Torna alle impostazioni');
@@ -6265,10 +6346,10 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     function syncStatusIcon(panelId) {
       if (!window.Icons || typeof Icons.setStatusVariant !== 'function') return;
       const id = panelId == null ? '' : String(panelId);
-      const hideStatus = isTurniStartPickPanel(id);
+      const hideStatus = isTurniStartPickPanel(id) || isTurnazioniPickPanel(id);
       if (hideStatus) {
         Icons.setStatusVariant('login');
-      } else if (isTurniStartFlow(id)) {
+      } else if (isActionFlow(id)) {
         Icons.setStatusVariant('check');
       } else {
         Icons.setStatusVariant('login');
@@ -6278,7 +6359,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       if (statusEl) {
         statusEl.hidden = hideStatus;
         statusEl.style.display = hideStatus ? "none" : "flex";
-        statusEl.classList.toggle("is-action", !hideStatus && isTurniStartFlow(id));
+        statusEl.classList.toggle("is-action", !hideStatus && isActionFlow(id));
       }
     }
 
@@ -6386,6 +6467,12 @@ activePanelId = id;
             }
             return;
           }
+          if (id === "turnazioni-add") {
+            if (window.TurnazioniAdd && typeof TurnazioniAdd.commit === "function") {
+              TurnazioniAdd.commit();
+            }
+            return;
+          }
           if (id === "turni-start-pick") {
             if (window.TurniStart && typeof TurniStart.backFromPick === "function") {
               TurniStart.backFromPick();
@@ -6413,11 +6500,27 @@ backBtn.addEventListener("click", () => {
     return;
   }
 
+  if (activePanelId === "turnazioni-add") {
+    if (window.TurnazioniAdd && typeof TurnazioniAdd.cancel === "function") {
+      TurnazioniAdd.cancel();
+    }
+    return;
+  }
+
   if (activePanelId === "turni-start-pick") {
     if (window.TurniStart && typeof TurniStart.backFromPick === "function") {
       TurniStart.backFromPick();
     } else if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turni-start", { internal: true });
+    }
+    return;
+  }
+
+  if (activePanelId === "turnazioni-pick") {
+    if (window.TurnazioniAdd && typeof TurnazioniAdd.backFromPick === "function") {
+      TurnazioniAdd.backFromPick();
+    } else if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turnazioni-add", { internal: true });
     }
     return;
   }

@@ -2277,6 +2277,10 @@ body.turni-no-select * {
 }
 
 
+.turnazioni-add-error{
+  margin: 0 0 var(--space-6) var(--space-2);
+}
+
 .turnazioni-add-wrap{
   display:flex;
   flex-direction:column;
