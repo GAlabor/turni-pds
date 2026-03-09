@@ -5793,6 +5793,8 @@ function closeAllSwipesInList(listEl) {
   }
 
   let exitEditModeImpl = function () {};
+  let commitAddTurnoImpl = function () { return false; };
+  let cancelAddTurnoImpl = function () { return false; };
 
 function initTurniPanel() {
   const settingsView = document.querySelector(".view-settings");
@@ -5845,7 +5847,7 @@ function initTurniPanel() {
     !listEl || !btnAdd || !toggleBtn || !cardEl || !headerEl ||
     !formEl || !inputNome || !inputSigla || !inputInizio || !inputFine ||
     !colorInput || !colorPreview || !colorTrigger ||
-    !saveBtn || !errorEl || !siglaPreviewEl || !noTimeToggleBtn
+    !errorEl || !siglaPreviewEl || !noTimeToggleBtn
   ) {
     return;
   }
@@ -6054,7 +6056,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     openNewTurnoPanel();
   });
 
-  saveBtn.addEventListener("click", () => {
+  function commitAddTurno() {
     clearError();
 
     const nome = (inputNome.value || "").trim();
@@ -6078,7 +6080,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
 
     if (hasError) {
       showError();
-      return;
+      return false;
     }
 
     const payload = { nome, sigla, inizio, fine, colore, noTime: isNoTime };
@@ -6102,10 +6104,42 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     panelAdd.dataset.settingsTitle = defaultAddTitle;
     resetAddForm();
 
+    if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+      if (SettingsUI.goBackTo("turni")) return true;
+    }
+
     if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turni", { internal: true });
     }
-  });
+
+    return true;
+  }
+
+  function cancelAddTurno() {
+    clearError();
+    editIndex = null;
+    panelAdd.dataset.settingsTitle = defaultAddTitle;
+    resetAddForm();
+
+    if (window.SettingsUI && typeof SettingsUI.goBackTo === "function") {
+      if (SettingsUI.goBackTo("turni")) return true;
+    }
+
+    if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
+      SettingsUI.openPanel("turni", { internal: true });
+    }
+
+    return true;
+  }
+
+  commitAddTurnoImpl = commitAddTurno;
+  cancelAddTurnoImpl = cancelAddTurno;
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", () => {
+      commitAddTurno();
+    });
+  }
 
   if (window.TurniInteractions) {
     TurniInteractions.attachCollapsibleCard({
@@ -6199,6 +6233,15 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
   };
 }
 
+
+  window.TurniAdd = {
+    commit: function () {
+      return commitAddTurnoImpl();
+    },
+    cancel: function () {
+      return cancelAddTurnoImpl();
+    }
+  };
 
   window.Turni = {
     init: initTurniPanel,
@@ -6301,6 +6344,11 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       return isTurniStartCancelPanel(panelId) || isTurniStartPickPanel(panelId);
     }
 
+    function isTurniAddCancelPanel(panelId) {
+      const id = panelId == null ? '' : String(panelId);
+      return id === 'turni-add';
+    }
+
     function isTurnazioniCancelPanel(panelId) {
       const id = panelId == null ? '' : String(panelId);
       return id === 'turnazioni-add';
@@ -6312,12 +6360,12 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
     }
 
     function isActionCancelPanel(panelId) {
-      return isTurniStartCancelPanel(panelId) || isTurnazioniCancelPanel(panelId);
+      return isTurniStartCancelPanel(panelId) || isTurniAddCancelPanel(panelId) || isTurnazioniCancelPanel(panelId);
     }
 
     function isActionFlow(panelId) {
       const id = panelId == null ? '' : String(panelId);
-      return isTurniStartFlow(id) || isTurnazioniCancelPanel(id);
+      return isTurniStartFlow(id) || isTurniAddCancelPanel(id) || isTurnazioniCancelPanel(id);
     }
 
     function syncBackIcon(panelId) {
@@ -6334,6 +6382,10 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
       }
       if (isTurniStartPickPanel(panelId)) {
         backBtn.setAttribute('aria-label', 'Torna a Inizio rotazione');
+        return;
+      }
+      if (isTurniAddCancelPanel(panelId)) {
+        backBtn.setAttribute('aria-label', 'Annulla modifiche');
         return;
       }
       if (isTurnazioniPickPanel(panelId)) {
@@ -6467,6 +6519,12 @@ activePanelId = id;
             }
             return;
           }
+          if (id === "turni-add") {
+            if (window.TurniAdd && typeof TurniAdd.commit === "function") {
+              TurniAdd.commit();
+            }
+            return;
+          }
           if (id === "turnazioni-add") {
             if (window.TurnazioniAdd && typeof TurnazioniAdd.commit === "function") {
               TurnazioniAdd.commit();
@@ -6496,6 +6554,13 @@ backBtn.addEventListener("click", () => {
   if (activePanelId === "turni-start") {
     if (window.TurniStart && typeof TurniStart.cancelStart === "function") {
       TurniStart.cancelStart();
+    }
+    return;
+  }
+
+  if (activePanelId === "turni-add") {
+    if (window.TurniAdd && typeof TurniAdd.cancel === "function") {
+      TurniAdd.cancel();
     }
     return;
   }
