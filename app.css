@@ -2019,6 +2019,10 @@ body.turni-no-select * {
   gap: var(--space-10);
 }
 
+.settings-panel.settings-turni-add .turni-form {
+  margin-top: 0;
+}
+
 .turni-field-row {
   display: flex;
   align-items: center;
