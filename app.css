@@ -3312,6 +3312,51 @@ body.turni-no-select * {
   -webkit-tap-highlight-color: transparent;
 }
 
+body.calendar-topbar-layout .app-status {
+  left: calc(env(safe-area-inset-left) + var(--topbar-inset));
+  right: auto;
+}
+
+.app-top-action {
+  position: fixed;
+  top: var(--topbar-top);
+  right: calc(env(safe-area-inset-right) + var(--topbar-inset));
+  z-index: 9999;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--accent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.calendar-topbar-layout .app-top-action {
+  display: flex;
+}
+
+.app-top-action svg {
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
+  display: block;
+}
+
+.app-top-action-ring {
+  stroke: var(--border);
+  stroke-opacity: 1;
+  fill: var(--status-icon-bg);
+  fill-opacity: 1;
+  stroke-width: 20;
+}
+
+.app-top-action-dot {
+  fill: var(--text);
+}
 
 #icoStatus svg {
   width: var(--status-icon-size);   

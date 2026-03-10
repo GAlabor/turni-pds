@@ -180,12 +180,21 @@
   <div id="statusIcon" class="app-status status-idle">
     <div id="icoStatus"></div>
   </div>
+
+  <button id="calendarMoreBtn" class="app-top-action app-top-action--more" type="button" aria-label="Altre opzioni" hidden>
+    <svg viewBox="0 0 512 512" aria-hidden="true">
+      <circle class="app-top-action-ring" cx="256" cy="256" r="210"></circle>
+<circle class="app-top-action-dot" cx="176" cy="256" r="16"></circle>
+<circle class="app-top-action-dot" cx="256" cy="256" r="16"></circle>
+<circle class="app-top-action-dot" cx="336" cy="256" r="16"></circle>
+    </svg>
+  </button>
   
   <main class="app-shell">   
     
     <section class="view view-calendar is-active" data-view="calendar">
       <header class="app-header">
-        <h1 class="app-title">I miei turni</h1>
+        <h1 class="app-title"></h1>
       </header>
       
       <section class="monthbar">

@@ -6923,6 +6923,19 @@ if (variant === "danger-filled") {
 
 (function () {
 
+function syncTopbarCalendarChrome() {
+  const activeView = document.querySelector(".view.is-active");
+  const isCalendar = !!(activeView && activeView.dataset.view === "calendar");
+
+  document.body.classList.toggle("calendar-topbar-layout", isCalendar);
+
+  const moreBtn = document.getElementById("calendarMoreBtn");
+  if (moreBtn) {
+    moreBtn.hidden = !isCalendar;
+    moreBtn.style.display = isCalendar ? "flex" : "none";
+  }
+}
+
 function initTabs() {
   const tabs  = document.querySelectorAll(".tab");
   const views = document.querySelectorAll(".view");
@@ -7042,8 +7055,12 @@ if (activeViewId === "settings" && target !== "settings") {
           });
         });
       }
+
+      syncTopbarCalendarChrome();
     });
   });
+
+  syncTopbarCalendarChrome();
 }
 
   
