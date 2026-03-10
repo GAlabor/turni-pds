@@ -531,10 +531,11 @@ body {
 .monthbar {
   touch-action: pan-y;
   margin: var(--space-14) 0 var(--space-20) 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-16);
+  justify-items: center;
+  gap: var(--space-8);
 }
 
 
@@ -542,6 +543,10 @@ body {
   touch-action: pan-y;
   font-size: var(--fs-cal-header); 
   font-weight: 600;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
@@ -3037,6 +3042,16 @@ body.turni-no-select * {
   background: transparent;
   box-shadow: none;
   color: var(--color-arrow-month);
+  display: inline-flex;
+  align-items: center;
+}
+
+.monthbar .prev {
+  justify-self: end;
+}
+
+.monthbar .next {
+  justify-self: start;
 }
 
 
@@ -3049,6 +3064,7 @@ body.turni-no-select * {
   stroke-width: var(--icon-arrow-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
+  transform: translateY(1px);
 }
 
 
