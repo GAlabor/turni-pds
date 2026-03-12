@@ -701,8 +701,12 @@ body {
   opacity: 0.95;
 }
 
-.day.empty .cal-turno-sigla {
-  display: none;
+.day.is-outside-month .cal-turno-sigla {
+  opacity: 0.56;
+}
+
+.day.is-outside-month .cal-turno-sigla.sigla-ready {
+  opacity: 0.56;
 }
 
 
@@ -716,11 +720,18 @@ body {
   pointer-events: none;
 }
 
-.day.empty {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  pointer-events: none;
+.day.is-outside-month {
+  color: var(--subtext);
+  opacity: 0.58;
+}
+
+.day.is-outside-month:hover {
+  transform: none;
+  border-color: var(--border);
+}
+
+.day.is-outside-month:hover::before {
+  opacity: 0;
 }
 
 .day:hover {
@@ -888,7 +899,7 @@ body {
 
   .calendar-container {
     margin-top: var(--space-8);
-    padding: var(--space-10) var(--space-2) var(--space-16);
+    padding: var(--space-10) var(--space-2) var(--space-12);
   }
 
   .dow-row {
@@ -943,7 +954,7 @@ body {
 
 @media (min-width: 901px) {
   .calendar-container {
-    padding-bottom: var(--space-16);
+    padding-bottom: var(--space-14);
   }
 }
 

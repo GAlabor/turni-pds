@@ -639,24 +639,20 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
     const firstDay = new Date(year, month, 1);
     const startIndex = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+    const totalCells = 42;
 
-    const isCurrentMonth =
-      year === today.getFullYear() &&
-      month === today.getMonth();
-
-    for (let i = 0; i < startIndex; i++) {
-      const empty = document.createElement("div");
-      empty.className = "day empty";
-      targetGrid.appendChild(empty);
-    }
-
-    for (let d = 1; d <= daysInMonth; d++) {
+    function appendDayCell(dateObj, opts) {
+      const options = opts || {};
       const cell = document.createElement("div");
       cell.className = "day";
-      cell.textContent = d;
+      cell.textContent = dateObj.getDate();
 
-      const colIndex = (startIndex + d - 1) % 7;
-      const dateObj = new Date(year, month, d);
+      if (options.isOutsideMonth) {
+        cell.classList.add("is-outside-month");
+      }
+
+      const colIndex = (dateObj.getDay() + 6) % 7;
 
       let festInfo = null;
       if (window.Festivita) {
@@ -678,13 +674,30 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
         cell.title = String(festInfo.nome);
       }
 
-      if (isCurrentMonth && d === today.getDate()) {
+      if (
+        dateObj.getFullYear() === today.getFullYear() &&
+        dateObj.getMonth() === today.getMonth() &&
+        dateObj.getDate() === today.getDate()
+      ) {
         cell.classList.add("today");
       }
 
       applyTurnazioneOverlayToCell(cell, dateObj);
-
       targetGrid.appendChild(cell);
+    }
+
+    for (let i = 0; i < startIndex; i++) {
+      const dayNum = prevMonthDays - startIndex + i + 1;
+      appendDayCell(new Date(year, month - 1, dayNum), { isOutsideMonth: true });
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      appendDayCell(new Date(year, month, d), { isOutsideMonth: false });
+    }
+
+    const remaining = Math.max(0, totalCells - targetGrid.children.length);
+    for (let d = 1; d <= remaining; d++) {
+      appendDayCell(new Date(year, month + 1, d), { isOutsideMonth: true });
     }
   }
 
