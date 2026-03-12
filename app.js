@@ -682,7 +682,9 @@ function applyTurnazioneOverlayToCell(cellEl, dateObj) {
         cell.classList.add("today");
       }
 
-      applyTurnazioneOverlayToCell(cell, dateObj);
+      if (!options.isOutsideMonth) {
+        applyTurnazioneOverlayToCell(cell, dateObj);
+      }
       targetGrid.appendChild(cell);
     }
 
