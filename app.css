@@ -3340,8 +3340,8 @@ body.turni-no-select * {
 }
 
 body.calendar-topbar-layout .app-status {
-  left: calc(env(safe-area-inset-left) + var(--topbar-inset));
-  right: auto;
+  left: auto;
+  right: calc(env(safe-area-inset-right) + var(--topbar-inset));
 }
 
 .app-top-action {
@@ -3364,6 +3364,8 @@ body.calendar-topbar-layout .app-status {
 }
 
 body.calendar-topbar-layout .app-top-action {
+  left: calc(env(safe-area-inset-left) + var(--topbar-inset));
+  right: auto;
   display: flex;
 }
 
