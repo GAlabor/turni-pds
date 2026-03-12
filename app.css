@@ -60,8 +60,11 @@
   
   --dow-muted: #6b7280;     
   --sunday: #5E6A7D;
---cal-festivo: #B34747;
---cal-superfestivo: #B34747;
+  --cal-festivo: #B34747;
+  --cal-superfestivo: #B34747;
+  --cal-outside-text: #566074;
+  --cal-outside-sigla: #445066;
+  --cal-outside-border: rgba(120,130,170,0.24);
   --today-border: var(--accent); 
   
   --version-color: rgba(15,23,42,0.65);
@@ -290,10 +293,13 @@
 
     --dow-muted: #9ca3af;
     --sunday: #8A93A3;
-
---cal-festivo: #F08A8A;
---cal-superfestivo: #F08A8A;
+    --cal-festivo: #F08A8A;
+    --cal-superfestivo: #F08A8A;
+    --cal-outside-text: #5f6880;
+    --cal-outside-sigla: #4e5971;
+    --cal-outside-border: rgba(148,163,184,0.22);
     --today-border: var(--accent);
+
     --version-color: rgba(226,232,240,0.8);
 
     --nav-fg: #e5e7eb;
@@ -338,10 +344,13 @@
 
   --dow-muted: #9ca3af;
   --sunday: #8A93A3;
-
-    --cal-festivo: #F08A8A;
-    --cal-superfestivo: #F08A8A;
+  --cal-festivo: #F08A8A;
+  --cal-superfestivo: #F08A8A;
+  --cal-outside-text: #5f6880;
+  --cal-outside-sigla: #4e5971;
+  --cal-outside-border: rgba(148,163,184,0.22);
   --today-border: var(--accent);
+
   --version-color: rgba(226,232,240,0.8);
 
   --nav-fg: #e5e7eb;
@@ -702,11 +711,13 @@ body {
 }
 
 .day.is-outside-month .cal-turno-sigla {
-  opacity: 0.56;
+  opacity: 0.50;
+  color: var(--cal-outside-sigla) !important;
 }
 
 .day.is-outside-month .cal-turno-sigla.sigla-ready {
-  opacity: 0.56;
+  opacity: 0.50;
+  color: var(--cal-outside-sigla) !important;
 }
 
 
@@ -721,13 +732,14 @@ body {
 }
 
 .day.is-outside-month {
-  color: var(--subtext);
-  opacity: 0.58;
+  color: var(--cal-outside-text) !important;
+  opacity: 0.50;
+  border-color: var(--cal-outside-border);
 }
 
 .day.is-outside-month:hover {
   transform: none;
-  border-color: var(--border);
+  border-color: var(--cal-outside-border);
 }
 
 .day.is-outside-month:hover::before {
@@ -754,6 +766,12 @@ body {
 
 .day.is-superfestivo {
   color: var(--cal-superfestivo);
+}
+
+.day.is-outside-month.sunday,
+.day.is-outside-month.is-festivo,
+.day.is-outside-month.is-superfestivo {
+  color: var(--cal-outside-text) !important;
 }
 
 
