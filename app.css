@@ -639,7 +639,7 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: var(--space-8);
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-18);
 }
 
 
@@ -888,12 +888,12 @@ body {
 
   .calendar-container {
     margin-top: var(--space-8);
-    padding: var(--space-10) var(--space-2) var(--space-10);
+    padding: var(--space-10) var(--space-2) var(--space-16);
   }
 
   .dow-row {
     gap: var(--space-2);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-10);
   }
 
   .dow {
@@ -3384,7 +3384,7 @@ body.calendar-topbar-layout .view-calendar .monthbar {
 }
 
 body.calendar-topbar-layout .view-calendar .calendar-wrapper {
-  margin-top: calc(var(--status-icon-size) + var(--space-8));
+  margin-top: calc(var(--status-icon-size) + var(--space-20));
 }
 
 .app-top-action svg {
