@@ -3369,6 +3369,24 @@ body.calendar-topbar-layout .app-top-action {
   display: flex;
 }
 
+body.calendar-topbar-layout .view-calendar .app-header {
+  display: none;
+}
+
+body.calendar-topbar-layout .view-calendar .monthbar {
+  position: fixed;
+  top: var(--topbar-top);
+  left: calc(env(safe-area-inset-left) + var(--topbar-inset) + var(--status-icon-size) + 16px);
+  right: calc(env(safe-area-inset-right) + var(--topbar-inset) + var(--status-icon-size) + 16px);
+  z-index: 9998;
+  margin: 0;
+  min-height: var(--status-icon-size);
+}
+
+body.calendar-topbar-layout .view-calendar .calendar-wrapper {
+  margin-top: calc(var(--status-icon-size) + var(--space-8));
+}
+
 .app-top-action svg {
   width: var(--status-icon-size);
   height: var(--status-icon-size);
