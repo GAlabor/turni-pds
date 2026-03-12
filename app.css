@@ -3384,7 +3384,9 @@ body.calendar-topbar-layout .app-top-action {
 }
 
 .app-top-action-dot {
-  fill: var(--text);
+  stroke: var(--text);
+  stroke-width: 22;
+  stroke-linecap: round;
 }
 
 #icoStatus svg {
