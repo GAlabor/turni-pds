@@ -3532,6 +3532,19 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   justify-content: flex-start;
 }
 
+.calendar-menu-brand-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.calendar-menu-brand-title{
+  font-size:18px;
+  font-weight:600;
+  letter-spacing:-0.01em;
+  color:var(--text);
+}
+
 .calendar-menu-brand-btn {
   appearance: none;
   -webkit-appearance: none;

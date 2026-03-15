@@ -22,20 +22,20 @@
     
 
     STORAGE_KEYS: {
-      theme: "turnipds-theme",
+      theme: "turnoblu-theme",
       
-      turni: "turnipds-turni",
+      turni: "turnoblu-turni",
 
-      turniVisualizza: "turnipds-turni-visualizza",
+      turniVisualizza: "turnoblu-turni-visualizza",
       
-      turnazioni: "turnipds-turnazioni",
-      turnazioniPreferred: "turnipds-turnazioni-preferred",
-      turniStart: "turnipds-turni-start",
+      turnazioni: "turnoblu-turnazioni",
+      turnazioniPreferred: "turnoblu-turnazioni-preferred",
+      turniStart: "turnoblu-turni-start",
       
-      indennita: "turnipds-indennita",
-      festivita: "turnipds-festivita",
-      inspag: "turnipds-inspag",
-      preferenze: "turnipds-preferenze"
+      indennita: "turnoblu-indennita",
+      festivita: "turnoblu-festivita",
+      inspag: "turnoblu-inspag",
+      preferenze: "turnoblu-preferenze"
     },
     
     
@@ -1344,7 +1344,7 @@ function isCalendarViewActive() {
   return !!(v && v.classList.contains("is-active"));
 }
 
-window.addEventListener("turnipds:storage-changed", () => {
+window.addEventListener("turnoblu:storage-changed", () => {
   if (currentMode !== MODES.DAYS) return;
 
   if (isCalendarViewActive()) {
@@ -1707,7 +1707,7 @@ window.Icons = {
 
 function emitStorageChange(key) {
   try {
-    window.dispatchEvent(new CustomEvent("turnipds:storage-changed", { detail: { key: String(key || "") } }));
+    window.dispatchEvent(new CustomEvent("turnoblu:storage-changed", { detail: { key: String(key || "") } }));
   } catch {}
 }
 
@@ -2119,7 +2119,7 @@ function saveTurnoIniziale(obj) {
 
   const FEST_KEY = (window.AppConfig && window.AppConfig.STORAGE_KEYS)
     ? window.AppConfig.STORAGE_KEYS.festivita
-    : 'turnipds-festivita';
+    : 'turnoblu-festivita';
 
   let defs = [];
   let isEditing = true;
@@ -2581,7 +2581,7 @@ if (window.TurniInteractions && typeof TurniInteractions.attachRowEditClick === 
     refreshFromStorage();
     renderSettingsPanel();
 
-    window.addEventListener('turnipds:storage-changed', (ev) => {
+    window.addEventListener('turnoblu:storage-changed', (ev) => {
       const k = ev && ev.detail ? String(ev.detail.key || '') : '';
       if (k && k !== FEST_KEY) return;
       refreshFromStorage();
@@ -4264,7 +4264,7 @@ if (window.TurniInteractions && !Turnazioni._turnazioniInteractionsAttached) {
         const KEY_TURNAZIONI = keys ? keys.turnazioni : null;
         const KEY_PREF      = keys ? keys.turnazioniPreferred : null;
 
-        window.addEventListener("turnipds:storage-changed", (ev) => {
+        window.addEventListener("turnoblu:storage-changed", (ev) => {
           const k = ev && ev.detail && ev.detail.key ? String(ev.detail.key) : "";
 
           if (k && (k === String(KEY_TURNAZIONI) || k === String(KEY_PREF))) {
@@ -6785,7 +6785,7 @@ if (variant === "danger-filled") {
     function emitStorageChange(key) {
       try {
         window.dispatchEvent(
-          new CustomEvent("turnipds:storage-changed", { detail: { key: String(key || "") } })
+          new CustomEvent("turnoblu:storage-changed", { detail: { key: String(key || "") } })
         );
       } catch {}
     }
