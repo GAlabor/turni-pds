@@ -3529,8 +3529,21 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 .calendar-menu-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-16);
+  justify-content: flex-start;
+}
+
+.calendar-menu-brand-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .calendar-menu-brand {
@@ -3538,10 +3551,6 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   height: var(--status-icon-size);
   display: block;
   object-fit: contain;
-  flex-shrink: 0;
-}
-
-.calendar-menu-close {
   flex-shrink: 0;
 }
 

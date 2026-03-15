@@ -7090,7 +7090,7 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
   let overlay = null;
   let drawer = null;
   let openBtn = null;
-  let closeBtn = null;
+  let brandBtn = null;
   let scrim = null;
 
   function bindPressFeedback(el) {
@@ -7160,20 +7160,20 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     overlay = document.getElementById("calendarMenuOverlay");
     drawer = document.getElementById("calendarMenuDrawer");
     openBtn = document.getElementById("calendarMoreBtn");
-    closeBtn = document.getElementById("calendarMenuCloseBtn");
+    brandBtn = document.getElementById("calendarMenuBrandBtn");
     scrim = overlay ? overlay.querySelector("[data-calendar-menu-close]") : null;
 
-    if (!overlay || !drawer || !openBtn || !closeBtn || !scrim) return;
+    if (!overlay || !drawer || !openBtn || !brandBtn || !scrim) return;
 
     bindPressFeedback(openBtn);
-    bindPressFeedback(closeBtn);
+    bindPressFeedback(brandBtn);
 
     openBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
       toggleMenu();
     });
 
-    closeBtn.addEventListener("click", (ev) => {
+    brandBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
       closeMenu();
     });
