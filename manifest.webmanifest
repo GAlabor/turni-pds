@@ -1,6 +1,6 @@
 {
   "name": "Turni Polizia di Stato",
-  "short_name": "TurnoBlu",
+  "short_name": "Turni PdS",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
