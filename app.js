@@ -7092,6 +7092,21 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
   let openBtn = null;
   let brandBtn = null;
   let scrim = null;
+  let todayLabel = null;
+
+  function updateTodayLabel() {
+    if (!todayLabel) return;
+    try {
+      const now = new Date();
+      todayLabel.textContent = new Intl.DateTimeFormat("it-IT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+      }).format(now);
+    } catch {
+      todayLabel.textContent = "";
+    }
+  }
 
   function bindPressFeedback(el) {
     if (!el || el.dataset.pressBound === "1") return;
@@ -7162,11 +7177,13 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     openBtn = document.getElementById("calendarMoreBtn");
     brandBtn = document.getElementById("calendarMenuBrandBtn");
     scrim = overlay ? overlay.querySelector("[data-calendar-menu-close]") : null;
+    todayLabel = document.getElementById("calendarMenuTodayLabel");
 
     if (!overlay || !drawer || !openBtn || !brandBtn || !scrim) return;
 
     bindPressFeedback(openBtn);
     bindPressFeedback(brandBtn);
+    updateTodayLabel();
 
     openBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
