@@ -3500,7 +3500,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   width: min(72vw, 460px);
   max-width: calc(100vw - 40px);
   padding:
-    calc(env(safe-area-inset-top) + var(--space-24))
+    calc(env(safe-area-inset-top) + var(--space-16))
     var(--space-18)
     calc(env(safe-area-inset-bottom) + var(--space-24));
   background: #ffffff;
@@ -3534,8 +3534,8 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 }
 
 .calendar-menu-brand {
-  width: 34px;
-  height: 34px;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
   display: block;
   object-fit: contain;
   flex-shrink: 0;
@@ -3611,7 +3611,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
     width: min(76vw, 400px);
     max-width: calc(100vw - 28px);
     padding:
-      calc(env(safe-area-inset-top) + var(--space-22))
+      calc(env(safe-area-inset-top) + var(--space-16))
       var(--space-16)
       calc(env(safe-area-inset-bottom) + var(--space-22));
   }
