@@ -181,7 +181,7 @@
     <div id="icoStatus"></div>
   </div>
 
-  <button id="calendarMoreBtn" class="app-top-action app-top-action--more" type="button" aria-label="Altre opzioni" hidden>
+  <button id="calendarMoreBtn" class="app-top-action app-top-action--more" type="button" aria-label="Apri menu calendario" aria-haspopup="dialog" aria-expanded="false" hidden>
     <svg viewBox="0 0 512 512" aria-hidden="true">
       <circle class="app-top-action-ring" cx="256" cy="256" r="210"></circle>
 <line class="app-top-action-dot" x1="180" y1="200" x2="332" y2="200"></line>
@@ -189,6 +189,27 @@
 <line class="app-top-action-dot" x1="180" y1="312" x2="332" y2="312"></line>
     </svg>
   </button>
+
+  <div id="calendarMenuOverlay" class="calendar-menu-overlay" hidden>
+    <div class="calendar-menu-scrim" data-calendar-menu-close></div>
+    <aside id="calendarMenuDrawer" class="calendar-menu-drawer" aria-label="Menu calendario" role="dialog" aria-modal="false">
+      <div class="calendar-menu-header">
+        <img class="calendar-menu-brand" src="ico/favicon.svg" alt="">
+        <button id="calendarMenuCloseBtn" class="icon-circle-btn calendar-menu-close" type="button" aria-label="Chiudi menu calendario">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-ui-close"></use>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="calendar-menu-nav" aria-label="Azioni calendario">
+        <button class="calendar-menu-item" type="button">Seleziona</button>
+        <button class="calendar-menu-item" type="button">Vai a data</button>
+        <hr class="calendar-menu-separator">
+        <button class="calendar-menu-item" type="button">Impostazioni</button>
+      </nav>
+    </aside>
+  </div>
   
   <main class="app-shell">   
     

@@ -6946,8 +6946,13 @@ function syncTopbarCalendarChrome() {
 
   const moreBtn = document.getElementById("calendarMoreBtn");
   if (moreBtn) {
+    const menuOpen = document.body.classList.contains("calendar-menu-open");
     moreBtn.hidden = !isCalendar;
-    moreBtn.style.display = isCalendar ? "flex" : "none";
+    moreBtn.style.display = (isCalendar && !menuOpen) ? "flex" : "none";
+  }
+
+  if (window.CalendarMenu && typeof CalendarMenu.sync === "function") {
+    CalendarMenu.sync(isCalendar);
   }
 }
 
@@ -7078,7 +7083,122 @@ if (activeViewId === "settings" && target !== "settings") {
   syncTopbarCalendarChrome();
 }
 
-  
+window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
+
+(function () {
+
+  let overlay = null;
+  let drawer = null;
+  let openBtn = null;
+  let closeBtn = null;
+  let scrim = null;
+
+  function bindPressFeedback(el) {
+    if (!el || el.dataset.pressBound === "1") return;
+    el.dataset.pressBound = "1";
+
+    const on = () => el.classList.add("is-press");
+    const off = () => el.classList.remove("is-press");
+
+    el.addEventListener("pointerdown", on);
+    el.addEventListener("pointerup", off);
+    el.addEventListener("pointercancel", off);
+    el.addEventListener("pointerleave", off);
+    el.addEventListener("touchstart", on, { passive: true });
+    el.addEventListener("touchend", off);
+    el.addEventListener("touchcancel", off);
+  }
+
+  function isCalendarActive() {
+    const activeView = document.querySelector(".view.is-active");
+    return !!(activeView && activeView.dataset.view === "calendar");
+  }
+
+  function isOpen() {
+    return document.body.classList.contains("calendar-menu-open");
+  }
+
+  function syncButtonState() {
+    if (!openBtn) return;
+    openBtn.setAttribute("aria-expanded", isOpen() ? "true" : "false");
+  }
+
+  function closeMenu() {
+    if (!overlay) return;
+    document.body.classList.remove("calendar-menu-open");
+    overlay.hidden = true;
+    syncButtonState();
+    if (openBtn && isCalendarActive()) {
+      openBtn.style.display = "flex";
+    }
+  }
+
+  function openMenu() {
+    if (!overlay || !isCalendarActive()) return;
+    overlay.hidden = false;
+    document.body.classList.add("calendar-menu-open");
+    syncButtonState();
+    if (openBtn) {
+      openBtn.style.display = "none";
+    }
+  }
+
+  function toggleMenu() {
+    if (isOpen()) closeMenu();
+    else openMenu();
+  }
+
+  function sync(isCalendar) {
+    if (!isCalendar) {
+      closeMenu();
+      return;
+    }
+    syncButtonState();
+  }
+
+  function init() {
+    overlay = document.getElementById("calendarMenuOverlay");
+    drawer = document.getElementById("calendarMenuDrawer");
+    openBtn = document.getElementById("calendarMoreBtn");
+    closeBtn = document.getElementById("calendarMenuCloseBtn");
+    scrim = overlay ? overlay.querySelector("[data-calendar-menu-close]") : null;
+
+    if (!overlay || !drawer || !openBtn || !closeBtn || !scrim) return;
+
+    bindPressFeedback(openBtn);
+    bindPressFeedback(closeBtn);
+
+    openBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      toggleMenu();
+    });
+
+    closeBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      closeMenu();
+    });
+
+    scrim.addEventListener("click", () => {
+      closeMenu();
+    });
+
+    drawer.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && isOpen()) {
+        closeMenu();
+      }
+    });
+
+    syncButtonState();
+  }
+
+  window.CalendarMenu = { init, open: openMenu, close: closeMenu, toggle: toggleMenu, sync };
+
+})();
+
   window.addEventListener("DOMContentLoaded", () => {
     
     if (window.Status && typeof Status.init === "function") {
@@ -7100,6 +7220,10 @@ if (activeViewId === "settings" && target !== "settings") {
     
     if (window.Calendar && typeof Calendar.init === "function") {
       Calendar.init();
+    }
+
+    if (window.CalendarMenu && typeof CalendarMenu.init === "function") {
+      CalendarMenu.init();
     }
 
     
