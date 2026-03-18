@@ -3530,7 +3530,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding-bottom: var(--space-18);
+  padding-bottom: var(--space-8);
   border-bottom: 1px solid rgba(148,163,184,0.18);
 }
 
@@ -3591,7 +3591,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 
 .calendar-menu-item-main{
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-14);
   min-width: 0;
 }
@@ -3602,7 +3602,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
+  color: var(--subtext);
   flex-shrink: 0;
   transform: translateY(-1px);
 }
@@ -3622,13 +3622,13 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
 .calendar-menu-item-label{
   font-size: 20px;
-  font-weight: 650;
+  font-weight: 550;
   letter-spacing: -0.02em;
   line-height: 1.15;
   color: var(--text);
@@ -3692,7 +3692,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
   }
 
   .calendar-menu-header{
-    padding-bottom: var(--space-16);
+    padding-bottom: var(--space-8);
   }
 
   .calendar-menu-nav{
