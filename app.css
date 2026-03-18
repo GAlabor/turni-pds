@@ -3573,8 +3573,16 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 .calendar-menu-nav {
   display: flex;
   flex-direction: column;
-  gap: var(--space-10);
+  gap: 0;
   margin-top: var(--space-36);
+}
+
+.calendar-menu-nav > .calendar-menu-item + .calendar-menu-item {
+  margin-top: var(--space-16);
+}
+
+.calendar-menu-nav > .calendar-menu-item:nth-of-type(2) {
+  margin-bottom: var(--space-24);
 }
 
 .calendar-menu-item {
@@ -3654,7 +3662,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 
 .calendar-menu-separator {
   width: calc(100% - var(--space-18));
-  margin: var(--space-2) 0 var(--space-2) var(--space-36);
+  margin: 0 0 var(--space-24) var(--space-36);
   border: 0;
   border-bottom: 1px solid var(--menu-separator);
 }
@@ -3697,7 +3705,6 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 
   .calendar-menu-nav{
     margin-top: var(--space-36);
-    gap: var(--space-12);
   }
 
   .calendar-menu-item-label {
