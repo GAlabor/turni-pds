@@ -3574,7 +3574,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   display: flex;
   flex-direction: column;
   gap: var(--space-10);
-  margin-top: var(--space-18);
+  margin-top: var(--space-36);
 }
 
 .calendar-menu-item {
@@ -3696,7 +3696,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
   }
 
   .calendar-menu-nav{
-    margin-top: var(--space-20);
+    margin-top: var(--space-36);
     gap: var(--space-12);
   }
 
