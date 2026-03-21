@@ -156,6 +156,11 @@
         <path d="M5 13 L9 17 L19 7" />
       </symbol>
 
+      <symbol id="ico-check-circle" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M7.5 12.5 L10.5 15.5 L16.8 9.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+
 
       <symbol id="ico-trash" viewBox="0 0 24 24">
         <path d="M9 6.5a3 3 0 0 1 6 0" />
@@ -217,9 +222,9 @@
       <nav class="calendar-menu-nav" aria-label="Azioni calendario">
         <button class="calendar-menu-item" type="button">
           <span class="calendar-menu-item-main">
-            <span class="calendar-menu-item-icon" aria-hidden="true">
+            <span class="calendar-menu-item-icon calendar-menu-item-icon--check" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none">
-                <use href="#ico-check"></use>
+                <use href="#ico-check-circle"></use>
               </svg>
             </span>
             <span class="calendar-menu-item-copy">
@@ -246,10 +251,10 @@
 
         <button class="calendar-menu-item" type="button">
           <span class="calendar-menu-item-main">
-            <span class="calendar-menu-item-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <use href="#ico-ui-settings"></use>
-              </svg>
+            <span class="calendar-menu-item-icon calendar-menu-item-icon--settings" aria-hidden="true">
+              <svg id="calendarMenuSettingsIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
             </span>
             <span class="calendar-menu-item-copy">
               <span class="calendar-menu-item-label">Impostazioni</span>

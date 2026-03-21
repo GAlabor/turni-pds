@@ -3626,6 +3626,16 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   stroke-linejoin: round;
 }
 
+.calendar-menu-item-icon--check svg{
+  width: 23px;
+  height: 23px;
+}
+
+.calendar-menu-item-icon--settings svg{
+  width: 20px;
+  height: 20px;
+}
+
 .calendar-menu-item-copy{
   display: flex;
   flex-direction: column;

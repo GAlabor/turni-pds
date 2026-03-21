@@ -1650,7 +1650,10 @@ const _statusCheckSvgText = `<!-- status-check.svg -->
 
     await loadSVGInto("icoRiepilogo", "riepilogo.svg");
     
-    await loadSVGInto("icoSettings", "settings.svg");
+    await Promise.all([
+      loadSVGInto("icoSettings", "settings.svg"),
+      loadSVGInto("calendarMenuSettingsIcon", "settings.svg")
+    ]);
     
     const tabbar = document.querySelector(".tabbar");
     if (tabbar) {
