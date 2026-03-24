@@ -114,6 +114,10 @@
   --icon-back-size: 26px;      
   --color-back-icon: var(--text); 
 
+  --calendar-menu-icon-size: 22px;
+  --calendar-menu-icon-stroke: 1.4;
+  --calendar-menu-check-stroke: var(--calendar-menu-icon-stroke);
+
   --cal-day-size: 40px;
 
   --turni-sigla-scale: 0.7;
@@ -3605,8 +3609,8 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 }
 
 .calendar-menu-item-icon{
-  width: 22px;
-  height: 22px;
+  width: var(--calendar-menu-icon-size);
+  height: var(--calendar-menu-icon-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3616,26 +3620,22 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 }
 
 .calendar-menu-item-icon svg{
-  width: 22px;
-  height: 22px;
+  width: var(--calendar-menu-icon-size);
+  height: var(--calendar-menu-icon-size);
   display: block;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.calendar-menu-item-icon--check svg{
-  width: 23px;
-  height: 23px;
+.calendar-menu-item-icon svg *{
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
-
-.calendar-menu-item-icon--settings svg{
-  width: 20px;
-  height: 20px;
-}
-
 .calendar-menu-item-copy{
   display: flex;
   flex-direction: column;
