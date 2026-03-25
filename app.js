@@ -6960,128 +6960,170 @@ function syncTopbarCalendarChrome() {
 }
 
 function initTabs() {
-  const tabs  = document.querySelectorAll(".tab");
-  const views = document.querySelectorAll(".view");
+  const tabs = Array.from(document.querySelectorAll(".tab"));
+  const views = Array.from(document.querySelectorAll(".view"));
 
   if (!tabs.length || !views.length) return;
+
+  const settingsTab = tabs.find(tab => tab.dataset.tab === "settings") || null;
+  const SETTINGS_MENU_ANIM_MS = 320;
+  let settingsMenuAnimTimer = 0;
+
+  function cleanupSettingsBeforeLeave() {
+    if (window.Turni && typeof Turni.exitEditMode === "function") {
+      Turni.exitEditMode();
+    }
+
+    if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
+      Turnazioni.exitEditMode();
+    }
+
+    if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
+      const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
+      const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
+      TurniInteractions.closeAllSwipesInList(turniList);
+      TurniInteractions.closeAllSwipesInList(turnazioniList);
+    }
+
+    if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
+      SettingsUI.showMain();
+    }
+    if (window.Icons && typeof Icons.setStatusVariant === "function") {
+      Icons.setStatusVariant("login");
+    }
+  }
+
+  function playSettingsMenuEnterAnimation() {
+    const settingsView = document.querySelector(".view-settings");
+    if (!settingsView) return;
+
+    settingsView.classList.remove("is-entering-from-menu");
+    void settingsView.offsetWidth;
+    settingsView.classList.add("is-entering-from-menu");
+
+    if (settingsMenuAnimTimer) {
+      clearTimeout(settingsMenuAnimTimer);
+    }
+
+    settingsMenuAnimTimer = setTimeout(() => {
+      settingsView.classList.remove("is-entering-from-menu");
+      settingsMenuAnimTimer = 0;
+    }, SETTINGS_MENU_ANIM_MS);
+  }
+
+  function setActiveTabForView(target) {
+    tabs.forEach(t => {
+      if (target === "settings") {
+        t.classList.toggle("active", t.dataset.tab === "settings");
+        return;
+      }
+      t.classList.toggle("active", t.dataset.tab === target);
+    });
+  }
+
+  function setActiveView(target, opts) {
+    const options = opts || {};
+    const activeView = document.querySelector(".view.is-active");
+    const activeViewId = activeView ? activeView.dataset.view : null;
+
+    if (!target) return activeViewId;
+
+    if (target === "settings" && !options.fromMenu) {
+      return activeViewId;
+    }
+
+    if (target === "calendar") {
+      const calendarView = document.querySelector(".view-calendar");
+      const isCalendarActive = !!(calendarView && calendarView.classList.contains("is-active"));
+
+      if (
+        isCalendarActive &&
+        window.Calendar &&
+        typeof Calendar.resetToToday === "function"
+      ) {
+        Calendar.resetToToday();
+        return activeViewId;
+      }
+    }
+
+    if (target === "settings") {
+      if (typeof window.__bootSettingsOnce === "function") {
+        window.__bootSettingsOnce();
+      }
+
+      const settingsView = document.querySelector(".view-settings");
+      const isSettingsActive = !!(settingsView && settingsView.classList.contains("is-active"));
+
+      if (isSettingsActive) {
+        if (options.fromMenu) {
+          if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
+            SettingsUI.showMain();
+          }
+          playSettingsMenuEnterAnimation();
+        }
+        return activeViewId;
+      }
+    }
+
+    if (activeViewId === "settings" && target !== "settings") {
+      cleanupSettingsBeforeLeave();
+    }
+
+    setActiveTabForView(target);
+    views.forEach(v => {
+      v.classList.toggle("is-active", v.dataset.view === target);
+    });
+
+    if (target === "settings" && options.fromMenu) {
+      if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
+        SettingsUI.showMain();
+      }
+      playSettingsMenuEnterAnimation();
+    }
+
+    if (target === "calendar" && window.Calendar) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (
+            activeViewId !== "calendar" &&
+            typeof Calendar.resetToToday === "function"
+          ) {
+            Calendar.resetToToday();
+          }
+
+          if (typeof Calendar.onEnterCalendarView === "function") {
+            Calendar.onEnterCalendarView();
+          }
+        });
+      });
+    }
+
+    syncTopbarCalendarChrome();
+    return activeViewId;
+  }
 
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
       const target = tab.dataset.tab;
-
-      
-      const activeView = document.querySelector(".view.is-active");
-      const activeViewId = activeView ? activeView.dataset.view : null;
-
-      
-      if (target === "calendar") {
-        const calendarView = document.querySelector(".view-calendar");
-        const isCalendarActive =
-          calendarView && calendarView.classList.contains("is-active");
-
-        if (
-          isCalendarActive &&
-          window.Calendar &&
-          typeof Calendar.resetToToday === "function"
-        ) {
-          Calendar.resetToToday();
-          return;
-        }
-      }
-      
-      
       if (target === "settings") {
-        
-        if (typeof window.__bootSettingsOnce === "function") {
-          window.__bootSettingsOnce();
-        }
-
-        const settingsView = document.querySelector(".view-settings");
-        const isSettingsActive =
-          settingsView && settingsView.classList.contains("is-active");
-
-        if (isSettingsActive) {
-          
-          if (window.Turni && typeof Turni.exitEditMode === "function") {
-            Turni.exitEditMode();
-          }
-          
-          if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
-            Turnazioni.exitEditMode();
-          }
-
-
-          if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
-            const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
-            const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
-            TurniInteractions.closeAllSwipesInList(turniList);
-            TurniInteractions.closeAllSwipesInList(turnazioniList);
-          }
-
-if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
-  SettingsUI.showMain();
-}
-if (window.Icons && typeof Icons.setStatusVariant === "function") {
-  Icons.setStatusVariant("login");
-}
-return;
-        }
+        return;
       }
-      
-      
-      
-if (activeViewId === "settings" && target !== "settings") {
-  if (window.Turni && typeof Turni.exitEditMode === "function") {
-    Turni.exitEditMode();
-  }
-
-  if (window.Turnazioni && typeof Turnazioni.exitEditMode === "function") {
-    Turnazioni.exitEditMode();
-  }
-
-  if (window.TurniInteractions && typeof TurniInteractions.closeAllSwipesInList === "function") {
-    const turniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turni-list]');
-    const turnazioniList = document.querySelector('.settings-panel.settings-turni[data-settings-id="turni"] [data-turnazioni-list]');
-    TurniInteractions.closeAllSwipesInList(turniList);
-    TurniInteractions.closeAllSwipesInList(turnazioniList);
-  }
-
-  if (window.SettingsUI && typeof SettingsUI.showMain === "function") {
-    SettingsUI.showMain();
-  }
-  if (window.Icons && typeof Icons.setStatusVariant === "function") {
-    Icons.setStatusVariant("login");
-  }
-}
-
-
-      
-      tabs.forEach(t => t.classList.toggle("active", t === tab));
-      views.forEach(v => {
-        v.classList.toggle("is-active", v.dataset.view === target);
-      });
-      
-      
-      if (target === "calendar" && window.Calendar) {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (
-              activeViewId !== "calendar" &&
-              typeof Calendar.resetToToday === "function"
-            ) {
-              Calendar.resetToToday();
-            }
-
-            if (typeof Calendar.onEnterCalendarView === "function") {
-              Calendar.onEnterCalendarView();
-            }
-          });
-        });
-      }
-
-      syncTopbarCalendarChrome();
+      setActiveView(target);
     });
   });
+
+  if (settingsTab) {
+    settingsTab.setAttribute("aria-disabled", "true");
+  }
+
+  window.AppTabs = {
+    openView: function (target) {
+      setActiveView(target);
+    },
+    openSettingsFromMenu: function () {
+      setActiveView("settings", { fromMenu: true });
+    }
+  };
 
   syncTopbarCalendarChrome();
 }
@@ -7094,6 +7136,7 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
   let drawer = null;
   let openBtn = null;
   let brandBtn = null;
+  let settingsBtn = null;
   let scrim = null;
   let todayLabel = null;
 
@@ -7179,13 +7222,15 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     drawer = document.getElementById("calendarMenuDrawer");
     openBtn = document.getElementById("calendarMoreBtn");
     brandBtn = document.getElementById("calendarMenuBrandBtn");
+    settingsBtn = overlay ? overlay.querySelector("[data-calendar-menu-settings]") : null;
     scrim = overlay ? overlay.querySelector("[data-calendar-menu-close]") : null;
     todayLabel = document.getElementById("calendarMenuTodayLabel");
 
-    if (!overlay || !drawer || !openBtn || !brandBtn || !scrim) return;
+    if (!overlay || !drawer || !openBtn || !brandBtn || !scrim || !settingsBtn) return;
 
     bindPressFeedback(openBtn);
     bindPressFeedback(brandBtn);
+    bindPressFeedback(settingsBtn);
     updateTodayLabel();
 
     openBtn.addEventListener("click", (ev) => {
@@ -7196,6 +7241,14 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     brandBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
       closeMenu();
+    });
+
+    settingsBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      closeMenu();
+      if (window.AppTabs && typeof AppTabs.openSettingsFromMenu === "function") {
+        AppTabs.openSettingsFromMenu();
+      }
     });
 
     scrim.addEventListener("click", () => {
