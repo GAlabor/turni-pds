@@ -3604,7 +3604,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 .calendar-menu-item-main{
   display: flex;
   align-items: flex-start;
-  gap: var(--space-14);
+  gap: var(--space-18);
   min-width: 0;
 }
 
@@ -3646,8 +3646,8 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 
 .calendar-menu-item-label{
   font-size: 20px;
-  font-weight: 550;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1.15;
   color: var(--text);
 }
@@ -3717,9 +3717,11 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
     margin-top: var(--space-36);
   }
 
-  .calendar-menu-item-label {
-    font-size: 18px;
-  }
+.calendar-menu-item-label {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
 
   .calendar-menu-item-meta{
     font-size: var(--fs-xs);
