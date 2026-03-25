@@ -1650,10 +1650,7 @@ const _statusCheckSvgText = `<!-- status-check.svg -->
 
     await loadSVGInto("icoRiepilogo", "riepilogo.svg");
     
-    await Promise.all([
-      loadSVGInto("icoSettings", "settings.svg"),
-      loadSVGInto("calendarMenuSettingsIcon", "settings.svg")
-    ]);
+    await loadSVGInto("calendarMenuSettingsIcon", "settings.svg");
     
     const tabbar = document.querySelector(".tabbar");
     if (tabbar) {
@@ -6965,7 +6962,6 @@ function initTabs() {
 
   if (!tabs.length || !views.length) return;
 
-  const settingsTab = tabs.find(tab => tab.dataset.tab === "settings") || null;
   const SETTINGS_MENU_ANIM_MS = 320;
   let settingsMenuAnimTimer = 0;
 
@@ -7112,9 +7108,6 @@ function initTabs() {
     });
   });
 
-  if (settingsTab) {
-    settingsTab.setAttribute("aria-disabled", "true");
-  }
 
   window.AppTabs = {
     openView: function (target) {
