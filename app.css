@@ -114,8 +114,8 @@
   --icon-back-size: 26px;      
   --color-back-icon: var(--text); 
 
-  --calendar-menu-icon-size: 22px;
-  --calendar-menu-icon-stroke: 1.4;
+  --calendar-menu-icon-size: 26px;
+  --calendar-menu-icon-stroke: 1.2;
   --calendar-menu-check-stroke: var(--calendar-menu-icon-stroke);
 
   --cal-day-size: 40px;
@@ -3625,6 +3625,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
   display: block;
   fill: none;
   stroke: currentColor;
+  stroke-width: var(--calendar-menu-icon-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -3632,6 +3633,7 @@ body.calendar-topbar-layout .view-calendar .calendar-wrapper {
 .calendar-menu-item-icon svg *{
   fill: none;
   stroke: currentColor;
+  stroke-width: inherit;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
