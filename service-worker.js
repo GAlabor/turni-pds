@@ -1,9 +1,9 @@
-const VERSION = '3.1.8';
+const VERSION = '3.1.9';
 const APP_VERSION = VERSION;
 
 const ICO_VERSION = 'v1.0';
 const SPLASH_VERSION = 'v1.0';
-const SVG_VERSION = 'v1.2';
+const SVG_VERSION = 'v1.3';
 
 const CACHE_APP = `turni-app-${APP_VERSION}`;
 const CACHE_ICO = `turni-ico-${ICO_VERSION}`;
@@ -162,7 +162,12 @@ self.addEventListener('install', event => {
     await Promise.allSettled(APP_URLS.map(u => appCache.add(u)));
     await Promise.allSettled(ICO_URLS.map(u => icoCache.add(u)));
     await Promise.allSettled(SPLASH_URLS.map(u => splashCache.add(u)));
-    await Promise.allSettled(SVG_URLS.map(u => svgCache.add(u)));
+    await Promise.allSettled(
+  SVG_URLS.map(async u => {
+    const res = await fetch(u, { cache: 'reload', credentials: 'same-origin' });
+    if (res.ok) await svgCache.put(u, res.clone());
+  })
+);
 
     await self.skipWaiting();
   })());

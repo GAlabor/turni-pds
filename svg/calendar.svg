@@ -6,12 +6,7 @@
    stroke-width="1.0"
    stroke-linecap="round"
    stroke-linejoin="round">
-  <!-- Cornice calendario -->
-  <rect x="2" y="2" width="20" height="20" rx="2.6" ry="2.6" />
 
-  <!-- Linea di separazione -->
-  <line x1="7" y1="13.0" x2="17" y2="13.0"
-        stroke-width="0.5" />
 </g>
 
 <!-- Gruppo testi (giorno + mese) -->
