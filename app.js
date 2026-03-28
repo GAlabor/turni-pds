@@ -34,7 +34,7 @@
       
       indennita: "turnipds-indennita",
       festivita: "turnipds-festivita",
-      inspag: "turnipds-inspag",
+      utenti: "turnipds-utenti",
       preferenze: "turnipds-preferenze"
     },
     
@@ -1646,7 +1646,7 @@ const _statusCheckSvgText = `<!-- status-check.svg -->
     await loadSVGInto("icoCalendar", "calendar.svg");
     setCalendarIconDateInSvg();
 
-    await loadSVGInto("icoInspag", "inspag.svg");
+    await loadSVGInto("icoUtenti", "users.svg");
 
     await loadSVGInto("icoRiepilogo", "riepilogo.svg");
     
@@ -6800,7 +6800,7 @@ if (variant === "danger-filled") {
         STORAGE_KEYS.turniStart,
         STORAGE_KEYS.indennita,
         STORAGE_KEYS.festivita,
-        STORAGE_KEYS.inspag,
+        STORAGE_KEYS.utenti,
         STORAGE_KEYS.preferenze
       ];
 
