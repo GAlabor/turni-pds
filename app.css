@@ -91,7 +91,7 @@
   
   --active-bright: 1.12;
   --active-contrast: 1.03;
-  --icon-pop: 1.08;
+  --icon-pop: 1.14;
   --lift: -1px;
   --press: 1px;
   --focus-ring: 0 0 0 2px rgba(10,132,255,0.4);
@@ -210,8 +210,8 @@
   --fs-cal-day-mobile: var(--fs-md);
   --fs-cal-month-cell: var(--fs-lg);
   --fs-cal-year-cell: var(--fs-base);
-  --fs-cal-icon-day: 10px;
-  --fs-cal-icon-month: 7px;  
+  --fs-cal-icon-day: 11.2px;
+  --fs-cal-icon-month: 7.8px;  
   --fs-settings-menu-desktop: var(--fs-xl);
   --fs-settings-menu-mobile: var(--fs-lg);
   --ls-settings-menu: -0.015em; 
@@ -3834,8 +3834,9 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
   right: 0;
   background: var(--tabbar-bg);
   border-top: 1px solid var(--tabbar-border);
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
   gap: var(--space-18);
   padding: var(--space-6) var(--space-18) calc(var(--space-8) + env(safe-area-inset-bottom));
   z-index: 10;
@@ -3853,8 +3854,9 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  justify-self: center;
   gap: var(--space-2);
-  flex: 1;
+  width: 100%;
   max-width: var(--tabMaxW);
   min-width: 0;
   height: var(--tabH);
@@ -3968,6 +3970,26 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 .tab.active svg {
   stroke-width: 1.6;
   transform: scale(var(--icon-pop));
+}
+
+.tab[data-tab="riepilogo"] svg,
+.tab[data-tab="utenti"] svg {
+  width: 40px;
+  height: 40px;
+}
+
+.tab[data-tab="calendar"] svg {
+  width: 42px;
+  height: 42px;
+}
+
+.tab[data-tab="riepilogo"].active svg,
+.tab[data-tab="utenti"].active svg {
+  transform: scale(calc(var(--icon-pop) + 0.02));
+}
+
+.tab[data-tab="calendar"].active svg {
+  transform: scale(calc(var(--icon-pop) + 0.04));
 }
 
 
