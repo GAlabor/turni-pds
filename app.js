@@ -1627,19 +1627,19 @@ const _statusCheckSvgText = `<!-- status-check.svg -->
     }
   }
   
-  function setCalendarIconDateInSvg() {
-    const host = document.getElementById("icoCalendar");
-    if (!host) return;
+function setCalendarIconDateInSvg() {
+  const host = document.getElementById("icoCalendar");
+  if (!host) return;
 
-    const now = new Date();
-    const months = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
+  const now = new Date();
+  const weekdays = ["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
 
-    const monthEl = host.querySelector("#calMonth");
-    const dayEl   = host.querySelector("#calDay");
+  const monthEl = host.querySelector("#calMonth");
+  const dayEl   = host.querySelector("#calDay");
 
-    if (monthEl) monthEl.textContent = months[now.getMonth()];
-    if (dayEl)   dayEl.textContent   = now.getDate();
-  }
+  if (monthEl) monthEl.textContent = weekdays[now.getDay()];
+  if (dayEl)   dayEl.textContent   = now.getDate();
+}
   
   async function loadTabbarIcons() {
     

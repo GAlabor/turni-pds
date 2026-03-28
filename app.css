@@ -3979,8 +3979,8 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 }
 
 .tab[data-tab="calendar"] svg {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
 }
 
 .tab[data-tab="riepilogo"].active svg,

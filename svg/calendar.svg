@@ -20,10 +20,10 @@
     14
   </text>
 
-  <!-- Mese (testo in basso) -->
+  <!-- Nome settimana (testo in basso) -->
   <text id="calMonth"
         x="12" y="19.3"
         text-anchor="middle">
-    Feb
+    Sab
   </text>
 </g>
