@@ -305,13 +305,41 @@
    
     <section class="view view-utenti" data-view="utenti">
       <header class="app-header">
-        <h1 class="app-title">Utenti</h1>
+        <h1 class="app-title"></h1>
       </header>
 
-      <div class="settings-container">
-        <p class="settings-hint">
-          Qui in futuro vedrai contenuti e funzionalità dedicati agli utenti.
-        </p>
+      <section class="monthbar">
+        <button class="nav-btn prev" type="button" aria-label="Mese precedente">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-nav-prev"></use>
+          </svg>
+        </button>
+        <div class="month-label"></div>
+        <button class="nav-btn next" type="button" aria-label="Mese successivo">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <use href="#ico-nav-next"></use>
+          </svg>
+        </button>
+      </section>
+
+      <div class="calendar-wrapper">
+        <div class="calendar-container mode-days" id="usersCalendarContainer">
+          <div class="dow-row">
+            <div class="dow">Lun</div>
+            <div class="dow">Mar</div>
+            <div class="dow">Mer</div>
+            <div class="dow">Gio</div>
+            <div class="dow">Ven</div>
+            <div class="dow">Sab</div>
+            <div class="dow">Dom</div>
+          </div>
+
+          <div class="calendar-grid" id="users-calendar-grid"></div>
+
+          <div class="month-grid" id="users-month-grid"></div>
+
+          <div class="year-grid" id="users-year-grid"></div>
+        </div>
       </div>
     </section>
    

@@ -148,1278 +148,1257 @@ function renderTurnazioniPickList(opts) {
     YEARS: "years"
   };
 
-  
   const YEARS_PAGE_SIZE = 12;
 
-  let today = new Date();
-  let currentYear = today.getFullYear();
-  let currentMonth = today.getMonth(); 
-  let currentMode = MODES.DAYS;
-  
-  let yearRangeStart = currentYear - 5;
-  
-  let gridDays = null;
-  let gridMonths = null;
-  let gridYears = null;
-  let monthLabel = null;
-  let prevBtn = null;
-  let nextBtn = null;
-  let calendarContainer = null;
-  
-  let _lastCalDaySize = null;
-  let _calendarDirty = false;
-  let _calendarInited = false;
+  function toLocalMidnight(dateObj) {
+    if (!(dateObj instanceof Date)) return null;
+    return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  }
 
+  function parseISODateToLocalMidnight(iso) {
+    if (!iso || typeof iso !== "string") return null;
 
+    const parts = iso.split("-");
+    if (parts.length < 3) return null;
 
-  function updateDayCellSize() {
-    if (!gridDays || !calendarContainer) return false;
-    if (currentMode !== MODES.DAYS) return false;
+    const y = Number(parts[0]);
+    const mo = Number(parts[1]) - 1;
+    const d = Number(parts[2]);
 
-    const dayEl = gridDays.querySelector(".day:not(.empty)");
-    if (!dayEl) return false;
+    if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return null;
 
-    const rect = dayEl.getBoundingClientRect();
-    if (!rect.width) return false;
+    return new Date(y, mo, d);
+  }
 
-    
-    const w = Math.round(rect.width * 2) / 2;
+  function toUTCDayNumber(dateObj) {
+    if (!(dateObj instanceof Date)) return null;
+    const y = dateObj.getFullYear();
+    const m = dateObj.getMonth();
+    const d = dateObj.getDate();
+    const t = Date.UTC(y, m, d);
+    if (!Number.isFinite(t)) return null;
+    return Math.trunc(t / 86400000);
+  }
 
-    if (_lastCalDaySize != null && Math.abs(w - _lastCalDaySize) < 0.25) {
-      return false;
+  function safeMod(n, m) {
+    if (!m) return 0;
+    return ((n % m) + m) % m;
+  }
+
+  function getCalendarSiglaSizingConfig(siglaText) {
+    const cal =
+      window.AppConfig &&
+      window.AppConfig.CALENDAR
+        ? window.AppConfig.CALENDAR
+        : null;
+
+    const len = (siglaText || "").length;
+
+    let fontPx = null;
+
+    if (len > 0 && len <= 2) {
+      fontPx = 23;
     }
 
-    _lastCalDaySize = w;
-    document.documentElement.style.setProperty("--cal-day-size", w + "px");
-    return true;
-  }
+    if (fontPx === null && cal && cal.turnoSiglaFontPx != null) {
+      const fCfg = cal.turnoSiglaFontPx;
 
-
-function toLocalMidnight(dateObj) {
-  if (!(dateObj instanceof Date)) return null;
-  return new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-}
-
-function parseISODateToLocalMidnight(iso) {
-  if (!iso || typeof iso !== "string") return null;
-
-  const parts = iso.split("-");
-  if (parts.length < 3) return null;
-
-  const y = Number(parts[0]);
-  const mo = Number(parts[1]) - 1;
-  const d = Number(parts[2]);
-
-  if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return null;
-
-  return new Date(y, mo, d);
-}
-
-
-function toUTCDayNumber(dateObj) {
-  if (!(dateObj instanceof Date)) return null;
-  const y = dateObj.getFullYear();
-  const m = dateObj.getMonth();
-  const d = dateObj.getDate();
-  const t = Date.UTC(y, m, d);
-  if (!Number.isFinite(t)) return null;
-  return Math.trunc(t / 86400000);
-}
-
-function safeMod(n, m) {
-  if (!m) return 0;
-  return ((n % m) + m) % m;
-}
-
-function getCalendarSiglaSizingConfig(siglaText) {
-  const cal =
-    window.AppConfig &&
-    window.AppConfig.CALENDAR
-      ? window.AppConfig.CALENDAR
-      : null;
-
-  const len = (siglaText || "").length;
-
-  let fontPx = null;
-
-  if (len > 0 && len <= 2) {
-    fontPx = 23;
-  }
-
-  if (fontPx === null && cal && cal.turnoSiglaFontPx != null) {
-    const fCfg = cal.turnoSiglaFontPx;
-
-    if (typeof fCfg === "object") {
-      
-      if (len <= 2) fontPx = fCfg.short;
-      else if (len === 3) fontPx = fCfg.medium;
-      else fontPx = fCfg.long;
-    } else if (Number.isFinite(Number(fCfg))) {
-      
-      fontPx = Number(fCfg);
+      if (typeof fCfg === "object") {
+        if (len <= 2) fontPx = fCfg.short;
+        else if (len === 3) fontPx = fCfg.medium;
+        else fontPx = fCfg.long;
+      } else if (Number.isFinite(Number(fCfg))) {
+        fontPx = Number(fCfg);
+      }
     }
+
+    if (fontPx === null) {
+      fontPx = 23;
+    }
+
+    const scale =
+      cal && Number.isFinite(Number(cal.turnoSiglaScale))
+        ? Number(cal.turnoSiglaScale)
+        : 1.0;
+
+    const fontWeight =
+      cal &&
+      (Number.isFinite(Number(cal.turnoSiglaFontWeight)) ||
+        typeof cal.turnoSiglaFontWeight === "string")
+        ? cal.turnoSiglaFontWeight
+        : null;
+
+    const letterSpacing =
+      cal && typeof cal.turnoSiglaLetterSpacing === "string"
+        ? cal.turnoSiglaLetterSpacing
+        : null;
+
+    return {
+      fontPx: Number.isFinite(fontPx) && fontPx > 0 ? fontPx : null,
+      scale: Number.isFinite(scale) && scale > 0 ? scale : 1.0,
+      fontWeight,
+      letterSpacing
+    };
   }
 
-  
-  if (fontPx === null) {
-    fontPx = 23;
-  }
-  
-  const scale =
-    cal && Number.isFinite(Number(cal.turnoSiglaScale))
-      ? Number(cal.turnoSiglaScale)
-      : 1.0;
-  
-  const fontWeight =
-    cal &&
-    (Number.isFinite(Number(cal.turnoSiglaFontWeight)) ||
-      typeof cal.turnoSiglaFontWeight === "string")
-      ? cal.turnoSiglaFontWeight
-      : null;
-  
-  const letterSpacing =
-    cal && typeof cal.turnoSiglaLetterSpacing === "string"
-      ? cal.turnoSiglaLetterSpacing
-      : null;
+  function getTurniColorForSigla(sigla) {
+    if (!window.TurniStorage) return "";
 
-  return {
-    fontPx: Number.isFinite(fontPx) && fontPx > 0 ? fontPx : null,
-    scale: Number.isFinite(scale) && scale > 0 ? scale : 1.0,
-    fontWeight,
-    letterSpacing
+    const s = (sigla != null) ? String(sigla).trim().toUpperCase() : "";
+    if (!s) return "";
+
+    const list = (typeof TurniStorage.loadTurni === "function") ? TurniStorage.loadTurni() : [];
+    if (!Array.isArray(list) || !list.length) return "";
+
+    const hit = list.find(t => {
+      const ts = (t && t.sigla != null) ? String(t.sigla).trim().toUpperCase() : "";
+      return ts === s;
+    }) || null;
+
+    const col = hit && hit.colore != null ? String(hit.colore).trim() : "";
+    return col || "";
+  }
+
+  function getCalendarSiglaForDate(dateObj) {
+    if (!window.TurniStorage) return null;
+
+    const show = TurniStorage.loadVisualToggle();
+    if (!show) return null;
+
+    const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
+      ? TurniStorage.getPreferredTurnazione()
+      : null;
+    if (!t) return null;
+
+    const days = Number(t.days) || 0;
+    const slots = Array.isArray(t.slots) ? t.slots : [];
+    const restIdx = Array.isArray(t.restIndices) ? t.restIndices : [];
+
+    if (!days || slots.length < days) return null;
+
+    const cfg = TurniStorage.loadTurnoIniziale();
+    if (!cfg || !cfg.date || !Number.isInteger(cfg.slotIndex)) return null;
+
+    const startDate = parseISODateToLocalMidnight(cfg.date);
+    const target = toLocalMidnight(dateObj);
+    if (!startDate || !target) return null;
+
+    const startDayNum = toUTCDayNumber(startDate);
+    const targetDayNum = toUTCDayNumber(target);
+    if (startDayNum === null || targetDayNum === null) return null;
+
+    const diffDays = targetDayNum - startDayNum;
+
+    const idx = safeMod((cfg.slotIndex || 0) + diffDays, days);
+    const slot = slots[idx] || null;
+
+    const baseSigla = slot && slot.sigla ? String(slot.sigla).trim() : "";
+    const baseColore = slot && slot.colore ? String(slot.colore).trim() : "";
+
+    const isRest = restIdx.includes(idx);
+
+    if (isRest && t.riposiFissi && typeof t.riposiFissi === "object") {
+      const dow = dateObj.getDay();
+
+      if (dow === 1 && t.riposiFissi.lunedi) {
+        const rf = t.riposiFissi.lunedi;
+        const sig = rf.sigla ? String(rf.sigla).trim() : "";
+        const col = rf.colore ? String(rf.colore).trim() : "";
+        if (sig) return { sigla: sig, colore: col };
+      }
+      if (dow === 2 && t.riposiFissi.martedi) {
+        const rf = t.riposiFissi.martedi;
+        const sig = rf.sigla ? String(rf.sigla).trim() : "";
+        const col = rf.colore ? String(rf.colore).trim() : "";
+        if (sig) return { sigla: sig, colore: col };
+      }
+    }
+
+    if (!baseSigla) return null;
+
+    const fromTurni = getTurniColorForSigla(baseSigla);
+    const finalColore = fromTurni || baseColore;
+    return { sigla: baseSigla, colore: finalColore };
+  }
+
+  const _siglaFitCache = new Map();
+  let _siglaBatchPending = [];
+  let _siglaBatchScheduled = false;
+
+  window.SiglaSizing = window.SiglaSizing || {};
+  window.SiglaSizing.calendarQueue = function (el, txt, baseFs) {
+    if (!el) return;
+    _siglaBatchPending.push({ el, txt: (txt != null ? String(txt) : ""), baseFs });
+    _scheduleSiglaBatch();
   };
-}
 
-function getTurniColorForSigla(sigla) {
-  if (!window.TurniStorage) return "";
+  function _siglaCacheKey(el, siglaText, baseFs) {
+    if (!el) return null;
 
-  const s = (sigla != null) ? String(sigla).trim().toUpperCase() : "";
-  if (!s) return "";
+    const rectW = el.clientWidth || Math.round(el.getBoundingClientRect().width);
+    if (!rectW) return null;
 
-  const list = (typeof TurniStorage.loadTurni === "function") ? TurniStorage.loadTurni() : [];
-  if (!Array.isArray(list) || !list.length) return "";
+    const css = getComputedStyle(el);
+    const fam = css.fontFamily || "";
+    const wgt = css.fontWeight || "";
+    const ls  = css.letterSpacing || "";
 
-  const hit = list.find(t => {
-    const ts = (t && t.sigla != null) ? String(t.sigla).trim().toUpperCase() : "";
-    return ts === s;
-  }) || null;
+    const w = Math.round(rectW * 2) / 2;
+    const b = Number.isFinite(Number(baseFs)) ? (Math.round(Number(baseFs) * 2) / 2) : "";
 
-  const col = hit && hit.colore != null ? String(hit.colore).trim() : "";
-  return col || "";
-}
+    return `${String(siglaText || "")}::w${w}::b${b}::${fam}::${wgt}::${ls}`;
+  }
 
-function getCalendarSiglaForDate(dateObj) {
-  if (!window.TurniStorage) return null;
+  function _applyFitWithCache(el, siglaText, baseFs) {
+    if (!el) return;
 
-  
-  const show = TurniStorage.loadVisualToggle();
-  if (!show) return null;
+    const txt = (siglaText != null) ? String(siglaText) : "";
+    const len = txt.length;
 
-  const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
-    ? TurniStorage.getPreferredTurnazione()
-    : null;
-  if (!t) return null;
-
-  const days = Number(t.days) || 0;
-  const slots = Array.isArray(t.slots) ? t.slots : [];
-  const restIdx = Array.isArray(t.restIndices) ? t.restIndices : [];
-
-  if (!days || slots.length < days) return null;
-
-  const cfg = TurniStorage.loadTurnoIniziale();
-  if (!cfg || !cfg.date || !Number.isInteger(cfg.slotIndex)) return null;
-
-  const startDate = parseISODateToLocalMidnight(cfg.date);
-  const target = toLocalMidnight(dateObj);
-  if (!startDate || !target) return null;
-
-  
-  const startDayNum = toUTCDayNumber(startDate);
-  const targetDayNum = toUTCDayNumber(target);
-  if (startDayNum === null || targetDayNum === null) return null;
-
-  const diffDays = targetDayNum - startDayNum;
-
-  const idx = safeMod((cfg.slotIndex || 0) + diffDays, days);
-  const slot = slots[idx] || null;
-
-  const baseSigla = slot && slot.sigla ? String(slot.sigla).trim() : "";
-  const baseColore = slot && slot.colore ? String(slot.colore).trim() : "";
-
-  const isRest = restIdx.includes(idx);
-
-  
-  if (isRest && t.riposiFissi && typeof t.riposiFissi === "object") {
-    const dow = dateObj.getDay(); 
-    
-    if (dow === 1 && t.riposiFissi.lunedi) {
-      const rf = t.riposiFissi.lunedi;
-      const sig = rf.sigla ? String(rf.sigla).trim() : "";
-      const col = rf.colore ? String(rf.colore).trim() : "";
-      if (sig) return { sigla: sig, colore: col };
+    if (len > 0 && len <= 2) {
+      el.style.fontSize = "23px";
+      return;
     }
-    if (dow === 2 && t.riposiFissi.martedi) {
-      const rf = t.riposiFissi.martedi;
-      const sig = rf.sigla ? String(rf.sigla).trim() : "";
-      const col = rf.colore ? String(rf.colore).trim() : "";
-      if (sig) return { sigla: sig, colore: col };
+
+    if (len >= 3 && len <= 4) {
+      const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
+      const need = el.scrollWidth;
+      if (avail && need && need <= avail + 0.5) {
+        return;
+      }
+    }
+
+    const key = _siglaCacheKey(el, txt, baseFs);
+    if (!key) return;
+
+    const cached = _siglaFitCache.get(key);
+    if (cached != null) {
+      el.style.fontSize = cached + "px";
+      return;
+    }
+
+    autoFitCalendarSigla(el, baseFs);
+
+    const finalFs = parseFloat(getComputedStyle(el).fontSize);
+    if (Number.isFinite(finalFs) && finalFs > 0) {
+      _siglaFitCache.set(key, Math.round(finalFs * 2) / 2);
     }
   }
 
-  if (!baseSigla) return null;
+  function _scheduleSiglaBatch() {
+    if (_siglaBatchScheduled) return;
+    _siglaBatchScheduled = true;
 
+    requestAnimationFrame(() => {
+      _siglaBatchScheduled = false;
+      const batch = _siglaBatchPending;
+      _siglaBatchPending = [];
+      if (!batch.length) return;
 
-const fromTurni = getTurniColorForSigla(baseSigla);
-const finalColore = fromTurni || baseColore;
-return { sigla: baseSigla, colore: finalColore };
+      batch.forEach((it) => {
+        if (!it || !it.el) return;
+        _applyFitWithCache(it.el, it.txt, it.baseFs);
+      });
 
-}
-
-const _siglaFitCache = new Map();
-let _siglaBatchPending = [];
-let _siglaBatchScheduled = false;
-
-// Calendario (celle rettangolari): pipeline autofit+batch esposta via facciata
-window.SiglaSizing = window.SiglaSizing || {};
-window.SiglaSizing.calendarQueue = function (el, txt, baseFs) {
-  if (!el) return;
-  _siglaBatchPending.push({ el, txt: (txt != null ? String(txt) : ""), baseFs });
-  _scheduleSiglaBatch();
-};
-
-function _siglaCacheKey(el, siglaText, baseFs) {
-  if (!el) return null;
-
-  const rectW = el.clientWidth || Math.round(el.getBoundingClientRect().width);
-  if (!rectW) return null;
-
-  const css = getComputedStyle(el);
-  const fam = css.fontFamily || "";
-  const wgt = css.fontWeight || "";
-  const ls  = css.letterSpacing || "";
-
-  const w = Math.round(rectW * 2) / 2;
-  const b = Number.isFinite(Number(baseFs)) ? (Math.round(Number(baseFs) * 2) / 2) : "";
-
-  
-  return `${String(siglaText || "")}::w${w}::b${b}::${fam}::${wgt}::${ls}`;
-}
-
-function _applyFitWithCache(el, siglaText, baseFs) {
-  if (!el) return;
-
-  const txt = (siglaText != null) ? String(siglaText) : "";
-  const len = txt.length;
-
-  
-  if (len > 0 && len <= 2) {
-    el.style.fontSize = "23px";
-    return;
+      requestAnimationFrame(() => {
+        batch.forEach((it) => {
+          if (!it || !it.el) return;
+          autoCenterCalendarSigla(it.el);
+        });
+        batch.forEach((it) => {
+          if (!it || !it.el) return;
+          it.el.classList.add("sigla-ready");
+        });
+      });
+    });
   }
-  
-  
-  if (len >= 3 && len <= 4) {
+
+  function autoFitCalendarSigla(el, baseFontPx) {
+    if (!el) return;
+
+    const baseFont = Number(baseFontPx);
+
+    const css = getComputedStyle(el);
+    const curFs = parseFloat(css.fontSize);
+
+    const startingFs = (Number.isFinite(baseFont) && baseFont > 0)
+      ? baseFont
+      : (Number.isFinite(curFs) && curFs > 0 ? curFs : 0);
+
+    if (!startingFs) return;
+
     const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
     const need = el.scrollWidth;
-    if (avail && need && need <= avail + 0.5) {
-      return;
+
+    if (!avail || !need) return;
+    if (need <= avail + 0.5) return;
+
+    const ratio = avail / need;
+    let fitted = startingFs * ratio;
+    fitted *= 1.06;
+
+    if (!Number.isFinite(fitted) || fitted <= 0) return;
+    fitted = Math.max(8, fitted);
+
+    const fittedRounded = (Math.round(fitted * 2) / 2);
+    el.style.fontSize = fittedRounded + "px";
+  }
+
+  function autoCenterCalendarSigla(el) {
+    if (!el) return;
+
+    el.style.transform = "";
+
+    if (!document.createRange) return;
+
+    const range = document.createRange();
+    range.selectNodeContents(el);
+
+    const textRect = range.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+
+    if (!textRect.width || !elRect.width) return;
+
+    const textCx = textRect.left + (textRect.width / 2);
+    const elCx = elRect.left + (elRect.width / 2);
+
+    const dx = elCx - textCx;
+    if (!Number.isFinite(dx)) return;
+
+    if (Math.abs(dx) < 0.25) return;
+
+    el.style.transform = `translateX(${dx}px)`;
+  }
+
+  function applyTurnazioneOverlayToCell(cellEl, dateObj, getOverlayInfo) {
+    if (!cellEl || !(dateObj instanceof Date)) return;
+
+    const old = cellEl.querySelector(".cal-turno-sigla");
+    if (old) old.remove();
+
+    const info = typeof getOverlayInfo === "function" ? getOverlayInfo(dateObj) : null;
+    if (!info) return;
+
+    const el = document.createElement("div");
+    el.className = "cal-turno-sigla";
+    el.textContent = info.sigla;
+
+    if (info.colore) el.style.color = info.colore;
+
+    el.style.textOverflow = "clip";
+
+    const sizing = getCalendarSiglaSizingConfig(info.sigla);
+
+    if (sizing.fontPx) {
+      const px = Math.max(1, sizing.fontPx);
+      el.style.fontSize = (Math.round(px * 2) / 2) + "px";
+    } else if (sizing.scale !== 1.0) {
+      const fs = parseFloat(getComputedStyle(el).fontSize);
+      if (Number.isFinite(fs) && fs > 0) {
+        const scaled = fs * sizing.scale;
+        el.style.fontSize = (Math.round(scaled * 2) / 2) + "px";
+      }
+    }
+
+    el.style.textRendering = "geometricPrecision";
+    el.style.setProperty("-webkit-font-smoothing", "antialiased");
+    el.style.setProperty("-moz-osx-font-smoothing", "grayscale");
+
+    if (sizing.fontWeight !== null && sizing.fontWeight !== undefined && sizing.fontWeight !== "") {
+      el.style.fontWeight = String(sizing.fontWeight);
+    }
+    if (sizing.letterSpacing !== null && sizing.letterSpacing !== undefined && sizing.letterSpacing !== "") {
+      el.style.letterSpacing = String(sizing.letterSpacing);
+    }
+
+    cellEl.appendChild(el);
+
+    const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
+    if (window.SiglaSizing && typeof SiglaSizing.calendarQueue === "function") {
+      SiglaSizing.calendarQueue(el, info.sigla, baseFs);
+    } else {
+      _siglaBatchPending.push({ el, txt: info.sigla, baseFs });
+      _scheduleSiglaBatch();
     }
   }
 
-  const key = _siglaCacheKey(el, txt, baseFs);
-  if (!key) return;
+  function createCalendarController(opts) {
+    const rootSelector = opts && opts.rootSelector ? String(opts.rootSelector) : "";
+    const containerId = opts && opts.containerId ? String(opts.containerId) : "";
+    const daysGridId = opts && opts.daysGridId ? String(opts.daysGridId) : "";
+    const monthsGridId = opts && opts.monthsGridId ? String(opts.monthsGridId) : "";
+    const yearsGridId = opts && opts.yearsGridId ? String(opts.yearsGridId) : "";
+    const getOverlayInfo = opts && typeof opts.getOverlayInfo === "function" ? opts.getOverlayInfo : (() => null);
 
-  const cached = _siglaFitCache.get(key);
-  if (cached != null) {
-    el.style.fontSize = cached + "px";
-    return;
-  }
+    let today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+    let currentMode = MODES.DAYS;
+    let yearRangeStart = currentYear - 5;
 
-  
-  autoFitCalendarSigla(el, baseFs);
+    let rootEl = null;
+    let gridDays = null;
+    let gridMonths = null;
+    let gridYears = null;
+    let monthLabel = null;
+    let prevBtn = null;
+    let nextBtn = null;
+    let calendarContainer = null;
 
-  const finalFs = parseFloat(getComputedStyle(el).fontSize);
-  if (Number.isFinite(finalFs) && finalFs > 0) {
-    _siglaFitCache.set(key, Math.round(finalFs * 2) / 2);
-  }
-}
+    let _lastCalDaySize = null;
+    let _calendarDirty = false;
+    let _calendarInited = false;
 
-function _scheduleSiglaBatch() {
-  if (_siglaBatchScheduled) return;
-  _siglaBatchScheduled = true;
+    let swipeInner = null;
+    let swipeAnimRunning = false;
+    let peekPrevLayer = null;
+    let peekNextLayer = null;
+    let peekKey = "";
 
-  requestAnimationFrame(() => {
-    _siglaBatchScheduled = false;
-    const batch = _siglaBatchPending;
-    _siglaBatchPending = [];
-    if (!batch.length) return;
-
-    
-    batch.forEach((it) => {
-      if (!it || !it.el) return;
-      _applyFitWithCache(it.el, it.txt, it.baseFs);
-    });
-
-    
-    requestAnimationFrame(() => {
-      batch.forEach((it) => {
-        if (!it || !it.el) return;
-        autoCenterCalendarSigla(it.el);
-      });
-      batch.forEach((it) => {
-        if (!it || !it.el) return;
-        it.el.classList.add("sigla-ready");
-      });
-    });
-  });
-}
-
-function autoFitCalendarSigla(el, baseFontPx) {
-  if (!el) return;
-
-  const baseFont = Number(baseFontPx);
-
-  const css = getComputedStyle(el);
-  const curFs = parseFloat(css.fontSize);
-
-  const startingFs = (Number.isFinite(baseFont) && baseFont > 0)
-    ? baseFont
-    : (Number.isFinite(curFs) && curFs > 0 ? curFs : 0);
-
-  if (!startingFs) return;
-
-  
-  const avail = el.clientWidth || Math.round(el.getBoundingClientRect().width);
-  const need = el.scrollWidth;
-
-  if (!avail || !need) return;
-
-  if (need <= avail + 0.5) return;
-
-  const ratio = avail / need;
-  let fitted = startingFs * ratio;
-  fitted *= 1.06;
-
-  
-  if (!Number.isFinite(fitted) || fitted <= 0) return;
-  fitted = Math.max(8, fitted);
-
-  const fittedRounded = (Math.round(fitted * 2) / 2);
-  el.style.fontSize = fittedRounded + "px";
-}
-
-function autoCenterCalendarSigla(el) {
-  if (!el) return;
-
-  
-  el.style.transform = "";
-
-  if (!document.createRange) return;
-
-  const range = document.createRange();
-  range.selectNodeContents(el);
-
-  const textRect = range.getBoundingClientRect();
-  const elRect = el.getBoundingClientRect();
-
-  if (!textRect.width || !elRect.width) return;
-
-  const textCx = textRect.left + (textRect.width / 2);
-  const elCx = elRect.left + (elRect.width / 2);
-
-  const dx = elCx - textCx;
-  if (!Number.isFinite(dx)) return;
-
-  
-  if (Math.abs(dx) < 0.25) return;
-
-  el.style.transform = `translateX(${dx}px)`;
-}
-
-function applyTurnazioneOverlayToCell(cellEl, dateObj) {
-  if (!cellEl || !(dateObj instanceof Date)) return;
-
-  const old = cellEl.querySelector(".cal-turno-sigla");
-  if (old) old.remove();
-
-  const info = getCalendarSiglaForDate(dateObj);
-  if (!info) return;
-
-  const el = document.createElement("div");
-  el.className = "cal-turno-sigla";
-  el.textContent = info.sigla;
-
-  if (info.colore) el.style.color = info.colore;
-
-  
-  el.style.textOverflow = "clip";
-
-  const sizing = getCalendarSiglaSizingConfig(info.sigla);
-
-  
-  if (sizing.fontPx) {
-    const px = Math.max(1, sizing.fontPx);
-    el.style.fontSize = (Math.round(px * 2) / 2) + "px";
-  } else if (sizing.scale !== 1.0) {
-    const fs = parseFloat(getComputedStyle(el).fontSize);
-    if (Number.isFinite(fs) && fs > 0) {
-      const scaled = fs * sizing.scale;
-      el.style.fontSize = (Math.round(scaled * 2) / 2) + "px";
-    }
-  }
-
-  el.style.textRendering = "geometricPrecision";
-  el.style.setProperty("-webkit-font-smoothing", "antialiased");
-  el.style.setProperty("-moz-osx-font-smoothing", "grayscale");
-
-  if (sizing.fontWeight !== null && sizing.fontWeight !== undefined && sizing.fontWeight !== "") {
-    el.style.fontWeight = String(sizing.fontWeight);
-  }
-  if (sizing.letterSpacing !== null && sizing.letterSpacing !== undefined && sizing.letterSpacing !== "") {
-    el.style.letterSpacing = String(sizing.letterSpacing);
-  }
-
-  cellEl.appendChild(el);
-
-  
-  const baseFs = sizing.fontPx ? Number(sizing.fontPx) : parseFloat(getComputedStyle(el).fontSize);
-  if (window.SiglaSizing && typeof SiglaSizing.calendarQueue === "function") {
-    SiglaSizing.calendarQueue(el, info.sigla, baseFs);
-  } else {
-    _siglaBatchPending.push({ el, txt: info.sigla, baseFs });
-    _scheduleSiglaBatch();
-  }
-}
-
-  function updateHeader() {
-    if (!monthLabel) return;
-
-    if (currentMode === MODES.DAYS) {
-      monthLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-      return;
+    function isActiveView() {
+      return !!(rootEl && rootEl.classList.contains("is-active"));
     }
 
-    if (currentMode === MODES.MONTHS) {
-      monthLabel.textContent = String(currentYear);
-      return;
-    }
+    function updateDayCellSize() {
+      if (!gridDays || !calendarContainer) return false;
+      if (currentMode !== MODES.DAYS) return false;
 
-    if (currentMode === MODES.YEARS) {
-      const end = yearRangeStart + YEARS_PAGE_SIZE - 1;
-      monthLabel.textContent = `${yearRangeStart} - ${end}`;
-    }
-  }
+      const dayEl = gridDays.querySelector(".day:not(.empty)");
+      if (!dayEl) return false;
 
-  function updateContainerModeClass() {
-    if (!calendarContainer) return;
-    calendarContainer.classList.remove("mode-days", "mode-months", "mode-years");
-    if (currentMode === MODES.DAYS) {
-      calendarContainer.classList.add("mode-days");
-    } else if (currentMode === MODES.MONTHS) {
-      calendarContainer.classList.add("mode-months");
-    } else if (currentMode === MODES.YEARS) {
-      calendarContainer.classList.add("mode-years");
-    }
-  }
-  
+      const rect = dayEl.getBoundingClientRect();
+      if (!rect.width) return false;
 
-  function renderDays() {
-    if (!gridDays) return;
+      const w = Math.round(rect.width * 2) / 2;
 
-    fillDaysGrid(gridDays, currentYear, currentMonth);
-
-    updateHeader();
-    updateDayCellSize();
-  }
-
-  function fillDaysGrid(targetGrid, year, month) {
-    if (!targetGrid) return;
-    targetGrid.innerHTML = "";
-
-    const firstDay = new Date(year, month, 1);
-    const startIndex = (firstDay.getDay() + 6) % 7;
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const prevMonthDays = new Date(year, month, 0).getDate();
-    const totalCells = 42;
-
-    function appendDayCell(dateObj, opts) {
-      const options = opts || {};
-      const cell = document.createElement("div");
-      cell.className = "day";
-      cell.textContent = dateObj.getDate();
-
-      if (options.isOutsideMonth) {
-        cell.classList.add("is-outside-month");
+      if (_lastCalDaySize != null && Math.abs(w - _lastCalDaySize) < 0.25) {
+        return false;
       }
 
-      const colIndex = (dateObj.getDay() + 6) % 7;
-
-      let festInfo = null;
-      if (window.Festivita) {
-        if (typeof Festivita.getInfoForDate === "function") {
-          festInfo = Festivita.getInfoForDate(dateObj);
-        } else if (typeof Festivita.getNomeForDate === "function") {
-          const nome = Festivita.getNomeForDate(dateObj);
-          if (nome) festInfo = { nome: String(nome), livello: "festivo" };
-        }
-      }
-
-      if (colIndex === 6) {
-        cell.classList.add("sunday");
-      }
-
-      if (festInfo && festInfo.nome) {
-        const livello = (festInfo.livello === "superfestivo") ? "superfestivo" : "festivo";
-        cell.classList.add(livello === "superfestivo" ? "is-superfestivo" : "is-festivo");
-        cell.title = String(festInfo.nome);
-      }
-
-      if (
-        dateObj.getFullYear() === today.getFullYear() &&
-        dateObj.getMonth() === today.getMonth() &&
-        dateObj.getDate() === today.getDate()
-      ) {
-        cell.classList.add("today");
-      }
-
-      if (!options.isOutsideMonth) {
-        applyTurnazioneOverlayToCell(cell, dateObj);
-      }
-      targetGrid.appendChild(cell);
-    }
-
-    for (let i = 0; i < startIndex; i++) {
-      const dayNum = prevMonthDays - startIndex + i + 1;
-      appendDayCell(new Date(year, month - 1, dayNum), { isOutsideMonth: true });
-    }
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      appendDayCell(new Date(year, month, d), { isOutsideMonth: false });
-    }
-
-    const remaining = Math.max(0, totalCells - targetGrid.children.length);
-    for (let d = 1; d <= remaining; d++) {
-      appendDayCell(new Date(year, month + 1, d), { isOutsideMonth: true });
-    }
-  }
-
-  function renderMonths() {
-    if (!gridMonths) return;
-
-    fillMonthsGrid(gridMonths, currentYear, true);
-
-    updateHeader();
-  }
-
-  function fillMonthsGrid(targetGrid, year, enableClicks) {
-    if (!targetGrid) return;
-    targetGrid.innerHTML = "";
-    const todayYear = today.getFullYear();
-    const todayMonth = today.getMonth();
-    const clicks = !!enableClicks;
-
-    for (let m = 0; m < 12; m++) {
-      const cell = document.createElement("button");
-      cell.type = "button";
-      cell.className = "month-cell";
-      cell.textContent = monthShort[m];
-
-      if (year === todayYear && m === todayMonth) {
-        cell.classList.add("is-current");
-      }
-
-      if (clicks) {
-        cell.addEventListener("click", () => {
-          currentMonth = m;
-          currentMode = MODES.DAYS;
-          updateContainerModeClass();
-          renderDays();
-        });
-      } else {
-        cell.disabled = true;
-      }
-
-      targetGrid.appendChild(cell);
-    }
-  }
-
-  function renderYears() {
-    if (!gridYears) return;
-
-    fillYearsGrid(gridYears, yearRangeStart, YEARS_PAGE_SIZE, true);
-
-    updateHeader();
-  }
-
-  function fillYearsGrid(targetGrid, rangeStart, pageSize, enableClicks) {
-    if (!targetGrid) return;
-    targetGrid.innerHTML = "";
-    const start = Number.isFinite(rangeStart) ? rangeStart : 0;
-    const size = Number.isFinite(pageSize) ? pageSize : YEARS_PAGE_SIZE;
-    const end = start + size - 1;
-    const todayYear = today.getFullYear();
-    const clicks = !!enableClicks;
-
-    for (let y = start; y <= end; y++) {
-      const cell = document.createElement("button");
-      cell.type = "button";
-      cell.className = "year-cell";
-      cell.textContent = y;
-
-      if (y === todayYear) {
-        cell.classList.add("is-current");
-      }
-
-      if (clicks) {
-        cell.addEventListener("click", () => {
-          currentYear = y;
-          currentMode = MODES.MONTHS;
-          updateContainerModeClass();
-          renderMonths();
-        });
-      } else {
-        cell.disabled = true;
-      }
-
-      targetGrid.appendChild(cell);
-    }
-  }
-
-  function setMode(mode) {
-    if (mode === currentMode && mode !== MODES.YEARS) {
-      return;
-    }
-
-    currentMode = mode;
-
-    if (currentMode === MODES.YEARS) {
-      
-      yearRangeStart = currentYear - 5;
-    }
-
-    updateContainerModeClass();
-
-    if (currentMode === MODES.DAYS) {
-      renderDays();
-    } else if (currentMode === MODES.MONTHS) {
-      renderMonths();
-    } else if (currentMode === MODES.YEARS) {
-      renderYears();
-    }
-  }
-
-  function goPrev() {
-    if (currentMode === MODES.DAYS) {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      }
-      renderDays();
-      return;
-    }
-
-    if (currentMode === MODES.MONTHS) {
-      currentYear--;
-      renderMonths();
-      return;
-    }
-
-    if (currentMode === MODES.YEARS) {
-      yearRangeStart -= YEARS_PAGE_SIZE;
-      renderYears();
-    }
-  }
-
-  function goNext() {
-    if (currentMode === MODES.DAYS) {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      renderDays();
-      return;
-    }
-
-    if (currentMode === MODES.MONTHS) {
-      currentYear++;
-      renderMonths();
-      return;
-    }
-
-    if (currentMode === MODES.YEARS) {
-      yearRangeStart += YEARS_PAGE_SIZE;
-      renderYears();
-    }
-  }
-
-  let swipeInner = null;
-  let swipeAnimRunning = false;
-  let peekPrevLayer = null;
-  let peekNextLayer = null;
-  let peekKey = "";
-
-  function ensureSwipeInner() {
-    if (!calendarContainer) return null;
-    if (swipeInner && swipeInner.parentElement === calendarContainer) return swipeInner;
-
-    const existing = calendarContainer.querySelector(":scope > .cal-swipe-inner");
-    if (existing) {
-      swipeInner = existing;
-      return swipeInner;
-    }
-
-    const inner = document.createElement("div");
-    inner.className = "cal-swipe-inner";
-
-    const toMove = [];
-    for (const ch of Array.from(calendarContainer.children)) {
-      if (ch.classList && ch.classList.contains("cal-swipe-layer")) continue;
-      toMove.push(ch);
-    }
-    toMove.forEach(n => inner.appendChild(n));
-    calendarContainer.appendChild(inner);
-    swipeInner = inner;
-    return swipeInner;
-  }
-
-  function setSwipeFx(dx) {
-    if (!calendarContainer) return;
-    const w = Math.max(1, calendarContainer.clientWidth || 1);
-    const clampedDx = Math.max(-w, Math.min(w, dx));
-    const p = Math.max(-1, Math.min(1, clampedDx / w));
-    const r = 0;
-    const shade = Math.min(0.10, Math.abs(p) * 0.10);
-    const prevO = Math.max(0, Math.min(1, p));
-    const nextO = Math.max(0, Math.min(1, -p));
-    const peekR = 0;
-    calendarContainer.style.setProperty("--calSwipeX", Math.round(clampedDx) + "px");
-    calendarContainer.style.setProperty("--calSwipeR", (Math.round(r * 10) / 10) + "deg");
-    calendarContainer.style.setProperty("--calSwipeShade", String(shade));
-    calendarContainer.style.setProperty("--calPeekPrevO", String(prevO));
-    calendarContainer.style.setProperty("--calPeekNextO", String(nextO));
-    calendarContainer.style.setProperty("--calPeekR", (Math.round(peekR * 10) / 10) + "deg");
-  }
-
-  function clearSwipeFx() {
-    if (!calendarContainer) return;
-    calendarContainer.style.removeProperty("--calSwipeX");
-    calendarContainer.style.removeProperty("--calSwipeR");
-    calendarContainer.style.removeProperty("--calSwipeShade");
-    calendarContainer.style.removeProperty("--calPeekPrevO");
-    calendarContainer.style.removeProperty("--calPeekNextO");
-    calendarContainer.style.removeProperty("--calPeekR");
-  }
-
-  function stripIdsDeep(el) {
-    if (!el || !el.querySelectorAll) return;
-    const all = el.querySelectorAll("[id]");
-    all.forEach(n => n.removeAttribute("id"));
-  }
-
-  function getAdjacentState(dir) {
-    const s = {
-      mode: currentMode,
-      year: currentYear,
-      month: currentMonth,
-      yearRangeStart: yearRangeStart
-    };
-
-    if (s.mode === MODES.DAYS) {
-      let y = s.year;
-      let m = s.month + (dir > 0 ? -1 : 1);
-      if (m < 0) { m = 11; y--; }
-      if (m > 11) { m = 0; y++; }
-      return { mode: s.mode, year: y, month: m, yearRangeStart: s.yearRangeStart };
-    }
-
-    if (s.mode === MODES.MONTHS) {
-      return { mode: s.mode, year: s.year + (dir > 0 ? -1 : 1), month: s.month, yearRangeStart: s.yearRangeStart };
-    }
-
-    if (s.mode === MODES.YEARS) {
-      const delta = YEARS_PAGE_SIZE * (dir > 0 ? -1 : 1);
-      return { mode: s.mode, year: s.year, month: s.month, yearRangeStart: s.yearRangeStart + delta };
-    }
-
-    return s;
-  }
-
-  function ensurePeekLayers() {
-    if (!calendarContainer) return;
-    const inner = ensureSwipeInner();
-    if (!inner) return;
-
-    const key = `${currentMode}|${currentYear}|${currentMonth}|${yearRangeStart}`;
-    if (peekPrevLayer && peekNextLayer && peekKey === key) return;
-
-    removePeekLayers();
-    peekKey = key;
-
-    const prevState = getAdjacentState(1);
-    const nextState = getAdjacentState(-1);
-
-    const makeLayer = (cls, state) => {
-      const layer = inner.cloneNode(true);
-      layer.classList.add("cal-swipe-layer", "cal-swipe-peek", cls);
-      stripIdsDeep(layer);
-
-      const gDays = layer.querySelector(".calendar-grid");
-      const gMonths = layer.querySelector(".month-grid");
-      const gYears = layer.querySelector(".year-grid");
-
-      if (state.mode === MODES.DAYS) {
-        fillDaysGrid(gDays, state.year, state.month);
-      } else if (state.mode === MODES.MONTHS) {
-        fillMonthsGrid(gMonths, state.year, false);
-      } else if (state.mode === MODES.YEARS) {
-        fillYearsGrid(gYears, state.yearRangeStart, YEARS_PAGE_SIZE, false);
-      }
-
-      return layer;
-    };
-
-    peekPrevLayer = makeLayer("cal-swipe-peek-prev", prevState);
-    peekNextLayer = makeLayer("cal-swipe-peek-next", nextState);
-
-    calendarContainer.insertBefore(peekPrevLayer, inner);
-    calendarContainer.insertBefore(peekNextLayer, inner);
-  }
-
-  function removePeekLayers() {
-    if (peekPrevLayer && peekPrevLayer.parentElement) peekPrevLayer.parentElement.removeChild(peekPrevLayer);
-    if (peekNextLayer && peekNextLayer.parentElement) peekNextLayer.parentElement.removeChild(peekNextLayer);
-    peekPrevLayer = null;
-    peekNextLayer = null;
-    peekKey = "";
-  }
-
-  function animateSwipeNavigate(dir, fromDx) {
-    if (!calendarContainer) return;
-    removePeekLayers();
-    if (swipeAnimRunning) {
-      if (dir < 0) goNext(); else goPrev();
-      clearSwipeFx();
-      return;
-    }
-
-    const inner = ensureSwipeInner();
-    if (!inner) {
-      if (dir < 0) goNext(); else goPrev();
-      return;
-    }
-
-    swipeAnimRunning = true;
-
-    const w = Math.max(1, calendarContainer.clientWidth || 1);
-    const startDx = Number.isFinite(fromDx) ? Math.max(-w, Math.min(w, fromDx)) : 0;
-    const startR = 0;
-
-    const oldLayer = inner.cloneNode(true);
-    oldLayer.classList.add("cal-swipe-layer", "cal-swipe-old");
-    oldLayer.style.transform = `translate3d(${Math.round(startDx)}px, 0, 0) rotateY(${(Math.round(startR * 10) / 10)}deg)`;
-    calendarContainer.appendChild(oldLayer);
-
-    calendarContainer.classList.remove("is-swiping", "is-settling", "is-animating");
-    calendarContainer.offsetHeight;
-
-    clearSwipeFx();
-    calendarContainer.style.setProperty("--calSwipeShade", "0.14");
-
-    const newStart = -dir * w;
-
-    inner.style.transition = "none";
-    inner.style.transform = `translate3d(${Math.round(newStart)}px, 0, 0) rotateY(0deg)`;
-
-    if (dir < 0) goNext(); else goPrev();
-
-    calendarContainer.offsetHeight;
-
-    calendarContainer.classList.add("is-animating");
-
-    requestAnimationFrame(() => {
-      oldLayer.style.transform = `translate3d(${Math.round(dir * w)}px, 0, 0) rotateY(0deg)`;
-      inner.style.transition = "transform 280ms cubic-bezier(0.22, 0.9, 0.2, 1)";
-      inner.style.transform = "translate3d(0px, 0, 0) rotateY(0deg)";
-    });
-
-    const cleanup = () => {
-      oldLayer.removeEventListener("transitionend", onEnd);
-      if (oldLayer && oldLayer.parentElement) oldLayer.parentElement.removeChild(oldLayer);
-      calendarContainer.classList.remove("is-animating", "is-settling", "is-swiping");
-      inner.style.transition = "";
-      inner.style.transform = "";
-      clearSwipeFx();
-      calendarContainer.style.removeProperty("--calSwipeShade");
-      swipeAnimRunning = false;
-    };
-
-    const onEnd = (e) => {
-      if (!e || e.propertyName !== "transform") return;
-      cleanup();
-    };
-
-    oldLayer.addEventListener("transitionend", onEnd);
-
-    setTimeout(() => {
-      if (swipeAnimRunning) cleanup();
-    }, 420);
-  }
-
-  function animateSwipeCancel(fromDx) {
-    if (!calendarContainer) return;
-    const inner = ensureSwipeInner();
-    if (!inner) return;
-    calendarContainer.classList.remove("is-animating");
-    calendarContainer.classList.add("is-settling");
-    setSwipeFx(Number.isFinite(fromDx) ? fromDx : 0);
-    requestAnimationFrame(() => {
-      setSwipeFx(0);
-    });
-
-    const done = () => {
-      inner.removeEventListener("transitionend", onEnd);
-      calendarContainer.classList.remove("is-settling", "is-swiping");
-      clearSwipeFx();
-      removePeekLayers();
-    };
-
-    const onEnd = (e) => {
-      if (!e || e.propertyName !== "transform") return;
-      done();
-    };
-
-    inner.addEventListener("transitionend", onEnd);
-    setTimeout(done, 320);
-  }
-  function setupSwipeToNavigate(rootEl) {
-    const root = rootEl || calendarContainer;
-    if (!root) return;
-
-    let active = false;
-    let pid = null;
-    let sx = 0;
-    let sy = 0;
-    let lx = 0;
-    let ly = 0;
-    let locked = false;
-    let horiz = false;
-
-    function reset() {
-      active = false;
-      pid = null;
-      sx = sy = lx = ly = 0;
-      locked = false;
-      horiz = false;
-    }
-
-    function isAllowedZone(target) {
-      if (!target || !target.closest) return false;
-      return !!target.closest(".monthbar, .calendar-wrapper, #calendarContainer");
-    }
-
-    function canStart(ev) {
-      if (!ev) return false;
-      if (ev.pointerType !== "touch") return false;
-
-      const t = ev.target;
-
-      if (!isAllowedZone(t)) return false;
-
-      if (t && t.closest) {
-        const inInteractive = !!t.closest("button, a, input, textarea, select, label, [role=\"button\"]");
-        if (inInteractive) {
-          const allowPickBtn = !!t.closest(".month-cell, .year-cell");
-          if (!allowPickBtn) return false;
-        }
-      }
-
+      _lastCalDaySize = w;
+      document.documentElement.style.setProperty("--cal-day-size", w + "px");
       return true;
     }
 
-    root.addEventListener("pointerdown", (ev) => {
-      if (!canStart(ev)) return;
-      ensureSwipeInner();
+    function updateHeader() {
+      if (!monthLabel) return;
+
+      if (currentMode === MODES.DAYS) {
+        monthLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        return;
+      }
+
+      if (currentMode === MODES.MONTHS) {
+        monthLabel.textContent = String(currentYear);
+        return;
+      }
+
+      if (currentMode === MODES.YEARS) {
+        const end = yearRangeStart + YEARS_PAGE_SIZE - 1;
+        monthLabel.textContent = `${yearRangeStart} - ${end}`;
+      }
+    }
+
+    function updateContainerModeClass() {
+      if (!calendarContainer) return;
+      calendarContainer.classList.remove("mode-days", "mode-months", "mode-years");
+      if (currentMode === MODES.DAYS) {
+        calendarContainer.classList.add("mode-days");
+      } else if (currentMode === MODES.MONTHS) {
+        calendarContainer.classList.add("mode-months");
+      } else if (currentMode === MODES.YEARS) {
+        calendarContainer.classList.add("mode-years");
+      }
+    }
+
+    function renderDays() {
+      if (!gridDays) return;
+      fillDaysGrid(gridDays, currentYear, currentMonth);
+      updateHeader();
+      updateDayCellSize();
+    }
+
+    function fillDaysGrid(targetGrid, year, month) {
+      if (!targetGrid) return;
+      targetGrid.innerHTML = "";
+
+      const firstDay = new Date(year, month, 1);
+      const startIndex = (firstDay.getDay() + 6) % 7;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const prevMonthDays = new Date(year, month, 0).getDate();
+      const totalCells = 42;
+
+      function appendDayCell(dateObj, opts2) {
+        const options = opts2 || {};
+        const cell = document.createElement("div");
+        cell.className = "day";
+        cell.textContent = dateObj.getDate();
+
+        if (options.isOutsideMonth) {
+          cell.classList.add("is-outside-month");
+        }
+
+        const colIndex = (dateObj.getDay() + 6) % 7;
+
+        let festInfo = null;
+        if (window.Festivita) {
+          if (typeof Festivita.getInfoForDate === "function") {
+            festInfo = Festivita.getInfoForDate(dateObj);
+          } else if (typeof Festivita.getNomeForDate === "function") {
+            const nome = Festivita.getNomeForDate(dateObj);
+            if (nome) festInfo = { nome: String(nome), livello: "festivo" };
+          }
+        }
+
+        if (colIndex === 6) {
+          cell.classList.add("sunday");
+        }
+
+        if (festInfo && festInfo.nome) {
+          const livello = (festInfo.livello === "superfestivo") ? "superfestivo" : "festivo";
+          cell.classList.add(livello === "superfestivo" ? "is-superfestivo" : "is-festivo");
+          cell.title = String(festInfo.nome);
+        }
+
+        if (
+          dateObj.getFullYear() === today.getFullYear() &&
+          dateObj.getMonth() === today.getMonth() &&
+          dateObj.getDate() === today.getDate()
+        ) {
+          cell.classList.add("today");
+        }
+
+        if (!options.isOutsideMonth) {
+          applyTurnazioneOverlayToCell(cell, dateObj, getOverlayInfo);
+        }
+        targetGrid.appendChild(cell);
+      }
+
+      for (let i = 0; i < startIndex; i++) {
+        const dayNum = prevMonthDays - startIndex + i + 1;
+        appendDayCell(new Date(year, month - 1, dayNum), { isOutsideMonth: true });
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        appendDayCell(new Date(year, month, d), { isOutsideMonth: false });
+      }
+
+      const remaining = Math.max(0, totalCells - targetGrid.children.length);
+      for (let d = 1; d <= remaining; d++) {
+        appendDayCell(new Date(year, month + 1, d), { isOutsideMonth: true });
+      }
+    }
+
+    function renderMonths() {
+      if (!gridMonths) return;
+      fillMonthsGrid(gridMonths, currentYear, true);
+      updateHeader();
+    }
+
+    function fillMonthsGrid(targetGrid, year, enableClicks) {
+      if (!targetGrid) return;
+      targetGrid.innerHTML = "";
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const clicks = !!enableClicks;
+
+      for (let m = 0; m < 12; m++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "month-cell";
+        cell.textContent = monthShort[m];
+
+        if (year === todayYear && m === todayMonth) {
+          cell.classList.add("is-current");
+        }
+
+        if (clicks) {
+          cell.addEventListener("click", () => {
+            currentMonth = m;
+            currentMode = MODES.DAYS;
+            updateContainerModeClass();
+            renderDays();
+          });
+        } else {
+          cell.disabled = true;
+        }
+
+        targetGrid.appendChild(cell);
+      }
+    }
+
+    function renderYears() {
+      if (!gridYears) return;
+      fillYearsGrid(gridYears, yearRangeStart, YEARS_PAGE_SIZE, true);
+      updateHeader();
+    }
+
+    function fillYearsGrid(targetGrid, rangeStart, pageSize, enableClicks) {
+      if (!targetGrid) return;
+      targetGrid.innerHTML = "";
+      const start = Number.isFinite(rangeStart) ? rangeStart : 0;
+      const size = Number.isFinite(pageSize) ? pageSize : YEARS_PAGE_SIZE;
+      const end = start + size - 1;
+      const todayYear = today.getFullYear();
+      const clicks = !!enableClicks;
+
+      for (let y = start; y <= end; y++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "year-cell";
+        cell.textContent = y;
+
+        if (y === todayYear) {
+          cell.classList.add("is-current");
+        }
+
+        if (clicks) {
+          cell.addEventListener("click", () => {
+            currentYear = y;
+            currentMode = MODES.MONTHS;
+            updateContainerModeClass();
+            renderMonths();
+          });
+        } else {
+          cell.disabled = true;
+        }
+
+        targetGrid.appendChild(cell);
+      }
+    }
+
+    function setMode(mode) {
+      if (mode === currentMode && mode !== MODES.YEARS) {
+        return;
+      }
+
+      currentMode = mode;
+
+      if (currentMode === MODES.YEARS) {
+        yearRangeStart = currentYear - 5;
+      }
+
+      updateContainerModeClass();
+
+      if (currentMode === MODES.DAYS) {
+        renderDays();
+      } else if (currentMode === MODES.MONTHS) {
+        renderMonths();
+      } else if (currentMode === MODES.YEARS) {
+        renderYears();
+      }
+    }
+
+    function goPrev() {
+      if (currentMode === MODES.DAYS) {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
+        renderDays();
+        return;
+      }
+
+      if (currentMode === MODES.MONTHS) {
+        currentYear--;
+        renderMonths();
+        return;
+      }
+
+      if (currentMode === MODES.YEARS) {
+        yearRangeStart -= YEARS_PAGE_SIZE;
+        renderYears();
+      }
+    }
+
+    function goNext() {
+      if (currentMode === MODES.DAYS) {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+        renderDays();
+        return;
+      }
+
+      if (currentMode === MODES.MONTHS) {
+        currentYear++;
+        renderMonths();
+        return;
+      }
+
+      if (currentMode === MODES.YEARS) {
+        yearRangeStart += YEARS_PAGE_SIZE;
+        renderYears();
+      }
+    }
+
+    function ensureSwipeInner() {
+      if (!calendarContainer) return null;
+      if (swipeInner && swipeInner.parentElement === calendarContainer) return swipeInner;
+
+      const existing = calendarContainer.querySelector(":scope > .cal-swipe-inner");
+      if (existing) {
+        swipeInner = existing;
+        return swipeInner;
+      }
+
+      const inner = document.createElement("div");
+      inner.className = "cal-swipe-inner";
+
+      const toMove = [];
+      for (const ch of Array.from(calendarContainer.children)) {
+        if (ch.classList && ch.classList.contains("cal-swipe-layer")) continue;
+        toMove.push(ch);
+      }
+      toMove.forEach(n => inner.appendChild(n));
+      calendarContainer.appendChild(inner);
+      swipeInner = inner;
+      return swipeInner;
+    }
+
+    function setSwipeFx(dx) {
+      if (!calendarContainer) return;
+      const w = Math.max(1, calendarContainer.clientWidth || 1);
+      const clampedDx = Math.max(-w, Math.min(w, dx));
+      const p = Math.max(-1, Math.min(1, clampedDx / w));
+      const r = 0;
+      const shade = Math.min(0.10, Math.abs(p) * 0.10);
+      const prevO = Math.max(0, Math.min(1, p));
+      const nextO = Math.max(0, Math.min(1, -p));
+      const peekR = 0;
+      calendarContainer.style.setProperty("--calSwipeX", Math.round(clampedDx) + "px");
+      calendarContainer.style.setProperty("--calSwipeR", (Math.round(r * 10) / 10) + "deg");
+      calendarContainer.style.setProperty("--calSwipeShade", String(shade));
+      calendarContainer.style.setProperty("--calPeekPrevO", String(prevO));
+      calendarContainer.style.setProperty("--calPeekNextO", String(nextO));
+      calendarContainer.style.setProperty("--calPeekR", (Math.round(peekR * 10) / 10) + "deg");
+    }
+
+    function clearSwipeFx() {
+      if (!calendarContainer) return;
+      calendarContainer.style.removeProperty("--calSwipeX");
+      calendarContainer.style.removeProperty("--calSwipeR");
+      calendarContainer.style.removeProperty("--calSwipeShade");
+      calendarContainer.style.removeProperty("--calPeekPrevO");
+      calendarContainer.style.removeProperty("--calPeekNextO");
+      calendarContainer.style.removeProperty("--calPeekR");
+    }
+
+    function stripIdsDeep(el) {
+      if (!el || !el.querySelectorAll) return;
+      const all = el.querySelectorAll("[id]");
+      all.forEach(n => n.removeAttribute("id"));
+    }
+
+    function getAdjacentState(dir) {
+      const s = {
+        mode: currentMode,
+        year: currentYear,
+        month: currentMonth,
+        yearRangeStart: yearRangeStart
+      };
+
+      if (s.mode === MODES.DAYS) {
+        let y = s.year;
+        let m = s.month + (dir > 0 ? -1 : 1);
+        if (m < 0) { m = 11; y--; }
+        if (m > 11) { m = 0; y++; }
+        return { mode: s.mode, year: y, month: m, yearRangeStart: s.yearRangeStart };
+      }
+
+      if (s.mode === MODES.MONTHS) {
+        return { mode: s.mode, year: s.year + (dir > 0 ? -1 : 1), month: s.month, yearRangeStart: s.yearRangeStart };
+      }
+
+      if (s.mode === MODES.YEARS) {
+        const delta = YEARS_PAGE_SIZE * (dir > 0 ? -1 : 1);
+        return { mode: s.mode, year: s.year, month: s.month, yearRangeStart: s.yearRangeStart + delta };
+      }
+
+      return s;
+    }
+
+    function ensurePeekLayers() {
+      if (!calendarContainer) return;
+      const inner = ensureSwipeInner();
+      if (!inner) return;
+
+      const key = `${currentMode}|${currentYear}|${currentMonth}|${yearRangeStart}`;
+      if (peekPrevLayer && peekNextLayer && peekKey === key) return;
+
       removePeekLayers();
-      active = true;
-      pid = ev.pointerId;
-      sx = lx = ev.clientX;
-      sy = ly = ev.clientY;
-      locked = false;
-      horiz = false;
-      calendarContainer && calendarContainer.classList.remove("is-settling", "is-animating");
-    });
+      peekKey = key;
 
-    root.addEventListener(
-      "pointermove",
-      (ev) => {
+      const prevState = getAdjacentState(1);
+      const nextState = getAdjacentState(-1);
+
+      const makeLayer = (cls, state) => {
+        const layer = inner.cloneNode(true);
+        layer.classList.add("cal-swipe-layer", "cal-swipe-peek", cls);
+        stripIdsDeep(layer);
+
+        const gDays = layer.querySelector(".calendar-grid");
+        const gMonths = layer.querySelector(".month-grid");
+        const gYears = layer.querySelector(".year-grid");
+
+        if (state.mode === MODES.DAYS) {
+          fillDaysGrid(gDays, state.year, state.month);
+        } else if (state.mode === MODES.MONTHS) {
+          fillMonthsGrid(gMonths, state.year, false);
+        } else if (state.mode === MODES.YEARS) {
+          fillYearsGrid(gYears, state.yearRangeStart, YEARS_PAGE_SIZE, false);
+        }
+
+        return layer;
+      };
+
+      peekPrevLayer = makeLayer("cal-swipe-peek-prev", prevState);
+      peekNextLayer = makeLayer("cal-swipe-peek-next", nextState);
+
+      calendarContainer.insertBefore(peekPrevLayer, inner);
+      calendarContainer.insertBefore(peekNextLayer, inner);
+    }
+
+    function removePeekLayers() {
+      if (peekPrevLayer && peekPrevLayer.parentElement) peekPrevLayer.parentElement.removeChild(peekPrevLayer);
+      if (peekNextLayer && peekNextLayer.parentElement) peekNextLayer.parentElement.removeChild(peekNextLayer);
+      peekPrevLayer = null;
+      peekNextLayer = null;
+      peekKey = "";
+    }
+
+    function animateSwipeNavigate(dir, fromDx) {
+      if (!calendarContainer) return;
+      removePeekLayers();
+      if (swipeAnimRunning) {
+        if (dir < 0) goNext(); else goPrev();
+        clearSwipeFx();
+        return;
+      }
+
+      const inner = ensureSwipeInner();
+      if (!inner) {
+        if (dir < 0) goNext(); else goPrev();
+        return;
+      }
+
+      swipeAnimRunning = true;
+
+      const w = Math.max(1, calendarContainer.clientWidth || 1);
+      const startDx = Number.isFinite(fromDx) ? Math.max(-w, Math.min(w, fromDx)) : 0;
+      const startR = 0;
+
+      const oldLayer = inner.cloneNode(true);
+      oldLayer.classList.add("cal-swipe-layer", "cal-swipe-old");
+      oldLayer.style.transform = `translate3d(${Math.round(startDx)}px, 0, 0) rotateY(${(Math.round(startR * 10) / 10)}deg)`;
+      calendarContainer.appendChild(oldLayer);
+
+      calendarContainer.classList.remove("is-swiping", "is-settling", "is-animating");
+      calendarContainer.offsetHeight;
+
+      clearSwipeFx();
+      calendarContainer.style.setProperty("--calSwipeShade", "0.14");
+
+      const newStart = -dir * w;
+
+      inner.style.transition = "none";
+      inner.style.transform = `translate3d(${Math.round(newStart)}px, 0, 0) rotateY(0deg)`;
+
+      if (dir < 0) goNext(); else goPrev();
+
+      calendarContainer.offsetHeight;
+
+      calendarContainer.classList.add("is-animating");
+
+      requestAnimationFrame(() => {
+        oldLayer.style.transform = `translate3d(${Math.round(dir * w)}px, 0, 0) rotateY(0deg)`;
+        inner.style.transition = "transform 280ms cubic-bezier(0.22, 0.9, 0.2, 1)";
+        inner.style.transform = "translate3d(0px, 0, 0) rotateY(0deg)";
+      });
+
+      const cleanup = () => {
+        oldLayer.removeEventListener("transitionend", onEnd);
+        if (oldLayer && oldLayer.parentElement) oldLayer.parentElement.removeChild(oldLayer);
+        calendarContainer.classList.remove("is-animating", "is-settling", "is-swiping");
+        inner.style.transition = "";
+        inner.style.transform = "";
+        clearSwipeFx();
+        calendarContainer.style.removeProperty("--calSwipeShade");
+        swipeAnimRunning = false;
+      };
+
+      const onEnd = (e) => {
+        if (!e || e.propertyName !== "transform") return;
+        cleanup();
+      };
+
+      oldLayer.addEventListener("transitionend", onEnd);
+
+      setTimeout(() => {
+        if (swipeAnimRunning) cleanup();
+      }, 420);
+    }
+
+    function animateSwipeCancel(fromDx) {
+      if (!calendarContainer) return;
+      const inner = ensureSwipeInner();
+      if (!inner) return;
+      calendarContainer.classList.remove("is-animating");
+      calendarContainer.classList.add("is-settling");
+      setSwipeFx(Number.isFinite(fromDx) ? fromDx : 0);
+      requestAnimationFrame(() => {
+        setSwipeFx(0);
+      });
+
+      const done = () => {
+        inner.removeEventListener("transitionend", onEnd);
+        calendarContainer.classList.remove("is-settling", "is-swiping");
+        clearSwipeFx();
+        removePeekLayers();
+      };
+
+      const onEnd = (e) => {
+        if (!e || e.propertyName !== "transform") return;
+        done();
+      };
+
+      inner.addEventListener("transitionend", onEnd);
+      setTimeout(done, 320);
+    }
+
+    function setupSwipeToNavigate(rootForSwipe) {
+      const root = rootForSwipe || calendarContainer;
+      if (!root) return;
+
+      let active = false;
+      let pid = null;
+      let sx = 0;
+      let sy = 0;
+      let lx = 0;
+      let ly = 0;
+      let locked = false;
+      let horiz = false;
+
+      function reset() {
+        active = false;
+        pid = null;
+        sx = sy = lx = ly = 0;
+        locked = false;
+        horiz = false;
+      }
+
+      function isAllowedZone(target) {
+        if (!target || !target.closest) return false;
+        return !!(rootEl && target.closest(".monthbar, .calendar-wrapper, .calendar-container") && rootEl.contains(target));
+      }
+
+      function canStart(ev) {
+        if (!ev) return false;
+        if (ev.pointerType !== "touch") return false;
+
+        const t = ev.target;
+
+        if (!isAllowedZone(t)) return false;
+
+        if (t && t.closest) {
+          const inInteractive = !!t.closest("button, a, input, textarea, select, label, [role=\"button\"]");
+          if (inInteractive) {
+            const allowPickBtn = !!t.closest(".month-cell, .year-cell");
+            if (!allowPickBtn) return false;
+          }
+        }
+
+        return true;
+      }
+
+      root.addEventListener("pointerdown", (ev) => {
+        if (!canStart(ev)) return;
+        ensureSwipeInner();
+        removePeekLayers();
+        active = true;
+        pid = ev.pointerId;
+        sx = lx = ev.clientX;
+        sy = ly = ev.clientY;
+        locked = false;
+        horiz = false;
+        calendarContainer && calendarContainer.classList.remove("is-settling", "is-animating");
+      });
+
+      root.addEventListener(
+        "pointermove",
+        (ev) => {
+          if (!active || ev.pointerId !== pid) return;
+
+          lx = ev.clientX;
+          ly = ev.clientY;
+
+          const dx = lx - sx;
+          const dy = ly - sy;
+          const adx = Math.abs(dx);
+          const ady = Math.abs(dy);
+
+          if (!locked) {
+            if (adx < 10 && ady < 10) return;
+
+            if (adx > ady * 1.2) {
+              locked = true;
+              horiz = true;
+              try { root.setPointerCapture(pid); } catch {}
+              ev.preventDefault();
+              if (calendarContainer) calendarContainer.classList.add("is-swiping");
+              ensurePeekLayers();
+            } else {
+              locked = true;
+              horiz = false;
+            }
+          }
+
+          if (horiz) {
+            ev.preventDefault();
+            ensurePeekLayers();
+            setSwipeFx(dx);
+          }
+        },
+        { passive: false }
+      );
+
+      function end(ev) {
         if (!active || ev.pointerId !== pid) return;
-
-        lx = ev.clientX;
-        ly = ev.clientY;
 
         const dx = lx - sx;
         const dy = ly - sy;
         const adx = Math.abs(dx);
         const ady = Math.abs(dy);
 
-        if (!locked) {
-          if (adx < 10 && ady < 10) return;
-
-          if (adx > ady * 1.2) {
-            locked = true;
-            horiz = true;
-            try { root.setPointerCapture(pid); } catch {}
-            ev.preventDefault();
-            if (calendarContainer) calendarContainer.classList.add("is-swiping");
-            ensurePeekLayers();
-          } else {
-            locked = true;
-            horiz = false;
-          }
+        if (horiz && adx >= 45 && adx > ady * 1.2) {
+          animateSwipeNavigate(dx < 0 ? -1 : 1, dx);
+        } else if (horiz) {
+          animateSwipeCancel(dx);
         }
 
-        if (horiz) {
-          ev.preventDefault();
-          ensurePeekLayers();
-          setSwipeFx(dx);
-        }
-      },
-      { passive: false }
-    );
-
-    function end(ev) {
-      if (!active || ev.pointerId !== pid) return;
-
-      const dx = lx - sx;
-      const dy = ly - sy;
-      const adx = Math.abs(dx);
-      const ady = Math.abs(dy);
-
-      if (horiz && adx >= 45 && adx > ady * 1.2) {
-        animateSwipeNavigate(dx < 0 ? -1 : 1, dx);
-      } else if (horiz) {
-        animateSwipeCancel(dx);
+        try { root.releasePointerCapture(pid); } catch {}
+        reset();
       }
 
-      try { root.releasePointerCapture(pid); } catch {}
-      reset();
+      root.addEventListener("pointerup", end);
+      root.addEventListener("pointercancel", end);
     }
 
-    root.addEventListener("pointerup", end);
-    root.addEventListener("pointercancel", end);
-  }
+    function setupOutsideClickHandler() {
+      document.addEventListener("click", (ev) => {
+        if (!calendarContainer) return;
+        if (!isActiveView()) return;
+        if (currentMode === MODES.DAYS) return;
 
+        const target = ev.target;
 
+        if (
+          calendarContainer.contains(target) ||
+          (monthLabel && monthLabel.contains(target)) ||
+          (prevBtn && prevBtn.contains(target)) ||
+          (nextBtn && nextBtn.contains(target))
+        ) {
+          return;
+        }
 
-  function setupOutsideClickHandler() {
-    document.addEventListener("click", (ev) => {
-      if (!calendarContainer) return;
-      if (currentMode === MODES.DAYS) return;
+        currentMode = MODES.DAYS;
+        updateContainerModeClass();
+        renderDays();
+      });
+    }
 
-      const target = ev.target;
-
-      if (
-        calendarContainer.contains(target) ||
-        (monthLabel && monthLabel.contains(target)) ||
-        (prevBtn && prevBtn.contains(target)) ||
-        (nextBtn && nextBtn.contains(target))
-      ) {
-        return;
-      }
-
-      
+    function resetToToday() {
+      today = new Date();
+      currentYear = today.getFullYear();
+      currentMonth = today.getMonth();
       currentMode = MODES.DAYS;
       updateContainerModeClass();
       renderDays();
-    });
-  }
-
-  function resetToToday() {
-    today = new Date();
-    currentYear = today.getFullYear();
-    currentMonth = today.getMonth();
-    currentMode = MODES.DAYS;
-    updateContainerModeClass();
-    renderDays();
-  }
-
-  function getState() {
-    return {
-      year: currentYear,
-      month: currentMonth,
-      mode: currentMode
-    };
-  }
-
-  function setState(state) {
-    if (!state) return;
-
-    const y = parseInt(state.year, 10);
-    const m = parseInt(state.month, 10);
-    const mode = state.mode;
-
-    if (!Number.isNaN(y)) currentYear = y;
-    if (!Number.isNaN(m)) currentMonth = m;
-
-    if (mode === MODES.DAYS || mode === MODES.MONTHS || mode === MODES.YEARS) {
-      currentMode = mode;
     }
 
-    updateContainerModeClass();
-
-    if (currentMode === MODES.DAYS) renderDays();
-    if (currentMode === MODES.MONTHS) renderMonths();
-    if (currentMode === MODES.YEARS) renderYears();
-  }
-
-  function reflowTurnoSigle() {
-    if (currentMode !== MODES.DAYS) return;
-
-    
-    const all = gridDays ? gridDays.querySelectorAll(".cal-turno-sigla") : [];
-    if (all && all.length) {
-      all.forEach(el => {
-        
-        el.classList.add("sigla-ready");
-      });
+    function getState() {
+      return {
+        year: currentYear,
+        month: currentMonth,
+        mode: currentMode
+      };
     }
-  }
 
-  function onEnterCalendarView() {
-    if (currentMode !== MODES.DAYS) return;
+    function setState(state) {
+      if (!state) return;
 
-    if (_calendarDirty) {
-      _calendarDirty = false;
-      renderDays(); 
-      return;
-    }
-    
-    reflowTurnoSigle();
-  }
+      const y = parseInt(state.year, 10);
+      const m = parseInt(state.month, 10);
+      const mode = state.mode;
 
-  function init() {
-    if (_calendarInited) return;
-    _calendarInited = true;
-    gridDays = document.getElementById("calendar-grid");
-    gridMonths = document.getElementById("month-grid");
-    gridYears = document.getElementById("year-grid");
-    monthLabel = document.querySelector(".month-label");
-    prevBtn = document.querySelector(".prev");
-    nextBtn = document.querySelector(".next");
-    calendarContainer = document.getElementById("calendarContainer");
-    const calendarViewEl = document.querySelector(".view-calendar");
+      if (!Number.isNaN(y)) currentYear = y;
+      if (!Number.isNaN(m)) currentMonth = m;
 
-    if (!gridDays || !monthLabel || !calendarContainer) return;
-
-    updateContainerModeClass();
-
-if (prevBtn) {
-  prevBtn.addEventListener("click", goPrev);
-}
-
-if (nextBtn) {
-  nextBtn.addEventListener("click", goNext);
-}
-
-setupSwipeToNavigate(calendarViewEl || calendarContainer);
-
-    
-    monthLabel.addEventListener("click", () => {
-      if (currentMode === MODES.DAYS) {
-        setMode(MODES.MONTHS);
-      } else if (currentMode === MODES.MONTHS) {
-        setMode(MODES.YEARS);
+      if (mode === MODES.DAYS || mode === MODES.MONTHS || mode === MODES.YEARS) {
+        currentMode = mode;
       }
-      
-    });
 
-    setupOutsideClickHandler();
-    renderDays();
+      updateContainerModeClass();
 
+      if (currentMode === MODES.DAYS) renderDays();
+      if (currentMode === MODES.MONTHS) renderMonths();
+      if (currentMode === MODES.YEARS) renderYears();
+    }
 
-function isCalendarViewActive() {
-  const v = document.querySelector(".view-calendar");
-  return !!(v && v.classList.contains("is-active"));
-}
+    function reflowTurnoSigle() {
+      if (currentMode !== MODES.DAYS) return;
+      const all = gridDays ? gridDays.querySelectorAll(".cal-turno-sigla") : [];
+      if (all && all.length) {
+        all.forEach(el => {
+          el.classList.add("sigla-ready");
+        });
+      }
+    }
 
-window.addEventListener("turnipds:storage-changed", () => {
-  if (currentMode !== MODES.DAYS) return;
-
-  if (isCalendarViewActive()) {
-    renderDays();
-  } else {
-    _calendarDirty = true;
-  }
-});
-
-
-window.addEventListener("storage", (ev) => {
-  if (!ev || !ev.key) return;
-  if (currentMode !== MODES.DAYS) return;
-
-  if (isCalendarViewActive()) {
-    renderDays();
-  } else {
-    _calendarDirty = true;
-  }
-});
-    
-    let _calResizeRaf = 0;
-    let _calResizeTimer = 0;
-
-    function scheduleCalendarResizeUpdate() {
+    function onEnterView() {
       if (currentMode !== MODES.DAYS) return;
 
-      
-      if (!_calResizeRaf) {
-        _calResizeRaf = requestAnimationFrame(() => {
-          _calResizeRaf = 0;
+      if (_calendarDirty) {
+        _calendarDirty = false;
+        renderDays();
+        return;
+      }
 
+      reflowTurnoSigle();
+    }
+
+    function init() {
+      if (_calendarInited) return;
+      _calendarInited = true;
+
+      rootEl = document.querySelector(rootSelector);
+      if (!rootEl) return;
+
+      gridDays = document.getElementById(daysGridId);
+      gridMonths = document.getElementById(monthsGridId);
+      gridYears = document.getElementById(yearsGridId);
+      monthLabel = rootEl.querySelector(".month-label");
+      prevBtn = rootEl.querySelector(".prev");
+      nextBtn = rootEl.querySelector(".next");
+      calendarContainer = document.getElementById(containerId);
+
+      if (!gridDays || !monthLabel || !calendarContainer) return;
+
+      updateContainerModeClass();
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", goPrev);
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", goNext);
+      }
+
+      setupSwipeToNavigate(rootEl || calendarContainer);
+
+      monthLabel.addEventListener("click", () => {
+        if (currentMode === MODES.DAYS) {
+          setMode(MODES.MONTHS);
+        } else if (currentMode === MODES.MONTHS) {
+          setMode(MODES.YEARS);
+        }
+      });
+
+      setupOutsideClickHandler();
+      renderDays();
+
+      window.addEventListener("turnipds:storage-changed", () => {
+        if (currentMode !== MODES.DAYS) return;
+
+        if (isActiveView()) {
+          renderDays();
+        } else {
+          _calendarDirty = true;
+        }
+      });
+
+      window.addEventListener("storage", (ev) => {
+        if (!ev || !ev.key) return;
+        if (currentMode !== MODES.DAYS) return;
+
+        if (isActiveView()) {
+          renderDays();
+        } else {
+          _calendarDirty = true;
+        }
+      });
+
+      let _calResizeRaf = 0;
+      let _calResizeTimer = 0;
+
+      function scheduleCalendarResizeUpdate() {
+        if (currentMode !== MODES.DAYS) return;
+
+        if (!_calResizeRaf) {
+          _calResizeRaf = requestAnimationFrame(() => {
+            _calResizeRaf = 0;
+
+            const changed = updateDayCellSize();
+            if (changed) {
+              if (_siglaFitCache && typeof _siglaFitCache.clear === "function") {
+                _siglaFitCache.clear();
+              }
+
+              if (isActiveView()) {
+                reflowTurnoSigle();
+              }
+            }
+          });
+        }
+
+        if (_calResizeTimer) clearTimeout(_calResizeTimer);
+        _calResizeTimer = setTimeout(() => {
           const changed = updateDayCellSize();
           if (changed) {
-            
-            if (typeof _siglaFitCache !== "undefined" && _siglaFitCache && typeof _siglaFitCache.clear === "function") {
+            if (_siglaFitCache && typeof _siglaFitCache.clear === "function") {
               _siglaFitCache.clear();
             }
-
-            
-            if (isCalendarViewActive()) {
+            if (isActiveView()) {
               reflowTurnoSigle();
             }
           }
-        });
+        }, 160);
       }
 
-      
-      if (_calResizeTimer) clearTimeout(_calResizeTimer);
-      _calResizeTimer = setTimeout(() => {
-        const changed = updateDayCellSize();
-        if (changed) {
-          if (typeof _siglaFitCache !== "undefined" && _siglaFitCache && typeof _siglaFitCache.clear === "function") {
-            _siglaFitCache.clear();
-          }
-          if (isCalendarViewActive()) {
-            reflowTurnoSigle();
-          }
-        }
-      }, 160);
+      window.addEventListener("resize", scheduleCalendarResizeUpdate);
+      window.addEventListener("orientationchange", scheduleCalendarResizeUpdate);
     }
 
-    window.addEventListener("resize", scheduleCalendarResizeUpdate);
-    window.addEventListener("orientationchange", scheduleCalendarResizeUpdate);
+    return {
+      init,
+      resetToToday,
+      getState,
+      setState,
+      reflowTurnoSigle,
+      onEnterView
+    };
   }
 
-  window.Calendar = {
-    init,
-    resetToToday,
-    getState,
-    setState,
-    reflowTurnoSigle,
-    onEnterCalendarView
-  };
+  window.Calendar = createCalendarController({
+    rootSelector: ".view-calendar",
+    containerId: "calendarContainer",
+    daysGridId: "calendar-grid",
+    monthsGridId: "month-grid",
+    yearsGridId: "year-grid",
+    getOverlayInfo: getCalendarSiglaForDate
+  });
 
+  window.UsersCalendar = createCalendarController({
+    rootSelector: ".view-utenti",
+    containerId: "usersCalendarContainer",
+    daysGridId: "users-calendar-grid",
+    monthsGridId: "users-month-grid",
+    yearsGridId: "users-year-grid",
+    getOverlayInfo: () => null
+  });
 
 })();
 
@@ -6940,9 +6919,11 @@ if (variant === "danger-filled") {
 
 function syncTopbarCalendarChrome() {
   const activeView = document.querySelector(".view.is-active");
-  const isCalendar = !!(activeView && activeView.dataset.view === "calendar");
+  const activeViewId = activeView ? activeView.dataset.view : "";
+  const hasCalendarTopbar = activeViewId === "calendar" || activeViewId === "utenti";
+  const isCalendar = activeViewId === "calendar";
 
-  document.body.classList.toggle("calendar-topbar-layout", isCalendar);
+  document.body.classList.toggle("calendar-topbar-layout", hasCalendarTopbar);
 
   const moreBtn = document.getElementById("calendarMoreBtn");
   if (moreBtn) {
@@ -7028,16 +7009,17 @@ function initTabs() {
       return activeViewId;
     }
 
-    if (target === "calendar") {
-      const calendarView = document.querySelector(".view-calendar");
-      const isCalendarActive = !!(calendarView && calendarView.classList.contains("is-active"));
+    if (target === "calendar" || target === "utenti") {
+      const targetView = document.querySelector(`.view-${target}`);
+      const isTargetActive = !!(targetView && targetView.classList.contains("is-active"));
+      const controller = target === "calendar" ? window.Calendar : window.UsersCalendar;
 
       if (
-        isCalendarActive &&
-        window.Calendar &&
-        typeof Calendar.resetToToday === "function"
+        isTargetActive &&
+        controller &&
+        typeof controller.resetToToday === "function"
       ) {
-        Calendar.resetToToday();
+        controller.resetToToday();
         return activeViewId;
       }
     }
@@ -7087,8 +7069,25 @@ function initTabs() {
             Calendar.resetToToday();
           }
 
-          if (typeof Calendar.onEnterCalendarView === "function") {
-            Calendar.onEnterCalendarView();
+          if (typeof Calendar.onEnterView === "function") {
+            Calendar.onEnterView();
+          }
+        });
+      });
+    }
+
+    if (target === "utenti" && window.UsersCalendar) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (
+            activeViewId !== "utenti" &&
+            typeof UsersCalendar.resetToToday === "function"
+          ) {
+            UsersCalendar.resetToToday();
+          }
+
+          if (typeof UsersCalendar.onEnterView === "function") {
+            UsersCalendar.onEnterView();
           }
         });
       });
@@ -7286,6 +7285,10 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     
     if (window.Calendar && typeof Calendar.init === "function") {
       Calendar.init();
+    }
+
+    if (window.UsersCalendar && typeof UsersCalendar.init === "function") {
+      UsersCalendar.init();
     }
 
     if (window.CalendarMenu && typeof CalendarMenu.init === "function") {

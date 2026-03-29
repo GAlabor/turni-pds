@@ -3430,11 +3430,13 @@ body.calendar-topbar-layout .app-top-action {
   display: flex;
 }
 
-body.calendar-topbar-layout .view-calendar .app-header {
+body.calendar-topbar-layout .view-calendar .app-header,
+body.calendar-topbar-layout .view-utenti .app-header {
   display: none;
 }
 
-body.calendar-topbar-layout .view-calendar .monthbar {
+body.calendar-topbar-layout .view-calendar .monthbar,
+body.calendar-topbar-layout .view-utenti .monthbar {
   position: fixed;
   top: var(--topbar-top);
   left: calc(env(safe-area-inset-left) + var(--topbar-inset) + var(--status-icon-size) + 16px);
@@ -3444,7 +3446,8 @@ body.calendar-topbar-layout .view-calendar .monthbar {
   min-height: var(--status-icon-size);
 }
 
-body.calendar-topbar-layout .view-calendar .calendar-wrapper {
+body.calendar-topbar-layout .view-calendar .calendar-wrapper,
+body.calendar-topbar-layout .view-utenti .calendar-wrapper {
   margin-top: calc(var(--status-icon-size) + var(--space-20));
 }
 
