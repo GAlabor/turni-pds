@@ -4032,15 +4032,25 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
     padding-inline: 10px;
   }
 
-  
+  .tab {
+    gap: 0;
+  }
+
   .tab-label {
-    display: none;
+    display: block;
+    font-size: 10px;
+    transform: translateY(-6px);
   }
 }
 
 @media (min-width: 901px) {
+  .tab {
+    gap: 0;
+  }
+
   .tab-label {
     display: block;
+    transform: translateY(-6px);
   }
 }
 
