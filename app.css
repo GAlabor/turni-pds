@@ -853,6 +853,73 @@ body {
   display: grid;
 }
 
+.users-calendar-topbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-16);
+  padding: 0 var(--space-2) var(--space-14);
+  border-bottom: 1px solid rgba(120,130,170,0.14);
+}
+
+.users-add-colleague-btn {
+  width: 100%;
+  min-width: 0;
+  padding: 1px 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  transition: transform 0.08s ease-out, opacity 0.16s ease;
+}
+
+.users-add-colleague-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.users-add-colleague-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.users-add-colleague-label {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (hover:hover) {
+  .users-add-colleague-btn:hover {
+    opacity: 0.78;
+  }
+}
+
+.users-add-colleague-btn:active,
+.users-add-colleague-btn.is-press {
+  transform: scale(0.985);
+}
+
 .month-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-16);
@@ -947,6 +1014,21 @@ body {
   .calendar-container {
     margin-top: var(--space-8);
     padding: var(--space-10) var(--space-2) var(--space-12);
+  }
+
+  .users-calendar-topbar {
+    margin-bottom: var(--space-10);
+    padding: 0 var(--space-4) var(--space-10);
+  }
+
+  .users-add-colleague-btn {
+    gap: var(--space-6);
+    font-size: 17px;
+  }
+
+  .users-add-colleague-icon {
+    width: 22px;
+    height: 22px;
   }
 
   .dow-row {
