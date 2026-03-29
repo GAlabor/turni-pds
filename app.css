@@ -3979,8 +3979,8 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 }
 
 .tab[data-tab="calendar"] svg {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
 }
 
 .tab[data-tab="riepilogo"].active svg,
@@ -3989,7 +3989,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 }
 
 .tab[data-tab="calendar"].active svg {
-  transform: scale(calc(var(--icon-pop) + 0.04));
+  transform: scale(calc(var(--icon-pop) + 0.02));
 }
 
 
@@ -4007,7 +4007,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 #icoCalendar #calDay {
   font-family: var(--font-ui);
   font-size: var(--fs-cal-icon-day);   
-  font-weight: 760;
+  font-weight: 500;
   fill: currentColor;
   stroke: none;
 }
@@ -4015,7 +4015,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 #icoCalendar #calMonth {
   font-family: var(--font-ui);
   font-size: var(--fs-cal-icon-month); 
-  font-weight: 650;
+  font-weight: 400;
   fill: currentColor;
   stroke: none;
 }
