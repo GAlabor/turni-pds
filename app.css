@@ -4039,7 +4039,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
   .tab-label {
     display: block;
     font-size: 10px;
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
 }
 
@@ -4050,7 +4050,7 @@ body.calendar-menu-open .view-calendar .calendar-wrapper {
 
   .tab-label {
     display: block;
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
 }
 
