@@ -1600,7 +1600,7 @@ window.addEventListener("storage", (ev) => {
 const _statusCheckSvgText = `<!-- status-check.svg -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <circle cx="256" cy="256" r="210" fill="var(--accent)" stroke="none"/>
-  <path d="M180 275 L235 330 L350 205" fill="none" stroke="var(--color-back-icon)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M180 275 L235 330 L350 205" fill="none" stroke="var(--color-confirm-icon)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 `;
 

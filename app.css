@@ -113,6 +113,7 @@
 
   --icon-back-size: 26px;      
   --color-back-icon: var(--text); 
+  --color-confirm-icon: #ffffff; 
 
   --calendar-menu-icon-size: 26px;
   --calendar-menu-icon-stroke: 1.2;
@@ -321,6 +322,7 @@
 
     --color-arrow-month: var(--nav-fg);
     --color-back-icon: var(--text);
+  --color-confirm-icon: #ffffff;
 
         
     --ui-tab-active-pill-bg: rgba(142,142,147,0.26);
@@ -379,6 +381,7 @@
 
   --color-arrow-month: var(--nav-fg);
   --color-back-icon: var(--text);
+  --color-confirm-icon: #ffffff;
 }
 
 *,
@@ -3060,7 +3063,7 @@ body.turni-no-select * {
   height: var(--icon-circle-lg);
   background: var(--accent);
   border: none;
-  color: var(--text);
+  color: var(--color-confirm-icon);
 }
 
 .icon-circle-btn--confirm svg{
@@ -3073,7 +3076,7 @@ body.turni-no-select * {
 @media (hover:hover) {
   .icon-circle-btn--confirm:hover{
     background: var(--accent);
-    color: var(--text);
+    color: var(--color-confirm-icon);
     border-color: transparent;
     box-shadow: var(--shadow-accent-hover);
   }
@@ -3083,7 +3086,7 @@ body.turni-no-select * {
 .icon-circle-btn--confirm.is-press{
   transform: scale(0.9);
   background: var(--accent);
-  color: var(--text);
+  color: var(--color-confirm-icon);
   border-color: transparent;
   box-shadow: var(--shadow-accent-press);
 }
