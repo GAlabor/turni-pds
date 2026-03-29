@@ -883,21 +883,25 @@ body {
 }
 
 .users-add-colleague-icon {
-  width: 24px;
-  height: 24px;
+  width: var(--icon-circle-sm);
+  height: var(--icon-circle-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  color: var(--nav-fg);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
   flex-shrink: 0;
 }
 
 .users-add-colleague-icon svg {
-  width: 100%;
-  height: 100%;
+  width: 22px;
+  height: 22px;
   display: block;
   stroke: currentColor;
-  stroke-width: 2.1;
+  stroke-width: 2.4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -1027,8 +1031,8 @@ body {
   }
 
   .users-add-colleague-icon {
-    width: 22px;
-    height: 22px;
+    width: var(--icon-circle-sm);
+    height: var(--icon-circle-sm);
   }
 
   .dow-row {
