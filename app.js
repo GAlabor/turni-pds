@@ -6921,19 +6921,19 @@ function syncTopbarCalendarChrome() {
   const activeView = document.querySelector(".view.is-active");
   const activeViewId = activeView ? activeView.dataset.view : "";
   const hasCalendarTopbar = activeViewId === "calendar" || activeViewId === "utenti";
-  const isCalendar = activeViewId === "calendar";
+  const hasMenu = hasCalendarTopbar;
 
   document.body.classList.toggle("calendar-topbar-layout", hasCalendarTopbar);
 
   const moreBtn = document.getElementById("calendarMoreBtn");
   if (moreBtn) {
     const menuOpen = document.body.classList.contains("calendar-menu-open");
-    moreBtn.hidden = !isCalendar;
-    moreBtn.style.display = (isCalendar && !menuOpen) ? "flex" : "none";
+    moreBtn.hidden = !hasMenu;
+    moreBtn.style.display = (hasMenu && !menuOpen) ? "flex" : "none";
   }
 
   if (window.CalendarMenu && typeof CalendarMenu.sync === "function") {
-    CalendarMenu.sync(isCalendar);
+    CalendarMenu.sync(hasMenu);
   }
 }
 
@@ -7131,6 +7131,9 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
   let settingsBtn = null;
   let scrim = null;
   let todayLabel = null;
+  let primaryItems = [];
+  let keepSeparator = null;
+  let calendarOnlyItems = [];
 
   function updateTodayLabel() {
     if (!todayLabel) return;
@@ -7162,9 +7165,30 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     el.addEventListener("touchcancel", off);
   }
 
-  function isCalendarActive() {
+  function getActiveViewId() {
     const activeView = document.querySelector(".view.is-active");
-    return !!(activeView && activeView.dataset.view === "calendar");
+    return activeView ? String(activeView.dataset.view || "") : "";
+  }
+
+  function isMenuAvailableView() {
+    const activeViewId = getActiveViewId();
+    return activeViewId === "calendar" || activeViewId === "utenti";
+  }
+
+  function updateMenuContent() {
+    const isUsers = getActiveViewId() === "utenti";
+
+    primaryItems.forEach((el) => {
+      if (el) el.hidden = isUsers;
+    });
+
+    if (keepSeparator) {
+      keepSeparator.hidden = false;
+    }
+
+    calendarOnlyItems.forEach((el) => {
+      if (el) el.hidden = isUsers;
+    });
   }
 
   function isOpen() {
@@ -7181,13 +7205,14 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     document.body.classList.remove("calendar-menu-open");
     overlay.hidden = true;
     syncButtonState();
-    if (openBtn && isCalendarActive()) {
+    if (openBtn && isMenuAvailableView()) {
       openBtn.style.display = "flex";
     }
   }
 
   function openMenu() {
-    if (!overlay || !isCalendarActive()) return;
+    if (!overlay || !isMenuAvailableView()) return;
+    updateMenuContent();
     overlay.hidden = false;
     document.body.classList.add("calendar-menu-open");
     syncButtonState();
@@ -7201,8 +7226,9 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     else openMenu();
   }
 
-  function sync(isCalendar) {
-    if (!isCalendar) {
+  function sync(isMenuAvailable) {
+    updateMenuContent();
+    if (!isMenuAvailable) {
       closeMenu();
       return;
     }
@@ -7217,13 +7243,17 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     settingsBtn = overlay ? overlay.querySelector("[data-calendar-menu-settings]") : null;
     scrim = overlay ? overlay.querySelector("[data-calendar-menu-close]") : null;
     todayLabel = document.getElementById("calendarMenuTodayLabel");
+    primaryItems = overlay ? Array.from(overlay.querySelectorAll("[data-calendar-menu-primary]")) : [];
+    keepSeparator = overlay ? overlay.querySelector("[data-calendar-menu-keep-separator]") : null;
+    calendarOnlyItems = overlay ? Array.from(overlay.querySelectorAll("[data-calendar-menu-calendar-only]")) : [];
 
-    if (!overlay || !drawer || !openBtn || !brandBtn || !scrim || !settingsBtn) return;
+    if (!overlay || !drawer || !openBtn || !brandBtn || !scrim || !settingsBtn || !keepSeparator) return;
 
     bindPressFeedback(openBtn);
     bindPressFeedback(brandBtn);
     bindPressFeedback(settingsBtn);
     updateTodayLabel();
+    updateMenuContent();
 
     openBtn.addEventListener("click", (ev) => {
       ev.stopPropagation();
