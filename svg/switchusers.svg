@@ -50,7 +50,7 @@
     </g>
 
     <!-- Freccia -->
-    <g id="switch-arrow" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <g id="switch-arrow" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <!-- linea -->
       <path d="M440 484 H580" />
       <!-- punta sinistra <path d="M472 458L432 484L472 510" /> -->
