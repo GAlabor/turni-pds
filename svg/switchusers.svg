@@ -52,10 +52,11 @@
     <!-- Freccia -->
     <g id="switch-arrow" stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <!-- linea -->
-      <path d="M440 484 H580" />
-      <!-- punta sinistra <path d="M472 458L432 484L472 510" /> -->
+      <path d="M460 484 H560" /> 
+      <!-- punta sinistra 
+      <path d="M490 458L460 484L490 510" />  -->
       <!-- punta destra -->
-      <path d="M548 458L588 484L548 510" />
+      <path d="M530 458L560 484L530 510" />
     </g>
 
   </g>
