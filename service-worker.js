@@ -1,9 +1,9 @@
-const VERSION = '3.2.6';
+const VERSION = '3.2.7';
 const APP_VERSION = VERSION;
 
 const ICO_VERSION = 'v1.0';
 const SPLASH_VERSION = 'v1.0';
-const SVG_VERSION = 'v1.9';
+const SVG_VERSION = 'v2.0';
 
 const CACHE_APP = `turni-app-${APP_VERSION}`;
 const CACHE_ICO = `turni-ico-${ICO_VERSION}`;
