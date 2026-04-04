@@ -6925,70 +6925,18 @@ const CALENDAR_MORE_DEFAULT_SVG = `
   <line class="app-top-action-dot" x1="180" y1="312" x2="332" y2="312"></line>
 </svg>`;
 
-let _switchUsersTopbarSvgText = "";
-let _switchUsersTopbarSvgPromise = null;
-
-async function ensureSwitchUsersTopbarSvg() {
-  if (_switchUsersTopbarSvgText) return _switchUsersTopbarSvgText;
-  if (_switchUsersTopbarSvgPromise) return _switchUsersTopbarSvgPromise;
-
-  const svgBase = window.AppConfig && window.AppConfig.PATHS ? window.AppConfig.PATHS.svgBase : "";
-  if (!svgBase) return "";
-
-  _switchUsersTopbarSvgPromise = fetch(`${svgBase}/switchusers.svg`, {
-    cache: "no-store",
-    credentials: "same-origin"
-  })
-    .then((res) => {
-      if (!res.ok) return "";
-      return res.text();
-    })
-    .then((txt) => {
-      _switchUsersTopbarSvgText = (txt || "").trim();
-      return _switchUsersTopbarSvgText;
-    })
-    .catch(() => "")
-    .finally(() => {
-      _switchUsersTopbarSvgPromise = null;
-    });
-
-  return _switchUsersTopbarSvgPromise;
-}
-
-function setTopbarMenuIconForView(activeViewId) {
-  const moreBtn = document.getElementById("calendarMoreBtn");
-  if (!moreBtn) return;
-
-  if (activeViewId === "utenti") {
-    if (moreBtn.dataset.iconVariant !== "switchusers") {
-      moreBtn.dataset.iconVariant = "switchusers";
-      moreBtn.innerHTML = CALENDAR_MORE_DEFAULT_SVG;
-      ensureSwitchUsersTopbarSvg().then((txt) => {
-        if (!txt) return;
-        if (moreBtn.dataset.iconVariant !== "switchusers") return;
-        moreBtn.innerHTML = txt;
-      });
-    }
-    return;
-  }
-
-  if (moreBtn.dataset.iconVariant !== "hamburger") {
-    moreBtn.dataset.iconVariant = "hamburger";
-    moreBtn.innerHTML = CALENDAR_MORE_DEFAULT_SVG;
-  }
-}
-
 function syncTopbarCalendarChrome() {
   const activeView = document.querySelector(".view.is-active");
   const activeViewId = activeView ? activeView.dataset.view : "";
   const hasCalendarTopbar = activeViewId === "calendar" || activeViewId === "utenti";
-  const hasMenu = hasCalendarTopbar;
+  const hasMenu = activeViewId === "calendar";
 
   document.body.classList.toggle("calendar-topbar-layout", hasCalendarTopbar);
 
   const moreBtn = document.getElementById("calendarMoreBtn");
   if (moreBtn) {
-    setTopbarMenuIconForView(activeViewId);
+    moreBtn.dataset.iconVariant = "hamburger";
+    moreBtn.innerHTML = CALENDAR_MORE_DEFAULT_SVG;
     const menuOpen = document.body.classList.contains("calendar-menu-open");
     moreBtn.hidden = !hasMenu;
     moreBtn.style.display = (hasMenu && !menuOpen) ? "flex" : "none";
@@ -7233,15 +7181,12 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
   }
 
   function isMenuAvailableView() {
-    const activeViewId = getActiveViewId();
-    return activeViewId === "calendar" || activeViewId === "utenti";
+    return getActiveViewId() === "calendar";
   }
 
   function updateMenuContent() {
-    const isUsers = getActiveViewId() === "utenti";
-
     primaryItems.forEach((el) => {
-      if (el) el.hidden = isUsers;
+      if (el) el.hidden = false;
     });
 
     if (keepSeparator) {
@@ -7249,7 +7194,7 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
     }
 
     calendarOnlyItems.forEach((el) => {
-      if (el) el.hidden = isUsers;
+      if (el) el.hidden = false;
     });
   }
 

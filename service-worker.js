@@ -1,9 +1,9 @@
-const VERSION = '3.2.9';
+const VERSION = '3.3.0';
 const APP_VERSION = VERSION;
 
 const ICO_VERSION = 'v1.0';
 const SPLASH_VERSION = 'v1.0';
-const SVG_VERSION = 'v2.2';
+const SVG_VERSION = 'v1.0';
 
 const CACHE_APP = `turni-app-${APP_VERSION}`;
 const CACHE_ICO = `turni-ico-${ICO_VERSION}`;
@@ -61,7 +61,6 @@ const SPLASH_URLS = [
 const SVG_URLS = [
   `${ROOT}/svg/calendar.svg`,
   `${ROOT}/svg/users.svg`,
-  `${ROOT}/svg/switchusers.svg`,
   `${ROOT}/svg/riepilogo.svg`,
   `${ROOT}/svg/settings.svg`,
   `${ROOT}/svg/login.svg`,

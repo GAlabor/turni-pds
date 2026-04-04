@@ -857,7 +857,7 @@ body {
   display: flex;
   align-items: center;
   margin-bottom: var(--space-16);
-  padding: 0 var(--space-2) var(--space-14);
+  padding: 0 var(--space-10) var(--space-14);
   border-bottom: 1px solid rgba(120,130,170,0.14);
 }
 
@@ -870,6 +870,7 @@ body {
   box-shadow: none;
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-8);
   font-size: 19px;
   font-weight: 500;
@@ -888,11 +889,11 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--nav-fg);
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
+  color: var(--color-confirm-icon);
+  background: var(--accent);
+  border: none;
   border-radius: 999px;
-  box-shadow: 0 4px 10px rgba(15,23,42,0.08);
+  box-shadow: var(--shadow-accent-press);
   flex-shrink: 0;
 }
 
@@ -908,6 +909,7 @@ body {
 
 .users-add-colleague-label {
   min-width: 0;
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -916,6 +918,12 @@ body {
 @media (hover:hover) {
   .users-add-colleague-btn:hover {
     opacity: 0.78;
+  }
+
+  .users-add-colleague-btn:hover .users-add-colleague-icon {
+    background: var(--accent);
+    color: var(--color-confirm-icon);
+    box-shadow: var(--shadow-accent-hover);
   }
 }
 
@@ -1022,7 +1030,7 @@ body {
 
   .users-calendar-topbar {
     margin-bottom: var(--space-10);
-    padding: 0 var(--space-4) var(--space-10);
+    padding: 0 var(--space-10) var(--space-10);
   }
 
   .users-add-colleague-btn {
