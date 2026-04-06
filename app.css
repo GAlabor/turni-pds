@@ -2214,7 +2214,7 @@ body.turni-no-select * {
 
 .turni-input {
   width: 100%;
-  max-width: 220px;
+  max-width: 100%;
   height: var(--turni-sigla-size);
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -2425,7 +2425,7 @@ body.turni-no-select * {
   }
 
   .turni-input {
-    max-width: 180px;
+    max-width: 100%;
   }
 
   .turni-label {
@@ -2878,7 +2878,7 @@ body.turni-no-select * {
 }
 
 .users-colleague-right{
-  flex: 0 0 min(52%, 240px);
+  flex: 0 0 min(52%, 220px);
 }
 
 .users-colleague-input{
@@ -2896,7 +2896,7 @@ body.turni-no-select * {
 }
 
 .users-colleague-row .turnazioni-pick-name{
-  flex: 0 0 42%;
+  flex: 0 0 40%;
 }
 
 .users-colleague-row .turni-start-pick-right{
@@ -2908,13 +2908,23 @@ body.turni-no-select * {
   min-height: 56px;
 }
 
-.settings-panel.settings-users-colleague-add{
-  padding-top: 0;
+.users-colleague-action-row{
+  padding: var(--space-12) var(--space-12);
+  min-height: 56px;
 }
 
-.users-colleague-action-row{
-  padding: 10px 6px;
-  min-height: 56px;
+.users-colleague-action-row .settings-row-left{
+  flex: 0 0 40%;
+  min-width: 0;
+  gap: 0;
+}
+
+.users-colleague-action-row .settings-row-right{
+  margin-left: auto;
+  min-width: 0;
+  flex: 0 0 min(52%, 220px);
+  justify-content: flex-end;
+  gap: var(--space-8);
 }
 
 .users-colleague-action-row .settings-row-label{
@@ -2933,11 +2943,20 @@ body.turni-no-select * {
   line-height: 1.2;
   letter-spacing: 0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
 .users-colleague-separator{
-  margin: 0;
+  margin: 0 var(--space-12);
+  border: 0;
+  border-bottom: 1px solid var(--menu-separator);
+}
+
+#usersColleagueDept{
+  max-width: 100%;
 }
 
 @media (max-width: 900px) {
@@ -2945,13 +2964,23 @@ body.turni-no-select * {
     align-items: flex-start;
   }
 
-  .users-colleague-row .turnazioni-pick-name{
-    flex: 0 0 38%;
+  .users-colleague-row .turnazioni-pick-name,
+  .users-colleague-action-row .settings-row-left{
+    flex: 0 0 36%;
     padding-top: 9px;
   }
 
-  .users-colleague-right{
-    flex-basis: min(58%, 220px);
+.users-colleague-right,
+.users-colleague-action-row .settings-row-right{
+  flex-basis: min(56%, 200px);
+}
+
+  .users-colleague-action-row{
+    padding: var(--space-12) var(--space-10);
+  }
+
+  .users-colleague-separator{
+    margin: 0 var(--space-10);
   }
 }
 
