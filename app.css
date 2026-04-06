@@ -2891,12 +2891,53 @@ body.turni-no-select * {
   font-variant-numeric: tabular-nums;
 }
 
+.users-colleague-summary-right{
+  justify-content: flex-end;
+}
+
 .users-colleague-row .turnazioni-pick-name{
   flex: 0 0 42%;
 }
 
 .users-colleague-row .turni-start-pick-right{
   margin-left: auto;
+}
+
+.settings-panel.settings-users-colleague-add .turnazioni-pick-row,
+.settings-panel.settings-users-colleague-start .turnazioni-pick-row{
+  min-height: 56px;
+}
+
+.settings-panel.settings-users-colleague-add{
+  padding-top: 0;
+}
+
+.users-colleague-action-row{
+  padding: 10px 6px;
+  min-height: 56px;
+}
+
+.users-colleague-action-row .settings-row-label{
+  font-size: var(--fs-turni-nome);
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.users-colleague-action-row .settings-row-summary{
+  font-size: var(--fs-turni-orario);
+  font-weight: 400;
+  color: var(--subtext);
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.users-colleague-separator{
+  margin: 0;
 }
 
 @media (max-width: 900px) {

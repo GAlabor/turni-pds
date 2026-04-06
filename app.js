@@ -4829,32 +4829,172 @@ function syncVisibility() {}
   let inputSurname = null;
   let inputName = null;
   let inputDept = null;
-  let inputRotation = null;
-  let inputStart = null;
+  let rotationRow = null;
+  let rotationSummary = null;
+  let startRow = null;
+  let startSummary = null;
   let errorEl = null;
 
-  function getFields() {
+  let rotationPickList = null;
+  let rotationPickEmpty = null;
+
+  let startDateInput = null;
+  let startDateRow = null;
+  let startDateSummary = null;
+  let startTurnoRow = null;
+  let startTurnoSummary = null;
+  let startErrorEl = null;
+
+  let startTurnoPickList = null;
+  let startTurnoPickEmpty = null;
+
+  let draft = {
+    cognome: '',
+    nome: '',
+    reparto: '',
+    turnazioneId: '',
+    turnazione: '',
+    inizioRotazione: '',
+    inizioRotazioneTurnoIndex: null,
+    inizioRotazioneTurno: ''
+  };
+
+  function formatDateShortISO(iso) {
+    if (!iso || typeof iso !== 'string') return '';
+    const d = new Date(iso + 'T00:00:00');
+    if (Number.isNaN(d.getTime())) return '';
+    try {
+      return new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    } catch {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String(d.getFullYear());
+      return `${dd}/${mm}/${yy}`;
+    }
+  }
+
+  function normalizeISODateYear4(v) {
+    if (typeof v !== 'string') return '';
+    let s = v.trim();
+    const firstDash = s.indexOf('-');
+    if (firstDash > 4) s = s.slice(0, 4) + s.slice(firstDash);
+    else if (firstDash === -1 && /^\d{5,}$/.test(s)) s = s.slice(0, 4);
+    if (s.length > 10) s = s.slice(0, 10);
+    return s;
+  }
+
+  function getTurnazioni() {
+    if (!window.TurniStorage || typeof TurniStorage.loadTurnazioni !== 'function') return [];
+    const all = TurniStorage.loadTurnazioni();
+    return Array.isArray(all) ? all : [];
+  }
+
+  function getTurnazioneById(id) {
+    const key = id == null ? '' : String(id);
+    if (!key) return null;
+    return getTurnazioni().find(t => String(t && t.id) === key) || null;
+  }
+
+  function getActiveTurnazione() {
+    if (!window.TurniStorage || typeof TurniStorage.getPreferredTurnazione !== 'function') return null;
+    return TurniStorage.getPreferredTurnazione() || null;
+  }
+
+  function getTurnoLabel(turnazione, idx, kind) {
+    const t = turnazione && typeof turnazione === 'object' ? turnazione : null;
+    const slotIndex = Number.isInteger(idx) ? idx : null;
+    if (!t || slotIndex === null || slotIndex < 0) return '';
+    const slots = Array.isArray(t.slots) ? t.slots : [];
+    const slot = slots[slotIndex] || null;
+    if (!slot) return '';
+    if (kind === 'sigla') return slot.sigla ? String(slot.sigla).trim() : '';
+    return slot.nome ? String(slot.nome).trim() : '';
+  }
+
+  function cloneData(data) {
+    const d = data && typeof data === 'object' ? data : {};
     return {
-      cognome: inputSurname ? String(inputSurname.value || '').trim() : '',
-      nome: inputName ? String(inputName.value || '').trim() : '',
-      reparto: inputDept ? String(inputDept.value || '').trim() : '',
-      turnazione: inputRotation ? String(inputRotation.value || '').trim() : '',
-      inizioRotazione: inputStart ? String(inputStart.value || '').trim() : ''
+      cognome: d.cognome ? String(d.cognome) : '',
+      nome: d.nome ? String(d.nome) : '',
+      reparto: d.reparto ? String(d.reparto) : '',
+      turnazioneId: d.turnazioneId ? String(d.turnazioneId) : '',
+      turnazione: d.turnazione ? String(d.turnazione) : '',
+      inizioRotazione: d.inizioRotazione ? String(d.inizioRotazione) : '',
+      inizioRotazioneTurnoIndex: Number.isInteger(d.inizioRotazioneTurnoIndex) ? d.inizioRotazioneTurnoIndex : null,
+      inizioRotazioneTurno: d.inizioRotazioneTurno ? String(d.inizioRotazioneTurno) : ''
     };
   }
 
+  function getFields() {
+    return cloneData(draft);
+  }
+
+  function applyDefaultTurnazioneIfMissing() {
+    if (draft.turnazioneId) return;
+    const active = getActiveTurnazione();
+    if (!active) return;
+    draft.turnazioneId = active.id != null ? String(active.id) : '';
+    draft.turnazione = active.name ? String(active.name) : '';
+  }
+
+  function applyDefaultStartIfMissing() {
+    if (draft.inizioRotazione || Number.isInteger(draft.inizioRotazioneTurnoIndex)) return;
+    const turnazione = getTurnazioneById(draft.turnazioneId) || getActiveTurnazione();
+    if (!turnazione) return;
+    const days = Number(turnazione.days) || 0;
+    const slots = Array.isArray(turnazione.slots) ? turnazione.slots : [];
+    if (!days || !slots.length) return;
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    draft.inizioRotazione = `${y}-${m}-${day}`;
+    draft.inizioRotazioneTurnoIndex = 0;
+    draft.inizioRotazioneTurno = getTurnoLabel(turnazione, 0, 'nome');
+  }
+
+  function syncRotationSummary() {
+    if (!rotationSummary) return;
+    rotationSummary.textContent = draft.turnazione || '';
+  }
+
+  function syncStartSummary() {
+    if (!startSummary) return;
+    const dateTxt = draft.inizioRotazione ? formatDateShortISO(draft.inizioRotazione) : '';
+    const turnazione = getTurnazioneById(draft.turnazioneId);
+    const turnoTxt = getTurnoLabel(turnazione, draft.inizioRotazioneTurnoIndex, 'sigla');
+    if (dateTxt && turnoTxt) {
+      startSummary.textContent = `${dateTxt} · ${turnoTxt}`;
+      return;
+    }
+    startSummary.textContent = dateTxt || turnoTxt || '';
+  }
+
+  function syncStartPanel() {
+    if (startDateInput) startDateInput.value = draft.inizioRotazione || '';
+    if (startDateSummary) startDateSummary.textContent = draft.inizioRotazione ? formatDateShortISO(draft.inizioRotazione) : '';
+    if (startTurnoSummary) {
+      const turnazione = getTurnazioneById(draft.turnazioneId);
+      startTurnoSummary.textContent = getTurnoLabel(turnazione, draft.inizioRotazioneTurnoIndex, 'nome');
+    }
+  }
+
   function setFields(data) {
-    const d = data && typeof data === 'object' ? data : {};
-    if (inputSurname) inputSurname.value = d.cognome ? String(d.cognome) : '';
-    if (inputName) inputName.value = d.nome ? String(d.nome) : '';
-    if (inputDept) inputDept.value = d.reparto ? String(d.reparto) : '';
-    if (inputRotation) inputRotation.value = d.turnazione ? String(d.turnazione) : '';
-    if (inputStart) inputStart.value = d.inizioRotazione ? String(d.inizioRotazione) : '';
+    draft = cloneData(data);
+    applyDefaultTurnazioneIfMissing();
+    applyDefaultStartIfMissing();
+    if (inputSurname) inputSurname.value = draft.cognome;
+    if (inputName) inputName.value = draft.nome;
+    if (inputDept) inputDept.value = draft.reparto;
+    syncRotationSummary();
+    syncStartSummary();
+    syncStartPanel();
   }
 
   function clearError() {
     if (errorEl) errorEl.hidden = true;
-    [inputSurname, inputName, inputDept, inputRotation, inputStart].forEach((el) => {
+    if (startErrorEl) startErrorEl.hidden = true;
+    [inputSurname, inputName, inputDept].forEach((el) => {
       if (el) el.classList.remove('is-invalid');
     });
   }
@@ -4865,15 +5005,13 @@ function syncVisibility() {}
 
   function validate() {
     clearError();
-    const fields = getFields();
     let ok = true;
-
-    if (!fields.cognome && inputSurname) { inputSurname.classList.add('is-invalid'); ok = false; }
-    if (!fields.nome && inputName) { inputName.classList.add('is-invalid'); ok = false; }
-    if (!fields.reparto && inputDept) { inputDept.classList.add('is-invalid'); ok = false; }
-    if (!fields.turnazione && inputRotation) { inputRotation.classList.add('is-invalid'); ok = false; }
-    if (!fields.inizioRotazione && inputStart) { inputStart.classList.add('is-invalid'); ok = false; }
-
+    if (!draft.cognome && inputSurname) { inputSurname.classList.add('is-invalid'); ok = false; }
+    if (!draft.nome && inputName) { inputName.classList.add('is-invalid'); ok = false; }
+    if (!draft.reparto && inputDept) { inputDept.classList.add('is-invalid'); ok = false; }
+    if (!draft.turnazioneId) ok = false;
+    if (!draft.inizioRotazione) ok = false;
+    if (!Number.isInteger(draft.inizioRotazioneTurnoIndex)) ok = false;
     if (!ok) showError();
     return ok;
   }
@@ -4894,17 +5032,101 @@ function syncVisibility() {}
     triggerLabel.textContent = label || 'Nessun collega';
   }
 
+  function renderRotationPickList() {
+    if (!rotationPickList) return;
+    renderTurnazioniPickList({
+      listEl: rotationPickList,
+      emptyEl: rotationPickEmpty,
+      items: getTurnazioni(),
+      isSelected: (it) => String(it && it.id) === String(draft.turnazioneId || ''),
+      getLabel: (it) => it && it.name ? String(it.name) : '',
+      showSelectedCheck: true,
+      keepSelectedTextColor: true,
+      onPick: (it) => {
+        draft.turnazioneId = it && it.id != null ? String(it.id) : '';
+        draft.turnazione = it && it.name ? String(it.name) : '';
+        if (!Number.isInteger(draft.inizioRotazioneTurnoIndex)) draft.inizioRotazioneTurnoIndex = 0;
+        draft.inizioRotazioneTurno = getTurnoLabel(it, draft.inizioRotazioneTurnoIndex, 'nome');
+        clearError();
+        syncRotationSummary();
+        syncStartSummary();
+        syncStartPanel();
+        if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+          SettingsUI.openPanel('users-colleague-add', { internal: true });
+        }
+      }
+    });
+  }
+
+  function renderStartTurnoPickList() {
+    if (!startTurnoPickList) return;
+    const turnazione = getTurnazioneById(draft.turnazioneId);
+    if (!turnazione) {
+      renderTurnazioniPickList({ listEl: startTurnoPickList, emptyEl: startTurnoPickEmpty, items: [] });
+      return;
+    }
+    const days = Number(turnazione.days) || 0;
+    const slots = Array.isArray(turnazione.slots) ? turnazione.slots : [];
+    const items = [];
+    for (let i = 0; i < days; i++) {
+      const s = slots[i] || {};
+      items.push({ index: i, nome: s.nome ? String(s.nome).trim() : '', sigla: s.sigla ? String(s.sigla).trim() : '' });
+    }
+    renderTurnazioniPickList({
+      listEl: startTurnoPickList,
+      emptyEl: startTurnoPickEmpty,
+      items,
+      isSelected: (it) => Number.isInteger(draft.inizioRotazioneTurnoIndex) && it.index === draft.inizioRotazioneTurnoIndex,
+      getLabel: (it) => it.nome || it.sigla || '',
+      showSelectedCheck: true,
+      keepSelectedTextColor: true,
+      onPick: (it) => {
+        draft.inizioRotazioneTurnoIndex = it.index;
+        draft.inizioRotazioneTurno = it.nome || '';
+        clearError();
+        syncStartSummary();
+        syncStartPanel();
+        if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+          SettingsUI.openPanel('users-colleague-start', { internal: true });
+        }
+      }
+    });
+  }
+
   function openAddPanel() {
     if (typeof window.__bootSettingsOnce === 'function') {
       window.__bootSettingsOnce();
     }
-    if (window.AppTabs && typeof AppTabs.openSettingsFromMenu === 'function') {
-      AppTabs.openSettingsFromMenu();
+    if (window.AppTabs && typeof AppTabs.openSettingsDirect === 'function') {
+      AppTabs.openSettingsDirect();
     }
     setFields(loadFirst());
     clearError();
     if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
       SettingsUI.openPanel('users-colleague-add', { internal: true });
+    }
+  }
+
+  function openRotationPick() {
+    renderRotationPickList();
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-rotation-pick', { internal: true });
+    }
+  }
+
+  function openStartPanel() {
+    applyDefaultTurnazioneIfMissing();
+    applyDefaultStartIfMissing();
+    syncStartPanel();
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-start', { internal: true });
+    }
+  }
+
+  function openStartTurnoPick() {
+    renderStartTurnoPickList();
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-start-turno-pick', { internal: true });
     }
   }
 
@@ -4930,6 +5152,27 @@ function syncVisibility() {}
     return true;
   }
 
+  function backFromRotationPick() {
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-add', { internal: true });
+    }
+    return true;
+  }
+
+  function backFromStartPanel() {
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-add', { internal: true });
+    }
+    return true;
+  }
+
+  function backFromStartTurnoPick() {
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-start', { internal: true });
+    }
+    return true;
+  }
+
   function init() {
     triggerBtn = document.querySelector('.users-add-colleague-btn');
     triggerLabel = document.querySelector('.users-add-colleague-label');
@@ -4937,30 +5180,120 @@ function syncVisibility() {}
     inputSurname = document.getElementById('usersColleagueSurname');
     inputName = document.getElementById('usersColleagueName');
     inputDept = document.getElementById('usersColleagueDept');
-    inputRotation = document.getElementById('usersColleagueRotation');
-    inputStart = document.getElementById('usersColleagueStart');
+    rotationRow = document.querySelector('[data-users-colleague-rotation-row]');
+    rotationSummary = document.getElementById('usersColleagueRotationSummary');
+    startRow = document.querySelector('[data-users-colleague-start-row]');
+    startSummary = document.getElementById('usersColleagueStartSummary');
     errorEl = document.querySelector('[data-users-colleague-error]');
+
+    rotationPickList = document.getElementById('usersColleagueRotationPickList');
+    rotationPickEmpty = document.getElementById('usersColleagueRotationPickEmpty');
+
+    startDateInput = document.getElementById('usersColleagueStartDate');
+    startDateRow = document.querySelector('[data-users-colleague-start-date-row]');
+    startDateSummary = document.getElementById('usersColleagueStartDateSummary');
+    startTurnoRow = document.querySelector('[data-users-colleague-start-turno-row]');
+    startTurnoSummary = document.getElementById('usersColleagueStartTurnoSummary');
+    startErrorEl = document.querySelector('[data-users-colleague-start-error]');
+
+    startTurnoPickList = document.getElementById('usersColleagueStartTurnoPickList');
+    startTurnoPickEmpty = document.getElementById('usersColleagueStartTurnoPickEmpty');
 
     if (triggerBtn && !triggerBtn.dataset.usersColleagueBound) {
       triggerBtn.dataset.usersColleagueBound = '1';
       triggerBtn.addEventListener('click', openAddPanel);
     }
 
-    [inputSurname, inputName, inputDept, inputRotation, inputStart].forEach((el) => {
+    [inputSurname, inputName, inputDept].forEach((el) => {
       if (!el || el.dataset.usersColleagueBound === '1') return;
       el.dataset.usersColleagueBound = '1';
-      el.addEventListener('input', clearError);
-      el.addEventListener('change', clearError);
+      el.addEventListener('input', () => {
+        if (el === inputSurname) draft.cognome = String(el.value || '').trim();
+        if (el === inputName) draft.nome = String(el.value || '').trim();
+        if (el === inputDept) draft.reparto = String(el.value || '').trim();
+        clearError();
+      });
     });
 
+    if (rotationRow && !rotationRow.dataset.usersColleagueBound) {
+      rotationRow.dataset.usersColleagueBound = '1';
+      rotationRow.addEventListener('click', openRotationPick);
+    }
+
+    if (startRow && !startRow.dataset.usersColleagueBound) {
+      startRow.dataset.usersColleagueBound = '1';
+      startRow.addEventListener('click', openStartPanel);
+    }
+
+if (startDateRow && !startDateRow.dataset.usersColleagueBound) {
+  startDateRow.dataset.usersColleagueBound = '1';
+  startDateRow.addEventListener('click', () => {
+    if (!startDateInput) return;
+    try {
+      startDateInput.focus({ preventScroll: true });
+    } catch {
+      startDateInput.focus();
+    }
+    try {
+      if (typeof startDateInput.showPicker === 'function') {
+        startDateInput.showPicker();
+      } else {
+        startDateInput.click();
+      }
+    } catch {
+      startDateInput.click();
+    }
+  });
+}
+
+    if (startDateInput && !startDateInput.dataset.usersColleagueBound) {
+      startDateInput.dataset.usersColleagueBound = '1';
+      startDateInput.addEventListener('input', () => {
+        const before = startDateInput.value || '';
+        const norm = normalizeISODateYear4(before);
+        if (norm !== before) startDateInput.value = norm;
+      });
+      startDateInput.addEventListener('change', () => {
+        const before = startDateInput.value || '';
+        const norm = normalizeISODateYear4(before);
+        if (norm !== before) startDateInput.value = norm;
+        draft.inizioRotazione = startDateInput.value || '';
+        clearError();
+        syncStartPanel();
+        syncStartSummary();
+      });
+    }
+
+    if (startTurnoRow && !startTurnoRow.dataset.usersColleagueBound) {
+      startTurnoRow.dataset.usersColleagueBound = '1';
+      startTurnoRow.addEventListener('click', openStartTurnoPick);
+    }
+
     syncTriggerLabel();
+    setFields(loadFirst());
 
     if (!init._storageBound) {
       init._storageBound = true;
       window.addEventListener('turnipds:storage-changed', (ev) => {
         const k = ev && ev.detail ? String(ev.detail.key || '') : '';
-        if (k && window.AppConfig && window.AppConfig.STORAGE_KEYS && k !== String(window.AppConfig.STORAGE_KEYS.utenti)) return;
+        const keys = window.AppConfig && window.AppConfig.STORAGE_KEYS ? window.AppConfig.STORAGE_KEYS : null;
+        if (k && keys && k !== String(keys.utenti) && k !== String(keys.turnazioni)) return;
         syncTriggerLabel();
+        if (k === String(keys.turnazioni)) {
+          const current = getTurnazioneById(draft.turnazioneId);
+          if (!current) {
+            draft.turnazioneId = '';
+            draft.turnazione = '';
+          } else {
+            draft.turnazione = current.name ? String(current.name) : '';
+            draft.inizioRotazioneTurno = getTurnoLabel(current, draft.inizioRotazioneTurnoIndex, 'nome');
+          }
+          applyDefaultTurnazioneIfMissing();
+          applyDefaultStartIfMissing();
+          syncRotationSummary();
+          syncStartSummary();
+          syncStartPanel();
+        }
       });
     }
   }
@@ -4968,6 +5301,12 @@ function syncVisibility() {}
   window.UsersColleague = {
     init,
     openAddPanel,
+    openRotationPick,
+    openStartPanel,
+    openStartTurnoPick,
+    backFromRotationPick,
+    backFromStartPanel,
+    backFromStartTurnoPick,
     commit,
     cancel
   };
@@ -6525,12 +6864,12 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
 
     function isTurnazioniCancelPanel(panelId) {
       const id = panelId == null ? '' : String(panelId);
-      return id === 'turnazioni-add' || id === 'users-colleague-add';
+      return id === 'turnazioni-add' || id === 'users-colleague-add' || id === 'users-colleague-start';
     }
 
     function isTurnazioniPickPanel(panelId) {
       const id = panelId == null ? '' : String(panelId);
-      return id === 'turnazioni-pick';
+      return id === 'turnazioni-pick' || id === 'users-colleague-rotation-pick' || id === 'users-colleague-start-turno-pick';
     }
 
     function isActionCancelPanel(panelId) {
@@ -6555,6 +6894,14 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
         return;
       }
       if (isTurniStartPickPanel(panelId)) {
+        backBtn.setAttribute('aria-label', 'Torna a Inizio rotazione');
+        return;
+      }
+      if (panelId === 'users-colleague-rotation-pick') {
+        backBtn.setAttribute('aria-label', 'Torna a Aggiungi collega');
+        return;
+      }
+      if (panelId === 'users-colleague-start-turno-pick') {
         backBtn.setAttribute('aria-label', 'Torna a Inizio rotazione');
         return;
       }
@@ -6705,7 +7052,7 @@ activePanelId = id;
             }
             return;
           }
-          if (id === "users-colleague-add") {
+          if (id === "users-colleague-add" || id === "users-colleague-start") {
             if (window.UsersColleague && typeof UsersColleague.commit === "function") {
               UsersColleague.commit();
             }
@@ -6717,6 +7064,19 @@ activePanelId = id;
             } else if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
               SettingsUI.openPanel("turni-start", { internal: true });
             }
+            return;
+          }
+          if (id === "users-colleague-rotation-pick") {
+            if (window.UsersColleague && typeof UsersColleague.backFromRotationPick === "function") {
+              UsersColleague.backFromRotationPick();
+            }
+            return;
+          }
+          if (id === "users-colleague-start-turno-pick") {
+            if (window.UsersColleague && typeof UsersColleague.backFromStartTurnoPick === "function") {
+              UsersColleague.backFromStartTurnoPick();
+            }
+            return;
           }
         });
       }
@@ -6759,6 +7119,13 @@ backBtn.addEventListener("click", () => {
     return;
   }
 
+  if (activePanelId === "users-colleague-start") {
+    if (window.UsersColleague && typeof UsersColleague.backFromStartPanel === "function") {
+      UsersColleague.backFromStartPanel();
+    }
+    return;
+  }
+
   if (activePanelId === "turni-start-pick") {
     if (window.TurniStart && typeof TurniStart.backFromPick === "function") {
       TurniStart.backFromPick();
@@ -6773,6 +7140,20 @@ backBtn.addEventListener("click", () => {
       TurnazioniAdd.backFromPick();
     } else if (window.SettingsUI && typeof SettingsUI.openPanel === "function") {
       SettingsUI.openPanel("turnazioni-add", { internal: true });
+    }
+    return;
+  }
+
+  if (activePanelId === "users-colleague-rotation-pick") {
+    if (window.UsersColleague && typeof UsersColleague.backFromRotationPick === "function") {
+      UsersColleague.backFromRotationPick();
+    }
+    return;
+  }
+
+  if (activePanelId === "users-colleague-start-turno-pick") {
+    if (window.UsersColleague && typeof UsersColleague.backFromStartTurnoPick === "function") {
+      UsersColleague.backFromStartTurnoPick();
     }
     return;
   }
@@ -7208,7 +7589,7 @@ function initTabs() {
 
     if (!target) return activeViewId;
 
-    if (target === "settings" && !options.fromMenu) {
+    if (target === "settings" && !options.fromMenu && !options.direct) {
       return activeViewId;
     }
 
@@ -7317,6 +7698,9 @@ function initTabs() {
     },
     openSettingsFromMenu: function () {
       setActiveView("settings", { fromMenu: true });
+    },
+    openSettingsDirect: function () {
+      setActiveView("settings", { direct: true });
     }
   };
 

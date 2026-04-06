@@ -870,25 +870,137 @@
       </span>
     </label>
 
-    <label class="turnazioni-pick-row turni-start-pick-row users-colleague-row" for="usersColleagueRotation">
-      <span class="turnazioni-pick-name">Turnazione</span>
-      <span class="turni-start-pick-right users-colleague-right">
-        <input class="turni-input users-colleague-input" id="usersColleagueRotation" type="text" maxlength="30" autocomplete="off">
-      </span>
-    </label>
+    <button class="settings-row turni-active-row users-colleague-action-row" type="button" data-users-colleague-rotation-row>
+      <div class="settings-row-left">
+        <span class="settings-row-label">Turnazione</span>
+      </div>
 
-    <label class="turnazioni-pick-row turni-start-pick-row users-colleague-row" for="usersColleagueStart">
-      <span class="turnazioni-pick-name">Inizio rotazione</span>
-      <span class="turni-start-pick-right users-colleague-right">
-        <input class="turni-input users-colleague-input users-colleague-input-date" id="usersColleagueStart" type="date" inputmode="numeric" maxlength="10" pattern="\d{4}-\d{2}-\d{2}">
-      </span>
-    </label>
+      <div class="settings-row-right">
+        <span class="settings-row-summary" id="usersColleagueRotationSummary"></span>
+        <span class="settings-row-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <use href="#ico-ui-chevron-right"></use>
+          </svg>
+        </span>
+      </div>
+    </button>
+
+    <hr class="settings-separator users-colleague-separator">
+
+    <button class="settings-row turni-active-row users-colleague-action-row" type="button" data-users-colleague-start-row>
+      <div class="settings-row-left">
+        <span class="settings-row-label">Inizio rotazione</span>
+      </div>
+
+      <div class="settings-row-right">
+        <span class="settings-row-summary" id="usersColleagueStartSummary"></span>
+        <span class="settings-row-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <use href="#ico-ui-chevron-right"></use>
+          </svg>
+        </span>
+      </div>
+    </button>
   </div>
 
   <p class="turni-error" data-users-colleague-error hidden>
     Compila tutti i campi
   </p>
 </div>
+</div>
+
+<div
+  class="settings-panel settings-users-colleague-rotation-pick"
+  data-settings-id="users-colleague-rotation-pick"
+  data-settings-title="Turnazione">
+
+  <div class="turnazioni-pick-wrap">
+    <p class="settings-hint">
+      Seleziona una turnazione per il collega.
+    </p>
+
+    <div class="turnazioni-pick-list" id="usersColleagueRotationPickList"></div>
+
+    <p class="turnazioni-pick-empty" id="usersColleagueRotationPickEmpty" hidden>
+      Nessuna turnazione disponibile.
+    </p>
+  </div>
+</div>
+
+<div
+  class="settings-panel settings-users-colleague-start"
+  data-settings-id="users-colleague-start"
+  data-settings-title="Inizio rotazione">
+
+<div class="turnazioni-pick-wrap">
+  <p class="settings-hint">
+    Seleziona il giorno e il turno da cui far partire la rotazione del collega.
+  </p>
+
+  <div class="turnazioni-pick-list turni-start-list" aria-label="Inizio rotazione collega">
+<label
+  class="turnazioni-pick-row turni-start-pick-row turni-start-date-row"
+  data-users-colleague-start-date-row
+  for="usersColleagueStartDate">
+  <span class="turnazioni-pick-name">Giorno</span>
+
+  <span class="turni-start-pick-right">
+    <span class="turni-start-pick-summary" id="usersColleagueStartDateSummary"></span>
+    <span class="settings-row-chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <use href="#ico-ui-chevron-right"></use>
+      </svg>
+    </span>
+  </span>
+
+  <input
+    class="turni-start-date-input"
+    id="usersColleagueStartDate"
+    type="date"
+    inputmode="numeric"
+    maxlength="10"
+    pattern="\d{4}-\d{2}-\d{2}">
+</label>
+
+    <button
+      class="turnazioni-pick-row turni-start-pick-row"
+      type="button"
+      data-users-colleague-start-turno-row>
+      <span class="turnazioni-pick-name">Turno</span>
+
+      <span class="turni-start-pick-right">
+        <span class="turni-start-pick-summary" id="usersColleagueStartTurnoSummary"></span>
+        <span class="settings-row-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <use href="#ico-ui-chevron-right"></use>
+          </svg>
+        </span>
+      </span>
+    </button>
+  </div>
+
+  <p class="turni-error" data-users-colleague-start-error hidden>
+    Seleziona giorno e turno
+  </p>
+</div>
+</div>
+
+<div
+  class="settings-panel settings-users-colleague-start-turno-pick"
+  data-settings-id="users-colleague-start-turno-pick"
+  data-settings-title="Turno">
+
+  <div class="turnazioni-pick-wrap">
+    <p class="settings-hint">
+      Seleziona un turno per l'inizio della rotazione del collega.
+    </p>
+
+    <div class="turnazioni-pick-list" id="usersColleagueStartTurnoPickList"></div>
+
+    <p class="turnazioni-pick-empty" id="usersColleagueStartTurnoPickEmpty" hidden>
+      Nessun turno disponibile.
+    </p>
+  </div>
 </div>
         
         <div
