@@ -1681,6 +1681,7 @@ window.Icons = {
   const TURNAZIONI_PREF_KEY = STORAGE_KEYS.turnazioniPreferred;
   
   const TURNI_START_KEY = STORAGE_KEYS.turniStart;
+  const UTENTI_KEY = STORAGE_KEYS.utenti;
 
   const FEST_KEY = STORAGE_KEYS.festivita;
 
@@ -2015,6 +2016,29 @@ function saveTurnoIniziale(obj) {
     }
   }
 
+  function loadUtenti() {
+    try {
+      const raw = localStorage.getItem(UTENTI_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveUtenti(arr) {
+    try {
+      localStorage.setItem(UTENTI_KEY, JSON.stringify(Array.isArray(arr) ? arr : []));
+      emitStorageChange(UTENTI_KEY);
+      if (window.Status && typeof Status.markSaved === "function") {
+        Status.markSaved();
+      }
+    } catch (e) {
+      console.warn("Salvataggio utenti fallito:", e);
+    }
+  }
+
   function isValidTime(str) {
     if (typeof str !== "string") return false;
     const s = str.trim();
@@ -2050,6 +2074,8 @@ function saveTurnoIniziale(obj) {
     getPreferredTurnazione,
     loadTurnoIniziale,
     saveTurnoIniziale,
+    loadUtenti,
+    saveUtenti,
 
     loadFestivita: loadFestivitaDefs,
     saveFestivita: saveFestivitaDefs
@@ -4797,6 +4823,160 @@ function syncVisibility() {}
 
 (function () {
 
+  let panelAdd = null;
+  let triggerBtn = null;
+  let triggerLabel = null;
+  let inputSurname = null;
+  let inputName = null;
+  let inputDept = null;
+  let inputRotation = null;
+  let inputStart = null;
+  let errorEl = null;
+
+  function getFields() {
+    return {
+      cognome: inputSurname ? String(inputSurname.value || '').trim() : '',
+      nome: inputName ? String(inputName.value || '').trim() : '',
+      reparto: inputDept ? String(inputDept.value || '').trim() : '',
+      turnazione: inputRotation ? String(inputRotation.value || '').trim() : '',
+      inizioRotazione: inputStart ? String(inputStart.value || '').trim() : ''
+    };
+  }
+
+  function setFields(data) {
+    const d = data && typeof data === 'object' ? data : {};
+    if (inputSurname) inputSurname.value = d.cognome ? String(d.cognome) : '';
+    if (inputName) inputName.value = d.nome ? String(d.nome) : '';
+    if (inputDept) inputDept.value = d.reparto ? String(d.reparto) : '';
+    if (inputRotation) inputRotation.value = d.turnazione ? String(d.turnazione) : '';
+    if (inputStart) inputStart.value = d.inizioRotazione ? String(d.inizioRotazione) : '';
+  }
+
+  function clearError() {
+    if (errorEl) errorEl.hidden = true;
+    [inputSurname, inputName, inputDept, inputRotation, inputStart].forEach((el) => {
+      if (el) el.classList.remove('is-invalid');
+    });
+  }
+
+  function showError() {
+    if (errorEl) errorEl.hidden = false;
+  }
+
+  function validate() {
+    clearError();
+    const fields = getFields();
+    let ok = true;
+
+    if (!fields.cognome && inputSurname) { inputSurname.classList.add('is-invalid'); ok = false; }
+    if (!fields.nome && inputName) { inputName.classList.add('is-invalid'); ok = false; }
+    if (!fields.reparto && inputDept) { inputDept.classList.add('is-invalid'); ok = false; }
+    if (!fields.turnazione && inputRotation) { inputRotation.classList.add('is-invalid'); ok = false; }
+    if (!fields.inizioRotazione && inputStart) { inputStart.classList.add('is-invalid'); ok = false; }
+
+    if (!ok) showError();
+    return ok;
+  }
+
+  function loadFirst() {
+    if (!window.TurniStorage || typeof TurniStorage.loadUtenti !== 'function') return null;
+    const all = TurniStorage.loadUtenti();
+    if (!Array.isArray(all) || !all.length) return null;
+    return all[0] && typeof all[0] === 'object' ? all[0] : null;
+  }
+
+  function syncTriggerLabel() {
+    if (!triggerLabel) return;
+    const first = loadFirst();
+    const cognome = first && first.cognome ? String(first.cognome).trim() : '';
+    const nome = first && first.nome ? String(first.nome).trim() : '';
+    const label = [cognome, nome].filter(Boolean).join(' ');
+    triggerLabel.textContent = label || 'Nessun collega';
+  }
+
+  function openAddPanel() {
+    if (typeof window.__bootSettingsOnce === 'function') {
+      window.__bootSettingsOnce();
+    }
+    if (window.AppTabs && typeof AppTabs.openSettingsFromMenu === 'function') {
+      AppTabs.openSettingsFromMenu();
+    }
+    setFields(loadFirst());
+    clearError();
+    if (window.SettingsUI && typeof SettingsUI.openPanel === 'function') {
+      SettingsUI.openPanel('users-colleague-add', { internal: true });
+    }
+  }
+
+  function commit() {
+    if (!validate()) return false;
+    if (window.TurniStorage && typeof TurniStorage.saveUtenti === 'function') {
+      TurniStorage.saveUtenti([getFields()]);
+    }
+    clearError();
+    syncTriggerLabel();
+    if (window.AppTabs && typeof AppTabs.openView === 'function') {
+      AppTabs.openView('utenti');
+    }
+    return true;
+  }
+
+  function cancel() {
+    clearError();
+    setFields(loadFirst());
+    if (window.AppTabs && typeof AppTabs.openView === 'function') {
+      AppTabs.openView('utenti');
+    }
+    return true;
+  }
+
+  function init() {
+    triggerBtn = document.querySelector('.users-add-colleague-btn');
+    triggerLabel = document.querySelector('.users-add-colleague-label');
+    panelAdd = document.querySelector('.settings-panel.settings-users-colleague-add[data-settings-id="users-colleague-add"]');
+    inputSurname = document.getElementById('usersColleagueSurname');
+    inputName = document.getElementById('usersColleagueName');
+    inputDept = document.getElementById('usersColleagueDept');
+    inputRotation = document.getElementById('usersColleagueRotation');
+    inputStart = document.getElementById('usersColleagueStart');
+    errorEl = document.querySelector('[data-users-colleague-error]');
+
+    if (triggerBtn && !triggerBtn.dataset.usersColleagueBound) {
+      triggerBtn.dataset.usersColleagueBound = '1';
+      triggerBtn.addEventListener('click', openAddPanel);
+    }
+
+    [inputSurname, inputName, inputDept, inputRotation, inputStart].forEach((el) => {
+      if (!el || el.dataset.usersColleagueBound === '1') return;
+      el.dataset.usersColleagueBound = '1';
+      el.addEventListener('input', clearError);
+      el.addEventListener('change', clearError);
+    });
+
+    syncTriggerLabel();
+
+    if (!init._storageBound) {
+      init._storageBound = true;
+      window.addEventListener('turnipds:storage-changed', (ev) => {
+        const k = ev && ev.detail ? String(ev.detail.key || '') : '';
+        if (k && window.AppConfig && window.AppConfig.STORAGE_KEYS && k !== String(window.AppConfig.STORAGE_KEYS.utenti)) return;
+        syncTriggerLabel();
+      });
+    }
+  }
+
+  window.UsersColleague = {
+    init,
+    openAddPanel,
+    commit,
+    cancel
+  };
+
+})();
+
+
+(function () {
+
   let activeRowBtn = null;
   let panelPick = null;
   let listEl = null;
@@ -6345,7 +6525,7 @@ if (visualToggleBtn && typeof loadVisualToggle === "function") {
 
     function isTurnazioniCancelPanel(panelId) {
       const id = panelId == null ? '' : String(panelId);
-      return id === 'turnazioni-add';
+      return id === 'turnazioni-add' || id === 'users-colleague-add';
     }
 
     function isTurnazioniPickPanel(panelId) {
@@ -6525,6 +6705,12 @@ activePanelId = id;
             }
             return;
           }
+          if (id === "users-colleague-add") {
+            if (window.UsersColleague && typeof UsersColleague.commit === "function") {
+              UsersColleague.commit();
+            }
+            return;
+          }
           if (id === "turni-start-pick") {
             if (window.TurniStart && typeof TurniStart.backFromPick === "function") {
               TurniStart.backFromPick();
@@ -6562,6 +6748,13 @@ backBtn.addEventListener("click", () => {
   if (activePanelId === "turnazioni-add") {
     if (window.TurnazioniAdd && typeof TurnazioniAdd.cancel === "function") {
       TurnazioniAdd.cancel();
+    }
+    return;
+  }
+
+  if (activePanelId === "users-colleague-add") {
+    if (window.UsersColleague && typeof UsersColleague.cancel === "function") {
+      UsersColleague.cancel();
     }
     return;
   }
@@ -7328,6 +7521,10 @@ window.syncTopbarCalendarChrome = syncTopbarCalendarChrome;
       UsersCalendar.init();
     }
 
+    if (window.UsersColleague && typeof UsersColleague.init === "function") {
+      UsersColleague.init();
+    }
+
     if (window.CalendarMenu && typeof CalendarMenu.init === "function") {
       CalendarMenu.init();
     }
@@ -7523,6 +7720,7 @@ function setVersionLabel(fullVersion) {
     "TurniStorage",
     "TurniRender",
     "TurniStart",
+    "UsersColleague",
     "TurniInteractions",
     "Turni",
     "SettingsUI"

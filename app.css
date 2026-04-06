@@ -2873,6 +2873,47 @@ body.turni-no-select * {
   display: none;
 }
 
+.users-colleague-row{
+  gap: var(--space-12);
+}
+
+.users-colleague-right{
+  flex: 0 0 min(52%, 240px);
+}
+
+.users-colleague-input{
+  max-width: 100%;
+  width: 100%;
+  text-align: left;
+}
+
+.users-colleague-input-date{
+  font-variant-numeric: tabular-nums;
+}
+
+.users-colleague-row .turnazioni-pick-name{
+  flex: 0 0 42%;
+}
+
+.users-colleague-row .turni-start-pick-right{
+  margin-left: auto;
+}
+
+@media (max-width: 900px) {
+  .users-colleague-row{
+    align-items: flex-start;
+  }
+
+  .users-colleague-row .turnazioni-pick-name{
+    flex: 0 0 38%;
+    padding-top: 9px;
+  }
+
+  .users-colleague-right{
+    flex-basis: min(58%, 220px);
+  }
+}
+
 .settings-panel.settings-turnazioni-pick.is-active{
   overflow: hidden;
 }
