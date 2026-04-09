@@ -259,24 +259,15 @@ function renderTurnazioniPickList(opts) {
     return col || "";
   }
 
-  function getCalendarSiglaForDate(dateObj) {
-    if (!window.TurniStorage) return null;
-
-    const show = TurniStorage.loadVisualToggle();
-    if (!show) return null;
-
-    const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
-      ? TurniStorage.getPreferredTurnazione()
-      : null;
-    if (!t) return null;
+  function getTurnazioneSiglaForDate(turnazione, cfg, dateObj) {
+    const t = turnazione && typeof turnazione === "object" ? turnazione : null;
+    if (!t || !(dateObj instanceof Date)) return null;
 
     const days = Number(t.days) || 0;
     const slots = Array.isArray(t.slots) ? t.slots : [];
     const restIdx = Array.isArray(t.restIndices) ? t.restIndices : [];
 
     if (!days || slots.length < days) return null;
-
-    const cfg = TurniStorage.loadTurnoIniziale();
     if (!cfg || !cfg.date || !Number.isInteger(cfg.slotIndex)) return null;
 
     const startDate = parseISODateToLocalMidnight(cfg.date);
@@ -288,13 +279,11 @@ function renderTurnazioniPickList(opts) {
     if (startDayNum === null || targetDayNum === null) return null;
 
     const diffDays = targetDayNum - startDayNum;
-
     const idx = safeMod((cfg.slotIndex || 0) + diffDays, days);
     const slot = slots[idx] || null;
 
     const baseSigla = slot && slot.sigla ? String(slot.sigla).trim() : "";
     const baseColore = slot && slot.colore ? String(slot.colore).trim() : "";
-
     const isRest = restIdx.includes(idx);
 
     if (isRest && t.riposiFissi && typeof t.riposiFissi === "object") {
@@ -319,6 +308,47 @@ function renderTurnazioniPickList(opts) {
     const fromTurni = getTurniColorForSigla(baseSigla);
     const finalColore = fromTurni || baseColore;
     return { sigla: baseSigla, colore: finalColore };
+  }
+
+  function getCalendarSiglaForDate(dateObj) {
+    if (!window.TurniStorage) return null;
+
+    const show = TurniStorage.loadVisualToggle();
+    if (!show) return null;
+
+    const t = (window.TurniStorage && typeof TurniStorage.getPreferredTurnazione === "function")
+      ? TurniStorage.getPreferredTurnazione()
+      : null;
+    if (!t) return null;
+
+    const cfg = TurniStorage.loadTurnoIniziale();
+    return getTurnazioneSiglaForDate(t, cfg, dateObj);
+  }
+
+  function getUsersCalendarSiglaForDate(dateObj) {
+    if (!window.TurniStorage) return null;
+    if (typeof TurniStorage.loadUtenti !== "function") return null;
+
+    const all = TurniStorage.loadUtenti();
+    if (!Array.isArray(all) || !all.length) return null;
+
+    const user = all[0] && typeof all[0] === "object" ? all[0] : null;
+    if (!user) return null;
+
+    const turnazioneId = user.turnazioneId != null ? String(user.turnazioneId).trim() : "";
+    const startDate = user.inizioRotazione != null ? String(user.inizioRotazione).trim() : "";
+    const slotIndex = Number.isInteger(user.inizioRotazioneTurnoIndex) ? user.inizioRotazioneTurnoIndex : null;
+
+    if (!turnazioneId || !startDate || slotIndex === null) return null;
+    if (typeof TurniStorage.loadTurnazioni !== "function") return null;
+
+    const turnazioni = TurniStorage.loadTurnazioni();
+    if (!Array.isArray(turnazioni) || !turnazioni.length) return null;
+
+    const turnazione = turnazioni.find(t => String(t && t.id) === turnazioneId) || null;
+    if (!turnazione) return null;
+
+    return getTurnazioneSiglaForDate(turnazione, { date: startDate, slotIndex }, dateObj);
   }
 
   const _siglaFitCache = new Map();
@@ -1397,7 +1427,7 @@ function renderTurnazioniPickList(opts) {
     daysGridId: "users-calendar-grid",
     monthsGridId: "users-month-grid",
     yearsGridId: "users-year-grid",
-    getOverlayInfo: () => null
+    getOverlayInfo: getUsersCalendarSiglaForDate
   });
 
 })();
